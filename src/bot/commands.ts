@@ -19,10 +19,12 @@ export function registerCommands(
   bot: Bot,
   db: Database.Database,
   deliverFlashcard: (chatId: number) => Promise<void>,
+  refreshUserJobs?: () => void,
 ): void {
   bot.command("start", async (ctx) => {
     const chatId = ctx.chat.id;
     addSubscriber(db, chatId, "telegram");
+    refreshUserJobs?.();
     await ctx.reply(
       "🇪🇪 Welcome to Flash Card IO!\n\n" +
       "You'll receive Estonian flashcards on a schedule.\n\n" +
@@ -37,6 +39,7 @@ export function registerCommands(
 
   bot.command("stop", async (ctx) => {
     removeSubscriber(db, ctx.chat.id);
+    refreshUserJobs?.();
     await ctx.reply("Stopped. Send /start to resume.");
   });
 
@@ -71,7 +74,8 @@ export function registerCommands(
     }
     const preset = SCHEDULE_PRESETS[arg];
     setSubscriberSchedule(db, ctx.chat.id, preset.cron);
-    await ctx.reply(`⏰ Schedule set to: ${preset.label}\n\nNote: The global scheduler runs on a fixed interval. Your personal schedule preference is saved for future per-user scheduling.`);
+    refreshUserJobs?.();
+    await ctx.reply(`⏰ Schedule set to: ${preset.label}\n\nYour personal cron job has been updated. Flashcards will arrive on your new schedule.`);
   });
 
   bot.command("stats", async (ctx) => {
