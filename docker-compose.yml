@@ -1,0 +1,10 @@
+services:
+  flashcard-bot:
+    build: .
+    env_file: .env
+    volumes:
+      - flashcard-data:/app/data/db
+    restart: unless-stopped
+
+volumes:
+  flashcard-data:
