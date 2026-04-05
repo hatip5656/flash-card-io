@@ -1,199 +1,3258 @@
 [
-  { "id": "a1-tere", "estonian": "tere", "english": "hello", "cefrLevel": "A1", "sentences": [{ "estonian": "Tere, kuidas läheb?", "english": "Hello, how are you?" }] },
-  { "id": "a1-aitäh", "estonian": "aitäh", "english": "thank you", "cefrLevel": "A1", "sentences": [{ "estonian": "Aitäh väga palju!", "english": "Thank you very much!" }] },
-  { "id": "a1-jah", "estonian": "jah", "english": "yes", "cefrLevel": "A1", "sentences": [{ "estonian": "Jah, ma olen nõus.", "english": "Yes, I agree." }] },
-  { "id": "a1-ei", "estonian": "ei", "english": "no", "cefrLevel": "A1", "sentences": [{ "estonian": "Ei, ma ei taha.", "english": "No, I don't want to." }] },
-  { "id": "a1-palun", "estonian": "palun", "english": "please", "cefrLevel": "A1", "sentences": [{ "estonian": "Palun üks kohv.", "english": "One coffee, please." }] },
-  { "id": "a1-head-aega", "estonian": "head aega", "english": "goodbye", "cefrLevel": "A1", "sentences": [{ "estonian": "Head aega, nägemiseni!", "english": "Goodbye, see you!" }] },
-  { "id": "a1-vabandust", "estonian": "vabandust", "english": "sorry / excuse me", "cefrLevel": "A1", "sentences": [{ "estonian": "Vabandust, kus on raamatukogu?", "english": "Excuse me, where is the library?" }] },
-  { "id": "a1-ma", "estonian": "ma", "english": "I", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma olen õpilane.", "english": "I am a student." }] },
-  { "id": "a1-sa", "estonian": "sa", "english": "you", "cefrLevel": "A1", "sentences": [{ "estonian": "Kust sa pärit oled?", "english": "Where are you from?" }] },
-  { "id": "a1-tema", "estonian": "tema", "english": "he/she", "cefrLevel": "A1", "sentences": [{ "estonian": "Tema on minu sõber.", "english": "He/she is my friend." }] },
-  { "id": "a1-me", "estonian": "me", "english": "we", "cefrLevel": "A1", "sentences": [{ "estonian": "Me läheme koos.", "english": "We go together." }] },
-  { "id": "a1-vesi", "estonian": "vesi", "english": "water", "cefrLevel": "A1", "sentences": [{ "estonian": "Palun anna mulle klaas vett.", "english": "Please give me a glass of water." }] },
-  { "id": "a1-leib", "estonian": "leib", "english": "bread", "cefrLevel": "A1", "sentences": [{ "estonian": "Eesti leib on väga hea.", "english": "Estonian bread is very good." }] },
-  { "id": "a1-piim", "estonian": "piim", "english": "milk", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma joon piima hommikul.", "english": "I drink milk in the morning." }] },
-  { "id": "a1-kohv", "estonian": "kohv", "english": "coffee", "cefrLevel": "A1", "sentences": [{ "estonian": "Üks kohv, palun.", "english": "One coffee, please." }] },
-  { "id": "a1-tee", "estonian": "tee", "english": "tea / road", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma joon rohelist teed.", "english": "I drink green tea." }] },
-  { "id": "a1-kodu", "estonian": "kodu", "english": "home", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma lähen koju.", "english": "I am going home." }] },
-  { "id": "a1-kool", "estonian": "kool", "english": "school", "cefrLevel": "A1", "sentences": [{ "estonian": "Lapsed lähevad kooli.", "english": "Children go to school." }] },
-  { "id": "a1-töö", "estonian": "töö", "english": "work", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma lähen tööle.", "english": "I am going to work." }] },
-  { "id": "a1-päev", "estonian": "päev", "english": "day", "cefrLevel": "A1", "sentences": [{ "estonian": "Head päeva!", "english": "Have a good day!" }] },
-  { "id": "a1-öö", "estonian": "öö", "english": "night", "cefrLevel": "A1", "sentences": [{ "estonian": "Head ööd!", "english": "Good night!" }] },
-  { "id": "a1-hommik", "estonian": "hommik", "english": "morning", "cefrLevel": "A1", "sentences": [{ "estonian": "Tere hommikust!", "english": "Good morning!" }] },
-  { "id": "a1-õhtu", "estonian": "õhtu", "english": "evening", "cefrLevel": "A1", "sentences": [{ "estonian": "Tere õhtust!", "english": "Good evening!" }] },
-  { "id": "a1-nimi", "estonian": "nimi", "english": "name", "cefrLevel": "A1", "sentences": [{ "estonian": "Mis su nimi on?", "english": "What is your name?" }] },
-  { "id": "a1-sõber", "estonian": "sõber", "english": "friend", "cefrLevel": "A1", "sentences": [{ "estonian": "Ta on minu parim sõber.", "english": "He is my best friend." }] },
-  { "id": "a1-pere", "estonian": "pere", "english": "family", "cefrLevel": "A1", "sentences": [{ "estonian": "Minu pere on suur.", "english": "My family is big." }] },
-  { "id": "a1-ema", "estonian": "ema", "english": "mother", "cefrLevel": "A1", "sentences": [{ "estonian": "Minu ema on arst.", "english": "My mother is a doctor." }] },
-  { "id": "a1-isa", "estonian": "isa", "english": "father", "cefrLevel": "A1", "sentences": [{ "estonian": "Minu isa töötab kontoris.", "english": "My father works in an office." }] },
-  { "id": "a1-laps", "estonian": "laps", "english": "child", "cefrLevel": "A1", "sentences": [{ "estonian": "Laps mängib õues.", "english": "The child plays outside." }] },
-  { "id": "a1-koer", "estonian": "koer", "english": "dog", "cefrLevel": "A1", "sentences": [{ "estonian": "Koer jookseb aias.", "english": "The dog runs in the garden." }] },
-  { "id": "a1-kass", "estonian": "kass", "english": "cat", "cefrLevel": "A1", "sentences": [{ "estonian": "Kass magab diivanil.", "english": "The cat sleeps on the couch." }] },
-  { "id": "a1-raamat", "estonian": "raamat", "english": "book", "cefrLevel": "A1", "sentences": [{ "estonian": "See raamat on väga huvitav.", "english": "This book is very interesting." }] },
-  { "id": "a1-auto", "estonian": "auto", "english": "car", "cefrLevel": "A1", "sentences": [{ "estonian": "Minu auto on punane.", "english": "My car is red." }] },
-  { "id": "a1-maja", "estonian": "maja", "english": "house", "cefrLevel": "A1", "sentences": [{ "estonian": "See maja on suur.", "english": "This house is big." }] },
-  { "id": "a1-toit", "estonian": "toit", "english": "food", "cefrLevel": "A1", "sentences": [{ "estonian": "Eesti toit on maitsev.", "english": "Estonian food is tasty." }] },
-  { "id": "a1-ilm", "estonian": "ilm", "english": "weather", "cefrLevel": "A1", "sentences": [{ "estonian": "Milline ilm täna on?", "english": "What is the weather like today?" }] },
-  { "id": "a1-päike", "estonian": "päike", "english": "sun", "cefrLevel": "A1", "sentences": [{ "estonian": "Päike paistab.", "english": "The sun is shining." }] },
-  { "id": "a1-vihm", "estonian": "vihm", "english": "rain", "cefrLevel": "A1", "sentences": [{ "estonian": "Täna sajab vihma.", "english": "It's raining today." }] },
-  { "id": "a1-lumi", "estonian": "lumi", "english": "snow", "cefrLevel": "A1", "sentences": [{ "estonian": "Talvel sajab lund.", "english": "It snows in winter." }] },
-  { "id": "a1-suur", "estonian": "suur", "english": "big", "cefrLevel": "A1", "sentences": [{ "estonian": "See on suur linn.", "english": "This is a big city." }] },
-  { "id": "a1-väike", "estonian": "väike", "english": "small", "cefrLevel": "A1", "sentences": [{ "estonian": "See on väike kass.", "english": "This is a small cat." }] },
-  { "id": "a1-hea", "estonian": "hea", "english": "good", "cefrLevel": "A1", "sentences": [{ "estonian": "See on väga hea.", "english": "This is very good." }] },
-  { "id": "a1-halb", "estonian": "halb", "english": "bad", "cefrLevel": "A1", "sentences": [{ "estonian": "Ilm on halb.", "english": "The weather is bad." }] },
-  { "id": "a1-uus", "estonian": "uus", "english": "new", "cefrLevel": "A1", "sentences": [{ "estonian": "See on minu uus auto.", "english": "This is my new car." }] },
-  { "id": "a1-vana", "estonian": "vana", "english": "old", "cefrLevel": "A1", "sentences": [{ "estonian": "See maja on väga vana.", "english": "This house is very old." }] },
-  { "id": "a1-armastus", "estonian": "armastus", "english": "love", "cefrLevel": "A1", "sentences": [{ "estonian": "Armastus on kõige tähtsam.", "english": "Love is the most important thing." }] },
-  { "id": "a1-täna", "estonian": "täna", "english": "today", "cefrLevel": "A1", "sentences": [{ "estonian": "Mis päev täna on?", "english": "What day is it today?" }] },
-  { "id": "a1-homme", "estonian": "homme", "english": "tomorrow", "cefrLevel": "A1", "sentences": [{ "estonian": "Homme on reede.", "english": "Tomorrow is Friday." }] },
-  { "id": "a1-eile", "estonian": "eile", "english": "yesterday", "cefrLevel": "A1", "sentences": [{ "estonian": "Eile oli ilus ilm.", "english": "Yesterday the weather was nice." }] },
-
-  { "id": "a1-üks", "estonian": "üks", "english": "one", "cefrLevel": "A1", "sentences": [{ "estonian": "Mul on üks vend.", "english": "I have one brother." }] },
-  { "id": "a1-kaks", "estonian": "kaks", "english": "two", "cefrLevel": "A1", "sentences": [{ "estonian": "Mul on kaks õde.", "english": "I have two sisters." }] },
-  { "id": "a1-kolm", "estonian": "kolm", "english": "three", "cefrLevel": "A1", "sentences": [{ "estonian": "Laual on kolm tasssi.", "english": "There are three cups on the table." }] },
-  { "id": "a1-neli", "estonian": "neli", "english": "four", "cefrLevel": "A1", "sentences": [{ "estonian": "Meil on neli tooli.", "english": "We have four chairs." }] },
-  { "id": "a1-viis", "estonian": "viis", "english": "five", "cefrLevel": "A1", "sentences": [{ "estonian": "Käel on viis sõrme.", "english": "A hand has five fingers." }] },
-  { "id": "a1-kuus", "estonian": "kuus", "english": "six", "cefrLevel": "A1", "sentences": [{ "estonian": "Kell on kuus.", "english": "It is six o'clock." }] },
-  { "id": "a1-seitse", "estonian": "seitse", "english": "seven", "cefrLevel": "A1", "sentences": [{ "estonian": "Nädalas on seitse päeva.", "english": "There are seven days in a week." }] },
-  { "id": "a1-kaheksa", "estonian": "kaheksa", "english": "eight", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma töötan kaheksa tundi.", "english": "I work eight hours." }] },
-  { "id": "a1-üheksa", "estonian": "üheksa", "english": "nine", "cefrLevel": "A1", "sentences": [{ "estonian": "Buss tuleb kell üheksa.", "english": "The bus comes at nine o'clock." }] },
-  { "id": "a1-kümme", "estonian": "kümme", "english": "ten", "cefrLevel": "A1", "sentences": [{ "estonian": "Mul on kümme eurot.", "english": "I have ten euros." }] },
-
-  { "id": "a1-te", "estonian": "te", "english": "you (plural/formal)", "cefrLevel": "A1", "sentences": [{ "estonian": "Kas te räägite inglise keelt?", "english": "Do you speak English?" }] },
-  { "id": "a1-nemad", "estonian": "nemad", "english": "they", "cefrLevel": "A1", "sentences": [{ "estonian": "Nemad elavad Tallinnas.", "english": "They live in Tallinn." }] },
-
-  { "id": "a1-punane", "estonian": "punane", "english": "red", "cefrLevel": "A1", "sentences": [{ "estonian": "See lill on punane.", "english": "This flower is red." }] },
-  { "id": "a1-sinine", "estonian": "sinine", "english": "blue", "cefrLevel": "A1", "sentences": [{ "estonian": "Taevas on sinine.", "english": "The sky is blue." }] },
-  { "id": "a1-roheline", "estonian": "roheline", "english": "green", "cefrLevel": "A1", "sentences": [{ "estonian": "Rohi on roheline.", "english": "The grass is green." }] },
-  { "id": "a1-kollane", "estonian": "kollane", "english": "yellow", "cefrLevel": "A1", "sentences": [{ "estonian": "Päike on kollane.", "english": "The sun is yellow." }] },
-  { "id": "a1-valge", "estonian": "valge", "english": "white", "cefrLevel": "A1", "sentences": [{ "estonian": "Lumi on valge.", "english": "Snow is white." }] },
-  { "id": "a1-must", "estonian": "must", "english": "black", "cefrLevel": "A1", "sentences": [{ "estonian": "Minu kass on must.", "english": "My cat is black." }] },
-  { "id": "a1-hall", "estonian": "hall", "english": "grey", "cefrLevel": "A1", "sentences": [{ "estonian": "Taevas on hall.", "english": "The sky is grey." }] },
-  { "id": "a1-pruun", "estonian": "pruun", "english": "brown", "cefrLevel": "A1", "sentences": [{ "estonian": "Koer on pruun.", "english": "The dog is brown." }] },
-  { "id": "a1-oranž", "estonian": "oranž", "english": "orange", "cefrLevel": "A1", "sentences": [{ "estonian": "Apelsin on oranž.", "english": "The orange is orange." }] },
-
-  { "id": "a1-esmaspäev", "estonian": "esmaspäev", "english": "Monday", "cefrLevel": "A1", "sentences": [{ "estonian": "Esmaspäev on nädala esimene päev.", "english": "Monday is the first day of the week." }] },
-  { "id": "a1-teisipäev", "estonian": "teisipäev", "english": "Tuesday", "cefrLevel": "A1", "sentences": [{ "estonian": "Teisipäeval on mul koosolek.", "english": "I have a meeting on Tuesday." }] },
-  { "id": "a1-kolmapäev", "estonian": "kolmapäev", "english": "Wednesday", "cefrLevel": "A1", "sentences": [{ "estonian": "Kolmapäeval ma õpin eesti keelt.", "english": "On Wednesday I study Estonian." }] },
-  { "id": "a1-neljapäev", "estonian": "neljapäev", "english": "Thursday", "cefrLevel": "A1", "sentences": [{ "estonian": "Neljapäeval läheme kinno.", "english": "On Thursday we go to the cinema." }] },
-  { "id": "a1-reede", "estonian": "reede", "english": "Friday", "cefrLevel": "A1", "sentences": [{ "estonian": "Reede on minu lemmikpäev.", "english": "Friday is my favorite day." }] },
-  { "id": "a1-laupäev", "estonian": "laupäev", "english": "Saturday", "cefrLevel": "A1", "sentences": [{ "estonian": "Laupäeval ma puhkan.", "english": "On Saturday I rest." }] },
-  { "id": "a1-pühapäev", "estonian": "pühapäev", "english": "Sunday", "cefrLevel": "A1", "sentences": [{ "estonian": "Pühapäeval me sööme koos.", "english": "On Sunday we eat together." }] },
-
-  { "id": "a1-vend", "estonian": "vend", "english": "brother", "cefrLevel": "A1", "sentences": [{ "estonian": "Minu vend on noorem kui mina.", "english": "My brother is younger than me." }] },
-  { "id": "a1-õde", "estonian": "õde", "english": "sister", "cefrLevel": "A1", "sentences": [{ "estonian": "Minu õde elab Tartus.", "english": "My sister lives in Tartu." }] },
-  { "id": "a1-vanaema", "estonian": "vanaema", "english": "grandmother", "cefrLevel": "A1", "sentences": [{ "estonian": "Vanaema teeb väga head kooki.", "english": "Grandmother makes very good cake." }] },
-  { "id": "a1-vanaisa", "estonian": "vanaisa", "english": "grandfather", "cefrLevel": "A1", "sentences": [{ "estonian": "Vanaisa elab maal.", "english": "Grandfather lives in the countryside." }] },
-  { "id": "a1-poeg", "estonian": "poeg", "english": "son", "cefrLevel": "A1", "sentences": [{ "estonian": "Minu poeg käib koolis.", "english": "My son goes to school." }] },
-  { "id": "a1-tütar", "estonian": "tütar", "english": "daughter", "cefrLevel": "A1", "sentences": [{ "estonian": "Minu tütar on viie aastane.", "english": "My daughter is five years old." }] },
-  { "id": "a1-mees", "estonian": "mees", "english": "man / husband", "cefrLevel": "A1", "sentences": [{ "estonian": "See mees on minu naaber.", "english": "This man is my neighbor." }] },
-  { "id": "a1-naine", "estonian": "naine", "english": "woman / wife", "cefrLevel": "A1", "sentences": [{ "estonian": "See naine on õpetaja.", "english": "This woman is a teacher." }] },
-
-  { "id": "a1-supp", "estonian": "supp", "english": "soup", "cefrLevel": "A1", "sentences": [{ "estonian": "Supp on kuum.", "english": "The soup is hot." }] },
-  { "id": "a1-liha", "estonian": "liha", "english": "meat", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma ei söö liha.", "english": "I don't eat meat." }] },
-  { "id": "a1-kala", "estonian": "kala", "english": "fish", "cefrLevel": "A1", "sentences": [{ "estonian": "Eestlased söövad palju kala.", "english": "Estonians eat a lot of fish." }] },
-  { "id": "a1-puuvili", "estonian": "puuvili", "english": "fruit", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma söön iga päev puuvilju.", "english": "I eat fruit every day." }] },
-  { "id": "a1-õun", "estonian": "õun", "english": "apple", "cefrLevel": "A1", "sentences": [{ "estonian": "See õun on magus.", "english": "This apple is sweet." }] },
-  { "id": "a1-kartul", "estonian": "kartul", "english": "potato", "cefrLevel": "A1", "sentences": [{ "estonian": "Kartul on Eesti põhitoit.", "english": "Potato is a staple food in Estonia." }] },
-  { "id": "a1-juust", "estonian": "juust", "english": "cheese", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma panen leivale juustu.", "english": "I put cheese on the bread." }] },
-  { "id": "a1-muna", "estonian": "muna", "english": "egg", "cefrLevel": "A1", "sentences": [{ "estonian": "Hommikul ma söön muna.", "english": "In the morning I eat an egg." }] },
-  { "id": "a1-suhkur", "estonian": "suhkur", "english": "sugar", "cefrLevel": "A1", "sentences": [{ "estonian": "Kas sa tahad suhkrut kohvi sisse?", "english": "Do you want sugar in your coffee?" }] },
-  { "id": "a1-sool", "estonian": "sool", "english": "salt", "cefrLevel": "A1", "sentences": [{ "estonian": "Palun anna mulle soola.", "english": "Please pass me the salt." }] },
-  { "id": "a1-või", "estonian": "või", "english": "butter / or", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma panen leivale võid.", "english": "I put butter on the bread." }] },
-
-  { "id": "a1-pea", "estonian": "pea", "english": "head", "cefrLevel": "A1", "sentences": [{ "estonian": "Mul on pea valus.", "english": "My head hurts." }] },
-  { "id": "a1-käsi", "estonian": "käsi", "english": "hand / arm", "cefrLevel": "A1", "sentences": [{ "estonian": "Pese käed ära!", "english": "Wash your hands!" }] },
-  { "id": "a1-jalg", "estonian": "jalg", "english": "foot / leg", "cefrLevel": "A1", "sentences": [{ "estonian": "Mu jalg on valus.", "english": "My leg hurts." }] },
-  { "id": "a1-silm", "estonian": "silm", "english": "eye", "cefrLevel": "A1", "sentences": [{ "estonian": "Tal on sinised silmad.", "english": "He/she has blue eyes." }] },
-  { "id": "a1-kõrv", "estonian": "kõrv", "english": "ear", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma kuulen kõrvaga.", "english": "I hear with my ear." }] },
-  { "id": "a1-nina", "estonian": "nina", "english": "nose", "cefrLevel": "A1", "sentences": [{ "estonian": "Nina on näo keskel.", "english": "The nose is in the middle of the face." }] },
-  { "id": "a1-suu", "estonian": "suu", "english": "mouth", "cefrLevel": "A1", "sentences": [{ "estonian": "Tee suu lahti!", "english": "Open your mouth!" }] },
-  { "id": "a1-hammas", "estonian": "hammas", "english": "tooth", "cefrLevel": "A1", "sentences": [{ "estonian": "Mul on hammas valus.", "english": "My tooth hurts." }] },
-  { "id": "a1-süda", "estonian": "süda", "english": "heart", "cefrLevel": "A1", "sentences": [{ "estonian": "Süda lööb kiiresti.", "english": "The heart beats fast." }] },
-
-  { "id": "a1-olema", "estonian": "olema", "english": "to be", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma olen eestlane.", "english": "I am Estonian." }] },
-  { "id": "a1-tegema", "estonian": "tegema", "english": "to do / to make", "cefrLevel": "A1", "sentences": [{ "estonian": "Mida sa teed?", "english": "What are you doing?" }] },
-  { "id": "a1-minema", "estonian": "minema", "english": "to go", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma lähen poodi.", "english": "I am going to the store." }] },
-  { "id": "a1-tulema", "estonian": "tulema", "english": "to come", "cefrLevel": "A1", "sentences": [{ "estonian": "Tule siia!", "english": "Come here!" }] },
-  { "id": "a1-sööma", "estonian": "sööma", "english": "to eat", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma söön lõunat.", "english": "I am eating lunch." }] },
-  { "id": "a1-jooma", "estonian": "jooma", "english": "to drink", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma joon vett.", "english": "I drink water." }] },
-  { "id": "a1-rääkima", "estonian": "rääkima", "english": "to speak / to talk", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma räägin eesti keelt.", "english": "I speak Estonian." }] },
-  { "id": "a1-lugema", "estonian": "lugema", "english": "to read", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma loen raamatut.", "english": "I am reading a book." }] },
-  { "id": "a1-kirjutama", "estonian": "kirjutama", "english": "to write", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma kirjutan kirja.", "english": "I am writing a letter." }] },
-  { "id": "a1-õppima", "estonian": "õppima", "english": "to learn / to study", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma õpin eesti keelt.", "english": "I am learning Estonian." }] },
-  { "id": "a1-töötama", "estonian": "töötama", "english": "to work", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma töötan haiglas.", "english": "I work in a hospital." }] },
-  { "id": "a1-magama", "estonian": "magama", "english": "to sleep", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma magan kaheksa tundi.", "english": "I sleep eight hours." }] },
-  { "id": "a1-elama", "estonian": "elama", "english": "to live", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma elan Tallinnas.", "english": "I live in Tallinn." }] },
-  { "id": "a1-tahtma", "estonian": "tahtma", "english": "to want", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma tahan jäätist.", "english": "I want ice cream." }] },
-  { "id": "a1-saama", "estonian": "saama", "english": "to get / can", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma saan aru.", "english": "I understand." }] },
-  { "id": "a1-teadma", "estonian": "teadma", "english": "to know", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma ei tea.", "english": "I don't know." }] },
-  { "id": "a1-nägema", "estonian": "nägema", "english": "to see", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma näen merd.", "english": "I see the sea." }] },
-  { "id": "a1-kuulma", "estonian": "kuulma", "english": "to hear", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma kuulen muusikat.", "english": "I hear music." }] },
-  { "id": "a1-ostma", "estonian": "ostma", "english": "to buy", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma ostan leiba.", "english": "I am buying bread." }] },
-  { "id": "a1-andma", "estonian": "andma", "english": "to give", "cefrLevel": "A1", "sentences": [{ "estonian": "Anna mulle see raamat.", "english": "Give me that book." }] },
-  { "id": "a1-mängima", "estonian": "mängima", "english": "to play", "cefrLevel": "A1", "sentences": [{ "estonian": "Lapsed mängivad õues.", "english": "The children play outside." }] },
-
-  { "id": "a1-ilus", "estonian": "ilus", "english": "beautiful", "cefrLevel": "A1", "sentences": [{ "estonian": "See lill on ilus.", "english": "This flower is beautiful." }] },
-  { "id": "a1-kuum", "estonian": "kuum", "english": "hot", "cefrLevel": "A1", "sentences": [{ "estonian": "Kohv on kuum.", "english": "The coffee is hot." }] },
-  { "id": "a1-külm", "estonian": "külm", "english": "cold", "cefrLevel": "A1", "sentences": [{ "estonian": "Talvel on külm.", "english": "It is cold in winter." }] },
-  { "id": "a1-soe", "estonian": "soe", "english": "warm", "cefrLevel": "A1", "sentences": [{ "estonian": "Täna on soe ilm.", "english": "Today the weather is warm." }] },
-  { "id": "a1-kallis", "estonian": "kallis", "english": "expensive / dear", "cefrLevel": "A1", "sentences": [{ "estonian": "See on liiga kallis.", "english": "This is too expensive." }] },
-  { "id": "a1-odav", "estonian": "odav", "english": "cheap", "cefrLevel": "A1", "sentences": [{ "estonian": "See pood on odav.", "english": "This shop is cheap." }] },
-  { "id": "a1-noor", "estonian": "noor", "english": "young", "cefrLevel": "A1", "sentences": [{ "estonian": "Ta on veel noor.", "english": "He/she is still young." }] },
-  { "id": "a1-kiire", "estonian": "kiire", "english": "fast / busy", "cefrLevel": "A1", "sentences": [{ "estonian": "Mul on kiire.", "english": "I am in a hurry." }] },
-  { "id": "a1-aeglane", "estonian": "aeglane", "english": "slow", "cefrLevel": "A1", "sentences": [{ "estonian": "Palun räägi aeglasemalt.", "english": "Please speak more slowly." }] },
-  { "id": "a1-pikk", "estonian": "pikk", "english": "tall / long", "cefrLevel": "A1", "sentences": [{ "estonian": "Ta on väga pikk.", "english": "He/she is very tall." }] },
-  { "id": "a1-lühike", "estonian": "lühike", "english": "short", "cefrLevel": "A1", "sentences": [{ "estonian": "See tee on lühike.", "english": "This road is short." }] },
-  { "id": "a1-kerge", "estonian": "kerge", "english": "light / easy", "cefrLevel": "A1", "sentences": [{ "estonian": "See ülesanne on kerge.", "english": "This task is easy." }] },
-  { "id": "a1-raske", "estonian": "raske", "english": "heavy / difficult", "cefrLevel": "A1", "sentences": [{ "estonian": "See kott on raske.", "english": "This bag is heavy." }] },
-
-  { "id": "a1-pood", "estonian": "pood", "english": "shop / store", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma lähen poodi.", "english": "I am going to the store." }] },
-  { "id": "a1-restoran", "estonian": "restoran", "english": "restaurant", "cefrLevel": "A1", "sentences": [{ "estonian": "Me sööme restoranis.", "english": "We eat at a restaurant." }] },
-  { "id": "a1-haigla", "estonian": "haigla", "english": "hospital", "cefrLevel": "A1", "sentences": [{ "estonian": "Arst töötab haiglas.", "english": "The doctor works in a hospital." }] },
-  { "id": "a1-apteek", "estonian": "apteek", "english": "pharmacy", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma ostan rohtu apteegist.", "english": "I buy medicine from the pharmacy." }] },
-  { "id": "a1-raamatukogu", "estonian": "raamatukogu", "english": "library", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma loen raamatukogus.", "english": "I read in the library." }] },
-  { "id": "a1-linn", "estonian": "linn", "english": "city", "cefrLevel": "A1", "sentences": [{ "estonian": "Tallinn on Eesti pealinn.", "english": "Tallinn is the capital of Estonia." }] },
-  { "id": "a1-tänav", "estonian": "tänav", "english": "street", "cefrLevel": "A1", "sentences": [{ "estonian": "Mis tänaval sa elad?", "english": "What street do you live on?" }] },
-  { "id": "a1-buss", "estonian": "buss", "english": "bus", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma sõidan bussiga tööle.", "english": "I take the bus to work." }] },
-  { "id": "a1-rong", "estonian": "rong", "english": "train", "cefrLevel": "A1", "sentences": [{ "estonian": "Rong läheb Tartusse.", "english": "The train goes to Tartu." }] },
-  { "id": "a1-lennuk", "estonian": "lennuk", "english": "airplane", "cefrLevel": "A1", "sentences": [{ "estonian": "Lennuk lendab kõrgel.", "english": "The airplane flies high." }] },
-
-  { "id": "a1-tund", "estonian": "tund", "english": "hour / lesson", "cefrLevel": "A1", "sentences": [{ "estonian": "Tund kestab 45 minutit.", "english": "The lesson lasts 45 minutes." }] },
-  { "id": "a1-minut", "estonian": "minut", "english": "minute", "cefrLevel": "A1", "sentences": [{ "estonian": "Oota üks minut.", "english": "Wait one minute." }] },
-  { "id": "a1-nädal", "estonian": "nädal", "english": "week", "cefrLevel": "A1", "sentences": [{ "estonian": "Üks nädal on seitse päeva.", "english": "One week is seven days." }] },
-  { "id": "a1-kuu", "estonian": "kuu", "english": "month / moon", "cefrLevel": "A1", "sentences": [{ "estonian": "Üks kuu on umbes 30 päeva.", "english": "One month is about 30 days." }] },
-  { "id": "a1-aasta", "estonian": "aasta", "english": "year", "cefrLevel": "A1", "sentences": [{ "estonian": "Üks aasta on 12 kuud.", "english": "One year is 12 months." }] },
-  { "id": "a1-kell", "estonian": "kell", "english": "clock / time", "cefrLevel": "A1", "sentences": [{ "estonian": "Mis kell on?", "english": "What time is it?" }] },
-
-  { "id": "a1-mina", "estonian": "mina", "english": "I (emphatic)", "cefrLevel": "A1", "sentences": [{ "estonian": "Mina olen Eestist.", "english": "I am from Estonia." }] },
-  { "id": "a1-sina", "estonian": "sina", "english": "you (emphatic)", "cefrLevel": "A1", "sentences": [{ "estonian": "Sina oled minu sõber.", "english": "You are my friend." }] },
-  { "id": "a1-see", "estonian": "see", "english": "this / that", "cefrLevel": "A1", "sentences": [{ "estonian": "See on minu raamat.", "english": "This is my book." }] },
-
-  { "id": "a1-keel", "estonian": "keel", "english": "language / tongue", "cefrLevel": "A1", "sentences": [{ "estonian": "Eesti keel on ilus.", "english": "The Estonian language is beautiful." }] },
-  { "id": "a1-sõna", "estonian": "sõna", "english": "word", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma õpin uusi sõnu.", "english": "I am learning new words." }] },
-  { "id": "a1-küsimus", "estonian": "küsimus", "english": "question", "cefrLevel": "A1", "sentences": [{ "estonian": "Mul on üks küsimus.", "english": "I have one question." }] },
-  { "id": "a1-vastus", "estonian": "vastus", "english": "answer", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma ei tea vastust.", "english": "I don't know the answer." }] },
-  { "id": "a1-arst", "estonian": "arst", "english": "doctor", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma lähen arsti juurde.", "english": "I am going to the doctor." }] },
-  { "id": "a1-õpetaja", "estonian": "õpetaja", "english": "teacher", "cefrLevel": "A1", "sentences": [{ "estonian": "Minu õpetaja on väga hea.", "english": "My teacher is very good." }] },
-  { "id": "a1-õpilane", "estonian": "õpilane", "english": "student", "cefrLevel": "A1", "sentences": [{ "estonian": "Ma olen õpilane.", "english": "I am a student." }] },
-  { "id": "a1-riik", "estonian": "riik", "english": "country / state", "cefrLevel": "A1", "sentences": [{ "estonian": "Eesti on väike riik.", "english": "Estonia is a small country." }] },
-  { "id": "a1-meri", "estonian": "meri", "english": "sea", "cefrLevel": "A1", "sentences": [{ "estonian": "Meri on sinine.", "english": "The sea is blue." }] },
-  { "id": "a1-mets", "estonian": "mets", "english": "forest", "cefrLevel": "A1", "sentences": [{ "estonian": "Eestis on palju metsa.", "english": "There is a lot of forest in Estonia." }] },
-  { "id": "a1-tuba", "estonian": "tuba", "english": "room", "cefrLevel": "A1", "sentences": [{ "estonian": "See tuba on suur.", "english": "This room is big." }] },
-  { "id": "a1-uks", "estonian": "uks", "english": "door", "cefrLevel": "A1", "sentences": [{ "estonian": "Palun sulge uks.", "english": "Please close the door." }] },
-  { "id": "a1-aken", "estonian": "aken", "english": "window", "cefrLevel": "A1", "sentences": [{ "estonian": "Tee aken lahti!", "english": "Open the window!" }] },
-  { "id": "a1-laud", "estonian": "laud", "english": "table", "cefrLevel": "A1", "sentences": [{ "estonian": "Raamat on laual.", "english": "The book is on the table." }] },
-  { "id": "a1-tool", "estonian": "tool", "english": "chair", "cefrLevel": "A1", "sentences": [{ "estonian": "Istu toolile.", "english": "Sit on the chair." }] },
-  { "id": "a1-telefon", "estonian": "telefon", "english": "phone", "cefrLevel": "A1", "sentences": [{ "estonian": "Minu telefon heliseb.", "english": "My phone is ringing." }] },
-  { "id": "a1-raha", "estonian": "raha", "english": "money", "cefrLevel": "A1", "sentences": [{ "estonian": "Mul ei ole raha.", "english": "I don't have money." }] },
-  { "id": "a1-aeg", "estonian": "aeg", "english": "time", "cefrLevel": "A1", "sentences": [{ "estonian": "Mul ei ole aega.", "english": "I don't have time." }] },
-  { "id": "a1-koht", "estonian": "koht", "english": "place / spot", "cefrLevel": "A1", "sentences": [{ "estonian": "See on ilus koht.", "english": "This is a beautiful place." }] },
-  { "id": "a1-inimene", "estonian": "inimene", "english": "person / human", "cefrLevel": "A1", "sentences": [{ "estonian": "Ta on hea inimene.", "english": "He/she is a good person." }] },
-  { "id": "a1-poiss", "estonian": "poiss", "english": "boy", "cefrLevel": "A1", "sentences": [{ "estonian": "Poiss jookseb kiiresti.", "english": "The boy runs fast." }] },
-  { "id": "a1-tüdruk", "estonian": "tüdruk", "english": "girl", "cefrLevel": "A1", "sentences": [{ "estonian": "Tüdruk loeb raamatut.", "english": "The girl reads a book." }] },
-  { "id": "a1-talv", "estonian": "talv", "english": "winter", "cefrLevel": "A1", "sentences": [{ "estonian": "Eesti talv on pikk.", "english": "Estonian winter is long." }] },
-  { "id": "a1-suvi", "estonian": "suvi", "english": "summer", "cefrLevel": "A1", "sentences": [{ "estonian": "Suvel on soe.", "english": "It is warm in summer." }] },
-  { "id": "a1-kevad", "estonian": "kevad", "english": "spring", "cefrLevel": "A1", "sentences": [{ "estonian": "Kevadel hakkavad lilled õitsema.", "english": "In spring the flowers start blooming." }] },
-  { "id": "a1-sügis", "estonian": "sügis", "english": "autumn", "cefrLevel": "A1", "sentences": [{ "estonian": "Sügisel langevad lehed.", "english": "In autumn the leaves fall." }] }
+  {
+    "id": "a1-tere",
+    "estonian": "tere",
+    "english": "hello",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Tere, kuidas läheb?",
+        "english": "Hello, how are you?"
+      }
+    ]
+  },
+  {
+    "id": "a1-aitäh",
+    "estonian": "aitäh",
+    "english": "thank you",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Aitäh väga palju!",
+        "english": "Thank you very much!"
+      }
+    ]
+  },
+  {
+    "id": "a1-jah",
+    "estonian": "jah",
+    "english": "yes",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Jah, ma olen nõus.",
+        "english": "Yes, I agree."
+      }
+    ]
+  },
+  {
+    "id": "a1-ei",
+    "estonian": "ei",
+    "english": "no",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ei, ma ei taha.",
+        "english": "No, I don't want to."
+      }
+    ]
+  },
+  {
+    "id": "a1-palun",
+    "estonian": "palun",
+    "english": "please",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Palun üks kohv.",
+        "english": "One coffee, please."
+      }
+    ]
+  },
+  {
+    "id": "a1-head-aega",
+    "estonian": "head aega",
+    "english": "goodbye",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Head aega, nägemiseni!",
+        "english": "Goodbye, see you!"
+      }
+    ]
+  },
+  {
+    "id": "a1-vabandust",
+    "estonian": "vabandust",
+    "english": "sorry / excuse me",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Vabandust, kus on raamatukogu?",
+        "english": "Excuse me, where is the library?"
+      }
+    ]
+  },
+  {
+    "id": "a1-ma",
+    "estonian": "ma",
+    "english": "I",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma olen õpilane.",
+        "english": "I am a student."
+      }
+    ]
+  },
+  {
+    "id": "a1-sa",
+    "estonian": "sa",
+    "english": "you",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Kust sa pärit oled?",
+        "english": "Where are you from?"
+      }
+    ]
+  },
+  {
+    "id": "a1-tema",
+    "estonian": "tema",
+    "english": "he/she",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Tema on minu sõber.",
+        "english": "He/she is my friend."
+      }
+    ]
+  },
+  {
+    "id": "a1-me",
+    "estonian": "me",
+    "english": "we",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Me läheme koos.",
+        "english": "We go together."
+      }
+    ]
+  },
+  {
+    "id": "a1-vesi",
+    "estonian": "vesi",
+    "english": "water",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Palun anna mulle klaas vett.",
+        "english": "Please give me a glass of water."
+      }
+    ]
+  },
+  {
+    "id": "a1-leib",
+    "estonian": "leib",
+    "english": "bread",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Eesti leib on väga hea.",
+        "english": "Estonian bread is very good."
+      }
+    ]
+  },
+  {
+    "id": "a1-piim",
+    "estonian": "piim",
+    "english": "milk",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma joon piima hommikul.",
+        "english": "I drink milk in the morning."
+      }
+    ]
+  },
+  {
+    "id": "a1-kohv",
+    "estonian": "kohv",
+    "english": "coffee",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Üks kohv, palun.",
+        "english": "One coffee, please."
+      }
+    ]
+  },
+  {
+    "id": "a1-tee",
+    "estonian": "tee",
+    "english": "tea / road",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma joon rohelist teed.",
+        "english": "I drink green tea."
+      }
+    ]
+  },
+  {
+    "id": "a1-kodu",
+    "estonian": "kodu",
+    "english": "home",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma lähen koju.",
+        "english": "I am going home."
+      }
+    ]
+  },
+  {
+    "id": "a1-kool",
+    "estonian": "kool",
+    "english": "school",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Lapsed lähevad kooli.",
+        "english": "Children go to school."
+      }
+    ]
+  },
+  {
+    "id": "a1-töö",
+    "estonian": "töö",
+    "english": "work",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma lähen tööle.",
+        "english": "I am going to work."
+      }
+    ]
+  },
+  {
+    "id": "a1-päev",
+    "estonian": "päev",
+    "english": "day",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Head päeva!",
+        "english": "Have a good day!"
+      }
+    ]
+  },
+  {
+    "id": "a1-öö",
+    "estonian": "öö",
+    "english": "night",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Head ööd!",
+        "english": "Good night!"
+      }
+    ]
+  },
+  {
+    "id": "a1-hommik",
+    "estonian": "hommik",
+    "english": "morning",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Tere hommikust!",
+        "english": "Good morning!"
+      }
+    ]
+  },
+  {
+    "id": "a1-õhtu",
+    "estonian": "õhtu",
+    "english": "evening",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Tere õhtust!",
+        "english": "Good evening!"
+      }
+    ]
+  },
+  {
+    "id": "a1-nimi",
+    "estonian": "nimi",
+    "english": "name",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mis su nimi on?",
+        "english": "What is your name?"
+      }
+    ]
+  },
+  {
+    "id": "a1-sõber",
+    "estonian": "sõber",
+    "english": "friend",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ta on minu parim sõber.",
+        "english": "He is my best friend."
+      }
+    ]
+  },
+  {
+    "id": "a1-pere",
+    "estonian": "pere",
+    "english": "family",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Minu pere on suur.",
+        "english": "My family is big."
+      }
+    ]
+  },
+  {
+    "id": "a1-ema",
+    "estonian": "ema",
+    "english": "mother",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Minu ema on arst.",
+        "english": "My mother is a doctor."
+      }
+    ]
+  },
+  {
+    "id": "a1-isa",
+    "estonian": "isa",
+    "english": "father",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Minu isa töötab kontoris.",
+        "english": "My father works in an office."
+      }
+    ]
+  },
+  {
+    "id": "a1-laps",
+    "estonian": "laps",
+    "english": "child",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Laps mängib õues.",
+        "english": "The child plays outside."
+      }
+    ]
+  },
+  {
+    "id": "a1-koer",
+    "estonian": "koer",
+    "english": "dog",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Koer jookseb aias.",
+        "english": "The dog runs in the garden."
+      }
+    ]
+  },
+  {
+    "id": "a1-kass",
+    "estonian": "kass",
+    "english": "cat",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Kass magab diivanil.",
+        "english": "The cat sleeps on the couch."
+      }
+    ]
+  },
+  {
+    "id": "a1-raamat",
+    "estonian": "raamat",
+    "english": "book",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See raamat on väga huvitav.",
+        "english": "This book is very interesting."
+      }
+    ]
+  },
+  {
+    "id": "a1-auto",
+    "estonian": "auto",
+    "english": "car",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Minu auto on punane.",
+        "english": "My car is red."
+      }
+    ]
+  },
+  {
+    "id": "a1-maja",
+    "estonian": "maja",
+    "english": "house",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See maja on suur.",
+        "english": "This house is big."
+      }
+    ]
+  },
+  {
+    "id": "a1-toit",
+    "estonian": "toit",
+    "english": "food",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Eesti toit on maitsev.",
+        "english": "Estonian food is tasty."
+      }
+    ]
+  },
+  {
+    "id": "a1-ilm",
+    "estonian": "ilm",
+    "english": "weather",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Milline ilm täna on?",
+        "english": "What is the weather like today?"
+      }
+    ]
+  },
+  {
+    "id": "a1-päike",
+    "estonian": "päike",
+    "english": "sun",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Päike paistab.",
+        "english": "The sun is shining."
+      }
+    ]
+  },
+  {
+    "id": "a1-vihm",
+    "estonian": "vihm",
+    "english": "rain",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Täna sajab vihma.",
+        "english": "It's raining today."
+      }
+    ]
+  },
+  {
+    "id": "a1-lumi",
+    "estonian": "lumi",
+    "english": "snow",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Talvel sajab lund.",
+        "english": "It snows in winter."
+      }
+    ]
+  },
+  {
+    "id": "a1-suur",
+    "estonian": "suur",
+    "english": "big",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See on suur linn.",
+        "english": "This is a big city."
+      }
+    ]
+  },
+  {
+    "id": "a1-väike",
+    "estonian": "väike",
+    "english": "small",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See on väike kass.",
+        "english": "This is a small cat."
+      }
+    ]
+  },
+  {
+    "id": "a1-hea",
+    "estonian": "hea",
+    "english": "good",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See on väga hea.",
+        "english": "This is very good."
+      }
+    ]
+  },
+  {
+    "id": "a1-halb",
+    "estonian": "halb",
+    "english": "bad",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ilm on halb.",
+        "english": "The weather is bad."
+      }
+    ]
+  },
+  {
+    "id": "a1-uus",
+    "estonian": "uus",
+    "english": "new",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See on minu uus auto.",
+        "english": "This is my new car."
+      }
+    ]
+  },
+  {
+    "id": "a1-vana",
+    "estonian": "vana",
+    "english": "old",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See maja on väga vana.",
+        "english": "This house is very old."
+      }
+    ]
+  },
+  {
+    "id": "a1-armastus",
+    "estonian": "armastus",
+    "english": "love",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Armastus on kõige tähtsam.",
+        "english": "Love is the most important thing."
+      }
+    ]
+  },
+  {
+    "id": "a1-täna",
+    "estonian": "täna",
+    "english": "today",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mis päev täna on?",
+        "english": "What day is it today?"
+      }
+    ]
+  },
+  {
+    "id": "a1-homme",
+    "estonian": "homme",
+    "english": "tomorrow",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Homme on reede.",
+        "english": "Tomorrow is Friday."
+      }
+    ]
+  },
+  {
+    "id": "a1-eile",
+    "estonian": "eile",
+    "english": "yesterday",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Eile oli ilus ilm.",
+        "english": "Yesterday the weather was nice."
+      }
+    ]
+  },
+  {
+    "id": "a1-üks",
+    "estonian": "üks",
+    "english": "one",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mul on üks vend.",
+        "english": "I have one brother."
+      }
+    ]
+  },
+  {
+    "id": "a1-kaks",
+    "estonian": "kaks",
+    "english": "two",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mul on kaks õde.",
+        "english": "I have two sisters."
+      }
+    ]
+  },
+  {
+    "id": "a1-kolm",
+    "estonian": "kolm",
+    "english": "three",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Laual on kolm tasssi.",
+        "english": "There are three cups on the table."
+      }
+    ]
+  },
+  {
+    "id": "a1-neli",
+    "estonian": "neli",
+    "english": "four",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Meil on neli tooli.",
+        "english": "We have four chairs."
+      }
+    ]
+  },
+  {
+    "id": "a1-viis",
+    "estonian": "viis",
+    "english": "five",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Käel on viis sõrme.",
+        "english": "A hand has five fingers."
+      }
+    ]
+  },
+  {
+    "id": "a1-kuus",
+    "estonian": "kuus",
+    "english": "six",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Kell on kuus.",
+        "english": "It is six o'clock."
+      }
+    ]
+  },
+  {
+    "id": "a1-seitse",
+    "estonian": "seitse",
+    "english": "seven",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Nädalas on seitse päeva.",
+        "english": "There are seven days in a week."
+      }
+    ]
+  },
+  {
+    "id": "a1-kaheksa",
+    "estonian": "kaheksa",
+    "english": "eight",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma töötan kaheksa tundi.",
+        "english": "I work eight hours."
+      }
+    ]
+  },
+  {
+    "id": "a1-üheksa",
+    "estonian": "üheksa",
+    "english": "nine",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Buss tuleb kell üheksa.",
+        "english": "The bus comes at nine o'clock."
+      }
+    ]
+  },
+  {
+    "id": "a1-kümme",
+    "estonian": "kümme",
+    "english": "ten",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mul on kümme eurot.",
+        "english": "I have ten euros."
+      }
+    ]
+  },
+  {
+    "id": "a1-te",
+    "estonian": "te",
+    "english": "you (plural/formal)",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Kas te räägite inglise keelt?",
+        "english": "Do you speak English?"
+      }
+    ]
+  },
+  {
+    "id": "a1-nemad",
+    "estonian": "nemad",
+    "english": "they",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Nemad elavad Tallinnas.",
+        "english": "They live in Tallinn."
+      }
+    ]
+  },
+  {
+    "id": "a1-punane",
+    "estonian": "punane",
+    "english": "red",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See lill on punane.",
+        "english": "This flower is red."
+      }
+    ]
+  },
+  {
+    "id": "a1-sinine",
+    "estonian": "sinine",
+    "english": "blue",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Taevas on sinine.",
+        "english": "The sky is blue."
+      }
+    ]
+  },
+  {
+    "id": "a1-roheline",
+    "estonian": "roheline",
+    "english": "green",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Rohi on roheline.",
+        "english": "The grass is green."
+      }
+    ]
+  },
+  {
+    "id": "a1-kollane",
+    "estonian": "kollane",
+    "english": "yellow",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Päike on kollane.",
+        "english": "The sun is yellow."
+      }
+    ]
+  },
+  {
+    "id": "a1-valge",
+    "estonian": "valge",
+    "english": "white",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Lumi on valge.",
+        "english": "Snow is white."
+      }
+    ]
+  },
+  {
+    "id": "a1-must",
+    "estonian": "must",
+    "english": "black",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Minu kass on must.",
+        "english": "My cat is black."
+      }
+    ]
+  },
+  {
+    "id": "a1-hall",
+    "estonian": "hall",
+    "english": "grey",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Taevas on hall.",
+        "english": "The sky is grey."
+      }
+    ]
+  },
+  {
+    "id": "a1-pruun",
+    "estonian": "pruun",
+    "english": "brown",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Koer on pruun.",
+        "english": "The dog is brown."
+      }
+    ]
+  },
+  {
+    "id": "a1-oranž",
+    "estonian": "oranž",
+    "english": "orange",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Apelsin on oranž.",
+        "english": "The orange is orange."
+      }
+    ]
+  },
+  {
+    "id": "a1-esmaspäev",
+    "estonian": "esmaspäev",
+    "english": "Monday",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Esmaspäev on nädala esimene päev.",
+        "english": "Monday is the first day of the week."
+      }
+    ]
+  },
+  {
+    "id": "a1-teisipäev",
+    "estonian": "teisipäev",
+    "english": "Tuesday",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Teisipäeval on mul koosolek.",
+        "english": "I have a meeting on Tuesday."
+      }
+    ]
+  },
+  {
+    "id": "a1-kolmapäev",
+    "estonian": "kolmapäev",
+    "english": "Wednesday",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Kolmapäeval ma õpin eesti keelt.",
+        "english": "On Wednesday I study Estonian."
+      }
+    ]
+  },
+  {
+    "id": "a1-neljapäev",
+    "estonian": "neljapäev",
+    "english": "Thursday",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Neljapäeval läheme kinno.",
+        "english": "On Thursday we go to the cinema."
+      }
+    ]
+  },
+  {
+    "id": "a1-reede",
+    "estonian": "reede",
+    "english": "Friday",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Reede on minu lemmikpäev.",
+        "english": "Friday is my favorite day."
+      }
+    ]
+  },
+  {
+    "id": "a1-laupäev",
+    "estonian": "laupäev",
+    "english": "Saturday",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Laupäeval ma puhkan.",
+        "english": "On Saturday I rest."
+      }
+    ]
+  },
+  {
+    "id": "a1-pühapäev",
+    "estonian": "pühapäev",
+    "english": "Sunday",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Pühapäeval me sööme koos.",
+        "english": "On Sunday we eat together."
+      }
+    ]
+  },
+  {
+    "id": "a1-vend",
+    "estonian": "vend",
+    "english": "brother",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Minu vend on noorem kui mina.",
+        "english": "My brother is younger than me."
+      }
+    ]
+  },
+  {
+    "id": "a1-õde",
+    "estonian": "õde",
+    "english": "sister",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Minu õde elab Tartus.",
+        "english": "My sister lives in Tartu."
+      }
+    ]
+  },
+  {
+    "id": "a1-vanaema",
+    "estonian": "vanaema",
+    "english": "grandmother",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Vanaema teeb väga head kooki.",
+        "english": "Grandmother makes very good cake."
+      }
+    ]
+  },
+  {
+    "id": "a1-vanaisa",
+    "estonian": "vanaisa",
+    "english": "grandfather",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Vanaisa elab maal.",
+        "english": "Grandfather lives in the countryside."
+      }
+    ]
+  },
+  {
+    "id": "a1-poeg",
+    "estonian": "poeg",
+    "english": "son",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Minu poeg käib koolis.",
+        "english": "My son goes to school."
+      }
+    ]
+  },
+  {
+    "id": "a1-tütar",
+    "estonian": "tütar",
+    "english": "daughter",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Minu tütar on viie aastane.",
+        "english": "My daughter is five years old."
+      }
+    ]
+  },
+  {
+    "id": "a1-mees",
+    "estonian": "mees",
+    "english": "man / husband",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See mees on minu naaber.",
+        "english": "This man is my neighbor."
+      }
+    ]
+  },
+  {
+    "id": "a1-naine",
+    "estonian": "naine",
+    "english": "woman / wife",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See naine on õpetaja.",
+        "english": "This woman is a teacher."
+      }
+    ]
+  },
+  {
+    "id": "a1-supp",
+    "estonian": "supp",
+    "english": "soup",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Supp on kuum.",
+        "english": "The soup is hot."
+      }
+    ]
+  },
+  {
+    "id": "a1-liha",
+    "estonian": "liha",
+    "english": "meat",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma ei söö liha.",
+        "english": "I don't eat meat."
+      }
+    ]
+  },
+  {
+    "id": "a1-kala",
+    "estonian": "kala",
+    "english": "fish",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Eestlased söövad palju kala.",
+        "english": "Estonians eat a lot of fish."
+      }
+    ]
+  },
+  {
+    "id": "a1-puuvili",
+    "estonian": "puuvili",
+    "english": "fruit",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma söön iga päev puuvilju.",
+        "english": "I eat fruit every day."
+      }
+    ]
+  },
+  {
+    "id": "a1-õun",
+    "estonian": "õun",
+    "english": "apple",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See õun on magus.",
+        "english": "This apple is sweet."
+      }
+    ]
+  },
+  {
+    "id": "a1-kartul",
+    "estonian": "kartul",
+    "english": "potato",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Kartul on Eesti põhitoit.",
+        "english": "Potato is a staple food in Estonia."
+      }
+    ]
+  },
+  {
+    "id": "a1-juust",
+    "estonian": "juust",
+    "english": "cheese",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma panen leivale juustu.",
+        "english": "I put cheese on the bread."
+      }
+    ]
+  },
+  {
+    "id": "a1-muna",
+    "estonian": "muna",
+    "english": "egg",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Hommikul ma söön muna.",
+        "english": "In the morning I eat an egg."
+      }
+    ]
+  },
+  {
+    "id": "a1-suhkur",
+    "estonian": "suhkur",
+    "english": "sugar",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Kas sa tahad suhkrut kohvi sisse?",
+        "english": "Do you want sugar in your coffee?"
+      }
+    ]
+  },
+  {
+    "id": "a1-sool",
+    "estonian": "sool",
+    "english": "salt",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Palun anna mulle soola.",
+        "english": "Please pass me the salt."
+      }
+    ]
+  },
+  {
+    "id": "a1-või",
+    "estonian": "või",
+    "english": "butter / or",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma panen leivale võid.",
+        "english": "I put butter on the bread."
+      }
+    ]
+  },
+  {
+    "id": "a1-pea",
+    "estonian": "pea",
+    "english": "head",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mul on pea valus.",
+        "english": "My head hurts."
+      }
+    ]
+  },
+  {
+    "id": "a1-käsi",
+    "estonian": "käsi",
+    "english": "hand / arm",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Pese käed ära!",
+        "english": "Wash your hands!"
+      }
+    ]
+  },
+  {
+    "id": "a1-jalg",
+    "estonian": "jalg",
+    "english": "foot / leg",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mu jalg on valus.",
+        "english": "My leg hurts."
+      }
+    ]
+  },
+  {
+    "id": "a1-silm",
+    "estonian": "silm",
+    "english": "eye",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Tal on sinised silmad.",
+        "english": "He/she has blue eyes."
+      }
+    ]
+  },
+  {
+    "id": "a1-kõrv",
+    "estonian": "kõrv",
+    "english": "ear",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma kuulen kõrvaga.",
+        "english": "I hear with my ear."
+      }
+    ]
+  },
+  {
+    "id": "a1-nina",
+    "estonian": "nina",
+    "english": "nose",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Nina on näo keskel.",
+        "english": "The nose is in the middle of the face."
+      }
+    ]
+  },
+  {
+    "id": "a1-suu",
+    "estonian": "suu",
+    "english": "mouth",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Tee suu lahti!",
+        "english": "Open your mouth!"
+      }
+    ]
+  },
+  {
+    "id": "a1-hammas",
+    "estonian": "hammas",
+    "english": "tooth",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mul on hammas valus.",
+        "english": "My tooth hurts."
+      }
+    ]
+  },
+  {
+    "id": "a1-süda",
+    "estonian": "süda",
+    "english": "heart",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Süda lööb kiiresti.",
+        "english": "The heart beats fast."
+      }
+    ]
+  },
+  {
+    "id": "a1-olema",
+    "estonian": "olema",
+    "english": "to be",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma olen eestlane.",
+        "english": "I am Estonian."
+      }
+    ]
+  },
+  {
+    "id": "a1-tegema",
+    "estonian": "tegema",
+    "english": "to do / to make",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mida sa teed?",
+        "english": "What are you doing?"
+      }
+    ]
+  },
+  {
+    "id": "a1-minema",
+    "estonian": "minema",
+    "english": "to go",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma lähen poodi.",
+        "english": "I am going to the store."
+      }
+    ]
+  },
+  {
+    "id": "a1-tulema",
+    "estonian": "tulema",
+    "english": "to come",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Tule siia!",
+        "english": "Come here!"
+      }
+    ]
+  },
+  {
+    "id": "a1-sööma",
+    "estonian": "sööma",
+    "english": "to eat",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma söön lõunat.",
+        "english": "I am eating lunch."
+      }
+    ]
+  },
+  {
+    "id": "a1-jooma",
+    "estonian": "jooma",
+    "english": "to drink",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma joon vett.",
+        "english": "I drink water."
+      }
+    ]
+  },
+  {
+    "id": "a1-rääkima",
+    "estonian": "rääkima",
+    "english": "to speak / to talk",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma räägin eesti keelt.",
+        "english": "I speak Estonian."
+      }
+    ]
+  },
+  {
+    "id": "a1-lugema",
+    "estonian": "lugema",
+    "english": "to read",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma loen raamatut.",
+        "english": "I am reading a book."
+      }
+    ]
+  },
+  {
+    "id": "a1-kirjutama",
+    "estonian": "kirjutama",
+    "english": "to write",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma kirjutan kirja.",
+        "english": "I am writing a letter."
+      }
+    ]
+  },
+  {
+    "id": "a1-õppima",
+    "estonian": "õppima",
+    "english": "to learn / to study",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma õpin eesti keelt.",
+        "english": "I am learning Estonian."
+      }
+    ]
+  },
+  {
+    "id": "a1-töötama",
+    "estonian": "töötama",
+    "english": "to work",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma töötan haiglas.",
+        "english": "I work in a hospital."
+      }
+    ]
+  },
+  {
+    "id": "a1-magama",
+    "estonian": "magama",
+    "english": "to sleep",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma magan kaheksa tundi.",
+        "english": "I sleep eight hours."
+      }
+    ]
+  },
+  {
+    "id": "a1-elama",
+    "estonian": "elama",
+    "english": "to live",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma elan Tallinnas.",
+        "english": "I live in Tallinn."
+      }
+    ]
+  },
+  {
+    "id": "a1-tahtma",
+    "estonian": "tahtma",
+    "english": "to want",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma tahan jäätist.",
+        "english": "I want ice cream."
+      }
+    ]
+  },
+  {
+    "id": "a1-saama",
+    "estonian": "saama",
+    "english": "to get / can",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma saan aru.",
+        "english": "I understand."
+      }
+    ]
+  },
+  {
+    "id": "a1-teadma",
+    "estonian": "teadma",
+    "english": "to know",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma ei tea.",
+        "english": "I don't know."
+      }
+    ]
+  },
+  {
+    "id": "a1-nägema",
+    "estonian": "nägema",
+    "english": "to see",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma näen merd.",
+        "english": "I see the sea."
+      }
+    ]
+  },
+  {
+    "id": "a1-kuulma",
+    "estonian": "kuulma",
+    "english": "to hear",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma kuulen muusikat.",
+        "english": "I hear music."
+      }
+    ]
+  },
+  {
+    "id": "a1-ostma",
+    "estonian": "ostma",
+    "english": "to buy",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma ostan leiba.",
+        "english": "I am buying bread."
+      }
+    ]
+  },
+  {
+    "id": "a1-andma",
+    "estonian": "andma",
+    "english": "to give",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Anna mulle see raamat.",
+        "english": "Give me that book."
+      }
+    ]
+  },
+  {
+    "id": "a1-mängima",
+    "estonian": "mängima",
+    "english": "to play",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Lapsed mängivad õues.",
+        "english": "The children play outside."
+      }
+    ]
+  },
+  {
+    "id": "a1-ilus",
+    "estonian": "ilus",
+    "english": "beautiful",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See lill on ilus.",
+        "english": "This flower is beautiful."
+      }
+    ]
+  },
+  {
+    "id": "a1-kuum",
+    "estonian": "kuum",
+    "english": "hot",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Kohv on kuum.",
+        "english": "The coffee is hot."
+      }
+    ]
+  },
+  {
+    "id": "a1-külm",
+    "estonian": "külm",
+    "english": "cold",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Talvel on külm.",
+        "english": "It is cold in winter."
+      }
+    ]
+  },
+  {
+    "id": "a1-soe",
+    "estonian": "soe",
+    "english": "warm",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Täna on soe ilm.",
+        "english": "Today the weather is warm."
+      }
+    ]
+  },
+  {
+    "id": "a1-kallis",
+    "estonian": "kallis",
+    "english": "expensive / dear",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See on liiga kallis.",
+        "english": "This is too expensive."
+      }
+    ]
+  },
+  {
+    "id": "a1-odav",
+    "estonian": "odav",
+    "english": "cheap",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See pood on odav.",
+        "english": "This shop is cheap."
+      }
+    ]
+  },
+  {
+    "id": "a1-noor",
+    "estonian": "noor",
+    "english": "young",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ta on veel noor.",
+        "english": "He/she is still young."
+      }
+    ]
+  },
+  {
+    "id": "a1-kiire",
+    "estonian": "kiire",
+    "english": "fast / busy",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mul on kiire.",
+        "english": "I am in a hurry."
+      }
+    ]
+  },
+  {
+    "id": "a1-aeglane",
+    "estonian": "aeglane",
+    "english": "slow",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Palun räägi aeglasemalt.",
+        "english": "Please speak more slowly."
+      }
+    ]
+  },
+  {
+    "id": "a1-pikk",
+    "estonian": "pikk",
+    "english": "tall / long",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ta on väga pikk.",
+        "english": "He/she is very tall."
+      }
+    ]
+  },
+  {
+    "id": "a1-lühike",
+    "estonian": "lühike",
+    "english": "short",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See tee on lühike.",
+        "english": "This road is short."
+      }
+    ]
+  },
+  {
+    "id": "a1-kerge",
+    "estonian": "kerge",
+    "english": "light / easy",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See ülesanne on kerge.",
+        "english": "This task is easy."
+      }
+    ]
+  },
+  {
+    "id": "a1-raske",
+    "estonian": "raske",
+    "english": "heavy / difficult",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See kott on raske.",
+        "english": "This bag is heavy."
+      }
+    ]
+  },
+  {
+    "id": "a1-pood",
+    "estonian": "pood",
+    "english": "shop / store",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma lähen poodi.",
+        "english": "I am going to the store."
+      }
+    ]
+  },
+  {
+    "id": "a1-restoran",
+    "estonian": "restoran",
+    "english": "restaurant",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Me sööme restoranis.",
+        "english": "We eat at a restaurant."
+      }
+    ]
+  },
+  {
+    "id": "a1-haigla",
+    "estonian": "haigla",
+    "english": "hospital",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Arst töötab haiglas.",
+        "english": "The doctor works in a hospital."
+      }
+    ]
+  },
+  {
+    "id": "a1-apteek",
+    "estonian": "apteek",
+    "english": "pharmacy",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma ostan rohtu apteegist.",
+        "english": "I buy medicine from the pharmacy."
+      }
+    ]
+  },
+  {
+    "id": "a1-raamatukogu",
+    "estonian": "raamatukogu",
+    "english": "library",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma loen raamatukogus.",
+        "english": "I read in the library."
+      }
+    ]
+  },
+  {
+    "id": "a1-linn",
+    "estonian": "linn",
+    "english": "city",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Tallinn on Eesti pealinn.",
+        "english": "Tallinn is the capital of Estonia."
+      }
+    ]
+  },
+  {
+    "id": "a1-tänav",
+    "estonian": "tänav",
+    "english": "street",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mis tänaval sa elad?",
+        "english": "What street do you live on?"
+      }
+    ]
+  },
+  {
+    "id": "a1-buss",
+    "estonian": "buss",
+    "english": "bus",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma sõidan bussiga tööle.",
+        "english": "I take the bus to work."
+      }
+    ]
+  },
+  {
+    "id": "a1-rong",
+    "estonian": "rong",
+    "english": "train",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Rong läheb Tartusse.",
+        "english": "The train goes to Tartu."
+      }
+    ]
+  },
+  {
+    "id": "a1-lennuk",
+    "estonian": "lennuk",
+    "english": "airplane",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Lennuk lendab kõrgel.",
+        "english": "The airplane flies high."
+      }
+    ]
+  },
+  {
+    "id": "a1-tund",
+    "estonian": "tund",
+    "english": "hour / lesson",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Tund kestab 45 minutit.",
+        "english": "The lesson lasts 45 minutes."
+      }
+    ]
+  },
+  {
+    "id": "a1-minut",
+    "estonian": "minut",
+    "english": "minute",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Oota üks minut.",
+        "english": "Wait one minute."
+      }
+    ]
+  },
+  {
+    "id": "a1-nädal",
+    "estonian": "nädal",
+    "english": "week",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Üks nädal on seitse päeva.",
+        "english": "One week is seven days."
+      }
+    ]
+  },
+  {
+    "id": "a1-kuu",
+    "estonian": "kuu",
+    "english": "month / moon",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Üks kuu on umbes 30 päeva.",
+        "english": "One month is about 30 days."
+      }
+    ]
+  },
+  {
+    "id": "a1-aasta",
+    "estonian": "aasta",
+    "english": "year",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Üks aasta on 12 kuud.",
+        "english": "One year is 12 months."
+      }
+    ]
+  },
+  {
+    "id": "a1-kell",
+    "estonian": "kell",
+    "english": "clock / time",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mis kell on?",
+        "english": "What time is it?"
+      }
+    ]
+  },
+  {
+    "id": "a1-mina",
+    "estonian": "mina",
+    "english": "I (emphatic)",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mina olen Eestist.",
+        "english": "I am from Estonia."
+      }
+    ]
+  },
+  {
+    "id": "a1-sina",
+    "estonian": "sina",
+    "english": "you (emphatic)",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Sina oled minu sõber.",
+        "english": "You are my friend."
+      }
+    ]
+  },
+  {
+    "id": "a1-see",
+    "estonian": "see",
+    "english": "this / that",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See on minu raamat.",
+        "english": "This is my book."
+      }
+    ]
+  },
+  {
+    "id": "a1-keel",
+    "estonian": "keel",
+    "english": "language / tongue",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Eesti keel on ilus.",
+        "english": "The Estonian language is beautiful."
+      }
+    ]
+  },
+  {
+    "id": "a1-sõna",
+    "estonian": "sõna",
+    "english": "word",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma õpin uusi sõnu.",
+        "english": "I am learning new words."
+      }
+    ]
+  },
+  {
+    "id": "a1-küsimus",
+    "estonian": "küsimus",
+    "english": "question",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mul on üks küsimus.",
+        "english": "I have one question."
+      }
+    ]
+  },
+  {
+    "id": "a1-vastus",
+    "estonian": "vastus",
+    "english": "answer",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma ei tea vastust.",
+        "english": "I don't know the answer."
+      }
+    ]
+  },
+  {
+    "id": "a1-arst",
+    "estonian": "arst",
+    "english": "doctor",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma lähen arsti juurde.",
+        "english": "I am going to the doctor."
+      }
+    ]
+  },
+  {
+    "id": "a1-õpetaja",
+    "estonian": "õpetaja",
+    "english": "teacher",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Minu õpetaja on väga hea.",
+        "english": "My teacher is very good."
+      }
+    ]
+  },
+  {
+    "id": "a1-õpilane",
+    "estonian": "õpilane",
+    "english": "student",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ma olen õpilane.",
+        "english": "I am a student."
+      }
+    ]
+  },
+  {
+    "id": "a1-riik",
+    "estonian": "riik",
+    "english": "country / state",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Eesti on väike riik.",
+        "english": "Estonia is a small country."
+      }
+    ]
+  },
+  {
+    "id": "a1-meri",
+    "estonian": "meri",
+    "english": "sea",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Meri on sinine.",
+        "english": "The sea is blue."
+      }
+    ]
+  },
+  {
+    "id": "a1-mets",
+    "estonian": "mets",
+    "english": "forest",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Eestis on palju metsa.",
+        "english": "There is a lot of forest in Estonia."
+      }
+    ]
+  },
+  {
+    "id": "a1-tuba",
+    "estonian": "tuba",
+    "english": "room",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See tuba on suur.",
+        "english": "This room is big."
+      }
+    ]
+  },
+  {
+    "id": "a1-uks",
+    "estonian": "uks",
+    "english": "door",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Palun sulge uks.",
+        "english": "Please close the door."
+      }
+    ]
+  },
+  {
+    "id": "a1-aken",
+    "estonian": "aken",
+    "english": "window",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Tee aken lahti!",
+        "english": "Open the window!"
+      }
+    ]
+  },
+  {
+    "id": "a1-laud",
+    "estonian": "laud",
+    "english": "table",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Raamat on laual.",
+        "english": "The book is on the table."
+      }
+    ]
+  },
+  {
+    "id": "a1-tool",
+    "estonian": "tool",
+    "english": "chair",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Istu toolile.",
+        "english": "Sit on the chair."
+      }
+    ]
+  },
+  {
+    "id": "a1-telefon",
+    "estonian": "telefon",
+    "english": "phone",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Minu telefon heliseb.",
+        "english": "My phone is ringing."
+      }
+    ]
+  },
+  {
+    "id": "a1-raha",
+    "estonian": "raha",
+    "english": "money",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mul ei ole raha.",
+        "english": "I don't have money."
+      }
+    ]
+  },
+  {
+    "id": "a1-aeg",
+    "estonian": "aeg",
+    "english": "time",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mul ei ole aega.",
+        "english": "I don't have time."
+      }
+    ]
+  },
+  {
+    "id": "a1-koht",
+    "estonian": "koht",
+    "english": "place / spot",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See on ilus koht.",
+        "english": "This is a beautiful place."
+      }
+    ]
+  },
+  {
+    "id": "a1-inimene",
+    "estonian": "inimene",
+    "english": "person / human",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ta on hea inimene.",
+        "english": "He/she is a good person."
+      }
+    ]
+  },
+  {
+    "id": "a1-poiss",
+    "estonian": "poiss",
+    "english": "boy",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Poiss jookseb kiiresti.",
+        "english": "The boy runs fast."
+      }
+    ]
+  },
+  {
+    "id": "a1-tüdruk",
+    "estonian": "tüdruk",
+    "english": "girl",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Tüdruk loeb raamatut.",
+        "english": "The girl reads a book."
+      }
+    ]
+  },
+  {
+    "id": "a1-talv",
+    "estonian": "talv",
+    "english": "winter",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Eesti talv on pikk.",
+        "english": "Estonian winter is long."
+      }
+    ]
+  },
+  {
+    "id": "a1-suvi",
+    "estonian": "suvi",
+    "english": "summer",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Suvel on soe.",
+        "english": "It is warm in summer."
+      }
+    ]
+  },
+  {
+    "id": "a1-kevad",
+    "estonian": "kevad",
+    "english": "spring",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Kevadel hakkavad lilled õitsema.",
+        "english": "In spring the flowers start blooming."
+      }
+    ]
+  },
+  {
+    "id": "a1-sügis",
+    "estonian": "sügis",
+    "english": "autumn",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Sügisel langevad lehed.",
+        "english": "In autumn the leaves fall."
+      }
+    ]
+  },
+  {
+    "id": "a1-ütlema",
+    "estonian": "ütlema",
+    "english": "say",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ütle oma nimi!",
+        "english": "Ütle oma nimi!"
+      },
+      {
+        "estonian": "Oleks ta siis ühegi lohutava sõna öelnud.",
+        "english": "Oleks ta siis ühegi lohutava sõna öelnud."
+      },
+      {
+        "estonian": "Hästi öeldud!",
+        "english": "Hästi öeldud!"
+      }
+    ]
+  },
+  {
+    "id": "a1-võtma",
+    "estonian": "võtma",
+    "english": "take",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Võta kott ja lähme!",
+        "english": "Võta kott ja lähme!"
+      },
+      {
+        "estonian": "Vares võttis leivatüki noka vahele.",
+        "english": "Vares võttis leivatüki noka vahele."
+      },
+      {
+        "estonian": "Võtsin laua pealt võtmed.",
+        "english": "Võtsin laua pealt võtmed."
+      }
+    ]
+  },
+  {
+    "id": "a1-pidama",
+    "estonian": "pidama",
+    "english": "need",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Kõik peavad kohal olema.",
+        "english": "Kõik peavad kohal olema."
+      },
+      {
+        "estonian": "Ta pidi vaikides ülekohut taluma.",
+        "english": "Ta pidi vaikides ülekohut taluma."
+      },
+      {
+        "estonian": "Lapsed peavad vanemate sõna kuulama.",
+        "english": "Lapsed peavad vanemate sõna kuulama."
+      }
+    ]
+  },
+  {
+    "id": "a1-panema",
+    "estonian": "panema",
+    "english": "put",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Pane piim külmkappi.",
+        "english": "Pane piim külmkappi."
+      },
+      {
+        "estonian": "Maria paneb näputöö käest ja läheb ust avama.",
+        "english": "Maria paneb näputöö käest ja läheb ust avama."
+      },
+      {
+        "estonian": "Pane raamat lauale.",
+        "english": "Pane raamat lauale."
+      }
+    ]
+  },
+  {
+    "id": "a1-hakkama",
+    "estonian": "hakkama",
+    "english": "start",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Kõik hakkasid naerma.",
+        "english": "Kõik hakkasid naerma."
+      },
+      {
+        "estonian": "Päevad hakkavad pikenema.",
+        "english": "Päevad hakkavad pikenema."
+      },
+      {
+        "estonian": "Hakkame siis tööle.",
+        "english": "Hakkame siis tööle."
+      }
+    ]
+  },
+  {
+    "id": "a1-viima",
+    "estonian": "viima",
+    "english": "take",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Isa viis hommikul lapsed kooli.",
+        "english": "Isa viis hommikul lapsed kooli."
+      },
+      {
+        "estonian": "Ära unusta naisele sünnipäevaks lilli viia.",
+        "english": "Ära unusta naisele sünnipäevaks lilli viia."
+      },
+      {
+        "estonian": "Limusiin viib presidendi otse lennujaama.",
+        "english": "Limusiin viib presidendi otse lennujaama."
+      }
+    ]
+  },
+  {
+    "id": "a1-tooma",
+    "estonian": "tooma",
+    "english": "bring",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Kohv toodi lauda sekundiga.",
+        "english": "Kohv toodi lauda sekundiga."
+      },
+      {
+        "estonian": "Jõuluvana tõi kõigile kingitusi.",
+        "english": "Jõuluvana tõi kõigile kingitusi."
+      },
+      {
+        "estonian": "Paat tõi merehädalised meie saarele.",
+        "english": "Paat tõi merehädalised meie saarele."
+      }
+    ]
+  },
+  {
+    "id": "a1-leidma",
+    "estonian": "leidma",
+    "english": "find",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Viige linnupoeg tagasi sinna, kust te ta leidsite.",
+        "english": "Viige linnupoeg tagasi sinna, kust te ta leidsite."
+      },
+      {
+        "estonian": "On vähe lootust teda elusana leida.",
+        "english": "On vähe lootust teda elusana leida."
+      },
+      {
+        "estonian": "Ma ei leia oma rahakotti.",
+        "english": "Ma ei leia oma rahakotti."
+      }
+    ]
+  },
+  {
+    "id": "a1-mõtlema",
+    "estonian": "mõtlema",
+    "english": "think",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Pean asjad enda jaoks selgeks mõtlema.",
+        "english": "Pean asjad enda jaoks selgeks mõtlema."
+      },
+      {
+        "estonian": "Ära kohe vasta, mõtle enne natuke.",
+        "english": "Ära kohe vasta, mõtle enne natuke."
+      },
+      {
+        "estonian": "Inimesed ei mõtle, mida nad ütlevad.",
+        "english": "Inimesed ei mõtle, mida nad ütlevad."
+      }
+    ]
+  },
+  {
+    "id": "a1-vaatama",
+    "estonian": "vaatama",
+    "english": "watch",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ära otse päikesesse vaata!",
+        "english": "Ära otse päikesesse vaata!"
+      },
+      {
+        "estonian": "Ootaja vaatas närviliselt kella.",
+        "english": "Ootaja vaatas närviliselt kella."
+      },
+      {
+        "estonian": "Vaata mõlemale poole, enne kui üle tee lähed.",
+        "english": "Vaata mõlemale poole, enne kui üle tee lähed."
+      }
+    ]
+  },
+  {
+    "id": "a1-elu",
+    "estonian": "elu",
+    "english": "life",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ta elu on väljaspool hädaohtu.",
+        "english": "Ta elu on väljaspool hädaohtu."
+      },
+      {
+        "estonian": "Arstid võitlesid haige elu eest.",
+        "english": "Arstid võitlesid haige elu eest."
+      },
+      {
+        "estonian": "Kas siin kiputi kellegi elu kallale?",
+        "english": "Kas siin kiputi kellegi elu kallale?"
+      }
+    ]
+  },
+  {
+    "id": "a1-maa",
+    "estonian": "maa",
+    "english": "land",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Pikk merereis ei ole sellega veel lõppenud, kui maa paistma hakkab.",
+        "english": "Pikk merereis ei ole sellega veel lõppenud, kui maa paistma hakkab."
+      },
+      {
+        "estonian": "Pääsukesed lendasid madalalt maa kohal.",
+        "english": "Pääsukesed lendasid madalalt maa kohal."
+      },
+      {
+        "estonian": "Laev lähenes maale.",
+        "english": "Laev lähenes maale."
+      }
+    ]
+  },
+  {
+    "id": "a1-asi",
+    "estonian": "asi",
+    "english": "thing",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Terve tuba oli igasuguseid asju täis.",
+        "english": "Terve tuba oli igasuguseid asju täis."
+      },
+      {
+        "estonian": "Naine pakkis oma asjad kokku ja läks minema.",
+        "english": "Naine pakkis oma asjad kokku ja läks minema."
+      },
+      {
+        "estonian": "Küll ta armastab ilusaid asju.",
+        "english": "Küll ta armastab ilusaid asju."
+      }
+    ]
+  },
+  {
+    "id": "a1-kord",
+    "estonian": "kord",
+    "english": "time",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "See oli ka ainus kord, kui reisil arstiabi vaja läks.",
+        "english": "See oli ka ainus kord, kui reisil arstiabi vaja läks."
+      },
+      {
+        "estonian": "Iga kord lõpeb see halvasti.",
+        "english": "Iga kord lõpeb see halvasti."
+      },
+      {
+        "estonian": "Sel korral tuli ta üksi.",
+        "english": "Sel korral tuli ta üksi."
+      }
+    ]
+  },
+  {
+    "id": "a1-osa",
+    "estonian": "osa",
+    "english": "part",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Rõdu on hoone osa.",
+        "english": "Rõdu on hoone osa."
+      },
+      {
+        "estonian": "Eri suuruse ja kujuga aju osad.",
+        "english": "Eri suuruse ja kujuga aju osad."
+      },
+      {
+        "estonian": "Alustame õhtu piduliku osaga.",
+        "english": "Alustame õhtu piduliku osaga."
+      }
+    ]
+  },
+  {
+    "id": "a1-pool",
+    "estonian": "pool",
+    "english": "half",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Pool miljonit.",
+        "english": "Pool miljonit."
+      },
+      {
+        "estonian": "Ostsin pool kilo õunu.",
+        "english": "Ostsin pool kilo õunu."
+      },
+      {
+        "estonian": "Koosolek kestis pool tundi (= 30 minutit).",
+        "english": "Koosolek kestis pool tundi (= 30 minutit)."
+      }
+    ]
+  },
+  {
+    "id": "a1-loom",
+    "estonian": "loom",
+    "english": "animal",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Maailmas elab palju huvitavaid linde, loomi ja putukaid.",
+        "english": "Maailmas elab palju huvitavaid linde, loomi ja putukaid."
+      },
+      {
+        "estonian": "Elevandid on ühed vaadatumad loomad loomaaedades.",
+        "english": "Elevandid on ühed vaadatumad loomad loomaaedades."
+      },
+      {
+        "estonian": "Jänes, rebane ja karu on loomad.",
+        "english": "Jänes, rebane ja karu on loomad."
+      }
+    ]
+  },
+  {
+    "id": "a1-puu",
+    "estonian": "puu",
+    "english": "tree",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ahvid elavad puu otsas.",
+        "english": "Ahvid elavad puu otsas."
+      },
+      {
+        "estonian": "Metsas on kohti, kus puud ei kasva.",
+        "english": "Metsas on kohti, kus puud ei kasva."
+      },
+      {
+        "estonian": "Päike hakkab puude taha vajuma.",
+        "english": "Päike hakkab puude taha vajuma."
+      }
+    ]
+  },
+  {
+    "id": "a1-lill",
+    "estonian": "lill",
+    "english": "flower",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Aeda on istutatud õunapuid ja põõsaid, lilledest rääkimata.",
+        "english": "Aeda on istutatud õunapuid ja põõsaid, lilledest rääkimata."
+      },
+      {
+        "estonian": "Aias õitsevad kaunid lilled.",
+        "english": "Aias õitsevad kaunid lilled."
+      },
+      {
+        "estonian": "Pane lilled vaasi!",
+        "english": "Pane lilled vaasi!"
+      }
+    ]
+  },
+  {
+    "id": "a1-jõgi",
+    "estonian": "jõgi",
+    "english": "river",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Sügaval oru põhjas lookleb jõgi.",
+        "english": "Sügaval oru põhjas lookleb jõgi."
+      },
+      {
+        "estonian": "Laevatatav jõgi.",
+        "english": "Laevatatav jõgi."
+      },
+      {
+        "estonian": "Amazonas on üks maailma pikimaid jõgesid.",
+        "english": "Amazonas on üks maailma pikimaid jõgesid."
+      }
+    ]
+  },
+  {
+    "id": "a1-mägi",
+    "estonian": "mägi",
+    "english": "mountain",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Otepää ümbruse mäed.",
+        "english": "Otepää ümbruse mäed."
+      },
+      {
+        "estonian": "Mäe otsast avanesid imelised vaated.",
+        "english": "Mäe otsast avanesid imelised vaated."
+      },
+      {
+        "estonian": "Fuji on jaapanlastele püha mägi.",
+        "english": "Fuji on jaapanlastele püha mägi."
+      }
+    ]
+  },
+  {
+    "id": "a1-järv",
+    "estonian": "järv",
+    "english": "lake",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Käisime järves ujumas.",
+        "english": "Käisime järves ujumas."
+      },
+      {
+        "estonian": "Kalamehed sõitsid paadiga järvele.",
+        "english": "Kalamehed sõitsid paadiga järvele."
+      },
+      {
+        "estonian": "Maja ehitati järve kaldale.",
+        "english": "Maja ehitati järve kaldale."
+      }
+    ]
+  },
+  {
+    "id": "a1-tuul",
+    "estonian": "tuul",
+    "english": "wind",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Väljas tõusis tugev tuul.",
+        "english": "Väljas tõusis tugev tuul."
+      },
+      {
+        "estonian": "Tuul puhub tormi ajal kuni 30 meetrit sekundis.",
+        "english": "Tuul puhub tormi ajal kuni 30 meetrit sekundis."
+      },
+      {
+        "estonian": "Kael on kange, tuul on vist läbi tõmmanud.",
+        "english": "Kael on kange, tuul on vist läbi tõmmanud."
+      }
+    ]
+  },
+  {
+    "id": "a1-taevas",
+    "estonian": "taevas",
+    "english": "sky",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Vanasti oli rohi rohelisem ja taevas sinisem.",
+        "english": "Vanasti oli rohi rohelisem ja taevas sinisem."
+      },
+      {
+        "estonian": "Taevas on pilves.",
+        "english": "Taevas on pilves."
+      },
+      {
+        "estonian": "Taevasse ilmus vikerkaar.",
+        "english": "Taevasse ilmus vikerkaar."
+      }
+    ]
+  },
+  {
+    "id": "a1-täht",
+    "estonian": "täht",
+    "english": "star",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Taevas näeb tuhandeid langevaid tähti.",
+        "english": "Taevas näeb tuhandeid langevaid tähti."
+      },
+      {
+        "estonian": "Tähed säravad taevas.",
+        "english": "Tähed säravad taevas."
+      }
+    ]
+  },
+  {
+    "id": "a1-laev",
+    "estonian": "laev",
+    "english": "ship",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Laev sõidab Eesti lipu all.",
+        "english": "Laev sõidab Eesti lipu all."
+      },
+      {
+        "estonian": "Merearheoloogid otsivad Läänemerest uppunud laevu.",
+        "english": "Merearheoloogid otsivad Läänemerest uppunud laevu."
+      },
+      {
+        "estonian": "Lõbusõidulaev.",
+        "english": "Lõbusõidulaev."
+      }
+    ]
+  },
+  {
+    "id": "a1-sild",
+    "estonian": "sild",
+    "english": "bridge",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Pirita jõe sild.",
+        "english": "Pirita jõe sild."
+      },
+      {
+        "estonian": "Elava liiklusega tänavale tehti jalakäijate sild.",
+        "english": "Elava liiklusega tänavale tehti jalakäijate sild."
+      },
+      {
+        "estonian": "Raudsild.",
+        "english": "Raudsild."
+      }
+    ]
+  },
+  {
+    "id": "a1-tugev",
+    "estonian": "tugev",
+    "english": "strong",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Vanaisa oli tugev nagu karu.",
+        "english": "Vanaisa oli tugev nagu karu."
+      },
+      {
+        "estonian": "Kehalt tugev mees.",
+        "english": "Kehalt tugev mees."
+      },
+      {
+        "estonian": "Minu isa on väga tugev mees.",
+        "english": "Minu isa on väga tugev mees."
+      }
+    ]
+  },
+  {
+    "id": "a1-nõrk",
+    "estonian": "nõrk",
+    "english": "weak",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ründaja otsib nõrku vastaseid.",
+        "english": "Ründaja otsib nõrku vastaseid."
+      },
+      {
+        "estonian": "Nõrk iseloom.",
+        "english": "Nõrk iseloom."
+      },
+      {
+        "estonian": "Nõrk käepigistus.",
+        "english": "Nõrk käepigistus."
+      }
+    ]
+  },
+  {
+    "id": "a1-puhas",
+    "estonian": "puhas",
+    "english": "clean",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Peske käed puhtaks.",
+        "english": "Peske käed puhtaks."
+      },
+      {
+        "estonian": "Panin voodisse puhtad linad.",
+        "english": "Panin voodisse puhtad linad."
+      },
+      {
+        "estonian": "Puhas õhk, puhas vesi ja vaikus on väärtused omaette.",
+        "english": "Puhas õhk, puhas vesi ja vaikus on väärtused omaette."
+      }
+    ]
+  },
+  {
+    "id": "a1-oluline",
+    "estonian": "oluline",
+    "english": "important",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Metsadel on oluline osa süsinikuringes.",
+        "english": "Metsadel on oluline osa süsinikuringes."
+      },
+      {
+        "estonian": "Teiste arvamus on talle väga oluline.",
+        "english": "Teiste arvamus on talle väga oluline."
+      },
+      {
+        "estonian": "Üks oluline erinevus siiski oli.",
+        "english": "Üks oluline erinevus siiski oli."
+      }
+    ]
+  },
+  {
+    "id": "a1-vajalik",
+    "estonian": "vajalik",
+    "english": "necessary",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Liha on inimese jaoks vajalike toitainete ning energia allikas.",
+        "english": "Liha on inimese jaoks vajalike toitainete ning energia allikas."
+      },
+      {
+        "estonian": "Samba rajamiseks vajalik summa on 5000 eurot.",
+        "english": "Samba rajamiseks vajalik summa on 5000 eurot."
+      },
+      {
+        "estonian": "Ülivajalik.",
+        "english": "Ülivajalik."
+      }
+    ]
+  },
+  {
+    "id": "a1-võimalik",
+    "estonian": "võimalik",
+    "english": "possible",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Seda oleks võimalik arvutada.",
+        "english": "Seda oleks võimalik arvutada."
+      },
+      {
+        "estonian": "Seaduse järgi on see võimalik.",
+        "english": "Seaduse järgi on see võimalik."
+      },
+      {
+        "estonian": "Asjad lahenesid parimal võimalikul moel.",
+        "english": "Asjad lahenesid parimal võimalikul moel."
+      }
+    ]
+  },
+  {
+    "id": "a1-huvitav",
+    "estonian": "huvitav",
+    "english": "interesting",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Äärmiselt huvitav nähtus.",
+        "english": "Äärmiselt huvitav nähtus."
+      },
+      {
+        "estonian": "Kuulsime huvitavaid fakte perekonna ajaloost.",
+        "english": "Kuulsime huvitavaid fakte perekonna ajaloost."
+      },
+      {
+        "estonian": "Telekas polnud midagi huvitavat.",
+        "english": "Telekas polnud midagi huvitavat."
+      }
+    ]
+  },
+  {
+    "id": "a1-tervis",
+    "estonian": "tervis",
+    "english": "health",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ta on hea vaimse tervise juures.",
+        "english": "Ta on hea vaimse tervise juures."
+      },
+      {
+        "estonian": "Nõrga tervisega tüdrukud.",
+        "english": "Nõrga tervisega tüdrukud."
+      },
+      {
+        "estonian": "Tulen, kui tervis lubab.",
+        "english": "Tulen, kui tervis lubab."
+      }
+    ]
+  },
+  {
+    "id": "a1-kultuur",
+    "estonian": "kultuur",
+    "english": "culture",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Kasvab majandus, õitseb kultuur.",
+        "english": "Kasvab majandus, õitseb kultuur."
+      },
+      {
+        "estonian": "Iidse kultuuriga maa.",
+        "english": "Iidse kultuuriga maa."
+      },
+      {
+        "estonian": "Tänapäeva kultuur.",
+        "english": "Tänapäeva kultuur."
+      }
+    ]
+  },
+  {
+    "id": "a1-loodus",
+    "estonian": "loodus",
+    "english": "nature",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Veetsin päeva vabas looduses.",
+        "english": "Veetsin päeva vabas looduses."
+      },
+      {
+        "estonian": "Plastpudel võib loodust reostada aastakümneid.",
+        "english": "Plastpudel võib loodust reostada aastakümneid."
+      },
+      {
+        "estonian": "Inimkond on osa loodusest.",
+        "english": "Inimkond on osa loodusest."
+      }
+    ]
+  },
+  {
+    "id": "a1-muusika",
+    "estonian": "muusika",
+    "english": "music",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Muusikale pühendatud elu.",
+        "english": "Muusikale pühendatud elu."
+      },
+      {
+        "estonian": "Peol mängis vali muusika.",
+        "english": "Peol mängis vali muusika."
+      }
+    ]
+  },
+  {
+    "id": "a1-plaan",
+    "estonian": "plaan",
+    "english": "plan",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Mul on täna plaan teha lambalihahautist.",
+        "english": "Mul on täna plaan teha lambalihahautist."
+      },
+      {
+        "estonian": "Suvel on plaanis sõpradega mööda Eestit ringi sõita.",
+        "english": "Suvel on plaanis sõpradega mööda Eestit ringi sõita."
+      },
+      {
+        "estonian": "Ülemusel olid uue töötajaga oma plaanid.",
+        "english": "Ülemusel olid uue töötajaga oma plaanid."
+      }
+    ]
+  },
+  {
+    "id": "a1-uskuma",
+    "estonian": "uskuma",
+    "english": "believe",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ta usub Jumalasse.",
+        "english": "Ta usub Jumalasse."
+      },
+      {
+        "estonian": "Ma ei usu jumalaid, ma ei usu saatust, vaid ennast.",
+        "english": "Ma ei usu jumalaid, ma ei usu saatust, vaid ennast."
+      },
+      {
+        "estonian": "Kas sa usud jumalasse/jumalat?",
+        "english": "Kas sa usud jumalasse/jumalat?"
+      }
+    ]
+  },
+  {
+    "id": "a1-unustama",
+    "estonian": "unustama",
+    "english": "forget",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Hommikuks olin unenäo unustanud.",
+        "english": "Hommikuks olin unenäo unustanud."
+      },
+      {
+        "estonian": "Kas unustasid parooli?",
+        "english": "Kas unustasid parooli?"
+      },
+      {
+        "estonian": "Lubadused unustati kiiresti.",
+        "english": "Lubadused unustati kiiresti."
+      }
+    ]
+  },
+  {
+    "id": "a1-ootama",
+    "estonian": "ootama",
+    "english": "wait",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Peatuses ootas bussi kaks inimest.",
+        "english": "Peatuses ootas bussi kaks inimest."
+      },
+      {
+        "estonian": "Takso ootab maja ees.",
+        "english": "Takso ootab maja ees."
+      },
+      {
+        "estonian": "Ema on juba kümme aastat oma kadunud poega koju oodanud.",
+        "english": "Ema on juba kümme aastat oma kadunud poega koju oodanud."
+      }
+    ]
+  },
+  {
+    "id": "a1-otsima",
+    "estonian": "otsima",
+    "english": "look",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Aita mul prille otsida!",
+        "english": "Aita mul prille otsida!"
+      },
+      {
+        "estonian": "Politsei otsib kadunud marjulist.",
+        "english": "Politsei otsib kadunud marjulist."
+      },
+      {
+        "estonian": "Esimene koht, kust infot otsitakse, on internet.",
+        "english": "Esimene koht, kust infot otsitakse, on internet."
+      }
+    ]
+  },
+  {
+    "id": "a1-alustama",
+    "estonian": "alustama",
+    "english": "begin",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Kui alustasin kunstnikuelu, maalisin peamiselt kõrbemaastikke.",
+        "english": "Kui alustasin kunstnikuelu, maalisin peamiselt kõrbemaastikke."
+      },
+      {
+        "estonian": "Homme alustan dieeti.",
+        "english": "Homme alustan dieeti."
+      },
+      {
+        "estonian": "Meeskond alustas treeningutega aprillis.",
+        "english": "Meeskond alustas treeningutega aprillis."
+      }
+    ]
+  },
+  {
+    "id": "a1-lõpetama",
+    "estonian": "lõpetama",
+    "english": "finish",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ta lõpetas ülikooli 2010. aastal.",
+        "english": "Ta lõpetas ülikooli 2010. aastal."
+      },
+      {
+        "estonian": "Lõpetan parasjagu koristamist.",
+        "english": "Lõpetan parasjagu koristamist."
+      },
+      {
+        "estonian": "Kontserdi lõpetas „Salve Regina”.",
+        "english": "Kontserdi lõpetas „Salve Regina”."
+      }
+    ]
+  },
+  {
+    "id": "a1-kasvama",
+    "estonian": "kasvama",
+    "english": "grow",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Lapsed kasvavad kiiresti.",
+        "english": "Lapsed kasvavad kiiresti."
+      },
+      {
+        "estonian": "Sul on juuksed pikaks kasvanud.",
+        "english": "Sul on juuksed pikaks kasvanud."
+      }
+    ]
+  },
+  {
+    "id": "a1-number",
+    "estonian": "number",
+    "english": "number",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Tähtedest ja numbritest koosnev salasõna.",
+        "english": "Tähtedest ja numbritest koosnev salasõna."
+      },
+      {
+        "estonian": "Summa numbritega.",
+        "english": "Summa numbritega."
+      },
+      {
+        "estonian": "Numbrid ühest kümneni.",
+        "english": "Numbrid ühest kümneni."
+      }
+    ]
+  },
+  {
+    "id": "a1-arv",
+    "estonian": "arv",
+    "english": "number",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Arvud ühest kümneni.",
+        "english": "Arvud ühest kümneni."
+      },
+      {
+        "estonian": "Kolmekohalised arvud.",
+        "english": "Kolmekohalised arvud."
+      },
+      {
+        "estonian": "Seitse on maagiline arv.",
+        "english": "Seitse on maagiline arv."
+      }
+    ]
+  },
+  {
+    "id": "a1-politsei",
+    "estonian": "politsei",
+    "english": "police",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ta töötab politseis.",
+        "english": "Ta töötab politseis."
+      },
+      {
+        "estonian": "Lärmi peale kutsuti kohale politsei.",
+        "english": "Lärmi peale kutsuti kohale politsei."
+      },
+      {
+        "estonian": "Naine viis leitud rahakoti politseisse.",
+        "english": "Naine viis leitud rahakoti politseisse."
+      }
+    ]
+  },
+  {
+    "id": "a1-arvuti",
+    "estonian": "arvuti",
+    "english": "computer",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Istusin arvuti taga terve päeva.",
+        "english": "Istusin arvuti taga terve päeva."
+      },
+      {
+        "estonian": "Andmetele saab ligi nutitelefoni või arvutit kasutades.",
+        "english": "Andmetele saab ligi nutitelefoni või arvutit kasutades."
+      },
+      {
+        "estonian": "Lülitan arvuti sisse.",
+        "english": "Lülitan arvuti sisse."
+      }
+    ]
+  },
+  {
+    "id": "a1-internet",
+    "estonian": "internet",
+    "english": "internet",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Juhtmevaba internet.",
+        "english": "Juhtmevaba internet."
+      },
+      {
+        "estonian": "Mobiilne internet.",
+        "english": "Mobiilne internet."
+      },
+      {
+        "estonian": "Kasutan internetti iga päev.",
+        "english": "Kasutan internetti iga päev."
+      }
+    ]
+  },
+  {
+    "id": "a1-köök",
+    "estonian": "köök",
+    "english": "kitchen",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Ema tegi köögis süüa.",
+        "english": "Ema tegi köögis süüa."
+      },
+      {
+        "estonian": "Ema teeb köögis süüa.",
+        "english": "Ema teeb köögis süüa."
+      },
+      {
+        "estonian": "Korteris on köök, elutuba, magamistuba ja vannituba.",
+        "english": "Korteris on köök, elutuba, magamistuba ja vannituba."
+      }
+    ]
+  },
+  {
+    "id": "a1-korrus",
+    "estonian": "korrus",
+    "english": "storey",
+    "cefrLevel": "A1",
+    "sentences": [
+      {
+        "estonian": "Renoveerimise käigus ehitati hoonele üks korrus juurde.",
+        "english": "Renoveerimise käigus ehitati hoonele üks korrus juurde."
+      },
+      {
+        "estonian": "Majakorrus.",
+        "english": "Majakorrus."
+      },
+      {
+        "estonian": "Ma elan viiendal korrusel.",
+        "english": "Ma elan viiendal korrusel."
+      }
+    ]
+  }
 ]
