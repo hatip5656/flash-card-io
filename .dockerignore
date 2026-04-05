@@ -1,0 +1,15 @@
+.git
+.gitignore
+*.md
+LICENSE
+.idea
+.vscode
+.env
+.DS_Store
+k8s/
+node_modules/
+dist/
+data/db/
+Dockerfile
+docker-compose.yml
+scripts/

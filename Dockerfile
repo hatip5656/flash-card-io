@@ -8,10 +8,11 @@ RUN npm run build
 
 FROM node:20-alpine
 WORKDIR /app
+RUN apk add --no-cache tini
 COPY package.json package-lock.json ./
-RUN npm ci --production
+RUN npm ci --omit=dev
 COPY --from=builder /app/dist/ ./dist/
 COPY data/ ./data/
-VOLUME /app/data/db
-ENV DB_PATH=/app/data/db/progress.db
+ENV DB_PATH=/data/db/progress.db
+ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["node", "dist/index.js"]

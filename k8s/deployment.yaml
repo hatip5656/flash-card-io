@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flash-card-io
+  namespace: flash-card-io
+  labels:
+    app: flash-card-io
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: flash-card-io
+  template:
+    metadata:
+      labels:
+        app: flash-card-io
+    spec:
+      containers:
+        - name: flash-card-io
+          image: ghcr.io/hatip5656/flash-card-io:latest
+          env:
+            - name: TELEGRAM_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: flash-card-io-secrets
+                  key: TELEGRAM_BOT_TOKEN
+            - name: UNSPLASH_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: flash-card-io-secrets
+                  key: UNSPLASH_ACCESS_KEY
+            - name: EKILEX_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: flash-card-io-secrets
+                  key: EKILEX_API_KEY
+            - name: CRON_SCHEDULE
+              value: "0 9 * * *"
+            - name: CRON_TIMEZONE
+              value: "Europe/Tallinn"
+            - name: CEFR_LEVELS
+              value: "A1,A2,B1,B2"
+            - name: DB_PATH
+              value: "/data/db/progress.db"
+            - name: FEATURE_TELEGRAM
+              value: "true"
+            - name: FEATURE_WHATSAPP
+              value: "false"
+          volumeMounts:
+            - name: data
+              mountPath: /data/db
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: flash-card-io-data
+      imagePullSecrets:
+        - name: ghcr-secret
