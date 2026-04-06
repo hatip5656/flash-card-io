@@ -13,5 +13,10 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 COPY --from=builder /app/dist/ ./dist/
 COPY data/ ./data/
+
+# Run as non-root (node user already exists in node:20-alpine as uid 1000)
+USER node
+
+EXPOSE 8080
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["node", "dist/index.js"]
+CMD ["node", "--max-old-space-size=200", "dist/index.js"]

@@ -20,9 +20,19 @@ spec:
       labels:
         app: flash-card-io
     spec:
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
         - name: flash-card-io
           image: ghcr.io/hatip5656/flash-card-io:latest
+          ports:
+            - name: health
+              containerPort: 8080
+              protocol: TCP
           env:
             - name: TELEGRAM_BOT_TOKEN
               valueFrom:
@@ -54,12 +64,35 @@ spec:
               value: "true"
             - name: FEATURE_WHATSAPP
               value: "false"
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=200"
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: health
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 6
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: health
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: health
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           resources:
             requests:
               cpu: 50m
-              memory: 128Mi
+              memory: 192Mi
             limits:
-              cpu: 200m
-              memory: 256Mi
+              cpu: 500m
+              memory: 384Mi
       imagePullSecrets:
         - name: ghcr-secret

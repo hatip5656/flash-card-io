@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { loadConfig } from "./config.js";
+import { startHealthServer, setReady } from "./health.js";
 import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel } from "./db/progress.js";
 import { loadWordBank, getUnsent } from "./flashcard/word-bank.js";
 import { buildFlashcard, buildFlashcardFromEkilex } from "./flashcard/builder.js";
@@ -104,6 +105,9 @@ async function refreshUserJobs(): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  // Start health server early so k8s can probe during startup
+  startHealthServer(8080);
+
   await initDb(config.databaseUrl);
 
   // Register bot commands
@@ -127,6 +131,9 @@ async function main(): Promise<void> {
     async () => { await refreshUserJobs(); },
   );
 
+  // Mark as ready — all systems initialized
+  setReady(true);
+
   console.error(`[main] Flash Card IO started`);
   console.error(`[main] Database: PostgreSQL`);
   console.error(`[main] Default schedule: ${config.cronSchedule} (${config.cronTimezone})`);
@@ -137,6 +144,7 @@ async function main(): Promise<void> {
   // Graceful shutdown
   const shutdown = async () => {
     console.error("[main] Shutting down...");
+    setReady(false);
     clearInterval(refreshInterval);
     globalScheduler.stop();
     if (bot) bot.stop();
