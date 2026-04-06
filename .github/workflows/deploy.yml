@@ -82,6 +82,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
           EKILEX_API_KEY: ${{ secrets.EKILEX_API_KEY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           # Create deployment directory on server
           sshpass -p "$SERVER_PASSWORD" ssh "$SERVER_USER@$SERVER_HOST" "mkdir -p ~/k8s/flash-card-io"
@@ -110,6 +111,7 @@ jobs:
               --from-literal=TELEGRAM_BOT_TOKEN="${TELEGRAM_BOT_TOKEN}" \
               --from-literal=UNSPLASH_ACCESS_KEY="${UNSPLASH_ACCESS_KEY}" \
               --from-literal=EKILEX_API_KEY="${EKILEX_API_KEY}" \
+              --from-literal=DATABASE_URL="${DATABASE_URL}" \
               --dry-run=client -o yaml | kubectl apply -f -
 
             # Update image tag
@@ -117,7 +119,6 @@ jobs:
 
             # Apply manifests
             kubectl apply -f namespace.yaml
-            kubectl apply -f pvc.yaml
             kubectl apply -f deployment.yaml
 
             # Wait for rollout
