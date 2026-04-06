@@ -1,10 +1,27 @@
 services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: flashcard_io
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d flashcard_io"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   flashcard-bot:
     build: .
     env_file: .env
-    volumes:
-      - flashcard-data:/app/data/db
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:
-  flashcard-data:
+  pgdata:

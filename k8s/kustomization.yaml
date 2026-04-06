@@ -5,8 +5,6 @@ namespace: flash-card-io
 
 resources:
   - namespace.yaml
-  - secret.yaml
-  - pvc.yaml
   - deployment.yaml
 
 commonLabels:

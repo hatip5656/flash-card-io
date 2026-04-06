@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import { loadConfig } from "./config.js";
-import { initDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel } from "./db/progress.js";
+import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel } from "./db/progress.js";
 import { loadWordBank, getUnsent } from "./flashcard/word-bank.js";
 import { buildFlashcard, buildFlashcardFromEkilex } from "./flashcard/builder.js";
-import { startGlobalScheduler, syncUserJobs, getActiveJobCount } from "./flashcard/scheduler.js";
+import { startGlobalScheduler, syncUserJobs } from "./flashcard/scheduler.js";
 import { createTelegramChannel } from "./channels/telegram.js";
 import { createWhatsAppChannel } from "./channels/whatsapp.js";
 import { registerCommands } from "./bot/commands.js";
@@ -13,7 +13,6 @@ import type { DeliveryChannel } from "./channels/types.js";
 import type { Bot } from "grammy";
 
 const config = loadConfig();
-const db = initDb(config.dbPath);
 
 loadWordBank();
 
@@ -37,8 +36,8 @@ if (config.ekilexApiKey) {
 }
 
 async function deliverFlashcard(chatId: number): Promise<void> {
-  const level = getSubscriberLevel(db, chatId);
-  const sentIds = getSentWordIds(db, chatId);
+  const level = await getSubscriberLevel(chatId);
+  const sentIds = await getSentWordIds(chatId);
   const unsent = getUnsent(level, sentIds);
 
   let flashcard;
@@ -53,7 +52,7 @@ async function deliverFlashcard(chatId: number): Promise<void> {
     wordValue = word.estonian;
   } else if (config.ekilexApiKey) {
     console.error(`[main] Local ${level} words exhausted, querying Ekilex live → chat ${chatId}`);
-    const sentValues = getSentWordValues(db, chatId);
+    const sentValues = await getSentWordValues(chatId);
     const ekilexWord = await getRandomWordForLevel(level, sentValues, config.ekilexApiKey);
 
     if (ekilexWord) {
@@ -93,59 +92,63 @@ async function deliverFlashcard(chatId: number): Promise<void> {
   for (const channel of channels) {
     const sent = await channel.sendFlashcard(chatId, flashcard);
     if (sent) {
-      markWordSent(db, chatId, wordId, wordValue);
+      await markWordSent(chatId, wordId, wordValue);
       console.error(`[main] Sent "${wordValue}" to ${chatId} via ${channel.name}`);
     }
   }
 }
 
-// Sync per-user schedules periodically
-function refreshUserJobs(): void {
-  const subscribers = getActiveSubscribers(db);
+async function refreshUserJobs(): Promise<void> {
+  const subscribers = await getActiveSubscribers();
   syncUserJobs(subscribers, config.cronTimezone, deliverFlashcard);
-  console.error(`[main] Synced ${getActiveJobCount()} user jobs`);
 }
 
-// Register bot commands
-if (bot) {
-  registerCommands(bot, db, deliverFlashcard, refreshUserJobs);
+async function main(): Promise<void> {
+  await initDb(config.databaseUrl);
 
-  bot.start({
-    onStart: () => console.error("[main] Telegram bot polling started"),
-  });
+  // Register bot commands
+  if (bot) {
+    registerCommands(bot, deliverFlashcard, refreshUserJobs);
+    bot.start({
+      onStart: () => console.error("[main] Telegram bot polling started"),
+    });
+  }
+
+  // Initial sync of user jobs
+  await refreshUserJobs();
+
+  // Periodically refresh user jobs
+  const refreshInterval = setInterval(() => refreshUserJobs(), 60_000);
+
+  // Global scheduler as fallback
+  const globalScheduler = startGlobalScheduler(
+    config.cronSchedule,
+    config.cronTimezone,
+    async () => { await refreshUserJobs(); },
+  );
+
+  console.error(`[main] Flash Card IO started`);
+  console.error(`[main] Database: PostgreSQL`);
+  console.error(`[main] Default schedule: ${config.cronSchedule} (${config.cronTimezone})`);
+  console.error(`[main] Levels: ${config.cefrLevels.join(", ")}`);
+  console.error(`[main] Channels: ${channels.map((c) => c.name).join(", ")}`);
+  console.error(`[main] Ekilex: ${config.ekilexApiKey ? "enabled" : "disabled"}`);
+
+  // Graceful shutdown
+  const shutdown = async () => {
+    console.error("[main] Shutting down...");
+    clearInterval(refreshInterval);
+    globalScheduler.stop();
+    if (bot) bot.stop();
+    await closeDb();
+    process.exit(0);
+  };
+
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
 }
 
-// Initial sync of user jobs
-refreshUserJobs();
-
-// Periodically refresh user jobs (picks up new subscribers + schedule changes)
-const refreshInterval = setInterval(refreshUserJobs, 60_000);
-
-// Global scheduler as fallback — syncs user jobs every tick too
-const globalScheduler = startGlobalScheduler(
-  config.cronSchedule,
-  config.cronTimezone,
-  async () => {
-    refreshUserJobs();
-  },
-);
-
-console.error(`[main] Flash Card IO started`);
-console.error(`[main] Default schedule: ${config.cronSchedule} (${config.cronTimezone})`);
-console.error(`[main] Levels: ${config.cefrLevels.join(", ")}`);
-console.error(`[main] Channels: ${channels.map((c) => c.name).join(", ")}`);
-console.error(`[main] Ekilex: ${config.ekilexApiKey ? "enabled" : "disabled"}`);
-console.error(`[main] Per-user scheduling: enabled`);
-
-// Graceful shutdown
-const shutdown = () => {
-  console.error("[main] Shutting down...");
-  clearInterval(refreshInterval);
-  globalScheduler.stop();
-  if (bot) bot.stop();
-  db.close();
-  process.exit(0);
-};
-
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
+main().catch((err) => {
+  console.error("Fatal:", err);
+  process.exit(1);
+});

@@ -1,5 +1,4 @@
 import type { Bot } from "grammy";
-import type Database from "better-sqlite3";
 import type { CefrLevel } from "../config.js";
 import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats } from "../db/progress.js";
 import { getWordsForLevel } from "../flashcard/word-bank.js";
@@ -17,13 +16,12 @@ const SCHEDULE_PRESETS: Record<string, { cron: string; label: string }> = {
 
 export function registerCommands(
   bot: Bot,
-  db: Database.Database,
   deliverFlashcard: (chatId: number) => Promise<void>,
   refreshUserJobs?: () => void,
 ): void {
   bot.command("start", async (ctx) => {
     const chatId = ctx.chat.id;
-    addSubscriber(db, chatId, "telegram");
+    await addSubscriber(chatId, "telegram");
     refreshUserJobs?.();
     await ctx.reply(
       "🇪🇪 Welcome to Flash Card IO!\n\n" +
@@ -38,7 +36,7 @@ export function registerCommands(
   });
 
   bot.command("stop", async (ctx) => {
-    removeSubscriber(db, ctx.chat.id);
+    await removeSubscriber(ctx.chat.id);
     refreshUserJobs?.();
     await ctx.reply("Stopped. Send /start to resume.");
   });
@@ -58,7 +56,7 @@ export function registerCommands(
       await ctx.reply(`Usage: /level A1|A2|B1|B2\nValid levels: ${VALID_LEVELS.join(", ")}`);
       return;
     }
-    setSubscriberLevel(db, ctx.chat.id, arg as CefrLevel);
+    await setSubscriberLevel(ctx.chat.id, arg as CefrLevel);
     const totalForLevel = getWordsForLevel(arg as CefrLevel).length;
     await ctx.reply(`Level set to ${arg}.\n📖 ${totalForLevel} local words available + live Ekilex queries for more.`);
   });
@@ -73,13 +71,13 @@ export function registerCommands(
       return;
     }
     const preset = SCHEDULE_PRESETS[arg];
-    setSubscriberSchedule(db, ctx.chat.id, preset.cron);
+    await setSubscriberSchedule(ctx.chat.id, preset.cron);
     refreshUserJobs?.();
     await ctx.reply(`⏰ Schedule set to: ${preset.label}\n\nYour personal cron job has been updated. Flashcards will arrive on your new schedule.`);
   });
 
   bot.command("stats", async (ctx) => {
-    const { sent, level, schedule } = getStats(db, ctx.chat.id);
+    const { sent, level, schedule } = await getStats(ctx.chat.id);
     const totalForLevel = getWordsForLevel(level).length;
     const scheduleLabel = Object.entries(SCHEDULE_PRESETS).find(([, v]) => v.cron === schedule)?.[1].label ?? schedule;
     await ctx.reply(

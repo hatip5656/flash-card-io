@@ -13,6 +13,5 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 COPY --from=builder /app/dist/ ./dist/
 COPY data/ ./data/
-ENV DB_PATH=/data/db/progress.db
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["node", "dist/index.js"]

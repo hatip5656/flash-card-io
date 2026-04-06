@@ -4,10 +4,10 @@ export interface AppConfig {
   telegramBotToken: string;
   unsplashAccessKey: string;
   ekilexApiKey: string | null;
+  databaseUrl: string;
   cronSchedule: string;
   cronTimezone: string;
   cefrLevels: CefrLevel[];
-  dbPath: string;
   featureTelegram: boolean;
   featureWhatsapp: boolean;
 }
@@ -26,6 +26,10 @@ export function loadConfig(): AppConfig {
     throw new Error("UNSPLASH_ACCESS_KEY is required");
   }
 
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is required (e.g. postgresql://user:pass@host:5432/flashcard_io)");
+  }
+
   const rawLevels = (process.env.CEFR_LEVELS ?? "A1,A2").split(",").map((s) => s.trim());
   const cefrLevels = rawLevels.filter((l): l is CefrLevel => VALID_LEVELS.includes(l as CefrLevel));
 
@@ -37,10 +41,10 @@ export function loadConfig(): AppConfig {
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN ?? "",
     unsplashAccessKey: process.env.UNSPLASH_ACCESS_KEY,
     ekilexApiKey: process.env.EKILEX_API_KEY ?? null,
+    databaseUrl: process.env.DATABASE_URL,
     cronSchedule: process.env.CRON_SCHEDULE ?? "0 9 * * *",
     cronTimezone: process.env.CRON_TIMEZONE ?? "Europe/Tallinn",
     cefrLevels,
-    dbPath: process.env.DB_PATH ?? "./data/db/progress.db",
     featureTelegram,
     featureWhatsapp,
   };
