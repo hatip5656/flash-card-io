@@ -2,11 +2,10 @@
 
 import { loadConfig } from "./config.js";
 import { startHealthServer, setReady } from "./health.js";
-import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, getRandomLearnedWord, backfillEnglish, getSentGrammarIds, markGrammarSent } from "./db/progress.js";
+import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, backfillEnglish, getSentGrammarIds, markGrammarSent } from "./db/progress.js";
 import { loadWordBank, getUnsent, getWordById } from "./flashcard/word-bank.js";
 import { loadGrammarBank, getRandomLesson } from "./flashcard/grammar-bank.js";
 import { buildFlashcard, buildFlashcardFromEkilex } from "./flashcard/builder.js";
-import { buildGrammarCaption } from "./flashcard/grammar-builder.js";
 import { startGlobalScheduler, syncUserJobs, scheduleRandomGrammarJobs, scheduleGrammarJobForUser, stopAllGrammarJobs } from "./flashcard/scheduler.js";
 import { createTelegramChannel } from "./channels/telegram.js";
 import { createWhatsAppChannel } from "./channels/whatsapp.js";
@@ -63,7 +62,8 @@ async function deliverFlashcard(chatId: number): Promise<void> {
 
     if (ekilexWord) {
       console.error(`[main] Ekilex found "${ekilexWord.wordValue}" (${ekilexWord.cefrLevel}) → chat ${chatId}`);
-      flashcard = await buildFlashcardFromEkilex(ekilexWord, config.unsplashAccessKey);
+      const wordForms = await getWordFormsForValue(ekilexWord.wordValue, config.ekilexApiKey).catch(() => null);
+      flashcard = await buildFlashcardFromEkilex(ekilexWord, config.unsplashAccessKey, wordForms);
       wordId = `ekilex-${ekilexWord.wordId}`;
       wordValue = ekilexWord.wordValue;
     } else {
@@ -108,88 +108,17 @@ async function deliverGrammarCard(chatId: number): Promise<void> {
   if (!bot) return;
 
   const level = await getSubscriberLevel(chatId);
-
-  // 50/50 chance: grammar lesson vs word-form card
-  const useLesson = Math.random() < 0.5;
-
-  if (useLesson) {
-    const sentIds = await getSentGrammarIds(chatId);
-    const lesson = getRandomLesson(level, sentIds);
-    if (lesson) {
-      await bot.api.sendMessage(chatId, lesson.content, { parse_mode: "HTML" });
-      await markGrammarSent(chatId, lesson.id);
-      console.error(`[main] Sent grammar lesson "${lesson.topic}" → chat ${chatId}`);
-      return;
-    }
-    // No lessons available for this level, fall through to word-form card
-  }
-
-  // Word-form card (requires Ekilex)
-  if (!config.ekilexApiKey) {
-    // Try a lesson as fallback
-    const sentIds = await getSentGrammarIds(chatId);
-    const lesson = getRandomLesson(level, sentIds);
-    if (lesson) {
-      await bot.api.sendMessage(chatId, lesson.content, { parse_mode: "HTML" });
-      await markGrammarSent(chatId, lesson.id);
-      console.error(`[main] Sent grammar lesson "${lesson.topic}" (Ekilex unavailable) → chat ${chatId}`);
-      return;
-    }
-    await bot.api.sendMessage(chatId, "No grammar content available right now. Try again later.");
-    return;
-  }
-
-  const learned = await getRandomLearnedWord(chatId);
-  if (!learned) {
-    // No learned words — send a lesson instead
-    const sentIds = await getSentGrammarIds(chatId);
-    const lesson = getRandomLesson(level, sentIds);
-    if (lesson) {
-      await bot.api.sendMessage(chatId, lesson.content, { parse_mode: "HTML" });
-      await markGrammarSent(chatId, lesson.id);
-      console.error(`[main] Sent grammar lesson "${lesson.topic}" (no learned words) → chat ${chatId}`);
-      return;
-    }
-    await bot.api.sendMessage(chatId, "Learn some words first with /next, then come back for grammar!");
-    return;
-  }
-
-  // Try up to 3 random learned words to find one with paradigm data
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const word = attempt === 0 ? learned : await getRandomLearnedWord(chatId);
-    if (!word) continue;
-
-    const result = await getWordFormsForValue(word.wordValue, config.ekilexApiKey);
-    if (!result || result.forms.length === 0) {
-      console.error(`[main] No forms for "${word.wordValue}", retrying...`);
-      continue;
-    }
-
-    const caption = buildGrammarCaption(
-      word.wordValue,
-      result.english ?? "",
-      result.pos,
-      result.cefrLevel ?? "",
-      result.forms,
-    );
-
-    await bot.api.sendMessage(chatId, caption, { parse_mode: "HTML" });
-    console.error(`[main] Sent grammar card for "${word.wordValue}" → chat ${chatId}`);
-    return;
-  }
-
-  // Word forms failed — send a lesson as fallback
   const sentIds = await getSentGrammarIds(chatId);
   const lesson = getRandomLesson(level, sentIds);
+
   if (lesson) {
     await bot.api.sendMessage(chatId, lesson.content, { parse_mode: "HTML" });
     await markGrammarSent(chatId, lesson.id);
-    console.error(`[main] Sent grammar lesson "${lesson.topic}" (no forms found) → chat ${chatId}`);
+    console.error(`[main] Sent grammar lesson "${lesson.topic}" → chat ${chatId}`);
     return;
   }
 
-  await bot.api.sendMessage(chatId, "No grammar data found right now. Try again later.");
-  console.error(`[main] Could not find grammar content → chat ${chatId}`);
+  await bot.api.sendMessage(chatId, "You've seen all grammar lessons for your level! Use /level to try a different level.");
 }
 
 async function refreshUserJobs(): Promise<void> {

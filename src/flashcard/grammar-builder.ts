@@ -84,6 +84,8 @@ function selectForms(forms: WordForm[], pos: string | null): Array<{ label: stri
   return selected.slice(0, 10);
 }
 
+export { simplifyLabel, selectForms };
+
 export function buildGrammarCaption(
   wordValue: string,
   english: string,

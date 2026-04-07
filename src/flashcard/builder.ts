@@ -1,7 +1,8 @@
 import { searchPhoto, triggerDownload } from "../services/unsplash.js";
 import { resolveSentence } from "../services/sentence.js";
-import type { Word, Flashcard } from "./types.js";
-import type { EkilexWord } from "../services/ekilex.js";
+import type { Word, Flashcard, WordForm } from "./types.js";
+import type { EkilexWord, WordFormResult } from "../services/ekilex.js";
+import { selectForms } from "./grammar-builder.js";
 
 export function escapeHtml(text: string): string {
   return text
@@ -17,6 +18,8 @@ interface CaptionParams {
   cefrLevel: string;
   sentence: { estonian: string; english: string };
   photo: { photographer: string; photographerUrl: string } | null;
+  forms?: WordForm[];
+  pos?: string | null;
   source?: string;
 }
 
@@ -26,6 +29,16 @@ function buildCaption(params: CaptionParams): string {
   caption += `\n\n💬 <i>${escapeHtml(params.sentence.estonian)}</i>`;
   if (params.sentence.english && params.sentence.english !== params.sentence.estonian) {
     caption += `\n📝 <tg-spoiler>${escapeHtml(params.sentence.english)}</tg-spoiler>`;
+  }
+
+  if (params.forms && params.forms.length > 0) {
+    const selected = selectForms(params.forms, params.pos ?? null).slice(0, 5);
+    if (selected.length > 0) {
+      caption += "\n\n<b>Forms:</b>";
+      for (const { label, value } of selected) {
+        caption += `\n${escapeHtml(label)}: <code>${escapeHtml(value)}</code>`;
+      }
+    }
   }
 
   if (params.photo) {
@@ -71,6 +84,7 @@ export async function buildFlashcard(
 export async function buildFlashcardFromEkilex(
   ekilexWord: EkilexWord,
   unsplashKey: string,
+  wordForms?: WordFormResult | null,
 ): Promise<Flashcard> {
   const photo = await searchPhoto(ekilexWord.english ?? ekilexWord.wordValue, unsplashKey);
 
@@ -96,6 +110,8 @@ export async function buildFlashcardFromEkilex(
     cefrLevel: ekilexWord.cefrLevel ?? "A1",
     sentence,
     photo,
+    forms: wordForms?.forms,
+    pos: wordForms?.pos ?? ekilexWord.pos,
     source: "Source: Ekilex/Sõnaveeb",
   });
 
