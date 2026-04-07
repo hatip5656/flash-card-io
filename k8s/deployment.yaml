@@ -29,6 +29,7 @@ spec:
       containers:
         - name: flash-card-io
           image: ghcr.io/hatip5656/flash-card-io:latest
+          imagePullPolicy: Always
           ports:
             - name: health
               containerPort: 8080
