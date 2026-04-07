@@ -2,8 +2,8 @@
 
 import { loadConfig } from "./config.js";
 import { startHealthServer, setReady } from "./health.js";
-import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, getRandomLearnedWord } from "./db/progress.js";
-import { loadWordBank, getUnsent } from "./flashcard/word-bank.js";
+import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, getRandomLearnedWord, backfillEnglish } from "./db/progress.js";
+import { loadWordBank, getUnsent, getWordById } from "./flashcard/word-bank.js";
 import { buildFlashcard, buildFlashcardFromEkilex } from "./flashcard/builder.js";
 import { buildGrammarCaption } from "./flashcard/grammar-builder.js";
 import { startGlobalScheduler, syncUserJobs, scheduleRandomGrammarJobs, scheduleGrammarJobForUser, stopAllGrammarJobs } from "./flashcard/scheduler.js";
@@ -149,6 +149,15 @@ async function main(): Promise<void> {
   startHealthServer(8080);
 
   await initDb(config.databaseUrl);
+
+  // Backfill english column for words learned before quiz feature
+  const backfilled = await backfillEnglish((wordId) => {
+    const word = getWordById(wordId);
+    return word?.english ?? null;
+  });
+  if (backfilled > 0) {
+    console.error(`[main] Backfilled english for ${backfilled} previously learned words`);
+  }
 
   // Register bot commands
   if (bot) {

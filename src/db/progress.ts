@@ -63,6 +63,24 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
   return pool;
 }
 
+export async function backfillEnglish(wordLookup: (wordId: string) => string | null): Promise<number> {
+  const res = await pool.query(
+    "SELECT chat_id, word_id, word_value FROM sent_words WHERE english IS NULL AND word_value IS NOT NULL",
+  );
+  let updated = 0;
+  for (const row of res.rows) {
+    const english = wordLookup(row.word_id);
+    if (english) {
+      await pool.query(
+        "UPDATE sent_words SET english = $1 WHERE chat_id = $2 AND word_id = $3",
+        [english, row.chat_id, row.word_id],
+      );
+      updated++;
+    }
+  }
+  return updated;
+}
+
 export async function closeDb(): Promise<void> {
   if (pool) await pool.end();
 }
