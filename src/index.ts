@@ -103,24 +103,32 @@ async function deliverFlashcard(chatId: number): Promise<void> {
 }
 
 async function deliverGrammarCard(chatId: number): Promise<void> {
-  if (!config.ekilexApiKey || !bot) return;
+  if (!bot) return;
+
+  if (!config.ekilexApiKey) {
+    await bot.api.sendMessage(chatId, "Grammar cards require the Ekilex API. This feature is not available right now.");
+    return;
+  }
+
+  const learned = await getRandomLearnedWord(chatId);
+  if (!learned) {
+    await bot.api.sendMessage(chatId, "Learn some words first with /next, then come back for grammar!");
+    return;
+  }
 
   // Try up to 3 random learned words to find one with paradigm data
   for (let attempt = 0; attempt < 3; attempt++) {
-    const learned = await getRandomLearnedWord(chatId);
-    if (!learned) {
-      console.error(`[main] No learned words for grammar card → chat ${chatId}`);
-      return;
-    }
+    const word = attempt === 0 ? learned : await getRandomLearnedWord(chatId);
+    if (!word) continue;
 
-    const result = await getWordFormsForValue(learned.wordValue, config.ekilexApiKey);
+    const result = await getWordFormsForValue(word.wordValue, config.ekilexApiKey);
     if (!result || result.forms.length === 0) {
-      console.error(`[main] No forms for "${learned.wordValue}", retrying...`);
+      console.error(`[main] No forms for "${word.wordValue}", retrying...`);
       continue;
     }
 
     const caption = buildGrammarCaption(
-      learned.wordValue,
+      word.wordValue,
       result.english ?? "",
       result.pos,
       result.cefrLevel ?? "",
@@ -128,10 +136,11 @@ async function deliverGrammarCard(chatId: number): Promise<void> {
     );
 
     await bot.api.sendMessage(chatId, caption, { parse_mode: "HTML" });
-    console.error(`[main] Sent grammar card for "${learned.wordValue}" → chat ${chatId}`);
+    console.error(`[main] Sent grammar card for "${word.wordValue}" → chat ${chatId}`);
     return;
   }
 
+  await bot.api.sendMessage(chatId, "No grammar data found for your words right now. Try again later — the Ekilex dictionary doesn't have forms for every word.");
   console.error(`[main] Could not find word with grammar data after 3 attempts → chat ${chatId}`);
 }
 
