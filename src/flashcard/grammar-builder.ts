@@ -34,6 +34,7 @@ const LABEL_SIMPLIFY: Array<{ pattern: RegExp; label: string }> = [
   { pattern: /kindla kõneviisi oleviku.*3.*pööre$/i, label: "present 3rd sg" },
   { pattern: /kindla kõneviisi lihtmineviku.*3.*pööre$/i, label: "past 3rd sg" },
   // Noun cases
+  { pattern: /ainsuse suunduv|lühike sisseütlev/i, label: "short illative sg" },
   { pattern: /ainsuse nimetav/i, label: "nominative sg" },
   { pattern: /ainsuse omastav/i, label: "genitive sg" },
   { pattern: /ainsuse osastav/i, label: "partitive sg" },
@@ -76,6 +77,8 @@ function selectForms(forms: WordForm[], pos: string | null): Array<{ label: stri
 
   const selected: Array<{ label: string; value: string }> = [];
   for (const f of unique.values()) {
+    // Skip forms with empty or placeholder values
+    if (!f.value || f.value === "-" || f.value === "–") continue;
     const label = simplifyLabel(f.morphValue || f.morphCode);
     selected.push({ label, value: f.value });
   }
