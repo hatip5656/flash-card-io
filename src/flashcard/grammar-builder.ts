@@ -1,53 +1,87 @@
 import type { WordForm } from "./types.js";
 import { escapeHtml } from "./builder.js";
 
-// Key morphological codes for Estonian nouns (14-case system)
-const NOUN_MORPH_CODES = [
-  { code: "SgN", label: "Nominative (sg)" },
-  { code: "SgG", label: "Genitive (sg)" },
-  { code: "SgP", label: "Partitive (sg)" },
-  { code: "SgIll", label: "Illative (sg)" },
-  { code: "SgIn", label: "Inessive (sg)" },
-  { code: "SgEl", label: "Elative (sg)" },
-  { code: "PlN", label: "Nominative (pl)" },
-  { code: "PlG", label: "Genitive (pl)" },
-  { code: "PlP", label: "Partitive (pl)" },
+// Estonian POS values from Ekilex and their English labels
+const POS_MAP: Record<string, { label: string; isVerb: boolean }> = {
+  V: { label: "verb", isVerb: true },
+  S: { label: "noun", isVerb: false },
+  A: { label: "adjective", isVerb: false },
+  D: { label: "adverb", isVerb: false },
+  P: { label: "pronoun", isVerb: false },
+  N: { label: "numeral", isVerb: false },
+  // Estonian language POS values
+  tegusõna: { label: "verb", isVerb: true },
+  nimisõna: { label: "noun", isVerb: false },
+  omadussõna: { label: "adjective", isVerb: false },
+  määrsõna: { label: "adverb", isVerb: false },
+  asesõna: { label: "pronoun", isVerb: false },
+  arvsõna: { label: "numeral", isVerb: false },
+};
+
+// Clean up verbose Estonian morphValue labels
+const LABEL_SIMPLIFY: Array<{ pattern: RegExp; label: string }> = [
+  // Verb forms
+  { pattern: /^ma-infinitiiv/i, label: "ma-inf" },
+  { pattern: /^da-infinitiiv/i, label: "da-inf" },
+  { pattern: /^mata-vorm/i, label: "-mata" },
+  { pattern: /^mas-vorm/i, label: "-mas" },
+  { pattern: /^mast-vorm/i, label: "-mast" },
+  { pattern: /^maks-vorm/i, label: "-maks" },
+  { pattern: /^des-vorm/i, label: "-des" },
+  { pattern: /^ma-tegevusnime umbisikuline/i, label: "passive ma-inf" },
+  { pattern: /kindla kõneviisi oleviku.*1.*pööre$/i, label: "present 1st sg" },
+  { pattern: /kindla kõneviisi oleviku.*2.*pööre$/i, label: "present 2nd sg" },
+  { pattern: /kindla kõneviisi oleviku.*3.*pööre$/i, label: "present 3rd sg" },
+  { pattern: /kindla kõneviisi lihtmineviku.*3.*pööre$/i, label: "past 3rd sg" },
+  // Noun cases
+  { pattern: /ainsuse nimetav/i, label: "nominative sg" },
+  { pattern: /ainsuse omastav/i, label: "genitive sg" },
+  { pattern: /ainsuse osastav/i, label: "partitive sg" },
+  { pattern: /ainsuse sisseütlev/i, label: "illative sg" },
+  { pattern: /ainsuse seesütlev/i, label: "inessive sg" },
+  { pattern: /ainsuse seestütlev/i, label: "elative sg" },
+  { pattern: /ainsuse alaleütlev/i, label: "allative sg" },
+  { pattern: /ainsuse alalütlev/i, label: "adessive sg" },
+  { pattern: /ainsuse alaltütlev/i, label: "ablative sg" },
+  { pattern: /mitmuse nimetav/i, label: "nominative pl" },
+  { pattern: /mitmuse omastav/i, label: "genitive pl" },
+  { pattern: /mitmuse osastav/i, label: "partitive pl" },
 ];
 
-// Key morphological codes for Estonian verbs
-const VERB_MORPH_CODES = [
-  { code: "Sup", label: "ma-infinitive" },
-  { code: "Inf", label: "da-infinitive" },
-  { code: "IndPrSg1", label: "Present 1st sg" },
-  { code: "IndPrSg2", label: "Present 2nd sg" },
-  { code: "IndPrSg3", label: "Present 3rd sg" },
-  { code: "IndPrPl1", label: "Present 1st pl" },
-  { code: "IndIpfSg3", label: "Past 3rd sg" },
-];
+function simplifyLabel(morphValue: string): string {
+  for (const { pattern, label } of LABEL_SIMPLIFY) {
+    if (pattern.test(morphValue)) return label;
+  }
+  // Fallback: use the original but truncate if too long
+  return morphValue.length > 25 ? morphValue.slice(0, 22) + "..." : morphValue;
+}
+
+function isVerb(pos: string | null): boolean {
+  if (!pos) return false;
+  return POS_MAP[pos]?.isVerb ?? false;
+}
+
+function getPosLabel(pos: string | null): string {
+  if (!pos) return "";
+  return POS_MAP[pos]?.label ?? pos;
+}
 
 function selectForms(forms: WordForm[], pos: string | null): Array<{ label: string; value: string }> {
-  const codes = pos === "V" ? VERB_MORPH_CODES : NOUN_MORPH_CODES;
+  // Deduplicate by morphCode, keeping first occurrence
+  const unique = new Map<string, WordForm>();
+  for (const f of forms) {
+    const key = f.morphCode || f.morphValue;
+    if (key && !unique.has(key)) unique.set(key, f);
+  }
 
   const selected: Array<{ label: string; value: string }> = [];
-  for (const { code, label } of codes) {
-    const match = forms.find((f) => f.morphCode === code);
-    if (match) {
-      selected.push({ label, value: match.value });
-    }
+  for (const f of unique.values()) {
+    const label = simplifyLabel(f.morphValue || f.morphCode);
+    selected.push({ label, value: f.value });
   }
 
-  // If no known codes matched, show the first few forms with their morphValue labels
-  if (selected.length === 0) {
-    const unique = new Map<string, WordForm>();
-    for (const f of forms) {
-      if (!unique.has(f.morphCode)) unique.set(f.morphCode, f);
-    }
-    for (const f of [...unique.values()].slice(0, 8)) {
-      selected.push({ label: f.morphValue || f.morphCode, value: f.value });
-    }
-  }
-
-  return selected;
+  // Limit to 10 most useful forms
+  return selected.slice(0, 10);
 }
 
 export function buildGrammarCaption(
@@ -57,7 +91,8 @@ export function buildGrammarCaption(
   cefrLevel: string,
   forms: WordForm[],
 ): string {
-  const posLabel = pos === "V" ? "verb" : pos === "S" ? "noun" : pos === "A" ? "adjective" : pos ?? "";
+  const posLabel = getPosLabel(pos);
+  const verb = isVerb(pos);
   const selected = selectForms(forms, pos);
 
   let caption = `📖 <b>Grammar: ${escapeHtml(wordValue)}</b>`;
@@ -65,7 +100,7 @@ export function buildGrammarCaption(
   caption += `\n🔄 <tg-spoiler>${escapeHtml(english)}</tg-spoiler>`;
   caption += `\n🏷️ ${escapeHtml(cefrLevel)}`;
 
-  caption += `\n\n<b>${pos === "V" ? "Conjugation" : "Declension"}:</b>`;
+  caption += `\n\n<b>${verb ? "Conjugation" : "Declension"}:</b>`;
   for (const { label, value } of selected) {
     caption += `\n${escapeHtml(label)}: <code>${escapeHtml(value)}</code>`;
   }
