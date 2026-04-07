@@ -18,6 +18,7 @@ interface EkilexSearchWord {
 interface EkilexWordDetails {
   paradigms?: EkilexParadigm[];
   lexemes: EkilexLexeme[];
+  word?: { paradigms?: EkilexParadigm[] };
 }
 
 interface EkilexLexeme {
@@ -26,6 +27,8 @@ interface EkilexLexeme {
   synonymLangGroups?: EkilexLangGroup[];
   usages?: EkilexUsage[];
   paradigms?: EkilexParadigm[];
+  word?: { paradigms?: EkilexParadigm[] };
+  lexemeWord?: { paradigms?: EkilexParadigm[] };
 }
 
 interface EkilexLangGroup {
@@ -109,14 +112,20 @@ function extractUsages(lexeme: EkilexLexeme): Array<{ estonian: string; english:
   return results;
 }
 
-function extractForms(details: EkilexWordDetails): WordForm[] {
+function collectParadigms(details: EkilexWordDetails): EkilexParadigm[] {
+  // Try every known path where paradigms might live
+  const sources: EkilexParadigm[][] = [
+    details.paradigms ?? [],
+    details.word?.paradigms ?? [],
+    ...details.lexemes.map((l) => l.paradigms ?? []),
+    ...details.lexemes.map((l) => l.word?.paradigms ?? []),
+    ...details.lexemes.map((l) => l.lexemeWord?.paradigms ?? []),
+  ];
+  return sources.flat();
+}
+
+function extractForms(paradigms: EkilexParadigm[]): WordForm[] {
   const forms: WordForm[] = [];
-
-  // Try top-level paradigms first, then per-lexeme paradigms
-  const paradigms: EkilexParadigm[] =
-    details.paradigms ??
-    details.lexemes.flatMap((l) => l.paradigms ?? []);
-
   for (const paradigm of paradigms) {
     for (const form of paradigm.forms ?? []) {
       if (form.value) {
@@ -128,14 +137,6 @@ function extractForms(details: EkilexWordDetails): WordForm[] {
       }
     }
   }
-
-  if (forms.length === 0) {
-    console.error(`[ekilex] No paradigm forms found. Keys: ${JSON.stringify(Object.keys(details))}`);
-    for (const lex of details.lexemes) {
-      console.error(`[ekilex] Lexeme keys: ${JSON.stringify(Object.keys(lex))}`);
-    }
-  }
-
   return forms;
 }
 
@@ -163,7 +164,21 @@ export async function getWordFormsForValue(
     const details = await apiRequest<EkilexWordDetails>(`/word/details/${w.wordId}`, apiKey);
     if (!details) continue;
 
-    const forms = extractForms(details);
+    // Try extracting paradigms from the details response
+    let paradigms = collectParadigms(details);
+    let forms = extractForms(paradigms);
+
+    // Fallback: try dedicated paradigms endpoint
+    if (forms.length === 0) {
+      const paradigmData = await apiRequest<EkilexParadigm[]>(`/word/paradigms/${w.wordId}`, apiKey);
+      if (paradigmData && paradigmData.length > 0) {
+        forms = extractForms(paradigmData);
+      }
+    }
+
+    if (forms.length === 0) {
+      console.error(`[ekilex] No forms for "${wordValue}" (wordId=${w.wordId}). Detail keys: ${JSON.stringify(Object.keys(details))}`);
+    }
 
     let english: string | null = null;
     let pos: string | null = null;
