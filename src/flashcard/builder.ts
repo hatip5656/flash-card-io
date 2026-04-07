@@ -1,7 +1,7 @@
 import { searchPhoto, triggerDownload } from "../services/unsplash.js";
 import { resolveSentence } from "../services/sentence.js";
 import type { Word, Flashcard, WordForm } from "./types.js";
-import type { EkilexWord, WordFormResult } from "../services/ekilex.js";
+import { type EkilexWord, type WordFormResult, getWordFormsForValue } from "../services/ekilex.js";
 import { selectForms } from "./grammar-builder.js";
 
 export function escapeHtml(text: string): string {
@@ -55,6 +55,7 @@ function buildCaption(params: CaptionParams): string {
 export async function buildFlashcard(
   word: Word,
   unsplashKey: string,
+  ekilexApiKey?: string | null,
 ): Promise<Flashcard> {
   const sentence = await resolveSentence(word);
   const photo = await searchPhoto(word.imageQuery ?? word.english, unsplashKey);
@@ -63,12 +64,20 @@ export async function buildFlashcard(
     triggerDownload(photo.downloadUrl, unsplashKey).catch(() => {});
   }
 
+  // Fetch word forms from Ekilex if available
+  let wordForms: WordFormResult | null = null;
+  if (ekilexApiKey) {
+    wordForms = await getWordFormsForValue(word.estonian, ekilexApiKey).catch(() => null);
+  }
+
   const caption = buildCaption({
     estonian: word.estonian,
     english: word.english,
     cefrLevel: word.cefrLevel,
     sentence,
     photo,
+    forms: wordForms?.forms,
+    pos: wordForms?.pos,
   });
 
   return {

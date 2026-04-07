@@ -52,7 +52,7 @@ async function deliverFlashcard(chatId: number): Promise<void> {
   if (unsent.length > 0) {
     const word = unsent[Math.floor(Math.random() * unsent.length)];
     console.error(`[main] Building flashcard for "${word.estonian}" (${word.cefrLevel}) from local → chat ${chatId}`);
-    flashcard = await buildFlashcard(word, config.unsplashAccessKey);
+    flashcard = await buildFlashcard(word, config.unsplashAccessKey, config.ekilexApiKey);
     wordId = word.id;
     wordValue = word.estonian;
   } else if (config.ekilexApiKey) {
