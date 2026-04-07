@@ -92,6 +92,76 @@ export function stopAllUserJobs(): void {
   userJobs.clear();
 }
 
+// --- Random grammar card scheduling ---
+
+const grammarJobs = new Map<number, Cron>();
+
+function randomTimeBetween(startHour: number, endHour: number): { hour: number; minute: number } {
+  const totalMinutes = (endHour - startHour) * 60;
+  const randomMinute = Math.floor(Math.random() * totalMinutes);
+  return {
+    hour: startHour + Math.floor(randomMinute / 60),
+    minute: randomMinute % 60,
+  };
+}
+
+export function scheduleRandomGrammarJobs(
+  subscribers: Subscriber[],
+  timezone: string,
+  deliverGrammarCard: (chatId: number) => Promise<void>,
+): void {
+  // Clear existing grammar jobs
+  stopAllGrammarJobs();
+
+  for (const sub of subscribers) {
+    const { hour, minute } = randomTimeBetween(8, 22);
+    const schedule = `${minute} ${hour} * * *`;
+
+    const cron = new Cron(schedule, { timezone }, async () => {
+      console.error(`[scheduler] Grammar tick for chat ${sub.chatId} at ${new Date().toISOString()}`);
+      try {
+        await deliverGrammarCard(sub.chatId);
+      } catch (err) {
+        console.error(`[scheduler] Error delivering grammar to ${sub.chatId}:`, err instanceof Error ? err.message : err);
+      }
+    });
+
+    grammarJobs.set(sub.chatId, cron);
+    console.error(`[scheduler] Scheduled grammar card for chat ${sub.chatId} at ${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`);
+  }
+}
+
+export function scheduleGrammarJobForUser(
+  chatId: number,
+  timezone: string,
+  deliverGrammarCard: (chatId: number) => Promise<void>,
+): void {
+  // Skip if already scheduled
+  if (grammarJobs.has(chatId)) return;
+
+  const { hour, minute } = randomTimeBetween(8, 22);
+  const schedule = `${minute} ${hour} * * *`;
+
+  const cron = new Cron(schedule, { timezone }, async () => {
+    console.error(`[scheduler] Grammar tick for chat ${chatId} at ${new Date().toISOString()}`);
+    try {
+      await deliverGrammarCard(chatId);
+    } catch (err) {
+      console.error(`[scheduler] Error delivering grammar to ${chatId}:`, err instanceof Error ? err.message : err);
+    }
+  });
+
+  grammarJobs.set(chatId, cron);
+  console.error(`[scheduler] Scheduled grammar card for chat ${chatId} at ${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`);
+}
+
+export function stopAllGrammarJobs(): void {
+  for (const [, job] of grammarJobs) {
+    job.stop();
+  }
+  grammarJobs.clear();
+}
+
 export function getActiveJobCount(): number {
   return userJobs.size;
 }

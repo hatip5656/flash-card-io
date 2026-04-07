@@ -56,6 +56,9 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
     )
   `);
 
+  // Migration: add english column for quiz support
+  await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS english TEXT`);
+
   console.error(`[db] Connected to PostgreSQL database "${dbName}"`);
   return pool;
 }
@@ -106,11 +109,28 @@ export async function setSubscriberSchedule(chatId: number, schedule: string): P
   await pool.query("UPDATE subscribers SET schedule = $1 WHERE chat_id = $2", [schedule, chatId]);
 }
 
-export async function markWordSent(chatId: number, wordId: string, wordValue?: string): Promise<void> {
+export async function markWordSent(chatId: number, wordId: string, wordValue?: string, english?: string): Promise<void> {
   await pool.query(
-    "INSERT INTO sent_words (chat_id, word_id, word_value) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
-    [chatId, wordId, wordValue ?? null],
+    "INSERT INTO sent_words (chat_id, word_id, word_value, english) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING",
+    [chatId, wordId, wordValue ?? null, english ?? null],
   );
+}
+
+export async function getRandomLearnedWord(chatId: number): Promise<{ wordId: string; wordValue: string } | null> {
+  const res = await pool.query(
+    "SELECT word_id, word_value FROM sent_words WHERE chat_id = $1 AND word_value IS NOT NULL ORDER BY RANDOM() LIMIT 1",
+    [chatId],
+  );
+  if (res.rows.length === 0) return null;
+  return { wordId: res.rows[0].word_id, wordValue: res.rows[0].word_value };
+}
+
+export async function getLearnedWordsForQuiz(chatId: number): Promise<Array<{ estonian: string; english: string }>> {
+  const res = await pool.query(
+    "SELECT word_value, english FROM sent_words WHERE chat_id = $1 AND word_value IS NOT NULL AND english IS NOT NULL",
+    [chatId],
+  );
+  return res.rows.map((r) => ({ estonian: r.word_value, english: r.english }));
 }
 
 export async function getSentWordIds(chatId: number): Promise<string[]> {
@@ -127,8 +147,20 @@ export async function getSentWordValues(chatId: number): Promise<Set<string>> {
 }
 
 export async function getStats(chatId: number): Promise<{ sent: number; level: CefrLevel; schedule: string }> {
-  const level = await getSubscriberLevel(chatId);
-  const schedule = await getSubscriberSchedule(chatId);
-  const res = await pool.query("SELECT COUNT(*) as count FROM sent_words WHERE chat_id = $1", [chatId]);
-  return { sent: Number(res.rows[0].count), level, schedule };
+  const res = await pool.query(
+    `SELECT s.cefr_level, s.schedule, COUNT(sw.word_id) AS sent
+     FROM subscribers s
+     LEFT JOIN sent_words sw ON sw.chat_id = s.chat_id
+     WHERE s.chat_id = $1
+     GROUP BY s.cefr_level, s.schedule`,
+    [chatId],
+  );
+  if (res.rows.length === 0) {
+    return { sent: 0, level: "A1" as CefrLevel, schedule: "0 9 * * *" };
+  }
+  return {
+    sent: Number(res.rows[0].sent),
+    level: (res.rows[0].cefr_level ?? "A1") as CefrLevel,
+    schedule: res.rows[0].schedule ?? "0 9 * * *",
+  };
 }

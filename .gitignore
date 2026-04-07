@@ -4,3 +4,4 @@ dist/
 *.tsbuildinfo
 .idea/
 data/db/
+/.mcp.json

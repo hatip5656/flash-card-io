@@ -2,14 +2,17 @@
 
 import { loadConfig } from "./config.js";
 import { startHealthServer, setReady } from "./health.js";
-import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel } from "./db/progress.js";
+import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, getRandomLearnedWord } from "./db/progress.js";
 import { loadWordBank, getUnsent } from "./flashcard/word-bank.js";
 import { buildFlashcard, buildFlashcardFromEkilex } from "./flashcard/builder.js";
-import { startGlobalScheduler, syncUserJobs } from "./flashcard/scheduler.js";
+import { buildGrammarCaption } from "./flashcard/grammar-builder.js";
+import { startGlobalScheduler, syncUserJobs, scheduleRandomGrammarJobs, scheduleGrammarJobForUser, stopAllGrammarJobs } from "./flashcard/scheduler.js";
 import { createTelegramChannel } from "./channels/telegram.js";
 import { createWhatsAppChannel } from "./channels/whatsapp.js";
 import { registerCommands } from "./bot/commands.js";
-import { getRandomWordForLevel } from "./services/ekilex.js";
+import { registerQuiz } from "./bot/quiz.js";
+import { getRandomWordForLevel, getWordFormsForValue } from "./services/ekilex.js";
+import { Cron } from "croner";
 import type { DeliveryChannel } from "./channels/types.js";
 import type { Bot } from "grammy";
 
@@ -93,15 +96,52 @@ async function deliverFlashcard(chatId: number): Promise<void> {
   for (const channel of channels) {
     const sent = await channel.sendFlashcard(chatId, flashcard);
     if (sent) {
-      await markWordSent(chatId, wordId, wordValue);
+      await markWordSent(chatId, wordId, wordValue, flashcard.word.english);
       console.error(`[main] Sent "${wordValue}" to ${chatId} via ${channel.name}`);
     }
   }
 }
 
+async function deliverGrammarCard(chatId: number): Promise<void> {
+  if (!config.ekilexApiKey || !bot) return;
+
+  // Try up to 3 random learned words to find one with paradigm data
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const learned = await getRandomLearnedWord(chatId);
+    if (!learned) {
+      console.error(`[main] No learned words for grammar card → chat ${chatId}`);
+      return;
+    }
+
+    const result = await getWordFormsForValue(learned.wordValue, config.ekilexApiKey);
+    if (!result || result.forms.length === 0) {
+      console.error(`[main] No forms for "${learned.wordValue}", retrying...`);
+      continue;
+    }
+
+    const caption = buildGrammarCaption(
+      learned.wordValue,
+      result.english ?? "",
+      result.pos,
+      result.cefrLevel ?? "",
+      result.forms,
+    );
+
+    await bot.api.sendMessage(chatId, caption, { parse_mode: "HTML" });
+    console.error(`[main] Sent grammar card for "${learned.wordValue}" → chat ${chatId}`);
+    return;
+  }
+
+  console.error(`[main] Could not find word with grammar data after 3 attempts → chat ${chatId}`);
+}
+
 async function refreshUserJobs(): Promise<void> {
   const subscribers = await getActiveSubscribers();
   syncUserJobs(subscribers, config.cronTimezone, deliverFlashcard);
+  // Ensure new subscribers get grammar cards without waiting for midnight reroll
+  for (const sub of subscribers) {
+    scheduleGrammarJobForUser(sub.chatId, config.cronTimezone, deliverGrammarCard);
+  }
 }
 
 async function main(): Promise<void> {
@@ -112,7 +152,8 @@ async function main(): Promise<void> {
 
   // Register bot commands
   if (bot) {
-    registerCommands(bot, deliverFlashcard, refreshUserJobs);
+    registerCommands(bot, deliverFlashcard, deliverGrammarCard, refreshUserJobs);
+    registerQuiz(bot);
     bot.start({
       onStart: () => console.error("[main] Telegram bot polling started"),
     });
@@ -121,8 +162,19 @@ async function main(): Promise<void> {
   // Initial sync of user jobs
   await refreshUserJobs();
 
+  // Schedule random grammar card deliveries
+  const subscribers = await getActiveSubscribers();
+  scheduleRandomGrammarJobs(subscribers, config.cronTimezone, deliverGrammarCard);
+
   // Periodically refresh user jobs
   const refreshInterval = setInterval(() => refreshUserJobs(), 60_000);
+
+  // Daily reroll of random grammar times at 00:05
+  const grammarRerollJob = new Cron("5 0 * * *", { timezone: config.cronTimezone }, async () => {
+    console.error(`[scheduler] Rerolling grammar card times at ${new Date().toISOString()}`);
+    const subs = await getActiveSubscribers();
+    scheduleRandomGrammarJobs(subs, config.cronTimezone, deliverGrammarCard);
+  });
 
   // Global scheduler as fallback
   const globalScheduler = startGlobalScheduler(
@@ -146,6 +198,8 @@ async function main(): Promise<void> {
     console.error("[main] Shutting down...");
     setReady(false);
     clearInterval(refreshInterval);
+    grammarRerollJob.stop();
+    stopAllGrammarJobs();
     globalScheduler.stop();
     if (bot) bot.stop();
     await closeDb();

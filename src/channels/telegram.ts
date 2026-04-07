@@ -13,11 +13,11 @@ export function createTelegramChannel(token: string): { channel: DeliveryChannel
         if (flashcard.imageUrl) {
           await bot.api.sendPhoto(chatId, flashcard.imageUrl, {
             caption: flashcard.caption,
-            parse_mode: "Markdown",
+            parse_mode: "HTML",
           });
         } else {
           await bot.api.sendMessage(chatId, flashcard.caption, {
-            parse_mode: "Markdown",
+            parse_mode: "HTML",
           });
         }
         return true;

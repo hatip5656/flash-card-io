@@ -3,6 +3,42 @@ import { resolveSentence } from "../services/sentence.js";
 import type { Word, Flashcard } from "./types.js";
 import type { EkilexWord } from "../services/ekilex.js";
 
+export function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+interface CaptionParams {
+  estonian: string;
+  english: string;
+  cefrLevel: string;
+  sentence: { estonian: string; english: string };
+  photo: { photographer: string; photographerUrl: string } | null;
+  source?: string;
+}
+
+function buildCaption(params: CaptionParams): string {
+  let caption = `📚 <b>${escapeHtml(params.estonian)}</b>\n🔄 <tg-spoiler>${escapeHtml(params.english)}</tg-spoiler>\n🌐 ET → EN\n🏷️ ${escapeHtml(params.cefrLevel)}`;
+
+  caption += `\n\n💬 <i>${escapeHtml(params.sentence.estonian)}</i>`;
+  if (params.sentence.english && params.sentence.english !== params.sentence.estonian) {
+    caption += `\n📝 <tg-spoiler>${escapeHtml(params.sentence.english)}</tg-spoiler>`;
+  }
+
+  if (params.photo) {
+    caption += `\n\n📷 <a href="${escapeHtml(params.photo.photographerUrl)}">${escapeHtml(params.photo.photographer)}</a> / Unsplash`;
+  }
+
+  if (params.source) {
+    caption += `\n\n📖 <i>${escapeHtml(params.source)}</i>`;
+  }
+
+  return caption;
+}
+
 export async function buildFlashcard(
   word: Word,
   unsplashKey: string,
@@ -14,12 +50,13 @@ export async function buildFlashcard(
     triggerDownload(photo.downloadUrl, unsplashKey).catch(() => {});
   }
 
-  let caption = `📚 *${word.estonian}*\n🔄 ${word.english}\n🌐 ET → EN\n🏷️ ${word.cefrLevel}`;
-  caption += `\n\n💬 _${sentence.estonian}_\n📝 _${sentence.english}_`;
-
-  if (photo) {
-    caption += `\n\n📷 [${photo.photographer}](${photo.photographerUrl}) / Unsplash`;
-  }
+  const caption = buildCaption({
+    estonian: word.estonian,
+    english: word.english,
+    cefrLevel: word.cefrLevel,
+    sentence,
+    photo,
+  });
 
   return {
     word,
@@ -53,14 +90,14 @@ export async function buildFlashcardFromEkilex(
     sentences: ekilexWord.usages,
   };
 
-  let caption = `📚 *${ekilexWord.wordValue}*\n🔄 ${ekilexWord.english}\n🌐 ET → EN\n🏷️ ${ekilexWord.cefrLevel}`;
-  caption += `\n\n💬 _${sentence.estonian}_\n📝 _${sentence.english}_`;
-
-  if (photo) {
-    caption += `\n\n📷 [${photo.photographer}](${photo.photographerUrl}) / Unsplash`;
-  }
-
-  caption += "\n\n📖 _Source: Ekilex/Sõnaveeb_";
+  const caption = buildCaption({
+    estonian: ekilexWord.wordValue,
+    english: ekilexWord.english ?? "",
+    cefrLevel: ekilexWord.cefrLevel ?? "A1",
+    sentence,
+    photo,
+    source: "Source: Ekilex/Sõnaveeb",
+  });
 
   return {
     word,
