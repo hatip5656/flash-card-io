@@ -121,7 +121,22 @@ function collectParadigms(details: EkilexWordDetails): EkilexParadigm[] {
     ...details.lexemes.map((l) => l.word?.paradigms ?? []),
     ...details.lexemes.map((l) => l.lexemeWord?.paradigms ?? []),
   ];
-  return sources.flat();
+  const result = sources.flat();
+
+  if (result.length === 0) {
+    // Log sub-object keys to discover the correct path
+    if (details.word) {
+      console.error(`[ekilex] details.word keys: ${JSON.stringify(Object.keys(details.word))}`);
+    }
+    if (details.lexemes[0]?.word) {
+      console.error(`[ekilex] lexeme.word keys: ${JSON.stringify(Object.keys(details.lexemes[0].word))}`);
+    }
+    if (details.lexemes[0]?.lexemeWord) {
+      console.error(`[ekilex] lexeme.lexemeWord keys: ${JSON.stringify(Object.keys(details.lexemes[0].lexemeWord))}`);
+    }
+  }
+
+  return result;
 }
 
 function extractForms(paradigms: EkilexParadigm[]): WordForm[] {
@@ -168,11 +183,19 @@ export async function getWordFormsForValue(
     let paradigms = collectParadigms(details);
     let forms = extractForms(paradigms);
 
-    // Fallback: try dedicated paradigms endpoint
+    // Fallback: try dedicated paradigms endpoints
     if (forms.length === 0) {
-      const paradigmData = await apiRequest<EkilexParadigm[]>(`/word/paradigms/${w.wordId}`, apiKey);
-      if (paradigmData && paradigmData.length > 0) {
-        forms = extractForms(paradigmData);
+      for (const path of [
+        `/word/paradigms/${w.wordId}`,
+        `/paradigm/word/${w.wordId}`,
+        `/word/${w.wordId}/paradigms`,
+      ]) {
+        const paradigmData = await apiRequest<EkilexParadigm[]>(path, apiKey);
+        if (paradigmData && Array.isArray(paradigmData) && paradigmData.length > 0) {
+          forms = extractForms(paradigmData);
+          console.error(`[ekilex] Found forms via ${path}`);
+          break;
+        }
       }
     }
 
