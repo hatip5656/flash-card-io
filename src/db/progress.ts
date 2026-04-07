@@ -56,8 +56,9 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
     )
   `);
 
-  // Migration: add english column for quiz support
+  // Migrations
   await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS english TEXT`);
+  await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS quiz_count INTEGER NOT NULL DEFAULT 0`);
 
   console.error(`[db] Connected to PostgreSQL database "${dbName}"`);
   return pool;
@@ -143,12 +144,20 @@ export async function getRandomLearnedWord(chatId: number): Promise<{ wordId: st
   return { wordId: res.rows[0].word_id, wordValue: res.rows[0].word_value };
 }
 
-export async function getLearnedWordsForQuiz(chatId: number): Promise<Array<{ estonian: string; english: string }>> {
+export async function getLearnedWordsForQuiz(chatId: number): Promise<Array<{ estonian: string; english: string; quizCount: number }>> {
   const res = await pool.query(
-    "SELECT word_value, english FROM sent_words WHERE chat_id = $1 AND word_value IS NOT NULL AND english IS NOT NULL",
+    "SELECT word_value, english, quiz_count FROM sent_words WHERE chat_id = $1 AND word_value IS NOT NULL AND english IS NOT NULL ORDER BY quiz_count ASC",
     [chatId],
   );
-  return res.rows.map((r) => ({ estonian: r.word_value, english: r.english }));
+  return res.rows.map((r) => ({ estonian: r.word_value, english: r.english, quizCount: Number(r.quiz_count) }));
+}
+
+export async function incrementQuizCount(chatId: number, wordValues: string[]): Promise<void> {
+  if (wordValues.length === 0) return;
+  await pool.query(
+    "UPDATE sent_words SET quiz_count = quiz_count + 1 WHERE chat_id = $1 AND word_value = ANY($2)",
+    [chatId, wordValues],
+  );
 }
 
 export async function getSentWordIds(chatId: number): Promise<string[]> {

@@ -1,5 +1,5 @@
 import { Bot, InlineKeyboard } from "grammy";
-import { getLearnedWordsForQuiz } from "../db/progress.js";
+import { getLearnedWordsForQuiz, incrementQuizCount } from "../db/progress.js";
 import { escapeHtml } from "../flashcard/builder.js";
 
 interface QuizQuestion {
@@ -47,8 +47,12 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-function buildQuestions(words: Array<{ estonian: string; english: string }>): QuizQuestion[] {
-  const selected = shuffle(words).slice(0, QUIZ_SIZE);
+function buildQuestions(words: Array<{ estonian: string; english: string; quizCount: number }>): QuizQuestion[] {
+  // Words arrive sorted by quiz_count ASC — pick from least-quizzed pool, then shuffle
+  const minCount = words[0]?.quizCount ?? 0;
+  const leastQuizzed = words.filter((w) => w.quizCount <= minCount + 1);
+  const pool = leastQuizzed.length >= QUIZ_SIZE ? leastQuizzed : words;
+  const selected = shuffle(pool).slice(0, QUIZ_SIZE);
 
   return selected.map((word) => {
     const distractors = shuffle(words.filter((w) => w.english !== word.english))
@@ -220,6 +224,11 @@ export function registerQuiz(bot: Bot): void {
     session.currentIndex++;
 
     if (session.currentIndex >= session.questions.length) {
+      // Increment quiz count for all words that appeared in this quiz
+      const quizzedWords = session.questions.map((q) => q.estonian);
+      await incrementQuizCount(chatId, quizzedWords).catch((err) =>
+        console.error("[quiz] Failed to increment quiz counts:", err instanceof Error ? err.message : err),
+      );
       await bot.api.sendMessage(chatId, buildSummary(session), { parse_mode: "HTML" });
       quizSessions.delete(chatId);
     } else {
