@@ -60,8 +60,32 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
   await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS english TEXT`);
   await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS quiz_count INTEGER NOT NULL DEFAULT 0`);
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS sent_grammar (
+      chat_id BIGINT NOT NULL,
+      lesson_id TEXT NOT NULL,
+      sent_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (chat_id, lesson_id)
+    )
+  `);
+
   console.error(`[db] Connected to PostgreSQL database "${dbName}"`);
   return pool;
+}
+
+export async function getSentGrammarIds(chatId: number): Promise<Set<string>> {
+  const res = await pool.query(
+    "SELECT lesson_id FROM sent_grammar WHERE chat_id = $1",
+    [chatId],
+  );
+  return new Set(res.rows.map((r) => r.lesson_id));
+}
+
+export async function markGrammarSent(chatId: number, lessonId: string): Promise<void> {
+  await pool.query(
+    "INSERT INTO sent_grammar (chat_id, lesson_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+    [chatId, lessonId],
+  );
 }
 
 export async function backfillEnglish(wordLookup: (wordId: string) => string | null): Promise<number> {

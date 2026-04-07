@@ -29,6 +29,13 @@ export interface GrammarCard {
   caption: string;
 }
 
+export interface GrammarLesson {
+  id: string;
+  cefrLevel: string;
+  topic: string;
+  content: string;
+}
+
 export interface Flashcard {
   word: Word;
   sentence: { estonian: string; english: string };

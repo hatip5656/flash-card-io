@@ -2,8 +2,9 @@
 
 import { loadConfig } from "./config.js";
 import { startHealthServer, setReady } from "./health.js";
-import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, getRandomLearnedWord, backfillEnglish } from "./db/progress.js";
+import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, getRandomLearnedWord, backfillEnglish, getSentGrammarIds, markGrammarSent } from "./db/progress.js";
 import { loadWordBank, getUnsent, getWordById } from "./flashcard/word-bank.js";
+import { loadGrammarBank, getRandomLesson } from "./flashcard/grammar-bank.js";
 import { buildFlashcard, buildFlashcardFromEkilex } from "./flashcard/builder.js";
 import { buildGrammarCaption } from "./flashcard/grammar-builder.js";
 import { startGlobalScheduler, syncUserJobs, scheduleRandomGrammarJobs, scheduleGrammarJobForUser, stopAllGrammarJobs } from "./flashcard/scheduler.js";
@@ -19,6 +20,7 @@ import type { Bot } from "grammy";
 const config = loadConfig();
 
 loadWordBank();
+loadGrammarBank();
 
 const channels: DeliveryChannel[] = [];
 let bot: Bot | undefined;
@@ -105,13 +107,49 @@ async function deliverFlashcard(chatId: number): Promise<void> {
 async function deliverGrammarCard(chatId: number): Promise<void> {
   if (!bot) return;
 
+  const level = await getSubscriberLevel(chatId);
+
+  // 50/50 chance: grammar lesson vs word-form card
+  const useLesson = Math.random() < 0.5;
+
+  if (useLesson) {
+    const sentIds = await getSentGrammarIds(chatId);
+    const lesson = getRandomLesson(level, sentIds);
+    if (lesson) {
+      await bot.api.sendMessage(chatId, lesson.content, { parse_mode: "HTML" });
+      await markGrammarSent(chatId, lesson.id);
+      console.error(`[main] Sent grammar lesson "${lesson.topic}" → chat ${chatId}`);
+      return;
+    }
+    // No lessons available for this level, fall through to word-form card
+  }
+
+  // Word-form card (requires Ekilex)
   if (!config.ekilexApiKey) {
-    await bot.api.sendMessage(chatId, "Grammar cards require the Ekilex API. This feature is not available right now.");
+    // Try a lesson as fallback
+    const sentIds = await getSentGrammarIds(chatId);
+    const lesson = getRandomLesson(level, sentIds);
+    if (lesson) {
+      await bot.api.sendMessage(chatId, lesson.content, { parse_mode: "HTML" });
+      await markGrammarSent(chatId, lesson.id);
+      console.error(`[main] Sent grammar lesson "${lesson.topic}" (Ekilex unavailable) → chat ${chatId}`);
+      return;
+    }
+    await bot.api.sendMessage(chatId, "No grammar content available right now. Try again later.");
     return;
   }
 
   const learned = await getRandomLearnedWord(chatId);
   if (!learned) {
+    // No learned words — send a lesson instead
+    const sentIds = await getSentGrammarIds(chatId);
+    const lesson = getRandomLesson(level, sentIds);
+    if (lesson) {
+      await bot.api.sendMessage(chatId, lesson.content, { parse_mode: "HTML" });
+      await markGrammarSent(chatId, lesson.id);
+      console.error(`[main] Sent grammar lesson "${lesson.topic}" (no learned words) → chat ${chatId}`);
+      return;
+    }
     await bot.api.sendMessage(chatId, "Learn some words first with /next, then come back for grammar!");
     return;
   }
@@ -140,8 +178,18 @@ async function deliverGrammarCard(chatId: number): Promise<void> {
     return;
   }
 
-  await bot.api.sendMessage(chatId, "No grammar data found for your words right now. Try again later — the Ekilex dictionary doesn't have forms for every word.");
-  console.error(`[main] Could not find word with grammar data after 3 attempts → chat ${chatId}`);
+  // Word forms failed — send a lesson as fallback
+  const sentIds = await getSentGrammarIds(chatId);
+  const lesson = getRandomLesson(level, sentIds);
+  if (lesson) {
+    await bot.api.sendMessage(chatId, lesson.content, { parse_mode: "HTML" });
+    await markGrammarSent(chatId, lesson.id);
+    console.error(`[main] Sent grammar lesson "${lesson.topic}" (no forms found) → chat ${chatId}`);
+    return;
+  }
+
+  await bot.api.sendMessage(chatId, "No grammar data found right now. Try again later.");
+  console.error(`[main] Could not find grammar content → chat ${chatId}`);
 }
 
 async function refreshUserJobs(): Promise<void> {

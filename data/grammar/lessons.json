@@ -1,0 +1,194 @@
+[
+  {
+    "id": "a1-personal-pronouns",
+    "cefrLevel": "A1",
+    "topic": "Personal Pronouns",
+    "content": "<b>Personal Pronouns</b>\n\nmina (ma) — I\nsina (sa) — you\ntema (ta) — he/she/it\nmeie (me) — we\nteie (te) — you (pl/formal)\nnemad (nad) — they\n\n<i>Short forms (ma, sa, ta...) are used in everyday speech.</i>\n\n💬 <i>Ma olen tudeng.</i> — I am a student."
+  },
+  {
+    "id": "a1-olema-present",
+    "cefrLevel": "A1",
+    "topic": "Verb 'olema' (to be)",
+    "content": "<b>Verb: olema (to be) — Present</b>\n\nma <code>olen</code> — I am\nsa <code>oled</code> — you are\nta <code>on</code> — he/she is\nme <code>oleme</code> — we are\nte <code>olete</code> — you are\nnad <code>on</code> — they are\n\nNegative: <code>ei ole</code> (for all persons)\n\n💬 <i>Ma olen eestlane.</i> — I am Estonian.\n💬 <i>Ta ei ole kodus.</i> — He/she is not at home."
+  },
+  {
+    "id": "a1-basic-word-order",
+    "cefrLevel": "A1",
+    "topic": "Basic Word Order",
+    "content": "<b>Basic Word Order: SVO</b>\n\nEstonian generally follows Subject-Verb-Object:\n\n💬 <i>Ma söön leiba.</i> — I eat bread.\n💬 <i>Ta loeb raamatut.</i> — He reads a book.\n\nIn questions, the verb comes first:\n💬 <i>Kas sa räägid eesti keelt?</i> — Do you speak Estonian?\n\n<i>'Kas' is the yes/no question word.</i>"
+  },
+  {
+    "id": "a1-nominative-case",
+    "cefrLevel": "A1",
+    "topic": "Nominative Case (nimetav)",
+    "content": "<b>Nominative Case (nimetav)</b>\n\nThe base/dictionary form. Used for:\n• Subject of a sentence\n• After 'olema' (to be)\n\n💬 <i><code>Koer</code> on suur.</i> — The dog is big.\n💬 <i>See on <code>raamat</code>.</i> — This is a book.\n\n<i>No endings added — this is the form you see in the dictionary.</i>"
+  },
+  {
+    "id": "a1-genitive-case",
+    "cefrLevel": "A1",
+    "topic": "Genitive Case (omastav)",
+    "content": "<b>Genitive Case (omastav)</b>\n\nShows possession and is the stem for many other cases.\n\nkoer → <code>koera</code> (dog's)\nraamat → <code>raamatu</code> (book's)\nmaja → <code>maja</code> (house's)\n\n💬 <i>See on <code>koera</code> nimi.</i> — This is the dog's name.\n💬 <i><code>Raamatu</code> hind on kõrge.</i> — The book's price is high.\n\n<i>Genitive is the most important case to learn — it forms the base for other cases.</i>"
+  },
+  {
+    "id": "a1-partitive-case",
+    "cefrLevel": "A1",
+    "topic": "Partitive Case (osastav)",
+    "content": "<b>Partitive Case (osastav)</b>\n\nUsed for:\n• Partial/uncounted objects\n• After numbers (except 'üks')\n• Negative sentences\n\nkoer → <code>koera</code>\nraamat → <code>raamatut</code>\npiim → <code>piima</code>\n\n💬 <i>Ma joon <code>piima</code>.</i> — I drink milk.\n💬 <i>Mul ei ole <code>raamatut</code>.</i> — I don't have a book.\n💬 <i>Kaks <code>koera</code>.</i> — Two dogs."
+  },
+  {
+    "id": "a1-question-words",
+    "cefrLevel": "A1",
+    "topic": "Question Words",
+    "content": "<b>Question Words</b>\n\n<code>kes?</code> — who?\n<code>mis?</code> — what?\n<code>kus?</code> — where? (location)\n<code>kuhu?</code> — where to? (direction)\n<code>kust?</code> — where from?\n<code>millal?</code> — when?\n<code>kuidas?</code> — how?\n<code>miks?</code> — why?\n<code>kui palju?</code> — how much/many?\n\n💬 <i>Kus sa elad?</i> — Where do you live?\n💬 <i>Mis see on?</i> — What is this?"
+  },
+  {
+    "id": "a1-numbers",
+    "cefrLevel": "A1",
+    "topic": "Numbers 1-10",
+    "content": "<b>Numbers 1-10</b>\n\n1 <code>üks</code>\n2 <code>kaks</code>\n3 <code>kolm</code>\n4 <code>neli</code>\n5 <code>viis</code>\n6 <code>kuus</code>\n7 <code>seitse</code>\n8 <code>kaheksa</code>\n9 <code>üheksa</code>\n10 <code>kümme</code>\n\n<i>After numbers 2+, nouns take the partitive singular:</i>\n💬 <i>kolm <code>raamatut</code></i> — three books"
+  },
+  {
+    "id": "a1-negation",
+    "cefrLevel": "A1",
+    "topic": "Negation",
+    "content": "<b>Negation with 'ei'</b>\n\nEstonian uses <code>ei</code> + verb stem (no personal endings):\n\nma söön → ma <code>ei söö</code>\nsa räägid → sa <code>ei räägi</code>\nta loeb → ta <code>ei loe</code>\n\n💬 <i>Ma ei söö liha.</i> — I don't eat meat.\n💬 <i>Ta ei räägi eesti keelt.</i> — He doesn't speak Estonian.\n\n<i>The verb loses its personal ending after 'ei'.</i>"
+  },
+  {
+    "id": "a2-past-simple",
+    "cefrLevel": "A2",
+    "topic": "Simple Past (lihtminevik)",
+    "content": "<b>Simple Past (lihtminevik)</b>\n\nFormed with <code>-s/-si</code> suffix:\n\nma <code>sõin</code> — I ate\nsa <code>sõid</code> — you ate\nta <code>sõi</code> — he/she ate\nme <code>sõime</code> — we ate\nte <code>sõite</code> — you ate\nnad <code>sõid</code> — they ate\n\nNegative: <code>ei söönud</code> (for all persons)\n\n💬 <i>Ma sõin eile suppi.</i> — I ate soup yesterday.\n💬 <i>Ta ei söönud midagi.</i> — He didn't eat anything."
+  },
+  {
+    "id": "a2-present-perfect",
+    "cefrLevel": "A2",
+    "topic": "Present Perfect (täisminevik)",
+    "content": "<b>Present Perfect (täisminevik)</b>\n\nFormed with <code>olema</code> + <code>-nud</code> participle:\n\nma <code>olen söönud</code> — I have eaten\nsa <code>oled söönud</code> — you have eaten\nta <code>on söönud</code> — he/she has eaten\n\nNegative: <code>ei ole söönud</code>\n\n💬 <i>Ma olen Tallinnas elanud viis aastat.</i> — I have lived in Tallinn for five years.\n💬 <i>Kas sa oled seda filmi näinud?</i> — Have you seen this movie?"
+  },
+  {
+    "id": "a2-illative-case",
+    "cefrLevel": "A2",
+    "topic": "Illative Case (sisseütlev) — 'into'",
+    "content": "<b>Illative Case — movement INTO</b>\n\nShort illative (most common):\nmaja → <code>majja</code> (into the house)\nlinn → <code>linna</code> (into the city)\nkool → <code>kooli</code> (into the school)\n\nLong illative (-sse):\nraamatukogu → <code>raamatukokku</code>\n\n💬 <i>Ma lähen <code>linna</code>.</i> — I'm going to the city.\n💬 <i>Lapsed lähevad <code>kooli</code>.</i> — Children go to school.\n\n<i>Illative answers: kuhu? (where to?)</i>"
+  },
+  {
+    "id": "a2-inessive-elative",
+    "cefrLevel": "A2",
+    "topic": "Inessive & Elative Cases — 'in' & 'out of'",
+    "content": "<b>Inessive (-s) — IN / Elative (-st) — OUT OF</b>\n\nInessive (kus? — where?):\nlinn → <code>linnas</code> (in the city)\nkool → <code>koolis</code> (in school)\nmaja → <code>majas</code> (in the house)\n\nElative (kust? — where from?):\nlinn → <code>linnast</code> (from the city)\nkool → <code>koolist</code> (from school)\n\n💬 <i>Ma elan <code>Tallinnas</code>.</i> — I live in Tallinn.\n💬 <i>Ta tuleb <code>koolist</code>.</i> — He comes from school."
+  },
+  {
+    "id": "a2-allative-adessive-ablative",
+    "cefrLevel": "A2",
+    "topic": "Surface Cases — 'onto', 'on', 'off'",
+    "content": "<b>Surface Cases (outer local cases)</b>\n\nAllative (-le) — ONTO (kuhu?):\nlaud → <code>lauale</code> (onto the table)\n\nAdessive (-l) — ON (kus?):\nlaud → <code>laual</code> (on the table)\n\nAblative (-lt) — OFF (kust?):\nlaud → <code>laualt</code> (off the table)\n\n💬 <i>Pane raamat <code>lauale</code>.</i> — Put the book on the table.\n💬 <i>Raamat on <code>laual</code>.</i> — The book is on the table.\n💬 <i>Võta raamat <code>laualt</code>.</i> — Take the book off the table."
+  },
+  {
+    "id": "a2-postpositions",
+    "cefrLevel": "A2",
+    "topic": "Postpositions",
+    "content": "<b>Postpositions (come AFTER the noun)</b>\n\nWith genitive:\nmaja <code>ees</code> — in front of the house\nmaja <code>taga</code> — behind the house\nmaja <code>kõrval</code> — next to the house\nmaja <code>sees</code> — inside the house\nmaja <code>peal</code> — on top of the house\nmaja <code>all</code> — under the house\n\n💬 <i>Auto on maja <code>ees</code>.</i> — The car is in front of the house.\n💬 <i>Kass istub laua <code>all</code>.</i> — The cat sits under the table.\n\n<i>Unlike English, Estonian puts these AFTER the noun.</i>"
+  },
+  {
+    "id": "a2-ma-da-infinitive",
+    "cefrLevel": "A2",
+    "topic": "ma-infinitive vs da-infinitive",
+    "content": "<b>ma-infinitive vs da-infinitive</b>\n\n<code>ma-infinitive</code> — used for purpose/going to do:\n💬 <i>Ma lähen <code>sööma</code>.</i> — I'm going to eat.\n💬 <i>Ta tuli <code>õppima</code>.</i> — He came to study.\n\n<code>da-infinitive</code> — used after modal verbs:\n💬 <i>Ma tahan <code>süüa</code>.</i> — I want to eat.\n💬 <i>Sa pead <code>õppida</code>.</i> — You have to study.\n💬 <i>Kas sa oskad <code>ujuda</code>?</i> — Can you swim?\n\n<i>Rule of thumb: movement verbs → ma, modal verbs → da</i>"
+  },
+  {
+    "id": "a2-comparatives",
+    "cefrLevel": "A2",
+    "topic": "Comparatives & Superlatives",
+    "content": "<b>Comparatives & Superlatives</b>\n\nComparative: genitive + <code>-m</code>\nSuperlative: <code>kõige</code> + comparative\n\nsuur → <code>suurem</code> → <code>kõige suurem</code>\n(big → bigger → biggest)\n\nilus → <code>ilusam</code> → <code>kõige ilusam</code>\n(beautiful → more beautiful → most beautiful)\n\n💬 <i>Tallinn on <code>suurem</code> kui Tartu.</i>\n— Tallinn is bigger than Tartu.\n💬 <i>See on <code>kõige ilusam</code> linn.</i>\n— This is the most beautiful city."
+  },
+  {
+    "id": "a2-numbers-11-100",
+    "cefrLevel": "A2",
+    "topic": "Numbers 11-100 & Ordinals",
+    "content": "<b>Numbers 11-100</b>\n\n11 <code>üksteist</code>, 12 <code>kaksteist</code>...\n20 <code>kakskümmend</code>\n21 <code>kakskümmend üks</code>\n30 <code>kolmkümmend</code>\n100 <code>sada</code>\n\n<b>Ordinals</b> (formed with -s):\n1st <code>esimene</code>\n2nd <code>teine</code>\n3rd <code>kolmas</code>\n4th <code>neljas</code>\n5th <code>viies</code>\n\n💬 <i>Ma elan <code>kolmandal</code> korrusel.</i>\n— I live on the third floor."
+  },
+  {
+    "id": "b1-conditional",
+    "cefrLevel": "B1",
+    "topic": "Conditional Mood (tingiv kõneviis)",
+    "content": "<b>Conditional Mood — would</b>\n\nFormed with <code>-ks</code> suffix:\n\nma <code>sööksin</code> — I would eat\nsa <code>sööksid</code> — you would eat\nta <code>sööks</code> — he/she would eat\nme <code>sööksime</code> — we would eat\n\nNegative: <code>ei sööks</code>\n\n💬 <i>Ma <code>tahaksin</code> kohvi.</i> — I would like coffee.\n💬 <i>Kas sa <code>tuleksid</code> minuga?</i> — Would you come with me?\n\n<i>Used for polite requests and hypotheticals.</i>"
+  },
+  {
+    "id": "b1-passive",
+    "cefrLevel": "B1",
+    "topic": "Passive Voice (umbisikuline tegumood)",
+    "content": "<b>Passive Voice</b>\n\nPresent passive: <code>-takse/-dakse</code>\n\n💬 <i>Siin <code>räägitakse</code> eesti keelt.</i>\n— Estonian is spoken here.\n💬 <i>Ukse <code>avatakse</code> kell 9.</i>\n— The door is opened at 9.\n\nPast passive: <code>-ti/-di</code>\n💬 <i>Maja <code>ehitati</code> 1990. aastal.</i>\n— The house was built in 1990.\n\n<i>No subject needed — the action itself is emphasized.</i>"
+  },
+  {
+    "id": "b1-translative-case",
+    "cefrLevel": "B1",
+    "topic": "Translative Case (saav) — 'becoming'",
+    "content": "<b>Translative Case (-ks) — becoming/turning into</b>\n\nõpetaja → <code>õpetajaks</code> (becoming a teacher)\nhaige → <code>haigeks</code> (becoming sick)\nsuureks → <code>suureks</code> (becoming big)\n\n💬 <i>Ta õpib <code>arstiks</code>.</i> — He's studying to become a doctor.\n💬 <i>Ma jäin <code>haigeks</code>.</i> — I got sick.\n💬 <i>Laps kasvab <code>suureks</code>.</i> — The child is growing up.\n\n<i>Answers: kelleks? milleks? (into what?)</i>"
+  },
+  {
+    "id": "b1-terminative-essive-abessive",
+    "cefrLevel": "B1",
+    "topic": "Terminative, Essive & Abessive Cases",
+    "content": "<b>Three Less Common Cases</b>\n\n<b>Terminative (-ni)</b> — up to/until:\n💬 <i>Ma jooksen <code>metsani</code>.</i> — I run up to the forest.\n💬 <i><code>Õhtuni</code> on aega.</i> — There's time until evening.\n\n<b>Essive (-na)</b> — in the role of:\n💬 <i>Ta töötab <code>õpetajana</code>.</i> — He works as a teacher.\n\n<b>Abessive (-ta)</b> — without:\n💬 <i>Ma tulin <code>rahata</code>.</i> — I came without money.\n💬 <i><code>Probleemita</code>!</i> — No problem!"
+  },
+  {
+    "id": "b1-relative-clauses",
+    "cefrLevel": "B1",
+    "topic": "Relative Clauses (kes, mis, kus)",
+    "content": "<b>Relative Clauses</b>\n\n<code>kes</code> — who (for people):\n💬 <i>Mees, <code>kes</code> seal istub, on mu isa.</i>\n— The man who sits there is my father.\n\n<code>mis</code> — which/that (for things):\n💬 <i>Raamat, <code>mida</code> ma loen, on huvitav.</i>\n— The book that I'm reading is interesting.\n\n<code>kus</code> — where:\n💬 <i>Linn, <code>kus</code> ma elan, on ilus.</i>\n— The city where I live is beautiful.\n\n<i>Note: 'mis' declines — mida (partitive), mille (genitive), etc.</i>"
+  },
+  {
+    "id": "b1-verb-rection",
+    "cefrLevel": "B1",
+    "topic": "Verb Rection — Which Case to Use",
+    "content": "<b>Verb Rection</b>\n\nSome verbs require specific cases:\n\n<b>Partitive verbs</b> (always partitive object):\narmastama → <i>Ma armastan <code>sind</code>.</i>\nootama → <i>Ma ootan <code>bussi</code>.</i>\n\n<b>Genitive → completed action:</b>\n💬 <i>Ma lugesin <code>raamatu</code> läbi.</i> — I read the book (finished it).\n\n<b>Partitive → ongoing/partial action:</b>\n💬 <i>Ma lugesin <code>raamatut</code>.</i> — I was reading the book.\n\n<i>This genitive/partitive distinction is one of Estonian's trickiest features!</i>"
+  },
+  {
+    "id": "b1-reported-speech",
+    "cefrLevel": "B1",
+    "topic": "Reported Speech (kaudne kõneviis)",
+    "content": "<b>Reported Speech — quotative mood</b>\n\nFormed with <code>-vat</code> suffix:\n\n💬 <i>Ta <code>olevat</code> haige.</i> — He is said to be sick.\n💬 <i>Ilm <code>minevat</code> külmaks.</i> — The weather is said to be getting cold.\n\nPast: <code>olevat</code> + <code>-nud</code>:\n💬 <i>Ta <code>olevat tulnud</code> Eestist.</i>\n— He is said to have come from Estonia.\n\n<i>Used when reporting what someone else said, without confirming it's true.</i>"
+  },
+  {
+    "id": "b2-comitative-case",
+    "cefrLevel": "B2",
+    "topic": "Comitative Case (kaasaütlev) — 'with'",
+    "content": "<b>Comitative Case (-ga) — with/together with</b>\n\nGenitive + <code>-ga</code>:\nauto → <code>autoga</code> (by car/with the car)\nsõber → <code>sõbraga</code> (with a friend)\n\n💬 <i>Ma tulen <code>autoga</code>.</i> — I'll come by car.\n💬 <i>Ta elab koos <code>sõbraga</code>.</i> — He lives with a friend.\n💬 <i>Mis <code>sinuga</code> juhtus?</i> — What happened to you?\n\n<i>-ga is added to the genitive form. This is the 14th and final Estonian case!</i>"
+  },
+  {
+    "id": "b2-nud-tud-participles",
+    "cefrLevel": "B2",
+    "topic": "-nud and -tud Participles",
+    "content": "<b>Participles as Adjectives</b>\n\n<code>-nud</code> (active, past):\n💬 <i><code>Väsinud</code> mees istus pingile.</i>\n— The tired man sat on the bench.\n\n<code>-tud</code> (passive, past):\n💬 <i><code>Suletud</code> uks.</i> — A closed door.\n💬 <i><code>Hästi tehtud</code>!</i> — Well done!\n\n<code>-v</code> (active, present):\n💬 <i><code>Magav</code> laps.</i> — A sleeping child.\n\n<code>-tav</code> (passive, present):\n💬 <i><code>Loetav</code> raamat.</i> — A readable book."
+  },
+  {
+    "id": "b2-imperative",
+    "cefrLevel": "B2",
+    "topic": "Imperative Mood (käskiv kõneviis)",
+    "content": "<b>Imperative — Commands</b>\n\n<b>Singular (sa):</b> verb stem\n💬 <i><code>Tule</code> siia!</i> — Come here!\n💬 <i><code>Istu</code> maha!</i> — Sit down!\n\n<b>Plural/formal (te):</b> stem + <code>-ge/-ke</code>\n💬 <i><code>Tulge</code> siia!</i> — Come here! (pl)\n💬 <i><code>Istuge</code> maha!</i> — Sit down! (pl)\n\n<b>Negative:</b> <code>ära/ärge</code> + verb stem\n💬 <i><code>Ära mine</code>!</i> — Don't go!\n💬 <i><code>Ärge unustage</code>!</i> — Don't forget! (pl)\n\n<b>Let's:</b> stem + <code>-gem/-kem</code>\n💬 <i><code>Lähme</code>!</i> — Let's go!"
+  },
+  {
+    "id": "b2-word-formation",
+    "cefrLevel": "B2",
+    "topic": "Word Formation Patterns",
+    "content": "<b>Common Word Formation Patterns</b>\n\n<b>Compound words:</b>\nraamat + kogu → <code>raamatukogu</code> (library)\nlinna + hall → <code>linnahall</code> (city hall)\n\n<b>-ja</b> (doer): õpetama → <code>õpetaja</code> (teacher)\n<b>-mine</b> (action noun): õppima → <code>õppimine</code> (studying)\n<b>-lik</b> (adjective): sõber → <code>sõbralik</code> (friendly)\n<b>-tu</b> (without): süü → <code>süütu</code> (innocent)\n<b>-kas</b> (having quality): jõud → <code>jõukas</code> (wealthy)\n\n<i>Estonian builds long compound words — break them into parts to understand them.</i>"
+  },
+  {
+    "id": "b2-clause-connectors",
+    "cefrLevel": "B2",
+    "topic": "Clause Connectors & Conjunctions",
+    "content": "<b>Connecting Clauses</b>\n\n<b>Coordinating:</b>\n<code>ja</code> — and\n<code>aga/kuid</code> — but\n<code>või</code> — or\n<code>ning</code> — and (formal)\n\n<b>Subordinating:</b>\n<code>et</code> — that\n<code>sest/kuna</code> — because\n<code>kui</code> — when/if\n<code>kuigi</code> — although\n<code>selleks et</code> — in order to\n\n💬 <i>Ma õpin, <code>sest</code> tahan eksamit sooritada.</i>\n— I study because I want to pass the exam.\n💬 <i><code>Kuigi</code> sajab, me lähme välja.</i>\n— Although it rains, we'll go out."
+  },
+  {
+    "id": "b2-pluperfect",
+    "cefrLevel": "B2",
+    "topic": "Pluperfect (enneminevik)",
+    "content": "<b>Pluperfect — had done</b>\n\nFormed with <code>olin/olid/oli</code> + <code>-nud</code>:\n\nma <code>olin söönud</code> — I had eaten\nsa <code>olid söönud</code> — you had eaten\nta <code>oli söönud</code> — he/she had eaten\n\n💬 <i>Kui ma tulin, ta <code>oli juba lahkunud</code>.</i>\n— When I arrived, he had already left.\n💬 <i>Me <code>olime söönud</code>, enne kui nad tulid.</i>\n— We had eaten before they came.\n\n<i>Used for actions completed before another past action.</i>"
+  },
+  {
+    "id": "b2-object-rules",
+    "cefrLevel": "B2",
+    "topic": "Object Case Rules — Complete Guide",
+    "content": "<b>Estonian Object Cases — Summary</b>\n\n<b>Nominative object</b> (full, imperative/impersonal):\n💬 <i>Ava <code>uks</code>!</i> — Open the door!\n\n<b>Genitive object</b> (completed single action):\n💬 <i>Ma avasin <code>ukse</code>.</i> — I opened the door.\n\n<b>Partitive object</b> (ongoing/partial/negative):\n💬 <i>Ma avan <code>ust</code>.</i> — I'm opening the door.\n💬 <i>Ma ei avanud <code>ust</code>.</i> — I didn't open the door.\n\n<i>The three-way object distinction (nominative/genitive/partitive) is the hallmark of Estonian grammar.</i>"
+  }
+]
