@@ -226,9 +226,15 @@ export function registerQuiz(bot: Bot): void {
     if (session.currentIndex >= session.questions.length) {
       // Persist quiz results and increment word counts
       const quizzedWords = session.questions.map((q) => q.estonian);
+      const quizAnswers = session.answers.map((a) => ({
+        estonian: a.estonian,
+        correctAnswer: a.correct,
+        userAnswer: a.chosen,
+        isCorrect: a.isCorrect,
+      }));
       await Promise.all([
         incrementQuizCount(chatId, quizzedWords),
-        saveQuizResult(chatId, session.score, session.questions.length),
+        saveQuizResult(chatId, session.score, session.questions.length, quizAnswers),
       ]).catch((err) =>
         console.error("[quiz] Failed to save quiz data:", err instanceof Error ? err.message : err),
       );

@@ -69,6 +69,7 @@ export function registerCommands(
     { command: "next", description: "Get a flashcard now" },
     { command: "grammar", description: "Get a grammar card" },
     { command: "quiz", description: "Start a vocabulary quiz" },
+    { command: "quizhistory", description: "View past quiz results & mistakes" },
     { command: "settings", description: "Open settings menu" },
     { command: "stats", description: "See your progress" },
     { command: "stop", description: "Stop receiving flashcards" },
@@ -152,6 +153,36 @@ export function registerCommands(
       parse_mode: "HTML",
       reply_markup: mainMenuKeyboard(),
     });
+  });
+
+  bot.command("quizhistory", async (ctx) => {
+    const history = await getQuizHistory(ctx.chat.id, 5);
+    if (history.length === 0) {
+      await ctx.reply("No quiz history yet. Use /quiz to take your first quiz!");
+      return;
+    }
+
+    let text = "<b>📋 Quiz History</b>\n";
+
+    for (const quiz of history) {
+      const date = quiz.completedAt.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+      const emoji = quiz.percentage >= 80 ? "🌟" : quiz.percentage >= 60 ? "👍" : "📚";
+
+      text += `\n${emoji} <b>${date}</b> — ${quiz.score}/${quiz.total} (${quiz.percentage}%)`;
+
+      const mistakes = quiz.answers.filter((a) => !a.isCorrect);
+      if (mistakes.length > 0) {
+        for (const m of mistakes) {
+          text += `\n   ❌ ${escapeHtml(m.estonian)} = ${escapeHtml(m.correctAnswer)} <i>(you: ${escapeHtml(m.userAnswer)})</i>`;
+        }
+      } else {
+        text += "\n   ✅ Perfect score!";
+      }
+    }
+
+    text += "\n\n<i>Showing last 5 quizzes</i>";
+
+    await ctx.reply(text, { parse_mode: "HTML" });
   });
 
   // --- Callback queries for inline buttons ---

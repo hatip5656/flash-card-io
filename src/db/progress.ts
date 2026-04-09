@@ -80,36 +80,86 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
     )
   `);
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS quiz_answers (
+      id SERIAL PRIMARY KEY,
+      quiz_id INTEGER NOT NULL REFERENCES quiz_results(id),
+      estonian TEXT NOT NULL,
+      correct_answer TEXT NOT NULL,
+      user_answer TEXT NOT NULL,
+      is_correct BOOLEAN NOT NULL
+    )
+  `);
+
   console.error(`[db] Connected to PostgreSQL database "${dbName}"`);
   return pool;
 }
 
+export interface QuizAnswer {
+  estonian: string;
+  correctAnswer: string;
+  userAnswer: string;
+  isCorrect: boolean;
+}
+
 export interface QuizResult {
+  id: number;
   score: number;
   total: number;
   percentage: number;
   completedAt: Date;
+  answers: QuizAnswer[];
 }
 
-export async function saveQuizResult(chatId: number, score: number, total: number): Promise<void> {
+export async function saveQuizResult(
+  chatId: number,
+  score: number,
+  total: number,
+  answers: QuizAnswer[],
+): Promise<void> {
   const percentage = Math.round((score / total) * 100);
-  await pool.query(
-    "INSERT INTO quiz_results (chat_id, score, total, percentage) VALUES ($1, $2, $3, $4)",
+  const res = await pool.query(
+    "INSERT INTO quiz_results (chat_id, score, total, percentage) VALUES ($1, $2, $3, $4) RETURNING id",
     [chatId, score, total, percentage],
   );
+  const quizId = res.rows[0].id;
+
+  for (const a of answers) {
+    await pool.query(
+      "INSERT INTO quiz_answers (quiz_id, estonian, correct_answer, user_answer, is_correct) VALUES ($1, $2, $3, $4, $5)",
+      [quizId, a.estonian, a.correctAnswer, a.userAnswer, a.isCorrect],
+    );
+  }
 }
 
-export async function getQuizHistory(chatId: number, limit = 10): Promise<QuizResult[]> {
+export async function getQuizHistory(chatId: number, limit = 5): Promise<QuizResult[]> {
   const res = await pool.query(
-    "SELECT score, total, percentage, completed_at FROM quiz_results WHERE chat_id = $1 ORDER BY completed_at DESC LIMIT $2",
+    "SELECT id, score, total, percentage, completed_at FROM quiz_results WHERE chat_id = $1 ORDER BY completed_at DESC LIMIT $2",
     [chatId, limit],
   );
-  return res.rows.map((r) => ({
-    score: Number(r.score),
-    total: Number(r.total),
-    percentage: Number(r.percentage),
-    completedAt: new Date(r.completed_at),
-  }));
+
+  const results: QuizResult[] = [];
+  for (const r of res.rows) {
+    const answersRes = await pool.query(
+      "SELECT estonian, correct_answer, user_answer, is_correct FROM quiz_answers WHERE quiz_id = $1 ORDER BY id",
+      [r.id],
+    );
+    results.push({
+      id: Number(r.id),
+      score: Number(r.score),
+      total: Number(r.total),
+      percentage: Number(r.percentage),
+      completedAt: new Date(r.completed_at),
+      answers: answersRes.rows.map((a) => ({
+        estonian: a.estonian,
+        correctAnswer: a.correct_answer,
+        userAnswer: a.user_answer,
+        isCorrect: a.is_correct,
+      })),
+    });
+  }
+
+  return results;
 }
 
 export async function getQuizStats(chatId: number): Promise<{ totalQuizzes: number; avgPercentage: number; recentTrend: number | null }> {
