@@ -1,6 +1,6 @@
 import type { Bot } from "grammy";
 import type { CefrLevel } from "../config.js";
-import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule } from "../db/progress.js";
+import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory } from "../db/progress.js";
 import { getWordsForLevel } from "../flashcard/word-bank.js";
 import { mainMenuKeyboard, levelPicker, schedulePicker } from "./keyboards.js";
 import { startQuiz } from "./quiz.js";
@@ -16,11 +16,17 @@ export const SCHEDULE_PRESETS: Record<string, { cron: string; label: string }> =
   "3x": { cron: "0 9,14,20 * * *", label: "3x daily (9 AM, 2 PM, 8 PM)" },
 };
 
-function formatSettings(level: CefrLevel, schedule: string, sent: number): string {
+interface QuizStatsInfo {
+  totalQuizzes: number;
+  avgPercentage: number;
+  recentTrend: number | null;
+}
+
+function formatSettings(level: CefrLevel, schedule: string, sent: number, quiz?: QuizStatsInfo): string {
   const totalForLevel = getWordsForLevel(level).length;
   const scheduleLabel = Object.entries(SCHEDULE_PRESETS).find(([, v]) => v.cron === schedule)?.[1].label ?? schedule;
   const pct = totalForLevel > 0 ? Math.round((sent / totalForLevel) * 100) : 0;
-  return [
+  const lines = [
     "<b>🇪🇪 Flash Card IO</b>",
     "",
     `🏷️ Level: <b>${level}</b>`,
@@ -28,7 +34,28 @@ function formatSettings(level: CefrLevel, schedule: string, sent: number): strin
     `📚 Words learned: <b>${sent}</b>`,
     `📖 Local ${level} words: ${totalForLevel}`,
     `✅ Progress: ${pct}%`,
-  ].join("\n");
+  ];
+
+  if (quiz && quiz.totalQuizzes > 0) {
+    lines.push("");
+    lines.push(`🧠 Quizzes taken: <b>${quiz.totalQuizzes}</b>`);
+    lines.push(`📊 Average score: <b>${quiz.avgPercentage}%</b>`);
+    if (quiz.recentTrend !== null) {
+      const arrow = quiz.recentTrend > 0 ? "📈" : quiz.recentTrend < 0 ? "📉" : "➡️";
+      const sign = quiz.recentTrend > 0 ? "+" : "";
+      lines.push(`${arrow} Trend: <b>${sign}${quiz.recentTrend}%</b>`);
+    }
+  }
+
+  return lines.join("\n");
+}
+
+async function getSettingsText(chatId: number): Promise<string> {
+  const [{ sent, level, schedule }, quiz] = await Promise.all([
+    getStats(chatId),
+    getQuizStats(chatId),
+  ]);
+  return formatSettings(level, schedule, sent, quiz);
 }
 
 export function registerCommands(
@@ -53,16 +80,14 @@ export function registerCommands(
     const chatId = ctx.chat.id;
     await addSubscriber(chatId, "telegram");
     refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
-    const { sent, level, schedule } = await getStats(chatId);
-    await ctx.reply(formatSettings(level, schedule, sent), {
+    await ctx.reply(await getSettingsText(chatId), {
       parse_mode: "HTML",
       reply_markup: mainMenuKeyboard(),
     });
   });
 
   bot.command("settings", async (ctx) => {
-    const { sent, level, schedule } = await getStats(ctx.chat.id);
-    await ctx.reply(formatSettings(level, schedule, sent), {
+    await ctx.reply(await getSettingsText(ctx.chat.id), {
       parse_mode: "HTML",
       reply_markup: mainMenuKeyboard(),
     });
@@ -123,8 +148,7 @@ export function registerCommands(
   });
 
   bot.command("stats", async (ctx) => {
-    const { sent, level, schedule } = await getStats(ctx.chat.id);
-    await ctx.reply(formatSettings(level, schedule, sent), {
+    await ctx.reply(await getSettingsText(ctx.chat.id), {
       parse_mode: "HTML",
       reply_markup: mainMenuKeyboard(),
     });
@@ -166,9 +190,8 @@ export function registerCommands(
         break;
 
       case "stats": {
-        const { sent, level, schedule } = await getStats(chatId);
         await ctx.answerCallbackQuery();
-        await ctx.editMessageText(formatSettings(level, schedule, sent), {
+        await ctx.editMessageText(await getSettingsText(chatId), {
           parse_mode: "HTML",
           reply_markup: mainMenuKeyboard(),
         });
@@ -223,9 +246,7 @@ export function registerCommands(
         refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
         const totalForLevel = getWordsForLevel(value as CefrLevel).length;
         await ctx.answerCallbackQuery({ text: `Level set to ${value} (${totalForLevel} words)` });
-        // Return to main menu with updated stats
-        const { sent, level, schedule } = await getStats(chatId);
-        await ctx.editMessageText(formatSettings(level, schedule, sent), {
+        await ctx.editMessageText(await getSettingsText(chatId), {
           parse_mode: "HTML",
           reply_markup: mainMenuKeyboard(),
         });
@@ -237,9 +258,7 @@ export function registerCommands(
         await setSubscriberSchedule(chatId, preset.cron);
         refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
         await ctx.answerCallbackQuery({ text: `Schedule: ${preset.label}` });
-        // Return to main menu with updated stats
-        const stats = await getStats(chatId);
-        await ctx.editMessageText(formatSettings(stats.level, stats.schedule, stats.sent), {
+        await ctx.editMessageText(await getSettingsText(chatId), {
           parse_mode: "HTML",
           reply_markup: mainMenuKeyboard(),
         });
@@ -252,8 +271,7 @@ export function registerCommands(
     const chatId = ctx.chat?.id;
     if (!chatId) return;
     await ctx.answerCallbackQuery();
-    const { sent, level, schedule } = await getStats(chatId);
-    await ctx.editMessageText(formatSettings(level, schedule, sent), {
+    await ctx.editMessageText(await getSettingsText(chatId), {
       parse_mode: "HTML",
       reply_markup: mainMenuKeyboard(),
     });

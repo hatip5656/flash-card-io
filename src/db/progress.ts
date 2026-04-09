@@ -69,8 +69,76 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
     )
   `);
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS quiz_results (
+      id SERIAL PRIMARY KEY,
+      chat_id BIGINT NOT NULL,
+      score INTEGER NOT NULL,
+      total INTEGER NOT NULL,
+      percentage INTEGER NOT NULL,
+      completed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
   console.error(`[db] Connected to PostgreSQL database "${dbName}"`);
   return pool;
+}
+
+export interface QuizResult {
+  score: number;
+  total: number;
+  percentage: number;
+  completedAt: Date;
+}
+
+export async function saveQuizResult(chatId: number, score: number, total: number): Promise<void> {
+  const percentage = Math.round((score / total) * 100);
+  await pool.query(
+    "INSERT INTO quiz_results (chat_id, score, total, percentage) VALUES ($1, $2, $3, $4)",
+    [chatId, score, total, percentage],
+  );
+}
+
+export async function getQuizHistory(chatId: number, limit = 10): Promise<QuizResult[]> {
+  const res = await pool.query(
+    "SELECT score, total, percentage, completed_at FROM quiz_results WHERE chat_id = $1 ORDER BY completed_at DESC LIMIT $2",
+    [chatId, limit],
+  );
+  return res.rows.map((r) => ({
+    score: Number(r.score),
+    total: Number(r.total),
+    percentage: Number(r.percentage),
+    completedAt: new Date(r.completed_at),
+  }));
+}
+
+export async function getQuizStats(chatId: number): Promise<{ totalQuizzes: number; avgPercentage: number; recentTrend: number | null }> {
+  const res = await pool.query(
+    "SELECT COUNT(*) as count, COALESCE(AVG(percentage), 0) as avg_pct FROM quiz_results WHERE chat_id = $1",
+    [chatId],
+  );
+  const totalQuizzes = Number(res.rows[0].count);
+  const avgPercentage = Math.round(Number(res.rows[0].avg_pct));
+
+  // Recent trend: compare last 5 quizzes avg vs previous 5
+  let recentTrend: number | null = null;
+  if (totalQuizzes >= 4) {
+    const recent = await pool.query(
+      "SELECT percentage FROM quiz_results WHERE chat_id = $1 ORDER BY completed_at DESC LIMIT 5",
+      [chatId],
+    );
+    const older = await pool.query(
+      "SELECT percentage FROM quiz_results WHERE chat_id = $1 ORDER BY completed_at DESC LIMIT 5 OFFSET 5",
+      [chatId],
+    );
+    if (older.rows.length > 0) {
+      const recentAvg = recent.rows.reduce((s: number, r: any) => s + Number(r.percentage), 0) / recent.rows.length;
+      const olderAvg = older.rows.reduce((s: number, r: any) => s + Number(r.percentage), 0) / older.rows.length;
+      recentTrend = Math.round(recentAvg - olderAvg);
+    }
+  }
+
+  return { totalQuizzes, avgPercentage, recentTrend };
 }
 
 export async function getSentGrammarIds(chatId: number): Promise<Set<string>> {

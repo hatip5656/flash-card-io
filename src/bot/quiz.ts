@@ -1,5 +1,5 @@
 import { Bot, InlineKeyboard } from "grammy";
-import { getLearnedWordsForQuiz, incrementQuizCount } from "../db/progress.js";
+import { getLearnedWordsForQuiz, incrementQuizCount, saveQuizResult } from "../db/progress.js";
 import { escapeHtml } from "../flashcard/builder.js";
 
 interface QuizQuestion {
@@ -224,10 +224,13 @@ export function registerQuiz(bot: Bot): void {
     session.currentIndex++;
 
     if (session.currentIndex >= session.questions.length) {
-      // Increment quiz count for all words that appeared in this quiz
+      // Persist quiz results and increment word counts
       const quizzedWords = session.questions.map((q) => q.estonian);
-      await incrementQuizCount(chatId, quizzedWords).catch((err) =>
-        console.error("[quiz] Failed to increment quiz counts:", err instanceof Error ? err.message : err),
+      await Promise.all([
+        incrementQuizCount(chatId, quizzedWords),
+        saveQuizResult(chatId, session.score, session.questions.length),
+      ]).catch((err) =>
+        console.error("[quiz] Failed to save quiz data:", err instanceof Error ? err.message : err),
       );
       await bot.api.sendMessage(chatId, buildSummary(session), { parse_mode: "HTML" });
       quizSessions.delete(chatId);
