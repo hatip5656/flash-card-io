@@ -81,6 +81,17 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
   `);
 
   await pool.query(`
+    CREATE TABLE IF NOT EXISTS activity_log (
+      id SERIAL PRIMARY KEY,
+      chat_id BIGINT NOT NULL,
+      activity_date DATE NOT NULL DEFAULT CURRENT_DATE,
+      words_learned INTEGER NOT NULL DEFAULT 0,
+      quizzes_taken INTEGER NOT NULL DEFAULT 0,
+      UNIQUE (chat_id, activity_date)
+    )
+  `);
+
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS quiz_answers (
       id SERIAL PRIMARY KEY,
       quiz_id INTEGER NOT NULL REFERENCES quiz_results(id),
@@ -90,6 +101,9 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
       is_correct BOOLEAN NOT NULL
     )
   `);
+
+  // Index for streak calculation
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_activity_log_chat_date ON activity_log (chat_id, activity_date DESC)`);
 
   console.error(`[db] Connected to PostgreSQL database "${dbName}"`);
   return pool;
@@ -236,6 +250,67 @@ export async function backfillEnglish(wordLookup: (wordId: string) => string | n
     }
   }
   return updated;
+}
+
+export async function logWordActivity(chatId: number): Promise<{ totalWords: number; milestone: number | null }> {
+  await pool.query(
+    `INSERT INTO activity_log (chat_id, words_learned) VALUES ($1, 1)
+     ON CONFLICT (chat_id, activity_date) DO UPDATE SET words_learned = activity_log.words_learned + 1`,
+    [chatId],
+  );
+  // Check for milestones
+  const res = await pool.query("SELECT COUNT(*) as total FROM sent_words WHERE chat_id = $1", [chatId]);
+  const totalWords = Number(res.rows[0].total);
+  const milestones = [10, 25, 50, 100, 250, 500, 1000];
+  const milestone = milestones.includes(totalWords) ? totalWords : null;
+  return { totalWords, milestone };
+}
+
+export async function logQuizActivity(chatId: number): Promise<void> {
+  await pool.query(
+    `INSERT INTO activity_log (chat_id, quizzes_taken) VALUES ($1, 1)
+     ON CONFLICT (chat_id, activity_date) DO UPDATE SET quizzes_taken = activity_log.quizzes_taken + 1`,
+    [chatId],
+  );
+}
+
+export async function getStreak(chatId: number): Promise<number> {
+  const res = await pool.query(
+    `SELECT activity_date FROM activity_log
+     WHERE chat_id = $1
+     ORDER BY activity_date DESC`,
+    [chatId],
+  );
+
+  if (res.rows.length === 0) return 0;
+
+  let streak = 0;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (const row of res.rows) {
+    const date = new Date(row.activity_date);
+    date.setHours(0, 0, 0, 0);
+    const expectedDate = new Date(today);
+    expectedDate.setDate(expectedDate.getDate() - streak);
+
+    if (date.getTime() === expectedDate.getTime()) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+}
+
+export async function getTodayActivity(chatId: number): Promise<{ wordsLearned: number; quizzesTaken: number }> {
+  const res = await pool.query(
+    "SELECT words_learned, quizzes_taken FROM activity_log WHERE chat_id = $1 AND activity_date = CURRENT_DATE",
+    [chatId],
+  );
+  if (res.rows.length === 0) return { wordsLearned: 0, quizzesTaken: 0 };
+  return { wordsLearned: Number(res.rows[0].words_learned), quizzesTaken: Number(res.rows[0].quizzes_taken) };
 }
 
 export async function closeDb(): Promise<void> {

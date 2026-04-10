@@ -1,5 +1,5 @@
 import { Bot, InlineKeyboard } from "grammy";
-import { getLearnedWordsForQuiz, incrementQuizCount, saveQuizResult, getMostMissedWords } from "../db/progress.js";
+import { getLearnedWordsForQuiz, incrementQuizCount, saveQuizResult, getMostMissedWords, logQuizActivity } from "../db/progress.js";
 import { getWordFormsForValue } from "../services/ekilex.js";
 import { escapeHtml } from "../flashcard/builder.js";
 import { selectForms } from "../flashcard/grammar-builder.js";
@@ -332,6 +332,7 @@ async function processAnswer(
     await Promise.all([
       incrementQuizCount(session.chatId, quizzedWords),
       saveQuizResult(session.chatId, session.score, session.questions.length, quizAnswers),
+      logQuizActivity(session.chatId),
     ]).catch((err) =>
       console.error("[quiz] Failed to save quiz data:", err instanceof Error ? err.message : err),
     );

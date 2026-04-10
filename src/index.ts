@@ -2,7 +2,7 @@
 
 import { loadConfig } from "./config.js";
 import { startHealthServer, setReady } from "./health.js";
-import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, backfillEnglish, getSentGrammarIds, markGrammarSent } from "./db/progress.js";
+import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, backfillEnglish, getSentGrammarIds, markGrammarSent, logWordActivity } from "./db/progress.js";
 import { loadWordBank, getUnsent, getWordById } from "./flashcard/word-bank.js";
 import { loadGrammarBank, getRandomLesson } from "./flashcard/grammar-bank.js";
 import { buildFlashcard, buildFlashcardFromEkilex } from "./flashcard/builder.js";
@@ -105,6 +105,10 @@ async function deliverFlashcard(chatId: number): Promise<void> {
     const sent = await channel.sendFlashcard(chatId, flashcard);
     if (sent) {
       await markWordSent(chatId, wordId, wordValue, flashcard.word.english);
+      const { milestone } = await logWordActivity(chatId).catch(() => ({ totalWords: 0, milestone: null }));
+      if (milestone && bot) {
+        await bot.api.sendMessage(chatId, `🎉 <b>Milestone!</b> You've learned <b>${milestone}</b> words!`, { parse_mode: "HTML" });
+      }
       console.error(`[main] Sent "${wordValue}" to ${chatId} via ${channel.name}`);
     }
   }

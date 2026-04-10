@@ -1,6 +1,6 @@
 import type { Bot } from "grammy";
 import type { CefrLevel } from "../config.js";
-import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory } from "../db/progress.js";
+import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity } from "../db/progress.js";
 import { getWordsForLevel } from "../flashcard/word-bank.js";
 import { mainMenuKeyboard, levelPicker, schedulePicker } from "./keyboards.js";
 import { startQuiz } from "./quiz.js";
@@ -22,19 +22,42 @@ interface QuizStatsInfo {
   recentTrend: number | null;
 }
 
-function formatSettings(level: CefrLevel, schedule: string, sent: number, quiz?: QuizStatsInfo): string {
+interface TodayActivity {
+  wordsLearned: number;
+  quizzesTaken: number;
+}
+
+function formatSettings(
+  level: CefrLevel,
+  schedule: string,
+  sent: number,
+  quiz?: QuizStatsInfo,
+  streak?: number,
+  today?: TodayActivity,
+): string {
   const totalForLevel = getWordsForLevel(level).length;
   const scheduleLabel = Object.entries(SCHEDULE_PRESETS).find(([, v]) => v.cron === schedule)?.[1].label ?? schedule;
   const pct = totalForLevel > 0 ? Math.round((sent / totalForLevel) * 100) : 0;
+
+  const streakEmoji = (streak ?? 0) >= 7 ? "🔥" : (streak ?? 0) >= 3 ? "⚡" : "📅";
+
   const lines = [
     "<b>🇪🇪 Flash Card IO</b>",
     "",
+    `${streakEmoji} Streak: <b>${streak ?? 0} day${(streak ?? 0) !== 1 ? "s" : ""}</b>`,
     `🏷️ Level: <b>${level}</b>`,
     `⏰ Schedule: <b>${escapeHtml(scheduleLabel)}</b>`,
     `📚 Words learned: <b>${sent}</b>`,
     `📖 Local ${level} words: ${totalForLevel}`,
     `✅ Progress: ${pct}%`,
   ];
+
+  if (today && (today.wordsLearned > 0 || today.quizzesTaken > 0)) {
+    lines.push("");
+    lines.push("<b>Today:</b>");
+    if (today.wordsLearned > 0) lines.push(`  📚 ${today.wordsLearned} word${today.wordsLearned !== 1 ? "s" : ""} learned`);
+    if (today.quizzesTaken > 0) lines.push(`  🧠 ${today.quizzesTaken} quiz${today.quizzesTaken !== 1 ? "zes" : ""} taken`);
+  }
 
   if (quiz && quiz.totalQuizzes > 0) {
     lines.push("");
@@ -51,11 +74,13 @@ function formatSettings(level: CefrLevel, schedule: string, sent: number, quiz?:
 }
 
 async function getSettingsText(chatId: number): Promise<string> {
-  const [{ sent, level, schedule }, quiz] = await Promise.all([
+  const [{ sent, level, schedule }, quiz, streak, today] = await Promise.all([
     getStats(chatId),
     getQuizStats(chatId),
+    getStreak(chatId),
+    getTodayActivity(chatId),
   ]);
-  return formatSettings(level, schedule, sent, quiz);
+  return formatSettings(level, schedule, sent, quiz, streak, today);
 }
 
 export function registerCommands(
