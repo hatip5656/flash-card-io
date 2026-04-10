@@ -252,6 +252,24 @@ export async function backfillEnglish(wordLookup: (wordId: string) => string | n
   return updated;
 }
 
+export async function getWordsForReview(chatId: number, limit = 5): Promise<Array<{ wordId: string; wordValue: string; english: string; sentAt: Date }>> {
+  // Prioritize: oldest words first, weighted by low quiz exposure
+  const res = await pool.query(
+    `SELECT word_id, word_value, english, sent_at
+     FROM sent_words
+     WHERE chat_id = $1 AND word_value IS NOT NULL AND english IS NOT NULL
+     ORDER BY quiz_count ASC, sent_at ASC
+     LIMIT $2`,
+    [chatId, limit],
+  );
+  return res.rows.map((r) => ({
+    wordId: r.word_id,
+    wordValue: r.word_value,
+    english: r.english,
+    sentAt: new Date(r.sent_at),
+  }));
+}
+
 export async function logWordActivity(chatId: number): Promise<{ totalWords: number; milestone: number | null }> {
   await pool.query(
     `INSERT INTO activity_log (chat_id, words_learned) VALUES ($1, 1)

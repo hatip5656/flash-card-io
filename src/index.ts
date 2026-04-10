@@ -2,7 +2,7 @@
 
 import { loadConfig } from "./config.js";
 import { startHealthServer, setReady } from "./health.js";
-import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, backfillEnglish, getSentGrammarIds, markGrammarSent, logWordActivity } from "./db/progress.js";
+import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, backfillEnglish, getSentGrammarIds, markGrammarSent, logWordActivity, getStreak, getTodayActivity } from "./db/progress.js";
 import { loadWordBank, getUnsent, getWordById } from "./flashcard/word-bank.js";
 import { loadGrammarBank, getRandomLesson } from "./flashcard/grammar-bank.js";
 import { buildFlashcard, buildFlashcardFromEkilex } from "./flashcard/builder.js";
@@ -181,6 +181,27 @@ async function main(): Promise<void> {
     scheduleRandomGrammarJobs(subs, config.cronTimezone, deliverGrammarCard);
   });
 
+  // Daily summary at 9 PM
+  const dailySummaryJob = new Cron("0 21 * * *", { timezone: config.cronTimezone }, async () => {
+    if (!bot) return;
+    const subs = await getActiveSubscribers();
+    for (const sub of subs) {
+      try {
+        const [streak, today] = await Promise.all([getStreak(sub.chatId), getTodayActivity(sub.chatId)]);
+        if (today.wordsLearned === 0 && today.quizzesTaken === 0) continue; // Skip inactive users
+        const streakEmoji = streak >= 7 ? "🔥" : streak >= 3 ? "⚡" : "📅";
+        let msg = `${streakEmoji} <b>Daily Summary</b>\n\n`;
+        msg += `📚 Words learned today: <b>${today.wordsLearned}</b>\n`;
+        msg += `🧠 Quizzes taken: <b>${today.quizzesTaken}</b>\n`;
+        msg += `${streakEmoji} Streak: <b>${streak} day${streak !== 1 ? "s" : ""}</b>\n`;
+        if (streak >= 3) msg += `\nKeep it up! 💪`;
+        await bot.api.sendMessage(sub.chatId, msg, { parse_mode: "HTML" });
+      } catch (err) {
+        console.error(`[main] Daily summary error for ${sub.chatId}:`, err instanceof Error ? err.message : err);
+      }
+    }
+  });
+
   // Global scheduler as fallback
   const globalScheduler = startGlobalScheduler(
     config.cronSchedule,
@@ -203,6 +224,7 @@ async function main(): Promise<void> {
     console.error("[main] Shutting down...");
     setReady(false);
     clearInterval(refreshInterval);
+    dailySummaryJob.stop();
     grammarRerollJob.stop();
     stopAllGrammarJobs();
     globalScheduler.stop();

@@ -1,6 +1,6 @@
 import type { Bot } from "grammy";
 import type { CefrLevel } from "../config.js";
-import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity } from "../db/progress.js";
+import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity, getWordsForReview } from "../db/progress.js";
 import { getWordsForLevel } from "../flashcard/word-bank.js";
 import { mainMenuKeyboard, levelPicker, schedulePicker } from "./keyboards.js";
 import { startQuiz } from "./quiz.js";
@@ -96,6 +96,7 @@ export function registerCommands(
     { command: "grammar", description: "Get a grammar card" },
     { command: "quiz", description: "Start a vocabulary quiz" },
     { command: "quizhistory", description: "View past quiz results & mistakes" },
+    { command: "review", description: "Review previously learned words" },
     { command: "settings", description: "Open settings menu" },
     { command: "stats", description: "See your progress" },
     { command: "stop", description: "Stop receiving flashcards" },
@@ -207,6 +208,25 @@ export function registerCommands(
     }
 
     text += "\n\n<i>Showing last 5 quizzes</i>";
+
+    await ctx.reply(text, { parse_mode: "HTML" });
+  });
+
+  bot.command("review", async (ctx) => {
+    const words = await getWordsForReview(ctx.chat.id, 5);
+    if (words.length === 0) {
+      await ctx.reply("No words to review yet. Use /next to learn some words first!");
+      return;
+    }
+
+    let text = "<b>📝 Word Review</b>\n\n";
+    text += "How many do you remember?\n\n";
+
+    for (const w of words) {
+      text += `<b>${escapeHtml(w.wordValue)}</b> — <tg-spoiler>${escapeHtml(w.english)}</tg-spoiler>\n`;
+    }
+
+    text += "\n<i>Tap the spoilers to check your memory. Use /quiz to test yourself!</i>";
 
     await ctx.reply(text, { parse_mode: "HTML" });
   });
