@@ -4,6 +4,7 @@ export interface AppConfig {
   telegramBotToken: string;
   unsplashAccessKey: string;
   ekilexApiKey: string | null;
+  googleTtsApiKey: string | null;
   databaseUrl: string;
   cronSchedule: string;
   cronTimezone: string;
@@ -41,6 +42,7 @@ export function loadConfig(): AppConfig {
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN ?? "",
     unsplashAccessKey: process.env.UNSPLASH_ACCESS_KEY,
     ekilexApiKey: process.env.EKILEX_API_KEY ?? null,
+    googleTtsApiKey: process.env.GOOGLE_TTS_API_KEY ?? null,
     databaseUrl: process.env.DATABASE_URL,
     cronSchedule: process.env.CRON_SCHEDULE ?? "0 9 * * *",
     cronTimezone: process.env.CRON_TIMEZONE ?? "Europe/Tallinn",

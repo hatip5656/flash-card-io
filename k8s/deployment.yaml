@@ -55,6 +55,12 @@ spec:
                 secretKeyRef:
                   name: flash-card-io-secrets
                   key: DATABASE_URL
+            - name: GOOGLE_TTS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: flash-card-io-secrets
+                  key: GOOGLE_TTS_API_KEY
+                  optional: true
             - name: CRON_SCHEDULE
               value: "0 9 * * *"
             - name: CRON_TIMEZONE
