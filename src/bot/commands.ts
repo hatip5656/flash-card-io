@@ -73,6 +73,15 @@ function formatSettings(
   return lines.join("\n");
 }
 
+async function safeEditMessage(ctx: any, text: string, extra?: any): Promise<void> {
+  try {
+    await ctx.editMessageText(text, extra);
+  } catch (err: any) {
+    if (err?.description?.includes("message is not modified")) return;
+    throw err;
+  }
+}
+
 async function getSettingsText(chatId: number): Promise<string> {
   const [{ sent, level, schedule }, quiz, streak, today] = await Promise.all([
     getStats(chatId),
@@ -268,7 +277,7 @@ export function registerCommands(
 
       case "stats": {
         await ctx.answerCallbackQuery();
-        await ctx.editMessageText(await getSettingsText(chatId), {
+        await safeEditMessage(ctx,await getSettingsText(chatId), {
           parse_mode: "HTML",
           reply_markup: mainMenuKeyboard(),
         });
@@ -279,7 +288,7 @@ export function registerCommands(
         await removeSubscriber(chatId);
         refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
         await ctx.answerCallbackQuery({ text: "Stopped." });
-        await ctx.editMessageText("Stopped. Send /start to resume.");
+        await safeEditMessage(ctx,"Stopped. Send /start to resume.");
         break;
     }
   });
@@ -293,7 +302,7 @@ export function registerCommands(
     switch (field) {
       case "level": {
         const current = await getSubscriberLevel(chatId);
-        await ctx.editMessageText(`Select your level (current: <b>${current}</b>):`, {
+        await safeEditMessage(ctx,`Select your level (current: <b>${current}</b>):`, {
           parse_mode: "HTML",
           reply_markup: levelPicker(current),
         });
@@ -302,7 +311,7 @@ export function registerCommands(
       case "schedule": {
         const currentCron = await getSubscriberSchedule(chatId);
         const label = Object.entries(SCHEDULE_PRESETS).find(([, v]) => v.cron === currentCron)?.[1].label ?? currentCron;
-        await ctx.editMessageText(`Select your schedule (current: <b>${escapeHtml(label)}</b>):`, {
+        await safeEditMessage(ctx,`Select your schedule (current: <b>${escapeHtml(label)}</b>):`, {
           parse_mode: "HTML",
           reply_markup: schedulePicker(currentCron),
         });
@@ -323,7 +332,7 @@ export function registerCommands(
         refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
         const totalForLevel = getWordsForLevel(value as CefrLevel).length;
         await ctx.answerCallbackQuery({ text: `Level set to ${value} (${totalForLevel} words)` });
-        await ctx.editMessageText(await getSettingsText(chatId), {
+        await safeEditMessage(ctx,await getSettingsText(chatId), {
           parse_mode: "HTML",
           reply_markup: mainMenuKeyboard(),
         });
@@ -335,7 +344,7 @@ export function registerCommands(
         await setSubscriberSchedule(chatId, preset.cron);
         refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
         await ctx.answerCallbackQuery({ text: `Schedule: ${preset.label}` });
-        await ctx.editMessageText(await getSettingsText(chatId), {
+        await safeEditMessage(ctx,await getSettingsText(chatId), {
           parse_mode: "HTML",
           reply_markup: mainMenuKeyboard(),
         });
@@ -348,7 +357,7 @@ export function registerCommands(
     const chatId = ctx.chat?.id;
     if (!chatId) return;
     await ctx.answerCallbackQuery();
-    await ctx.editMessageText(await getSettingsText(chatId), {
+    await safeEditMessage(ctx,await getSettingsText(chatId), {
       parse_mode: "HTML",
       reply_markup: mainMenuKeyboard(),
     });

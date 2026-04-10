@@ -14,20 +14,21 @@ export async function searchPhoto(
   query: string,
   accessKey: string,
 ): Promise<UnsplashPhoto | null> {
-  const params = new URLSearchParams({
-    query,
-    per_page: "1",
-    orientation: "landscape",
-  });
+  try {
+    const params = new URLSearchParams({
+      query,
+      per_page: "1",
+      orientation: "landscape",
+    });
 
-  const res = await fetch(`${UNSPLASH_API}/search/photos?${params}`, {
-    headers: { Authorization: `Client-ID ${accessKey}` },
-  });
+    const res = await fetch(`${UNSPLASH_API}/search/photos?${params}`, {
+      headers: { Authorization: `Client-ID ${accessKey}` },
+    });
 
-  if (!res.ok) {
-    console.error(`[unsplash] API error: ${res.status} ${res.statusText}`);
-    return null;
-  }
+    if (!res.ok) {
+      console.error(`[unsplash] API error: ${res.status} ${res.statusText}`);
+      return null;
+    }
 
   const data = (await res.json()) as {
     results: Array<{
@@ -52,6 +53,10 @@ export async function searchPhoto(
     photographerUrl: photo.user.links.html,
     downloadUrl: photo.links.download_location,
   };
+  } catch (err) {
+    console.error(`[unsplash] Error searching for "${query}":`, err instanceof Error ? err.message : err);
+    return null;
+  }
 }
 
 export async function triggerDownload(

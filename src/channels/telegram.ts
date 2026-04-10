@@ -10,13 +10,19 @@ export function createTelegramChannel(token: string): { channel: DeliveryChannel
 
     async sendFlashcard(chatId: number, flashcard: Flashcard): Promise<boolean> {
       try {
-        if (flashcard.imageUrl) {
+        const caption = flashcard.caption;
+
+        if (flashcard.imageUrl && caption.length <= 1024) {
           await bot.api.sendPhoto(chatId, flashcard.imageUrl, {
-            caption: flashcard.caption,
+            caption,
             parse_mode: "HTML",
           });
+        } else if (flashcard.imageUrl) {
+          // Caption too long for photo — send photo first, then caption as text
+          await bot.api.sendPhoto(chatId, flashcard.imageUrl);
+          await bot.api.sendMessage(chatId, caption, { parse_mode: "HTML" });
         } else {
-          await bot.api.sendMessage(chatId, flashcard.caption, {
+          await bot.api.sendMessage(chatId, caption, {
             parse_mode: "HTML",
           });
         }

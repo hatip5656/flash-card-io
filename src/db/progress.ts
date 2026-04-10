@@ -293,33 +293,18 @@ export async function logQuizActivity(chatId: number): Promise<void> {
 }
 
 export async function getStreak(chatId: number): Promise<number> {
+  // Use DB's CURRENT_DATE to avoid timezone mismatch with containers
   const res = await pool.query(
-    `SELECT activity_date FROM activity_log
-     WHERE chat_id = $1
-     ORDER BY activity_date DESC`,
+    `SELECT COUNT(*) AS streak FROM (
+       SELECT activity_date,
+              CURRENT_DATE - activity_date - ROW_NUMBER() OVER (ORDER BY activity_date DESC) + 1 AS grp
+       FROM activity_log
+       WHERE chat_id = $1
+     ) sub
+     WHERE grp = 0`,
     [chatId],
   );
-
-  if (res.rows.length === 0) return 0;
-
-  let streak = 0;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  for (const row of res.rows) {
-    const date = new Date(row.activity_date);
-    date.setHours(0, 0, 0, 0);
-    const expectedDate = new Date(today);
-    expectedDate.setDate(expectedDate.getDate() - streak);
-
-    if (date.getTime() === expectedDate.getTime()) {
-      streak++;
-    } else {
-      break;
-    }
-  }
-
-  return streak;
+  return Number(res.rows[0]?.streak ?? 0);
 }
 
 export async function getTodayActivity(chatId: number): Promise<{ wordsLearned: number; quizzesTaken: number }> {
