@@ -132,6 +132,20 @@ export async function saveQuizResult(
   }
 }
 
+export async function getMostMissedWords(chatId: number, limit = 20): Promise<Array<{ estonian: string; mistakes: number }>> {
+  const res = await pool.query(
+    `SELECT estonian, COUNT(*) as mistakes
+     FROM quiz_answers qa
+     JOIN quiz_results qr ON qa.quiz_id = qr.id
+     WHERE qr.chat_id = $1 AND qa.is_correct = false
+     GROUP BY estonian
+     ORDER BY mistakes DESC
+     LIMIT $2`,
+    [chatId, limit],
+  );
+  return res.rows.map((r) => ({ estonian: r.estonian, mistakes: Number(r.mistakes) }));
+}
+
 export async function getQuizHistory(chatId: number, limit = 5): Promise<QuizResult[]> {
   const res = await pool.query(
     "SELECT id, score, total, percentage, completed_at FROM quiz_results WHERE chat_id = $1 ORDER BY completed_at DESC LIMIT $2",

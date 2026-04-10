@@ -63,6 +63,7 @@ export function registerCommands(
   deliverFlashcard: (chatId: number) => Promise<void>,
   deliverGrammarCard: (chatId: number) => Promise<void>,
   refreshUserJobs?: () => Promise<void>,
+  ekilexApiKey?: string | null,
 ): void {
   bot.api.setMyCommands([
     { command: "start", description: "Start the bot / show menu" },
@@ -214,7 +215,7 @@ export function registerCommands(
       case "quiz":
         await ctx.answerCallbackQuery();
         try {
-          await startQuiz(bot, chatId);
+          await startQuiz(bot, chatId, ekilexApiKey);
         } catch (err) {
           console.error("[commands] action:quiz error:", err instanceof Error ? err.message : err);
         }

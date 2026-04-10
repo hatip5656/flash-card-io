@@ -147,8 +147,8 @@ async function main(): Promise<void> {
 
   // Register bot commands
   if (bot) {
-    registerCommands(bot, deliverFlashcard, deliverGrammarCard, refreshUserJobs);
-    registerQuiz(bot);
+    registerCommands(bot, deliverFlashcard, deliverGrammarCard, refreshUserJobs, config.ekilexApiKey);
+    registerQuiz(bot, config.ekilexApiKey);
     bot.start({
       onStart: () => console.error("[main] Telegram bot polling started"),
     });
