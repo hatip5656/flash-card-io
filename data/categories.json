@@ -1,0 +1,62 @@
+{
+  "greetings": {
+    "label": "Greetings & Basics",
+    "emoji": "👋",
+    "words": ["tere", "head aega", "aitäh", "palun", "vabandust", "jah", "ei", "tere hommikust", "tere õhtust", "head ööd"]
+  },
+  "food": {
+    "label": "Food & Drink",
+    "emoji": "🍽️",
+    "words": ["leib", "piim", "vesi", "kohv", "tee", "liha", "kala", "juust", "õun", "kartul", "supp", "sool", "suhkur", "või", "muna"]
+  },
+  "family": {
+    "label": "Family",
+    "emoji": "👨‍👩‍👧‍👦",
+    "words": ["ema", "isa", "vend", "õde", "laps", "poeg", "tütar", "vanaema", "vanaisa", "pere", "naine", "mees", "abikaasa"]
+  },
+  "numbers": {
+    "label": "Numbers",
+    "emoji": "🔢",
+    "words": ["üks", "kaks", "kolm", "neli", "viis", "kuus", "seitse", "kaheksa", "üheksa", "kümme", "sada", "tuhat"]
+  },
+  "colors": {
+    "label": "Colors",
+    "emoji": "🎨",
+    "words": ["punane", "sinine", "roheline", "kollane", "valge", "must", "pruun", "hall", "roosa", "oranž"]
+  },
+  "time": {
+    "label": "Time & Days",
+    "emoji": "📅",
+    "words": ["täna", "homme", "eile", "nädal", "kuu", "aasta", "esmaspäev", "teisipäev", "kolmapäev", "neljapäev", "reede", "laupäev", "pühapäev", "hommik", "õhtu"]
+  },
+  "places": {
+    "label": "Places",
+    "emoji": "📍",
+    "words": ["kool", "maja", "linn", "pood", "haigla", "raamatukogu", "tänav", "park", "restoran", "hotell", "lennujaam", "sadam"]
+  },
+  "body": {
+    "label": "Body & Health",
+    "emoji": "🏥",
+    "words": ["pea", "käsi", "jalg", "silm", "kõrv", "nina", "suu", "süda", "selg", "haige", "terve", "arst"]
+  },
+  "nature": {
+    "label": "Nature & Weather",
+    "emoji": "🌿",
+    "words": ["ilm", "päike", "vihm", "lumi", "tuul", "meri", "mets", "järv", "puu", "lill", "soe", "külm"]
+  },
+  "travel": {
+    "label": "Travel & Transport",
+    "emoji": "✈️",
+    "words": ["auto", "buss", "rong", "lennuk", "laev", "pilet", "reis", "kaart", "kohver", "pass"]
+  },
+  "work": {
+    "label": "Work & Education",
+    "emoji": "💼",
+    "words": ["töö", "õpetaja", "tudeng", "raamat", "klass", "eksam", "arvuti", "kontor", "palk", "amet"]
+  },
+  "emotions": {
+    "label": "Emotions",
+    "emoji": "😊",
+    "words": ["rõõmus", "kurb", "vihane", "väsinud", "õnnelik", "kartma", "armastama", "meeldima", "tahtma", "lootma"]
+  }
+}
