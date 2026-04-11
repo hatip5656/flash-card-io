@@ -8,7 +8,7 @@ RUN npm run build
 
 FROM node:20-alpine
 WORKDIR /app
-RUN apk add --no-cache tini
+RUN apk add --no-cache tini espeak-ng
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 COPY --from=builder /app/dist/ ./dist/

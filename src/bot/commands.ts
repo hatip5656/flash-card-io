@@ -1,6 +1,6 @@
 import type { Bot } from "grammy";
 import type { CefrLevel } from "../config.js";
-import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity, getWordsForReview } from "../db/progress.js";
+import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity, getWordsDueForReview } from "../db/progress.js";
 import { getWordsForLevel } from "../flashcard/word-bank.js";
 import { mainMenuKeyboard, levelPicker, schedulePicker } from "./keyboards.js";
 import { startQuiz } from "./quiz.js";
@@ -222,13 +222,13 @@ export function registerCommands(
   });
 
   bot.command("review", async (ctx) => {
-    const words = await getWordsForReview(ctx.chat.id, 5);
+    const words = await getWordsDueForReview(ctx.chat.id, 5);
     if (words.length === 0) {
-      await ctx.reply("No words to review yet. Use /next to learn some words first!");
+      await ctx.reply("No words due for review! All caught up. Come back later or use /quiz to practice.");
       return;
     }
 
-    let text = "<b>📝 Word Review</b>\n\n";
+    let text = "<b>📝 Words Due for Review</b>\n\n";
     text += "How many do you remember?\n\n";
 
     for (const w of words) {

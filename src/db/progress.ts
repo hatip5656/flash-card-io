@@ -61,6 +61,11 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
   await pool.query(`ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS first_name TEXT`);
   await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS english TEXT`);
   await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS quiz_count INTEGER NOT NULL DEFAULT 0`);
+  // SM-2 spaced repetition fields
+  await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS ease_factor REAL NOT NULL DEFAULT 2.5`);
+  await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS interval_days INTEGER NOT NULL DEFAULT 1`);
+  await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS next_review DATE NOT NULL DEFAULT CURRENT_DATE`);
+  await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS repetitions INTEGER NOT NULL DEFAULT 0`);
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS sent_grammar (
@@ -252,6 +257,56 @@ export async function backfillEnglish(wordLookup: (wordId: string) => string | n
     }
   }
   return updated;
+}
+
+// SM-2 Spaced Repetition Algorithm
+export async function getWordsDueForReview(chatId: number, limit = 10): Promise<Array<{ wordId: string; wordValue: string; english: string }>> {
+  const res = await pool.query(
+    `SELECT word_id, word_value, english FROM sent_words
+     WHERE chat_id = $1 AND word_value IS NOT NULL AND english IS NOT NULL
+       AND next_review <= CURRENT_DATE
+     ORDER BY next_review ASC, ease_factor ASC
+     LIMIT $2`,
+    [chatId, limit],
+  );
+  return res.rows.map((r) => ({ wordId: r.word_id, wordValue: r.word_value, english: r.english }));
+}
+
+export async function updateSm2(chatId: number, wordValue: string, quality: number): Promise<void> {
+  // quality: 0-5 (0-2 = fail, 3 = hard, 4 = good, 5 = easy)
+  const res = await pool.query(
+    "SELECT ease_factor, interval_days, repetitions FROM sent_words WHERE chat_id = $1 AND word_value = $2",
+    [chatId, wordValue],
+  );
+  if (res.rows.length === 0) return;
+
+  let { ease_factor: ef, interval_days: interval, repetitions: reps } = res.rows[0];
+  ef = Number(ef);
+  interval = Number(interval);
+  reps = Number(reps);
+
+  if (quality >= 3) {
+    // Correct response
+    if (reps === 0) interval = 1;
+    else if (reps === 1) interval = 6;
+    else interval = Math.round(interval * ef);
+    reps++;
+  } else {
+    // Incorrect — reset
+    reps = 0;
+    interval = 1;
+  }
+
+  // Update ease factor (minimum 1.3)
+  ef = ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+  if (ef < 1.3) ef = 1.3;
+
+  await pool.query(
+    `UPDATE sent_words SET ease_factor = $1, interval_days = $2, repetitions = $3,
+     next_review = CURRENT_DATE + $2
+     WHERE chat_id = $4 AND word_value = $5`,
+    [ef, interval, reps, chatId, wordValue],
+  );
 }
 
 export async function getWordsForReview(chatId: number, limit = 5): Promise<Array<{ wordId: string; wordValue: string; english: string; sentAt: Date }>> {
