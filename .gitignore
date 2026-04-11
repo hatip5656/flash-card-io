@@ -5,3 +5,5 @@ dist/
 .idea/
 data/db/
 /.mcp.json
+.playwright-mcp/
+.claude/
