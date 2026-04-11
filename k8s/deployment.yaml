@@ -66,6 +66,10 @@ spec:
               value: "true"
             - name: FEATURE_WHATSAPP
               value: "false"
+            - name: TTS_API_URL
+              value: "http://tts-api:8000"
+            - name: TTS_SPEAKER
+              value: "mari"
             - name: NODE_OPTIONS
               value: "--max-old-space-size=200"
           startupProbe:

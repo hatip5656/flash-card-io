@@ -1,0 +1,169 @@
+---
+# RabbitMQ for TTS communication
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-rabbitmq
+  namespace: flash-card-io
+  labels:
+    app: tts-rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tts-rabbitmq
+  template:
+    metadata:
+      labels:
+        app: tts-rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          image: rabbitmq:3-alpine
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: "tts"
+            - name: RABBITMQ_DEFAULT_PASS
+              value: "tts"
+          ports:
+            - containerPort: 5672
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tts-rabbitmq
+  namespace: flash-card-io
+spec:
+  selector:
+    app: tts-rabbitmq
+  ports:
+    - port: 5672
+      targetPort: 5672
+---
+# TTS API (FastAPI)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-api
+  namespace: flash-card-io
+  labels:
+    app: tts-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tts-api
+  template:
+    metadata:
+      labels:
+        app: tts-api
+    spec:
+      containers:
+        - name: tts-api
+          image: ghcr.io/tartunlp/text-to-speech-api:latest
+          env:
+            - name: MQ_HOST
+              value: "tts-rabbitmq"
+            - name: MQ_PORT
+              value: "5672"
+            - name: MQ_USERNAME
+              value: "tts"
+            - name: MQ_PASSWORD
+              value: "tts"
+          ports:
+            - containerPort: 8000
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tts-api
+  namespace: flash-card-io
+spec:
+  selector:
+    app: tts-api
+  ports:
+    - port: 8000
+      targetPort: 8000
+---
+# TTS Worker (neural synthesis) — needs model files
+# Model must be downloaded and placed in a PersistentVolume or init container
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-worker
+  namespace: flash-card-io
+  labels:
+    app: tts-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tts-worker
+  template:
+    metadata:
+      labels:
+        app: tts-worker
+    spec:
+      initContainers:
+        # Download model files if not present
+        - name: model-downloader
+          image: alpine:3
+          command:
+            - sh
+            - -c
+            - |
+              if [ ! -f /models/multispeaker/model_weights.hdf5 ]; then
+                echo "Downloading TTS model..."
+                apk add --no-cache wget unzip
+                wget -q https://github.com/TartuNLP/text-to-speech-worker/releases/download/v3.1.0/multispeaker.zip -O /tmp/model.zip
+                unzip -o /tmp/model.zip -d /models/
+                rm /tmp/model.zip
+                echo "Model downloaded successfully"
+              else
+                echo "Model already exists, skipping download"
+              fi
+          volumeMounts:
+            - name: models
+              mountPath: /models
+      containers:
+        - name: tts-worker
+          image: ghcr.io/tartunlp/text-to-speech-worker:latest
+          args: ["--model-name", "multispeaker"]
+          env:
+            - name: MQ_HOST
+              value: "tts-rabbitmq"
+            - name: MQ_PORT
+              value: "5672"
+            - name: MQ_USERNAME
+              value: "tts"
+            - name: MQ_PASSWORD
+              value: "tts"
+            - name: MKL_NUM_THREADS
+              value: "2"
+          volumeMounts:
+            - name: models
+              mountPath: /app/models
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+      volumes:
+        - name: models
+          emptyDir: {}
