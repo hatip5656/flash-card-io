@@ -77,6 +77,7 @@ async function deliverFlashcard(chatId: number): Promise<void> {
           photographer: null,
           photographerUrl: null,
           caption: `🎉 You've learned all available ${level} words! Use /level to try a different level.`,
+          audio: null,
 
         });
       }
@@ -92,6 +93,7 @@ async function deliverFlashcard(chatId: number): Promise<void> {
         photographer: null,
         photographerUrl: null,
         caption: `🎉 You've completed all ${level} words! Use /level to move to the next level.`,
+        audio: null,
       });
     }
     return;

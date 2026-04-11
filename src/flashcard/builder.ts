@@ -1,5 +1,6 @@
 import { searchPhoto, triggerDownload } from "../services/unsplash.js";
 import { resolveSentence } from "../services/sentence.js";
+import { synthesizeSpeech } from "../services/tts.js";
 import type { Word, Flashcard, WordForm } from "./types.js";
 import { type EkilexWord, type WordFormResult, getWordFormsForValue } from "../services/ekilex.js";
 import { selectForms } from "./grammar-builder.js";
@@ -79,6 +80,8 @@ export async function buildFlashcard(
     pos: wordForms?.pos,
   });
 
+  const audio = await synthesizeSpeech(word.estonian).catch(() => null);
+
   return {
     word,
     sentence,
@@ -86,6 +89,7 @@ export async function buildFlashcard(
     photographer: photo?.photographer ?? null,
     photographerUrl: photo?.photographerUrl ?? null,
     caption,
+    audio,
   };
 }
 
@@ -123,6 +127,8 @@ export async function buildFlashcardFromEkilex(
     source: "Source: Ekilex/Sõnaveeb",
   });
 
+  const audio = await synthesizeSpeech(ekilexWord.wordValue).catch(() => null);
+
   return {
     word,
     sentence,
@@ -130,5 +136,6 @@ export async function buildFlashcardFromEkilex(
     photographer: photo?.photographer ?? null,
     photographerUrl: photo?.photographerUrl ?? null,
     caption,
+    audio,
   };
 }

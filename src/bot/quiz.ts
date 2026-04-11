@@ -1,5 +1,5 @@
 import { Bot, InlineKeyboard } from "grammy";
-import { getLearnedWordsForQuiz, incrementQuizCount, saveQuizResult, getMostMissedWords, logQuizActivity } from "../db/progress.js";
+import { getLearnedWordsForQuiz, incrementQuizCount, saveQuizResult, getMostMissedWords, logQuizActivity, updateSm2 } from "../db/progress.js";
 import { getWordFormsForValue } from "../services/ekilex.js";
 import { escapeHtml } from "../flashcard/builder.js";
 import { selectForms } from "../flashcard/grammar-builder.js";
@@ -305,6 +305,10 @@ async function processAnswer(
     chosen,
     isCorrect,
   });
+
+  // Update SM-2 spaced repetition: quality 5 (easy) if correct, 1 (fail) if wrong
+  const sm2Quality = isCorrect ? 4 : 1;
+  await updateSm2(session.chatId, question.estonian, sm2Quality).catch(() => {});
 
   session.awaitingTextInput = false;
 

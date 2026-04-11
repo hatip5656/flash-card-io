@@ -1,4 +1,4 @@
-import { Bot } from "grammy";
+import { Bot, InputFile } from "grammy";
 import type { DeliveryChannel } from "./types.js";
 import type { Flashcard } from "../flashcard/types.js";
 
@@ -18,13 +18,17 @@ export function createTelegramChannel(token: string): { channel: DeliveryChannel
             parse_mode: "HTML",
           });
         } else if (flashcard.imageUrl) {
-          // Caption too long for photo — send photo first, then caption as text
           await bot.api.sendPhoto(chatId, flashcard.imageUrl);
           await bot.api.sendMessage(chatId, caption, { parse_mode: "HTML" });
         } else {
           await bot.api.sendMessage(chatId, caption, {
             parse_mode: "HTML",
           });
+        }
+
+        // Send pronunciation audio if available
+        if (flashcard.audio) {
+          await bot.api.sendVoice(chatId, new InputFile(flashcard.audio, "pronunciation.wav"));
         }
 
         return true;

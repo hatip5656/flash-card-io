@@ -43,4 +43,5 @@ export interface Flashcard {
   photographer: string | null;
   photographerUrl: string | null;
   caption: string;
+  audio: Buffer | null;
 }
