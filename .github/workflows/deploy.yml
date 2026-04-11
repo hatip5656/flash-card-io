@@ -126,7 +126,11 @@ jobs:
 
             # Apply manifests
             kubectl apply -f namespace.yaml
+            kubectl apply -f neurokone.yaml
             kubectl apply -f deployment.yaml
+
+            # Restart to pick up latest image
+            kubectl rollout restart deployment/flash-card-io -n flash-card-io
 
             # Wait for rollout
             kubectl rollout status deployment/flash-card-io -n flash-card-io --timeout=120s
