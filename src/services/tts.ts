@@ -8,12 +8,14 @@ import { randomBytes } from "crypto";
 const execFileAsync = promisify(execFile);
 
 const VOICE = "et+f2";   // Female Estonian voice (clearer intonation)
-const SPEED = "120";      // Slower for learners
-const PITCH = "55";       // Slightly higher pitch
+const SPEED = "100";      // Slow and clear for learners
+const PITCH = "50";       // Natural pitch
+const GAP = "20";         // 20ms gap between words for clarity
 
 async function synthesizeSegment(text: string, outputFile: string): Promise<void> {
   await execFileAsync("espeak-ng", [
     "-v", VOICE,
+    "-g", GAP,
     "-s", SPEED,
     "-p", PITCH,
     "-w", outputFile,
