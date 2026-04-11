@@ -115,7 +115,7 @@ export function registerCommands(
 
   bot.command("start", async (ctx) => {
     const chatId = ctx.chat.id;
-    await addSubscriber(chatId, "telegram");
+    await addSubscriber(chatId, "telegram", ctx.from?.username, ctx.from?.first_name);
     refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
     await ctx.reply(await getSettingsText(chatId), {
       parse_mode: "HTML",

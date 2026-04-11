@@ -57,6 +57,8 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
   `);
 
   // Migrations
+  await pool.query(`ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS username TEXT`);
+  await pool.query(`ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS first_name TEXT`);
   await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS english TEXT`);
   await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS quiz_count INTEGER NOT NULL DEFAULT 0`);
 
@@ -320,11 +322,11 @@ export async function closeDb(): Promise<void> {
   if (pool) await pool.end();
 }
 
-export async function addSubscriber(chatId: number, channel = "telegram"): Promise<void> {
+export async function addSubscriber(chatId: number, channel = "telegram", username?: string, firstName?: string): Promise<void> {
   await pool.query(`
-    INSERT INTO subscribers (chat_id, channel) VALUES ($1, $2)
-    ON CONFLICT (chat_id) DO UPDATE SET active = TRUE, channel = EXCLUDED.channel
-  `, [chatId, channel]);
+    INSERT INTO subscribers (chat_id, channel, username, first_name) VALUES ($1, $2, $3, $4)
+    ON CONFLICT (chat_id) DO UPDATE SET active = TRUE, channel = EXCLUDED.channel, username = COALESCE(EXCLUDED.username, subscribers.username), first_name = COALESCE(EXCLUDED.first_name, subscribers.first_name)
+  `, [chatId, channel, username ?? null, firstName ?? null]);
 }
 
 export async function removeSubscriber(chatId: number): Promise<void> {
