@@ -2,9 +2,10 @@
 
 import { loadConfig } from "./config.js";
 import { startHealthServer, setReady } from "./health.js";
-import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, backfillEnglish, getSentGrammarIds, markGrammarSent, logWordActivity, getStreak, getTodayActivity } from "./db/progress.js";
+import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, backfillEnglish, getSentGrammarIds, markGrammarSent, logWordActivity, getStreak, getTodayActivity, getStats, getQuizStats } from "./db/progress.js";
 import { loadWordBank, getUnsent, getWordById } from "./flashcard/word-bank.js";
 import { loadGrammarBank, getRandomLesson } from "./flashcard/grammar-bank.js";
+import { loadCategories } from "./flashcard/categories.js";
 import { buildFlashcard, buildFlashcardFromEkilex } from "./flashcard/builder.js";
 import { startGlobalScheduler, syncUserJobs, scheduleRandomGrammarJobs, scheduleGrammarJobForUser, stopAllGrammarJobs } from "./flashcard/scheduler.js";
 import { createTelegramChannel } from "./channels/telegram.js";
@@ -20,6 +21,7 @@ const config = loadConfig();
 
 loadWordBank();
 loadGrammarBank();
+loadCategories();
 
 const channels: DeliveryChannel[] = [];
 let bot: Bot | undefined;
@@ -179,6 +181,40 @@ async function main(): Promise<void> {
     scheduleRandomGrammarJobs(subs, config.cronTimezone, deliverGrammarCard);
   });
 
+  // Weekly progress report — Sundays at 10 AM
+  const weeklyReportJob = new Cron("0 10 * * 0", { timezone: config.cronTimezone }, async () => {
+    if (!bot) return;
+    const subs = await getActiveSubscribers();
+    for (const sub of subs) {
+      try {
+        const [{ sent, level }, quiz, streak] = await Promise.all([
+          getStats(sub.chatId),
+          getQuizStats(sub.chatId),
+          getStreak(sub.chatId),
+        ]);
+        if (sent === 0) continue;
+        const streakEmoji = streak >= 7 ? "🔥" : streak >= 3 ? "⚡" : "📅";
+        let msg = `📊 <b>Weekly Progress Report</b>\n\n`;
+        msg += `${streakEmoji} Streak: <b>${streak} day${streak !== 1 ? "s" : ""}</b>\n`;
+        msg += `🏷️ Level: <b>${level}</b>\n`;
+        msg += `📚 Total words learned: <b>${sent}</b>\n`;
+        if (quiz.totalQuizzes > 0) {
+          msg += `🧠 Quizzes taken: <b>${quiz.totalQuizzes}</b>\n`;
+          msg += `📊 Average score: <b>${quiz.avgPercentage}%</b>\n`;
+          if (quiz.recentTrend !== null) {
+            const arrow = quiz.recentTrend > 0 ? "📈" : quiz.recentTrend < 0 ? "📉" : "➡️";
+            const sign = quiz.recentTrend > 0 ? "+" : "";
+            msg += `${arrow} Trend: <b>${sign}${quiz.recentTrend}%</b>\n`;
+          }
+        }
+        msg += `\nKeep learning! Use /review to practice words due today.`;
+        await bot.api.sendMessage(sub.chatId, msg, { parse_mode: "HTML" });
+      } catch (err) {
+        console.error(`[main] Weekly report error for ${sub.chatId}:`, err instanceof Error ? err.message : err);
+      }
+    }
+  });
+
   // Daily summary at 9 PM
   const dailySummaryJob = new Cron("0 21 * * *", { timezone: config.cronTimezone }, async () => {
     if (!bot) return;
@@ -222,6 +258,7 @@ async function main(): Promise<void> {
     console.error("[main] Shutting down...");
     setReady(false);
     clearInterval(refreshInterval);
+    weeklyReportJob.stop();
     dailySummaryJob.stop();
     grammarRerollJob.stop();
     stopAllGrammarJobs();

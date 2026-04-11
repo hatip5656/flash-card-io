@@ -2,6 +2,7 @@ import type { Bot } from "grammy";
 import type { CefrLevel } from "../config.js";
 import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity, getWordsDueForReview } from "../db/progress.js";
 import { getWordsForLevel } from "../flashcard/word-bank.js";
+import { getAllCategories } from "../flashcard/categories.js";
 import { mainMenuKeyboard, levelPicker, schedulePicker } from "./keyboards.js";
 import { startQuiz } from "./quiz.js";
 import { escapeHtml } from "../flashcard/builder.js";
@@ -105,7 +106,9 @@ export function registerCommands(
     { command: "grammar", description: "Get a grammar card" },
     { command: "quiz", description: "Start a vocabulary quiz" },
     { command: "quizhistory", description: "View past quiz results & mistakes" },
-    { command: "review", description: "Review previously learned words" },
+    { command: "review", description: "Review words due today (SM-2)" },
+    { command: "topics", description: "Browse vocabulary topics" },
+    { command: "idiom", description: "Random Estonian idiom" },
     { command: "settings", description: "Open settings menu" },
     { command: "stats", description: "See your progress" },
     { command: "stop", description: "Stop receiving flashcards" },
@@ -237,6 +240,47 @@ export function registerCommands(
 
     text += "\n<i>Tap the spoilers to check your memory. Use /quiz to test yourself!</i>";
 
+    await ctx.reply(text, { parse_mode: "HTML" });
+  });
+
+  bot.command("topics", async (ctx) => {
+    const cats = getAllCategories();
+    if (cats.length === 0) {
+      await ctx.reply("No topic categories available.");
+      return;
+    }
+    let text = "<b>📚 Vocabulary Topics</b>\n\n";
+    for (const cat of cats) {
+      text += `${cat.emoji} <b>${escapeHtml(cat.label)}</b> — ${cat.wordCount} words\n`;
+    }
+    text += "\n<i>Topics help organize your learning. Words from all topics appear in flashcards and quizzes.</i>";
+    await ctx.reply(text, { parse_mode: "HTML" });
+  });
+
+  bot.command("idiom", async (ctx) => {
+    const idioms = [
+      { estonian: "Iga algus on raske.", english: "Every beginning is hard.", meaning: "Starting something new is always difficult." },
+      { estonian: "Harjutamine teeb meistriks.", english: "Practice makes a master.", meaning: "Practice makes perfect." },
+      { estonian: "Kes otsib, see leiab.", english: "Who seeks, finds.", meaning: "If you look for something, you'll find it." },
+      { estonian: "Hommik on õhtust targem.", english: "Morning is wiser than evening.", meaning: "Sleep on it before making decisions." },
+      { estonian: "Üheksa korda mõõda, üks kord lõika.", english: "Measure nine times, cut once.", meaning: "Think carefully before acting." },
+      { estonian: "Kus suitsu, seal tuld.", english: "Where there's smoke, there's fire.", meaning: "Rumors usually have some truth." },
+      { estonian: "Aeg on raha.", english: "Time is money.", meaning: "Don't waste time." },
+      { estonian: "Kes teisele auku kaevab, see ise sisse kukub.", english: "Who digs a hole for another falls in themselves.", meaning: "Karma — what goes around comes around." },
+      { estonian: "Õnn tuleb magades.", english: "Luck comes while sleeping.", meaning: "Good things come to those who wait." },
+      { estonian: "Küla hull on küla ilu.", english: "The village fool is the village's beauty.", meaning: "Every community needs its characters." },
+      { estonian: "Oma silm on kuningas.", english: "Your own eye is king.", meaning: "Seeing is believing." },
+      { estonian: "Rumal rääkigu palju, tark kuulab ja teab.", english: "The fool talks a lot, the wise listens and knows.", meaning: "Listen more than you speak." },
+      { estonian: "Igal oinal oma mihklipäev.", english: "Every ram has its Michaelmas.", meaning: "Everyone gets what's coming to them." },
+      { estonian: "Vana karu ei tantsi.", english: "An old bear doesn't dance.", meaning: "Old habits die hard." },
+      { estonian: "Kes kannatab, see kaua elab.", english: "Who endures, lives long.", meaning: "Patience is a virtue." },
+    ];
+    const pick = idioms[Math.floor(Math.random() * idioms.length)];
+    const text =
+      `🇪🇪 <b>Estonian Idiom</b>\n\n` +
+      `💬 <i>${escapeHtml(pick.estonian)}</i>\n` +
+      `📝 <tg-spoiler>${escapeHtml(pick.english)}</tg-spoiler>\n\n` +
+      `💡 ${escapeHtml(pick.meaning)}`;
     await ctx.reply(text, { parse_mode: "HTML" });
   });
 
