@@ -1,6 +1,5 @@
 import { searchPhoto, triggerDownload } from "../services/unsplash.js";
 import { resolveSentence } from "../services/sentence.js";
-import { synthesizeSpeech } from "../services/tts.js";
 import type { Word, Flashcard, WordForm } from "./types.js";
 import { type EkilexWord, type WordFormResult, getWordFormsForValue } from "../services/ekilex.js";
 import { selectForms } from "./grammar-builder.js";
@@ -57,7 +56,6 @@ export async function buildFlashcard(
   word: Word,
   unsplashKey: string,
   ekilexApiKey?: string | null,
-  ttsApiKey?: string | null,
 ): Promise<Flashcard> {
   const sentence = await resolveSentence(word);
   const photo = await searchPhoto(word.imageQuery ?? word.english, unsplashKey);
@@ -66,16 +64,10 @@ export async function buildFlashcard(
     triggerDownload(photo.downloadUrl, unsplashKey).catch(() => {});
   }
 
-  // Fetch word forms from Ekilex if available
   let wordForms: WordFormResult | null = null;
   if (ekilexApiKey) {
     wordForms = await getWordFormsForValue(word.estonian, ekilexApiKey).catch(() => null);
   }
-
-  // Synthesize pronunciation audio
-  const audio = ttsApiKey
-    ? await synthesizeSpeech(word.estonian, ttsApiKey).catch(() => null)
-    : null;
 
   const caption = buildCaption({
     estonian: word.estonian,
@@ -94,7 +86,6 @@ export async function buildFlashcard(
     photographer: photo?.photographer ?? null,
     photographerUrl: photo?.photographerUrl ?? null,
     caption,
-    audio,
   };
 }
 
@@ -102,7 +93,6 @@ export async function buildFlashcardFromEkilex(
   ekilexWord: EkilexWord,
   unsplashKey: string,
   wordForms?: WordFormResult | null,
-  ttsApiKey?: string | null,
 ): Promise<Flashcard> {
   const photo = await searchPhoto(ekilexWord.english ?? ekilexWord.wordValue, unsplashKey);
 
@@ -133,10 +123,6 @@ export async function buildFlashcardFromEkilex(
     source: "Source: Ekilex/Sõnaveeb",
   });
 
-  const audio = ttsApiKey
-    ? await synthesizeSpeech(ekilexWord.wordValue, ttsApiKey).catch(() => null)
-    : null;
-
   return {
     word,
     sentence,
@@ -144,6 +130,5 @@ export async function buildFlashcardFromEkilex(
     photographer: photo?.photographer ?? null,
     photographerUrl: photo?.photographerUrl ?? null,
     caption,
-    audio,
   };
 }

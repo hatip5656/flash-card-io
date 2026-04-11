@@ -1,0 +1,316 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - complementary "Skip links" [ref=e5]:
+        - link "Skip to main content" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e7]: Skip to main content
+        - button "Keyboard shortcuts" [ref=e8]:
+          - generic [ref=e9]: Keyboard shortcuts
+        - link "Accessibility Help external, opens new window" [ref=e10] [cursor=pointer]:
+          - /url: https://cloud.google.com/docs/accessibility?hl=en_US
+          - generic [ref=e11]:
+            - text: Accessibility Help
+            - generic "external, opens new window" [ref=e12]:
+              - img "external, opens new window" [ref=e13]:
+                - img [ref=e14]
+        - link "Accessibility Feedback external, opens new window" [ref=e16] [cursor=pointer]:
+          - /url: https://support.google.com/accessibility/contact/feedback?hl=en_US
+          - generic [ref=e17]:
+            - text: Accessibility Feedback
+            - generic "external, opens new window" [ref=e18]:
+              - img "external, opens new window" [ref=e19]:
+                - img [ref=e20]
+      - banner [ref=e23]:
+        - generic [ref=e24]:
+          - navigation [ref=e27]:
+            - button "Navigation menu (.)" [ref=e28] [cursor=pointer]:
+              - img [ref=e30]
+          - link "Google Cloud Platform Home" [ref=e32] [cursor=pointer]:
+            - /url: /
+            - generic:
+              - img
+          - button "You're currently working in mvp lebanon. Hit enter to switch projects, folders, or organizations" [ref=e120]:
+            - generic [ref=e121]:
+              - img [ref=e123]
+              - generic [ref=e126]: mvp lebanon
+        - button "Open search" [ref=e47] [cursor=pointer]:
+          - img [ref=e49]
+        - generic [ref=e51]:
+          - generic [ref=e52]:
+            - button "Open or close Gemini Cloud Assist chat (Option G)" [ref=e130] [cursor=pointer]:
+              - img [ref=e132]
+            - button "Activate Cloud Shell (G then S)" [ref=e134] [cursor=pointer]:
+              - img [ref=e136]
+            - button "1 unread notifications. Open notifications" [ref=e59] [cursor=pointer]:
+              - generic [ref=e62]: "1"
+            - button "Settings and utilities" [ref=e67] [cursor=pointer]:
+              - img [ref=e69]
+          - 'button "Account: Hatip Aksunger (hatipaksunger@gmail.com)" [ref=e140]':
+            - img [ref=e141]
+    - main [ref=e94]:
+      - generic [ref=e154]:
+        - generic [ref=e157]:
+          - button "Back to previous page" [ref=e161] [cursor=pointer]:
+            - img [ref=e163]
+          - heading "Product details" [level=1] [ref=e167]:
+            - generic [ref=e168]: Product details
+        - generic [ref=e172]:
+          - generic [ref=e177]:
+            - img [ref=e180]
+            - generic [ref=e181]:
+              - heading "Cloud Text-to-Speech API" [level=1] [ref=e182]
+              - paragraph [ref=e183]:
+                - link "Google Enterprise API" [ref=e185] [cursor=pointer]:
+                  - /url: /marketplace/browse?filter=partner:Google%20Enterprise%20API&project=mvp-lebanon
+              - paragraph [ref=e186]: Synthesizes natural-sounding speech by applying powerful neural network models.
+              - generic [ref=e189]:
+                - button "enable this API" [ref=e193]:
+                  - generic [ref=e194]: Enable
+                - link "try this API, with an external link" [ref=e198]:
+                  - generic [ref=e199]:
+                    - text: Try this API
+                    - img "external" [ref=e200]:
+                      - img [ref=e201]:
+                        - img [ref=e202]
+          - navigation "Product Information" [ref=e204]:
+            - generic [ref=e205]:
+              - tablist [ref=e206]:
+                - generic [ref=e209]:
+                  - tab "Overview" [selected] [ref=e210] [cursor=pointer]:
+                    - generic [ref=e212]: Overview
+                  - tab "Pricing" [ref=e213] [cursor=pointer]:
+                    - generic [ref=e215]: Pricing
+                  - tab "Documentation" [ref=e216] [cursor=pointer]:
+                    - generic [ref=e218]: Documentation
+                  - tab "Related Products" [ref=e219] [cursor=pointer]:
+                    - generic [ref=e221]: Related Products
+              - tabpanel "Overview"
+          - generic [ref=e222]:
+            - generic [ref=e223]:
+              - heading "Overview" [level=2] [ref=e224]
+              - generic [ref=e225]:
+                - generic [ref=e229]: Synthesizes natural-sounding speech by applying powerful neural network models.
+                - generic [ref=e231]:
+                  - heading "Additional details" [level=3] [ref=e232]
+                  - list [ref=e233]:
+                    - listitem [ref=e234]:
+                      - generic [ref=e235]:
+                        - generic [ref=e236]: "Type:"
+                        - link "Browse all SaaS & APIs products" [ref=e238] [cursor=pointer]:
+                          - /url: /apis/library/browse?filter=solution-type:saas&project=mvp-lebanon
+                          - text: SaaS & APIs
+                    - listitem [ref=e239]:
+                      - generic [ref=e240]:
+                        - generic [ref=e241]: "Last product update:"
+                        - text: 7/22/22
+                    - listitem [ref=e242]:
+                      - generic [ref=e243]:
+                        - generic [ref=e244]: "Category:"
+                        - link "Browse all Google Enterprise APIs products" [ref=e246] [cursor=pointer]:
+                          - /url: /apis/library/browse?filter=category:enterprise-api&project=mvp-lebanon
+                          - text: Google Enterprise APIs
+                    - listitem [ref=e247]:
+                      - generic [ref=e248]:
+                        - generic [ref=e249]: "Service name:"
+                        - generic [ref=e250]: texttospeech.googleapis.com
+                    - listitem
+            - generic [ref=e252]:
+              - heading "Pricing" [level=3] [ref=e253]
+              - generic [ref=e255]:
+                - generic [ref=e261]:
+                  - group [ref=e263]:
+                    - button "Cloud TTS API audio output token count for Gemini 2.5 Flash" [ref=e264] [cursor=pointer]:
+                      - generic [ref=e266]:
+                        - generic [ref=e267]: Cloud TTS API audio output token count for Gemini 2.5 Flash
+                        - img [ref=e269]:
+                          - img [ref=e270]
+                    - button "Cloud TTS API audio output token count for Gemini 2.5 Pro" [ref=e272] [cursor=pointer]:
+                      - generic [ref=e274]:
+                        - generic [ref=e275]: Cloud TTS API audio output token count for Gemini 2.5 Pro
+                        - img [ref=e277]:
+                          - img [ref=e278]
+                    - button "Cloud TTS API text input token count for Gemini 2.5 Flash TTS" [ref=e280] [cursor=pointer]:
+                      - generic [ref=e282]:
+                        - generic [ref=e283]: Cloud TTS API text input token count for Gemini 2.5 Flash TTS
+                        - img [ref=e285]:
+                          - img [ref=e286]
+                    - button "Cloud TTS API text input token count for Gemini 2.5 Pro" [ref=e288] [cursor=pointer]:
+                      - generic [ref=e290]:
+                        - generic [ref=e291]: Cloud TTS API text input token count for Gemini 2.5 Pro
+                        - img [ref=e293]:
+                          - img [ref=e294]
+                    - button "Count of characters for Chirp Voice Cloning" [ref=e296] [cursor=pointer]:
+                      - generic [ref=e298]:
+                        - generic [ref=e299]: Count of characters for Chirp Voice Cloning
+                        - img [ref=e301]:
+                          - img [ref=e302]
+                    - button "Count of characters for Chirp3-HD voices" [ref=e304] [cursor=pointer]:
+                      - generic [ref=e306]:
+                        - generic [ref=e307]: Count of characters for Chirp3-HD voices
+                        - img [ref=e309]:
+                          - img [ref=e310]
+                    - button "Count of characters for using standard voices" [ref=e312] [cursor=pointer]:
+                      - generic [ref=e314]:
+                        - generic [ref=e315]: Count of characters for using standard voices
+                        - img [ref=e317]:
+                          - img [ref=e318]
+                    - button "Count of characters for using Studio voices." [ref=e320] [cursor=pointer]:
+                      - generic [ref=e322]:
+                        - generic [ref=e323]: Count of characters for using Studio voices.
+                        - img [ref=e325]:
+                          - img [ref=e326]
+                    - button "Count of characters for using wavenet voices" [ref=e328] [cursor=pointer]:
+                      - generic [ref=e330]:
+                        - generic [ref=e331]: Count of characters for using wavenet voices
+                        - img [ref=e333]:
+                          - img [ref=e334]
+                    - button "Custom Voice Model Training" [ref=e336] [cursor=pointer]:
+                      - generic [ref=e338]:
+                        - generic [ref=e339]: Custom Voice Model Training
+                        - img [ref=e341]:
+                          - img [ref=e342]
+                    - button "Custom Voice Standard Prediction Offline Audio Time" [ref=e344] [cursor=pointer]:
+                      - generic [ref=e346]:
+                        - generic [ref=e347]: Custom Voice Standard Prediction Offline Audio Time
+                        - img [ref=e349]:
+                          - img [ref=e350]
+                    - button "Custom Voice Standard Prediction Realtime Characters Count" [ref=e352] [cursor=pointer]:
+                      - generic [ref=e354]:
+                        - generic [ref=e355]: Custom Voice Standard Prediction Realtime Characters Count
+                        - img [ref=e357]:
+                          - img [ref=e358]
+                    - button "Speech To Text On-Device - Per Device" [ref=e360] [cursor=pointer]:
+                      - generic [ref=e362]:
+                        - generic [ref=e363]: Speech To Text On-Device - Per Device
+                        - img [ref=e365]:
+                          - img [ref=e366]
+                    - button "Text To Speech On-Device - Per Device" [ref=e368] [cursor=pointer]:
+                      - generic [ref=e370]:
+                        - generic [ref=e371]: Text To Speech On-Device - Per Device
+                        - img [ref=e373]:
+                          - img [ref=e374]
+                    - button "Custom Voice Model Hosting Time" [ref=e376] [cursor=pointer]:
+                      - generic [ref=e378]:
+                        - generic [ref=e379]: Custom Voice Model Hosting Time
+                        - img [ref=e381]:
+                          - img [ref=e382]
+                  - generic [ref=e386]:
+                    - generic [ref=e387]: USD 10.00
+                    - generic [ref=e388]: /1M count
+                - paragraph [ref=e390]:
+                  - generic [ref=e391]:
+                    - text: "Note: Additional charges may also apply from infrastructure you use to call the API."
+                    - generic [ref=e392]:
+                      - text: If you pay in a currency other than USD, the prices listed in your currency on
+                      - link "Google Cloud SKUs external, opens new window" [ref=e393] [cursor=pointer]:
+                        - /url: https://cloud.google.com/skus/
+                        - text: Google Cloud SKUs
+                        - img "external, opens new window" [ref=e394]:
+                          - img [ref=e395]
+                      - text: apply. Please refer to
+                      - link "Google Cloud Price List external, opens new window" [ref=e397] [cursor=pointer]:
+                        - /url: https://cloud.google.com/pricing/list
+                        - text: Google Cloud Price List
+                        - img "external, opens new window" [ref=e398]:
+                          - img [ref=e399]
+                      - text: for the latest pricing.
+                - paragraph [ref=e402]: We’re currently using USD to calculate costs, which can be changed in the billing setup. Final prices in your bill will be set in accordance with your billing setup, and might be subject to exchange rates.
+            - generic [ref=e404]:
+              - heading "Tutorials and documentation" [level=3] [ref=e405]
+              - link "Learn more external, opens new window" [ref=e408] [cursor=pointer]:
+                - /url: https://cloud.google.com/text-to-speech/?hl=en_US
+                - generic [ref=e409]: Learn more
+                - img "external, opens new window" [ref=e410]:
+                  - img [ref=e411]
+            - generic [ref=e414]:
+              - heading "Terms of Service" [level=3] [ref=e415]
+              - paragraph [ref=e417]:
+                - text: "By using this product you agree to the terms and conditions of the following license:"
+                - generic [ref=e418]:
+                  - link "Google Cloud Platform" [ref=e419] [cursor=pointer]:
+                    - /url: /tos?id=cloud
+                  - text: .
+            - generic [ref=e422]:
+              - heading "Related Products" [level=2] [ref=e423]
+              - heading "Customers who use this product also use the following products" [level=2] [ref=e425]
+              - region [ref=e427]:
+                - list [ref=e429]:
+                  - listitem [ref=e430]:
+                    - generic [ref=e431]:
+                      - generic [ref=e432]:
+                        - img [ref=e434]
+                        - 'heading "Gemini API: Build with latest models from Google Deepmind using the Gemini API for Developers" [level=2] [ref=e435]':
+                          - 'link "Gemini API: Build with latest models from Google Deepmind using the Gemini API for Developers" [ref=e436] [cursor=pointer]':
+                            - /url: /apis/library/generativelanguage.googleapis.com?project=mvp-lebanon
+                            - text: Gemini API
+                        - generic [ref=e437]: Google
+                      - paragraph [ref=e440]: Build with latest models from Google Deepmind using the Gemini API for Developers
+                  - listitem [ref=e441]:
+                    - generic [ref=e442]:
+                      - generic [ref=e443]:
+                        - img [ref=e445]
+                        - 'heading "Google Drive API: Create and manage resources in Google Drive." [level=2] [ref=e446]':
+                          - 'link "Google Drive API: Create and manage resources in Google Drive." [ref=e447] [cursor=pointer]':
+                            - /url: /apis/library/drive.googleapis.com?project=mvp-lebanon
+                            - text: Google Drive API
+                        - generic [ref=e448]:
+                          - text: Google Enterprise API
+                          - button "Help popup" [ref=e450] [cursor=pointer]:
+                            - img [ref=e452]
+                      - paragraph [ref=e456]: Create and manage resources in Google Drive.
+                  - listitem [ref=e457]:
+                    - generic [ref=e458]:
+                      - generic [ref=e459]:
+                        - img [ref=e461]
+                        - 'heading "Vertex AI API: Train high-quality custom machine learning models with minimal machine learning expertise and…" [level=2] [ref=e462]':
+                          - 'link "Vertex AI API: Train high-quality custom machine learning models with minimal machine learning expertise and…" [ref=e463] [cursor=pointer]':
+                            - /url: /apis/library/aiplatform.googleapis.com?project=mvp-lebanon
+                            - text: Vertex AI API
+                        - generic [ref=e464]:
+                          - text: Google Enterprise API
+                          - button "Help popup" [ref=e466] [cursor=pointer]:
+                            - img [ref=e468]
+                      - paragraph [ref=e472]: Train high-quality custom machine learning models with minimal machine learning expertise and…
+                  - listitem [ref=e473]:
+                    - generic [ref=e474]:
+                      - generic [ref=e475]:
+                        - img [ref=e477]
+                        - 'heading "Cloud Speech-to-Text API: Speech recognition" [level=2] [ref=e478]':
+                          - 'link "Cloud Speech-to-Text API: Speech recognition" [ref=e479] [cursor=pointer]':
+                            - /url: /apis/library/speech.googleapis.com?project=mvp-lebanon
+                            - text: Cloud Speech-to-Text API
+                        - generic [ref=e480]:
+                          - text: Google Enterprise API
+                          - button "Help popup" [ref=e482] [cursor=pointer]:
+                            - img [ref=e484]
+                      - paragraph [ref=e488]: Speech recognition
+                  - listitem [ref=e489]:
+                    - generic [ref=e490]:
+                      - generic [ref=e491]:
+                        - img [ref=e493]
+                        - 'heading "Google Sheets API: Read and write Google Sheets data" [level=2] [ref=e494]':
+                          - 'link "Google Sheets API: Read and write Google Sheets data" [ref=e495] [cursor=pointer]':
+                            - /url: /apis/library/sheets.googleapis.com?project=mvp-lebanon
+                            - text: Google Sheets API
+                        - generic [ref=e496]:
+                          - text: Google Enterprise API
+                          - button "Help popup" [ref=e498] [cursor=pointer]:
+                            - img [ref=e500]
+                      - paragraph [ref=e504]: Read and write Google Sheets data
+                  - listitem [ref=e505]:
+                    - generic [ref=e506]:
+                      - generic [ref=e507]:
+                        - img [ref=e509]
+                        - 'heading "YouTube Data API v3: The YouTube Data API v3 is an API that provides access to YouTube data, such as videos, playlists,…" [level=2] [ref=e510]':
+                          - 'link "YouTube Data API v3: The YouTube Data API v3 is an API that provides access to YouTube data, such as videos, playlists,…" [ref=e511] [cursor=pointer]':
+                            - /url: /apis/library/youtube.googleapis.com?project=mvp-lebanon
+                            - text: YouTube Data API v3
+                        - generic [ref=e512]: Google
+                      - paragraph [ref=e515]: The YouTube Data API v3 is an API that provides access to YouTube data, such as videos, playlists,…
+  - iframe [ref=e118]:
+    
+  - generic:
+    - document
+  - iframe [ref=e517]:
+    
