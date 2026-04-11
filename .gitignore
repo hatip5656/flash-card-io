@@ -2,8 +2,22 @@ node_modules/
 dist/
 .env
 *.tsbuildinfo
+
+# IDE
 .idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Data
 data/db/
+
+# MCP / Tools
 /.mcp.json
 .playwright-mcp/
 .claude/
+
+# OS
+.DS_Store
+Thumbs.db
