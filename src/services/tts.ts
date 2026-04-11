@@ -1,9 +1,38 @@
+import { execFile } from "child_process";
+import { promisify } from "util";
+import { tmpdir } from "os";
+import { join } from "path";
+import { readFile, writeFile, unlink } from "fs/promises";
+import { randomBytes } from "crypto";
+
+const execFileAsync = promisify(execFile);
+
 const TTS_API_URL = process.env.TTS_API_URL || "http://tts-api:8000";
 const TTS_SPEAKER = process.env.TTS_SPEAKER || "mari";
 
+async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
+  const id = randomBytes(6).toString("hex");
+  const wavFile = join(tmpdir(), `tts-${id}.wav`);
+  const oggFile = join(tmpdir(), `tts-${id}.ogg`);
+
+  try {
+    await writeFile(wavFile, wavBuffer);
+    await execFileAsync("ffmpeg", [
+      "-i", wavFile,
+      "-c:a", "libopus",
+      "-b:a", "48k",
+      "-y",
+      oggFile,
+    ], { timeout: 10_000 });
+    return await readFile(oggFile);
+  } finally {
+    await unlink(wavFile).catch(() => {});
+    await unlink(oggFile).catch(() => {});
+  }
+}
+
 export async function synthesizeSpeech(word: string, sentence?: string): Promise<Buffer | null> {
   try {
-    // Synthesize word + sentence as one text with a pause marker
     const text = sentence && sentence !== word
       ? `${word}. ... ${sentence}`
       : word;
@@ -24,8 +53,15 @@ export async function synthesizeSpeech(word: string, sentence?: string): Promise
       return null;
     }
 
-    const arrayBuffer = await res.arrayBuffer();
-    return Buffer.from(arrayBuffer);
+    const wavBuffer = Buffer.from(await res.arrayBuffer());
+
+    // Convert WAV to OGG Opus for clean Telegram playback
+    try {
+      return await convertWavToOgg(wavBuffer);
+    } catch {
+      // If ffmpeg not available, send WAV as fallback
+      return wavBuffer;
+    }
   } catch (err) {
     console.error(`[tts] Error synthesizing "${word}":`, err instanceof Error ? err.message : err);
     return null;
