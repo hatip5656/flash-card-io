@@ -40,9 +40,6 @@ if (config.ekilexApiKey) {
   console.error("[main] Ekilex live queries enabled");
 }
 
-if (config.googleTtsApiKey) {
-  console.error("[main] Google TTS pronunciation enabled");
-}
 
 async function deliverFlashcard(chatId: number): Promise<void> {
   const level = await getSubscriberLevel(chatId);
@@ -56,7 +53,7 @@ async function deliverFlashcard(chatId: number): Promise<void> {
   if (unsent.length > 0) {
     const word = unsent[Math.floor(Math.random() * unsent.length)];
     console.error(`[main] Building flashcard for "${word.estonian}" (${word.cefrLevel}) from local → chat ${chatId}`);
-    flashcard = await buildFlashcard(word, config.unsplashAccessKey, config.ekilexApiKey, config.googleTtsApiKey);
+    flashcard = await buildFlashcard(word, config.unsplashAccessKey, config.ekilexApiKey);
     wordId = word.id;
     wordValue = word.estonian;
   } else if (config.ekilexApiKey) {
@@ -67,7 +64,7 @@ async function deliverFlashcard(chatId: number): Promise<void> {
     if (ekilexWord) {
       console.error(`[main] Ekilex found "${ekilexWord.wordValue}" (${ekilexWord.cefrLevel}) → chat ${chatId}`);
       const wordForms = await getWordFormsForValue(ekilexWord.wordValue, config.ekilexApiKey).catch(() => null);
-      flashcard = await buildFlashcardFromEkilex(ekilexWord, config.unsplashAccessKey, wordForms, config.googleTtsApiKey);
+      flashcard = await buildFlashcardFromEkilex(ekilexWord, config.unsplashAccessKey, wordForms);
       wordId = `ekilex-${ekilexWord.wordId}`;
       wordValue = ekilexWord.wordValue;
     } else {
@@ -80,7 +77,7 @@ async function deliverFlashcard(chatId: number): Promise<void> {
           photographer: null,
           photographerUrl: null,
           caption: `🎉 You've learned all available ${level} words! Use /level to try a different level.`,
-          audio: null,
+
         });
       }
       return;
@@ -95,7 +92,6 @@ async function deliverFlashcard(chatId: number): Promise<void> {
         photographer: null,
         photographerUrl: null,
         caption: `🎉 You've completed all ${level} words! Use /level to move to the next level.`,
-        audio: null,
       });
     }
     return;

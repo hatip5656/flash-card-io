@@ -1,4 +1,4 @@
-import { Bot, InputFile } from "grammy";
+import { Bot } from "grammy";
 import type { DeliveryChannel } from "./types.js";
 import type { Flashcard } from "../flashcard/types.js";
 
@@ -25,11 +25,6 @@ export function createTelegramChannel(token: string): { channel: DeliveryChannel
           await bot.api.sendMessage(chatId, caption, {
             parse_mode: "HTML",
           });
-        }
-
-        // Send pronunciation audio if available
-        if (flashcard.audio) {
-          await bot.api.sendVoice(chatId, new InputFile(flashcard.audio, "pronunciation.ogg"));
         }
 
         return true;
