@@ -2,7 +2,7 @@
 
 import { loadConfig } from "./config.js";
 import { startHealthServer, setReady } from "./health.js";
-import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, backfillEnglish, getSentGrammarIds, markGrammarSent, logWordActivity, getStreak, getTodayActivity, getStats, getQuizStats } from "./db/progress.js";
+import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, backfillEnglish, getSentGrammarIds, markGrammarSent, logWordActivity, getStreak, getTodayActivity, getStats, getQuizStats, getPreferences } from "./db/progress.js";
 import { loadWordBank, getUnsent, getWordById } from "./flashcard/word-bank.js";
 import { loadGrammarBank, getRandomLesson } from "./flashcard/grammar-bank.js";
 import { loadCategories } from "./flashcard/categories.js";
@@ -44,7 +44,8 @@ if (config.ekilexApiKey) {
 
 
 async function deliverFlashcard(chatId: number): Promise<void> {
-  const level = await getSubscriberLevel(chatId);
+  const [level, prefs] = await Promise.all([getSubscriberLevel(chatId), getPreferences(chatId)]);
+  const buildOpts = { audioEnabled: prefs.audio, voiceName: prefs.voiceName, wordFormsEnabled: prefs.wordForms };
   const sentIds = await getSentWordIds(chatId);
   const unsent = getUnsent(level, sentIds);
 
@@ -55,7 +56,7 @@ async function deliverFlashcard(chatId: number): Promise<void> {
   if (unsent.length > 0) {
     const word = unsent[Math.floor(Math.random() * unsent.length)];
     console.error(`[main] Building flashcard for "${word.estonian}" (${word.cefrLevel}) from local → chat ${chatId}`);
-    flashcard = await buildFlashcard(word, config.unsplashAccessKey, config.ekilexApiKey);
+    flashcard = await buildFlashcard(word, config.unsplashAccessKey, config.ekilexApiKey, buildOpts);
     wordId = word.id;
     wordValue = word.estonian;
   } else if (config.ekilexApiKey) {
@@ -66,7 +67,7 @@ async function deliverFlashcard(chatId: number): Promise<void> {
     if (ekilexWord) {
       console.error(`[main] Ekilex found "${ekilexWord.wordValue}" (${ekilexWord.cefrLevel}) → chat ${chatId}`);
       const wordForms = await getWordFormsForValue(ekilexWord.wordValue, config.ekilexApiKey).catch(() => null);
-      flashcard = await buildFlashcardFromEkilex(ekilexWord, config.unsplashAccessKey, wordForms);
+      flashcard = await buildFlashcardFromEkilex(ekilexWord, config.unsplashAccessKey, wordForms, buildOpts);
       wordId = `ekilex-${ekilexWord.wordId}`;
       wordValue = ekilexWord.wordValue;
     } else {
@@ -116,6 +117,9 @@ async function deliverFlashcard(chatId: number): Promise<void> {
 
 async function deliverGrammarCard(chatId: number): Promise<void> {
   if (!bot) return;
+
+  const prefs = await getPreferences(chatId);
+  if (!prefs.grammarCards) return;
 
   const level = await getSubscriberLevel(chatId);
   const sentIds = await getSentGrammarIds(chatId);

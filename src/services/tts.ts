@@ -31,7 +31,7 @@ async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
   }
 }
 
-export async function synthesizeSpeech(word: string, sentence?: string): Promise<Buffer | null> {
+export async function synthesizeSpeech(word: string, sentence?: string, voiceName?: string): Promise<Buffer | null> {
   try {
     const text = sentence && sentence !== word
       ? `${word}. ... ${sentence}`
@@ -42,7 +42,7 @@ export async function synthesizeSpeech(word: string, sentence?: string): Promise
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         text,
-        speaker: TTS_SPEAKER,
+        speaker: voiceName || TTS_SPEAKER,
         speed: 0.85,
       }),
       signal: AbortSignal.timeout(15_000),

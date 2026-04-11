@@ -1,9 +1,9 @@
 import type { Bot } from "grammy";
 import type { CefrLevel } from "../config.js";
-import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity, getWordsDueForReview } from "../db/progress.js";
+import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity, getWordsDueForReview, getPreferences, updatePreference } from "../db/progress.js";
 import { getWordsForLevel } from "../flashcard/word-bank.js";
 import { getAllCategories } from "../flashcard/categories.js";
-import { mainMenuKeyboard, levelPicker, schedulePicker } from "./keyboards.js";
+import { mainMenuKeyboard, levelPicker, schedulePicker, preferencesKeyboard, voicePicker } from "./keyboards.js";
 import { startQuiz } from "./quiz.js";
 import { escapeHtml } from "../flashcard/builder.js";
 
@@ -334,6 +334,16 @@ export function registerCommands(
         await ctx.answerCallbackQuery({ text: "Stopped." });
         await safeEditMessage(ctx,"Stopped. Send /start to resume.");
         break;
+
+      case "preferences": {
+        const prefs = await getPreferences(chatId);
+        await ctx.answerCallbackQuery();
+        await safeEditMessage(ctx,"<b>⚙️ Preferences</b>\n\nTap to toggle:", {
+          parse_mode: "HTML",
+          reply_markup: preferencesKeyboard(prefs),
+        });
+        break;
+      }
     }
   });
 
@@ -395,6 +405,48 @@ export function registerCommands(
         break;
       }
     }
+  });
+
+  bot.callbackQuery(/^pref:/, async (ctx) => {
+    const chatId = ctx.chat?.id;
+    if (!chatId) return;
+    const key = ctx.callbackQuery.data!.replace("pref:", "");
+
+    if (key === "voicePicker") {
+      const prefs = await getPreferences(chatId);
+      await ctx.answerCallbackQuery();
+      await safeEditMessage(ctx,"<b>🎤 Select Voice</b>\n\nChoose an Estonian voice:", {
+        parse_mode: "HTML",
+        reply_markup: voicePicker(prefs.voiceName),
+      });
+      return;
+    }
+
+    // Toggle boolean preferences
+    const prefs = await getPreferences(chatId);
+    const current = (prefs as any)[key];
+    if (typeof current === "boolean") {
+      await updatePreference(chatId, key, !current);
+      const updated = await getPreferences(chatId);
+      await ctx.answerCallbackQuery({ text: `${key}: ${!current ? "ON" : "OFF"}` });
+      await safeEditMessage(ctx,"<b>⚙️ Preferences</b>\n\nTap to toggle:", {
+        parse_mode: "HTML",
+        reply_markup: preferencesKeyboard(updated),
+      });
+    }
+  });
+
+  bot.callbackQuery(/^set:voice:/, async (ctx) => {
+    const chatId = ctx.chat?.id;
+    if (!chatId) return;
+    const voice = ctx.callbackQuery.data!.replace("set:voice:", "");
+    await updatePreference(chatId, "voiceName", voice);
+    await ctx.answerCallbackQuery({ text: `Voice: ${voice}` });
+    const prefs = await getPreferences(chatId);
+    await safeEditMessage(ctx,"<b>⚙️ Preferences</b>\n\nTap to toggle:", {
+      parse_mode: "HTML",
+      reply_markup: preferencesKeyboard(prefs),
+    });
   });
 
   bot.callbackQuery("back_menu", async (ctx) => {

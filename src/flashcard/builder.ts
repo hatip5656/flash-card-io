@@ -53,10 +53,17 @@ function buildCaption(params: CaptionParams): string {
   return caption;
 }
 
+export interface BuildOptions {
+  audioEnabled?: boolean;
+  voiceName?: string;
+  wordFormsEnabled?: boolean;
+}
+
 export async function buildFlashcard(
   word: Word,
   unsplashKey: string,
   ekilexApiKey?: string | null,
+  options?: BuildOptions,
 ): Promise<Flashcard> {
   const sentence = await resolveSentence(word);
   const photo = await searchPhoto(word.imageQuery ?? word.english, unsplashKey);
@@ -66,7 +73,7 @@ export async function buildFlashcard(
   }
 
   let wordForms: WordFormResult | null = null;
-  if (ekilexApiKey) {
+  if (ekilexApiKey && (options?.wordFormsEnabled ?? true)) {
     wordForms = await getWordFormsForValue(word.estonian, ekilexApiKey).catch(() => null);
   }
 
@@ -80,7 +87,9 @@ export async function buildFlashcard(
     pos: wordForms?.pos,
   });
 
-  const audio = await synthesizeSpeech(word.estonian, sentence.estonian).catch(() => null);
+  const audio = (options?.audioEnabled ?? true)
+    ? await synthesizeSpeech(word.estonian, sentence.estonian, options?.voiceName).catch(() => null)
+    : null;
 
   return {
     word,
@@ -97,6 +106,7 @@ export async function buildFlashcardFromEkilex(
   ekilexWord: EkilexWord,
   unsplashKey: string,
   wordForms?: WordFormResult | null,
+  options?: BuildOptions,
 ): Promise<Flashcard> {
   const photo = await searchPhoto(ekilexWord.english ?? ekilexWord.wordValue, unsplashKey);
 
@@ -127,7 +137,9 @@ export async function buildFlashcardFromEkilex(
     source: "Source: Ekilex/Sõnaveeb",
   });
 
-  const audio = await synthesizeSpeech(ekilexWord.wordValue, sentence.estonian).catch(() => null);
+  const audio = (options?.audioEnabled ?? true)
+    ? await synthesizeSpeech(ekilexWord.wordValue, sentence.estonian, options?.voiceName).catch(() => null)
+    : null;
 
   return {
     word,

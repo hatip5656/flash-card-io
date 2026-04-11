@@ -1,5 +1,6 @@
 import { InlineKeyboard } from "grammy";
 import type { CefrLevel } from "../config.js";
+import type { UserPreferences } from "../db/progress.js";
 import { SCHEDULE_PRESETS } from "./commands.js";
 
 export function mainMenuKeyboard(): InlineKeyboard {
@@ -13,6 +14,7 @@ export function mainMenuKeyboard(): InlineKeyboard {
     .text("🏷️ Level", "edit_level")
     .text("⏰ Schedule", "edit_schedule")
     .row()
+    .text("⚙️ Preferences", "action:preferences")
     .text("🛑 Stop", "action:stop");
 }
 
@@ -32,5 +34,33 @@ export function schedulePicker(currentCron: string): InlineKeyboard {
     kb.row();
   }
   kb.text("« Back", "back_menu");
+  return kb;
+}
+
+export function preferencesKeyboard(prefs: UserPreferences): InlineKeyboard {
+  const toggle = (on: boolean) => on ? "✅" : "❌";
+  return new InlineKeyboard()
+    .text(`${toggle(prefs.audio)} Audio`, "pref:audio")
+    .text(`${toggle(prefs.wordForms)} Word Forms`, "pref:wordForms")
+    .row()
+    .text(`${toggle(prefs.grammarCards)} Grammar Cards`, "pref:grammarCards")
+    .row()
+    .text(`${toggle(prefs.dailySummary)} Daily Summary`, "pref:dailySummary")
+    .text(`${toggle(prefs.weeklyReport)} Weekly Report`, "pref:weeklyReport")
+    .row()
+    .text(`🎤 Voice: ${prefs.voiceName}`, "pref:voicePicker")
+    .row()
+    .text("« Back", "back_menu");
+}
+
+export function voicePicker(current: string): InlineKeyboard {
+  const voices = ["mari", "albert", "indrek", "kalev", "kylli", "liivika", "meelis", "peeter", "tambet", "vesta"];
+  const kb = new InlineKeyboard();
+  for (let i = 0; i < voices.length; i++) {
+    const v = voices[i];
+    kb.text(v === current ? `✅ ${v}` : v, `set:voice:${v}`);
+    if (i % 3 === 2) kb.row();
+  }
+  kb.row().text("« Back to preferences", "action:preferences");
   return kb;
 }

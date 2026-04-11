@@ -59,6 +59,7 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
   // Migrations
   await pool.query(`ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS username TEXT`);
   await pool.query(`ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS first_name TEXT`);
+  await pool.query(`ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS preferences JSONB NOT NULL DEFAULT '{}'::jsonb`);
   await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS english TEXT`);
   await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS quiz_count INTEGER NOT NULL DEFAULT 0`);
   // SM-2 spaced repetition fields
@@ -375,6 +376,37 @@ export async function getTodayActivity(chatId: number): Promise<{ wordsLearned: 
 
 export async function closeDb(): Promise<void> {
   if (pool) await pool.end();
+}
+
+export interface UserPreferences {
+  audio: boolean;
+  voiceName: string;
+  wordForms: boolean;
+  grammarCards: boolean;
+  dailySummary: boolean;
+  weeklyReport: boolean;
+}
+
+const DEFAULT_PREFERENCES: UserPreferences = {
+  audio: true,
+  voiceName: "mari",
+  wordForms: true,
+  grammarCards: true,
+  dailySummary: true,
+  weeklyReport: true,
+};
+
+export async function getPreferences(chatId: number): Promise<UserPreferences> {
+  const res = await pool.query("SELECT preferences FROM subscribers WHERE chat_id = $1", [chatId]);
+  const stored = res.rows[0]?.preferences ?? {};
+  return { ...DEFAULT_PREFERENCES, ...stored };
+}
+
+export async function updatePreference(chatId: number, key: string, value: any): Promise<void> {
+  await pool.query(
+    `UPDATE subscribers SET preferences = preferences || $1::jsonb WHERE chat_id = $2`,
+    [JSON.stringify({ [key]: value }), chatId],
+  );
 }
 
 export async function addSubscriber(chatId: number, channel = "telegram", username?: string, firstName?: string): Promise<void> {
