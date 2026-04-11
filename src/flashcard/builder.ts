@@ -80,7 +80,7 @@ export async function buildFlashcard(
     pos: wordForms?.pos,
   });
 
-  const audio = await synthesizeSpeech(word.estonian).catch(() => null);
+  const audio = await synthesizeSpeech(word.estonian, sentence.estonian).catch(() => null);
 
   return {
     word,
@@ -127,7 +127,7 @@ export async function buildFlashcardFromEkilex(
     source: "Source: Ekilex/Sõnaveeb",
   });
 
-  const audio = await synthesizeSpeech(ekilexWord.wordValue).catch(() => null);
+  const audio = await synthesizeSpeech(ekilexWord.wordValue, sentence.estonian).catch(() => null);
 
   return {
     word,
