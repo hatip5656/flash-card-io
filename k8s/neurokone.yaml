@@ -77,6 +77,8 @@ spec:
               value: "tts"
             - name: MQ_PASSWORD
               value: "tts"
+            - name: RESPONSE_TIMEOUT
+              value: "60"
           ports:
             - containerPort: 8000
           resources:
@@ -153,7 +155,7 @@ spec:
             - name: MQ_PASSWORD
               value: "tts"
             - name: MKL_NUM_THREADS
-              value: "2"
+              value: "4"
           volumeMounts:
             - name: models
               mountPath: /app/models
