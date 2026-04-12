@@ -19,8 +19,14 @@ async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
     await writeFile(wavFile, wavBuffer);
     await execFileAsync("ffmpeg", [
       "-i", wavFile,
+      "-af", [
+        "highpass=f=80",           // cut low-frequency hum
+        "lowpass=f=8000",          // cut high-frequency hiss
+        "afftdn=nf=-20",          // FFT-based noise reduction
+        "loudnorm=I=-16:TP=-1.5", // normalize loudness
+      ].join(","),
       "-c:a", "libopus",
-      "-b:a", "48k",
+      "-b:a", "64k",
       "-y",
       oggFile,
     ], { timeout: 10_000 });
