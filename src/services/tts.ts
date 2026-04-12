@@ -20,10 +20,14 @@ async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
     await execFileAsync("ffmpeg", [
       "-i", wavFile,
       "-af", [
-        "highpass=f=80",           // cut low-frequency hum
-        "lowpass=f=8000",          // cut high-frequency hiss
-        "afftdn=nf=-20",          // FFT-based noise reduction
-        "loudnorm=I=-16:TP=-1.5", // normalize loudness
+        "atrim=start=0.06",        // trim first 60ms (neural TTS warmup buzz)
+        "asetpts=PTS-STARTPTS",    // reset timestamps after trim
+        "highpass=f=100",           // cut low-frequency hum
+        "lowpass=f=7500",           // cut high-frequency hiss
+        "afftdn=nf=-25",           // aggressive FFT noise reduction
+        "agate=threshold=0.01:attack=5:release=50",  // gate quiet buzz between words
+        "afade=t=in:d=0.03",       // 30ms fade-in to smooth start
+        "loudnorm=I=-16:TP=-1.5",  // normalize loudness
       ].join(","),
       "-c:a", "libopus",
       "-b:a", "64k",
