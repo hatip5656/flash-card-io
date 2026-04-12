@@ -15,13 +15,58 @@ services:
       timeout: 5s
       retries: 5
 
+  tts-rabbitmq:
+    image: rabbitmq:3-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: tts
+      RABBITMQ_DEFAULT_PASS: tts
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  tts-api:
+    image: ghcr.io/tartunlp/text-to-speech-api:latest
+    environment:
+      MQ_HOST: tts-rabbitmq
+      MQ_PORT: "5672"
+      MQ_USERNAME: tts
+      MQ_PASSWORD: tts
+      RESPONSE_TIMEOUT: "60"
+    ports:
+      - "8000:8000"
+    depends_on:
+      tts-rabbitmq:
+        condition: service_healthy
+
+  tts-worker:
+    image: ghcr.io/tartunlp/text-to-speech-worker:latest
+    command: ["--model-name", "multispeaker"]
+    environment:
+      MQ_HOST: tts-rabbitmq
+      MQ_PORT: "5672"
+      MQ_USERNAME: tts
+      MQ_PASSWORD: tts
+      MKL_NUM_THREADS: "4"
+    volumes:
+      - tts-models:/app/models
+    depends_on:
+      tts-rabbitmq:
+        condition: service_healthy
+
   flashcard-bot:
     build: .
     env_file: .env
+    environment:
+      TTS_API_URL: http://tts-api:8000
     depends_on:
       postgres:
         condition: service_healthy
+      tts-api:
+        condition: service_started
     restart: unless-stopped
 
 volumes:
   pgdata:
+  tts-models:
