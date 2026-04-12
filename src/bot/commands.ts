@@ -404,6 +404,16 @@ export function registerCommands(
         });
         break;
       }
+      case "voice": {
+        await updatePreference(chatId, "voiceName", value);
+        await ctx.answerCallbackQuery({ text: `Voice: ${value}` });
+        const prefs = await getPreferences(chatId);
+        await safeEditMessage(ctx,"<b>⚙️ Preferences</b>\n\nTap to toggle:", {
+          parse_mode: "HTML",
+          reply_markup: preferencesKeyboard(prefs),
+        });
+        break;
+      }
     }
   });
 
@@ -436,18 +446,7 @@ export function registerCommands(
     }
   });
 
-  bot.callbackQuery(/^set:voice:/, async (ctx) => {
-    const chatId = ctx.chat?.id;
-    if (!chatId) return;
-    const voice = ctx.callbackQuery.data!.replace("set:voice:", "");
-    await updatePreference(chatId, "voiceName", voice);
-    await ctx.answerCallbackQuery({ text: `Voice: ${voice}` });
-    const prefs = await getPreferences(chatId);
-    await safeEditMessage(ctx,"<b>⚙️ Preferences</b>\n\nTap to toggle:", {
-      parse_mode: "HTML",
-      reply_markup: preferencesKeyboard(prefs),
-    });
-  });
+  // voice selection is handled inside the set: callback switch
 
   bot.callbackQuery("back_menu", async (ctx) => {
     const chatId = ctx.chat?.id;
