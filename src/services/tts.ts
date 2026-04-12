@@ -43,13 +43,9 @@ async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
 
 export async function synthesizeSpeech(word: string, sentence?: string, voiceName?: string): Promise<Buffer | null> {
   try {
-    // Prepend a short sacrificial phrase so the TTS model "warms up"
-    // on it — the initial buzz artifact lands here instead of on the real word.
-    // We trim this prefix off in ffmpeg afterwards.
-    const speechText = sentence && sentence !== word
+    const text = sentence && sentence !== word
       ? `${word}. ... ${sentence}`
       : word;
-    const text = `. ${speechText}`;
 
     const res = await fetch(`${TTS_API_URL}/v2`, {
       method: "POST",
@@ -59,7 +55,7 @@ export async function synthesizeSpeech(word: string, sentence?: string, voiceNam
         speaker: voiceName || TTS_SPEAKER,
         speed: 0.85,
       }),
-      signal: AbortSignal.timeout(15_000),
+      signal: AbortSignal.timeout(30_000),
     });
 
     if (!res.ok) {
