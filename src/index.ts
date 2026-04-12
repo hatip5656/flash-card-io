@@ -191,6 +191,8 @@ async function main(): Promise<void> {
     const subs = await getActiveSubscribers();
     for (const sub of subs) {
       try {
+        const prefs = await getPreferences(sub.chatId);
+        if (!prefs.weeklyReport) continue;
         const [{ sent, level }, quiz, streak] = await Promise.all([
           getStats(sub.chatId),
           getQuizStats(sub.chatId),
@@ -225,6 +227,8 @@ async function main(): Promise<void> {
     const subs = await getActiveSubscribers();
     for (const sub of subs) {
       try {
+        const prefs = await getPreferences(sub.chatId);
+        if (!prefs.dailySummary) continue;
         const [streak, today] = await Promise.all([getStreak(sub.chatId), getTodayActivity(sub.chatId)]);
         if (today.wordsLearned === 0 && today.quizzesTaken === 0) continue; // Skip inactive users
         const streakEmoji = streak >= 7 ? "🔥" : streak >= 3 ? "⚡" : "📅";
