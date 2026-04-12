@@ -20,7 +20,7 @@ async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
     await execFileAsync("ffmpeg", [
       "-i", wavFile,
       "-af", [
-        "atrim=start=0.06",        // trim first 60ms (neural TTS warmup buzz)
+        "silenceremove=start_periods=1:start_silence=0.05:start_threshold=-40dB",  // trim leading silence/buzz until speech starts
         "asetpts=PTS-STARTPTS",    // reset timestamps after trim
         "highpass=f=100",           // cut low-frequency hum
         "lowpass=f=7500",           // cut high-frequency hiss
@@ -43,9 +43,13 @@ async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
 
 export async function synthesizeSpeech(word: string, sentence?: string, voiceName?: string): Promise<Buffer | null> {
   try {
-    const text = sentence && sentence !== word
+    // Prepend a short sacrificial phrase so the TTS model "warms up"
+    // on it — the initial buzz artifact lands here instead of on the real word.
+    // We trim this prefix off in ffmpeg afterwards.
+    const speechText = sentence && sentence !== word
       ? `${word}. ... ${sentence}`
       : word;
+    const text = `. ${speechText}`;
 
     const res = await fetch(`${TTS_API_URL}/v2`, {
       method: "POST",
