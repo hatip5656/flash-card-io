@@ -1,3 +1,5 @@
+import { getCachedJson, setCachedJson, TTL } from "./cache.js";
+
 const UNSPLASH_API = "https://api.unsplash.com";
 
 export interface UnsplashPhoto {
@@ -14,6 +16,12 @@ export async function searchPhoto(
   query: string,
   accessKey: string,
 ): Promise<UnsplashPhoto | null> {
+  const cacheKey = query.toLowerCase().trim();
+
+  // Check disk cache first (saves rate-limited API calls)
+  const cached = await getCachedJson<UnsplashPhoto>("unsplash", cacheKey, TTL.UNSPLASH);
+  if (cached) return cached;
+
   try {
     const params = new URLSearchParams({
       query,
@@ -23,6 +31,7 @@ export async function searchPhoto(
 
     const res = await fetch(`${UNSPLASH_API}/search/photos?${params}`, {
       headers: { Authorization: `Client-ID ${accessKey}` },
+      signal: AbortSignal.timeout(10_000),
     });
 
     if (!res.ok) {
@@ -30,29 +39,34 @@ export async function searchPhoto(
       return null;
     }
 
-  const data = (await res.json()) as {
-    results: Array<{
-      id: string;
-      urls: { regular: string; thumb: string };
-      description: string | null;
-      alt_description: string | null;
-      user: { name: string; links: { html: string } };
-      links: { download_location: string };
-    }>;
-  };
+    const data = (await res.json()) as {
+      results: Array<{
+        id: string;
+        urls: { regular: string; thumb: string };
+        description: string | null;
+        alt_description: string | null;
+        user: { name: string; links: { html: string } };
+        links: { download_location: string };
+      }>;
+    };
 
-  if (data.results.length === 0) return null;
+    if (data.results.length === 0) return null;
 
-  const photo = data.results[0];
-  return {
-    id: photo.id,
-    url: photo.urls.regular,
-    thumbUrl: photo.urls.thumb,
-    description: photo.description ?? photo.alt_description,
-    photographer: photo.user.name,
-    photographerUrl: photo.user.links.html,
-    downloadUrl: photo.links.download_location,
-  };
+    const photo = data.results[0];
+    const result: UnsplashPhoto = {
+      id: photo.id,
+      url: photo.urls.regular,
+      thumbUrl: photo.urls.thumb,
+      description: photo.description ?? photo.alt_description,
+      photographer: photo.user.name,
+      photographerUrl: photo.user.links.html,
+      downloadUrl: photo.links.download_location,
+    };
+
+    // Cache to disk (fire-and-forget)
+    setCachedJson("unsplash", cacheKey, result).catch(() => {});
+
+    return result;
   } catch (err) {
     console.error(`[unsplash] Error searching for "${query}":`, err instanceof Error ? err.message : err);
     return null;

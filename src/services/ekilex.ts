@@ -1,4 +1,5 @@
 import type { WordForm } from "../flashcard/types.js";
+import { getCachedJson, setCachedJson, TTL } from "./cache.js";
 
 const API_BASE = "https://ekilex.ee/api";
 const MAX_DETAIL_LOOKUPS = 10;
@@ -170,6 +171,12 @@ export async function getWordFormsForValue(
   wordValue: string,
   apiKey: string,
 ): Promise<WordFormResult | null> {
+  const cacheKey = wordValue.toLowerCase();
+
+  // Check disk cache first (eliminates 2-5 sequential API calls)
+  const cached = await getCachedJson<WordFormResult>("ekilex", cacheKey, TTL.EKILEX);
+  if (cached) return cached;
+
   const data = await apiRequest<EkilexSearchResponse>(`/word/search/${encodeURIComponent(wordValue)}`, apiKey);
   if (!data?.words) return null;
 
@@ -215,7 +222,9 @@ export async function getWordFormsForValue(
     }
 
     if (forms.length > 0 || english) {
-      return { forms, english, pos, cefrLevel };
+      const result = { forms, english, pos, cefrLevel };
+      setCachedJson("ekilex", cacheKey, result).catch(() => {});
+      return result;
     }
   }
 

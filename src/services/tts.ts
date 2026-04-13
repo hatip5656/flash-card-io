@@ -4,6 +4,7 @@ import { tmpdir } from "os";
 import { join } from "path";
 import { readFile, writeFile, unlink } from "fs/promises";
 import { randomBytes } from "crypto";
+import { getCachedBuffer, setCachedBuffer, TTL } from "./cache.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -20,14 +21,14 @@ async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
     await execFileAsync("ffmpeg", [
       "-i", wavFile,
       "-af", [
-        "silenceremove=start_periods=1:start_silence=0.05:start_threshold=-40dB",  // trim leading silence/buzz until speech starts
-        "asetpts=PTS-STARTPTS",    // reset timestamps after trim
-        "highpass=f=100",           // cut low-frequency hum
-        "lowpass=f=7500",           // cut high-frequency hiss
-        "afftdn=nf=-25",           // aggressive FFT noise reduction
-        "agate=threshold=0.01:attack=5:release=50",  // gate quiet buzz between words
-        "afade=t=in:d=0.03",       // 30ms fade-in to smooth start
-        "loudnorm=I=-16:TP=-1.5",  // normalize loudness
+        "silenceremove=start_periods=1:start_silence=0.05:start_threshold=-40dB",
+        "asetpts=PTS-STARTPTS",
+        "highpass=f=100",
+        "lowpass=f=7500",
+        "afftdn=nf=-25",
+        "agate=threshold=0.01:attack=5:release=50",
+        "afade=t=in:d=0.03",
+        "loudnorm=I=-16:TP=-1.5",
       ].join(","),
       "-c:a", "libopus",
       "-b:a", "64k",
@@ -42,20 +43,23 @@ async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
 }
 
 export async function synthesizeSpeech(word: string, sentence?: string, voiceName?: string): Promise<Buffer | null> {
-  try {
-    const text = sentence && sentence !== word
-      ? `${word}. ... ${sentence}`
-      : word;
+  const voice = voiceName || TTS_SPEAKER;
+  const text = sentence && sentence !== word ? `${word}. ... ${sentence}` : word;
+  const cacheKey = `${text}\0${voice}`;
 
+  // Check disk cache first
+  const cached = await getCachedBuffer("tts", cacheKey, "ogg", TTL.TTS);
+  if (cached) {
+    console.error(`[tts] Cache hit for "${word}" (${voice})`);
+    return cached;
+  }
+
+  try {
     const res = await fetch(`${TTS_API_URL}/v2`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        text,
-        speaker: voiceName || TTS_SPEAKER,
-        speed: 0.85,
-      }),
-      signal: AbortSignal.timeout(15_000),  // 15s max — don't block the event loop too long
+      body: JSON.stringify({ text, speaker: voice, speed: 0.85 }),
+      signal: AbortSignal.timeout(15_000),
     });
 
     if (!res.ok) {
@@ -65,13 +69,17 @@ export async function synthesizeSpeech(word: string, sentence?: string, voiceNam
 
     const wavBuffer = Buffer.from(await res.arrayBuffer());
 
-    // Convert WAV to OGG Opus for clean Telegram playback
+    let audio: Buffer;
     try {
-      return await convertWavToOgg(wavBuffer);
+      audio = await convertWavToOgg(wavBuffer);
     } catch {
-      // If ffmpeg not available, send WAV as fallback
-      return wavBuffer;
+      audio = wavBuffer;
     }
+
+    // Cache to disk (fire-and-forget)
+    setCachedBuffer("tts", cacheKey, "ogg", audio).catch(() => {});
+
+    return audio;
   } catch (err) {
     console.error(`[tts] Error synthesizing "${word}":`, err instanceof Error ? err.message : err);
     return null;

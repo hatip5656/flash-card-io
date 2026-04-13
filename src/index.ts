@@ -13,6 +13,7 @@ import { createWhatsAppChannel } from "./channels/whatsapp.js";
 import { registerCommands } from "./bot/commands.js";
 import { registerQuiz } from "./bot/quiz.js";
 import { getRandomWordForLevel, getWordFormsForValue } from "./services/ekilex.js";
+import { evictExpired, TTL, getCacheStats } from "./services/cache.js";
 import { Cron } from "croner";
 import type { DeliveryChannel } from "./channels/types.js";
 import type { Bot } from "grammy";
@@ -288,6 +289,25 @@ async function main(): Promise<void> {
   // Mark as ready — all systems initialized
   setReady(true);
 
+  // Evict expired cache entries every 6 hours
+  const cacheEvictionJob = new Cron("0 */6 * * *", { timezone: config.cronTimezone }, async () => {
+    const tts = await evictExpired("tts", TTL.TTS);
+    const unsplash = await evictExpired("unsplash", TTL.UNSPLASH);
+    const ekilex = await evictExpired("ekilex", TTL.EKILEX);
+    if (tts + unsplash + ekilex > 0) {
+      console.error(`[cache] Evicted ${tts} TTS, ${unsplash} Unsplash, ${ekilex} Ekilex expired entries`);
+    }
+  });
+
+  // Log cache stats on startup (async, non-blocking)
+  getCacheStats().then((stats) => {
+    const entries = Object.entries(stats);
+    if (entries.length > 0) {
+      const summary = entries.map(([ns, s]) => `${ns}: ${s.files} files (${(s.sizeBytes / 1024).toFixed(0)}KB)`).join(", ");
+      console.error(`[cache] ${summary}`);
+    }
+  }).catch(() => {});
+
   console.error(`[main] Flash Card IO started`);
   console.error(`[main] Database: PostgreSQL`);
   console.error(`[main] Default schedule: ${config.cronSchedule} (${config.cronTimezone})`);
@@ -301,6 +321,7 @@ async function main(): Promise<void> {
     setReady(false);
     clearInterval(refreshInterval);
     weeklyReportJob.stop();
+    cacheEvictionJob.stop();
     dailySummaryJob.stop();
     grammarRerollJob.stop();
     stopAllGrammarJobs();
