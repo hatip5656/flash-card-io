@@ -6,6 +6,7 @@
 import { mkdir, readFile, writeFile, stat, readdir, unlink } from "fs/promises";
 import { join } from "path";
 import { createHash } from "crypto";
+import { errMsg } from "../utils.js";
 
 export const CACHE_DIR = process.env.CACHE_DIR || "./cache";
 
@@ -47,7 +48,7 @@ export async function setCachedBuffer(namespace: string, key: string, ext: strin
     await ensureDir(namespacePath(namespace));
     await writeFile(filePath(namespace, key, ext), data);
   } catch (err) {
-    console.error(`[cache] Write error (${namespace}):`, err instanceof Error ? err.message : err);
+    console.error(`[cache] Write error (${namespace}):`, errMsg(err));
   }
 }
 
@@ -74,7 +75,7 @@ export async function setCachedJson(namespace: string, key: string, data: unknow
     await ensureDir(namespacePath(namespace));
     await writeFile(filePath(namespace, key, "json"), JSON.stringify(data));
   } catch (err) {
-    console.error(`[cache] Write error (${namespace}):`, err instanceof Error ? err.message : err);
+    console.error(`[cache] Write error (${namespace}):`, errMsg(err));
   }
 }
 

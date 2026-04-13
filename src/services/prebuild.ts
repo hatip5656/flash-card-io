@@ -7,6 +7,7 @@ import { readFile, writeFile, readdir, unlink, rename, stat } from "fs/promises"
 import { join } from "path";
 import { CACHE_DIR, ensureDir } from "./cache.js";
 import type { Flashcard } from "../flashcard/types.js";
+import { errMsg } from "../utils.js";
 
 const QUEUE_DIR = join(CACHE_DIR, "prebuild");
 export const QUEUE_SIZE = 5;
@@ -132,7 +133,7 @@ export async function pushPrebuilt(chatId: number, entry: PrebuiltEntry & { leve
     };
     await writeFile(join(dir, `${id}.json`), JSON.stringify(stored));
   } catch (err) {
-    console.error(`[prebuild] Push error for ${chatId}:`, err instanceof Error ? err.message : err);
+    console.error(`[prebuild] Push error for ${chatId}:`, errMsg(err));
   }
 }
 

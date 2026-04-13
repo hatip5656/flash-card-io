@@ -3,6 +3,7 @@ import { getLearnedWordsForQuiz, incrementQuizCount, saveQuizResult, getMostMiss
 import { getWordFormsForValue } from "../services/ekilex.js";
 import { escapeHtml } from "../flashcard/builder.js";
 import { selectForms } from "../flashcard/grammar-builder.js";
+import { shuffle, errMsg } from "../utils.js";
 
 async function safeAnswer(ctx: any, opts?: { text?: string }): Promise<void> {
   try {
@@ -58,14 +59,6 @@ function isSessionExpired(session: QuizSession): boolean {
   return Date.now() - session.startedAt > SESSION_TTL_MS;
 }
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
 
 function normalize(text: string): string {
   return text.trim().toLowerCase().replace(/[.!?,;:'"]/g, "");
@@ -347,7 +340,7 @@ async function processAnswer(
       saveQuizResult(session.chatId, session.score, session.questions.length, quizAnswers),
       logQuizActivity(session.chatId),
     ]).catch((err) =>
-      console.error("[quiz] Failed to save quiz data:", err instanceof Error ? err.message : err),
+      console.error("[quiz] Failed to save quiz data:", errMsg(err)),
     );
     await bot.api.sendMessage(session.chatId, buildSummary(session), { parse_mode: "HTML" });
     quizSessions.delete(session.chatId);

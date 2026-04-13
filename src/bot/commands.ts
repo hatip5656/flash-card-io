@@ -7,6 +7,7 @@ import { getAllCategories } from "../flashcard/categories.js";
 import { mainMenuKeyboard, levelPicker, schedulePicker, preferencesKeyboard, voicePicker } from "./keyboards.js";
 import { startQuiz } from "./quiz.js";
 import { escapeHtml } from "../flashcard/builder.js";
+import { errMsg } from "../utils.js";
 
 const VALID_LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2"];
 
@@ -123,14 +124,14 @@ export function registerCommands(
     { command: "settings", description: "Open settings menu" },
     { command: "stats", description: "See your progress" },
     { command: "stop", description: "Stop receiving flashcards" },
-  ]).catch((err) => console.error("[commands] Failed to set bot commands:", err instanceof Error ? err.message : err));
+  ]).catch((err) => console.error("[commands] Failed to set bot commands:", errMsg(err)));
 
   // --- Slash commands ---
 
   bot.command("start", async (ctx) => {
     const chatId = ctx.chat.id;
     await addSubscriber(chatId, "telegram", ctx.from?.username, ctx.from?.first_name);
-    refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
+    refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", errMsg(err)));
     await ctx.reply(await getSettingsText(chatId), {
       parse_mode: "HTML",
       reply_markup: mainMenuKeyboard(),
@@ -146,7 +147,7 @@ export function registerCommands(
 
   bot.command("stop", async (ctx) => {
     await removeSubscriber(ctx.chat.id);
-    refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
+    refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", errMsg(err)));
     await ctx.reply("Stopped. Send /start to resume.");
   });
 
@@ -155,7 +156,7 @@ export function registerCommands(
       await deliverFlashcard(ctx.chat.id);
     } catch (err) {
       await ctx.reply("Failed to send flashcard. Try again later.");
-      console.error("[commands] /next error:", err instanceof Error ? err.message : err);
+      console.error("[commands] /next error:", errMsg(err));
     }
   });
 
@@ -164,7 +165,7 @@ export function registerCommands(
       await deliverGrammarCard(ctx.chat.id);
     } catch (err) {
       await ctx.reply("Failed to send grammar card. Try again later.");
-      console.error("[commands] /grammar error:", err instanceof Error ? err.message : err);
+      console.error("[commands] /grammar error:", errMsg(err));
     }
   });
 
@@ -179,7 +180,7 @@ export function registerCommands(
     }
     await setSubscriberLevel(ctx.chat.id, arg as CefrLevel);
     invalidateQueue(ctx.chat.id).catch(() => {});
-    refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
+    refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", errMsg(err)));
     const totalForLevel = getWordsForLevel(arg as CefrLevel).length;
     await ctx.reply(`Level set to ${arg}.\n📖 ${totalForLevel} local words available + live Ekilex queries for more.`);
   });
@@ -195,7 +196,7 @@ export function registerCommands(
     }
     const preset = SCHEDULE_PRESETS[arg];
     await setSubscriberSchedule(ctx.chat.id, preset.cron);
-    refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
+    refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", errMsg(err)));
     await ctx.reply(`⏰ Schedule set to: ${preset.label}`);
   });
 
@@ -309,7 +310,7 @@ export function registerCommands(
           await safeAnswer(ctx,);
           await deliverFlashcard(chatId);
         } catch (err) {
-          console.error("[commands] action:next error:", err instanceof Error ? err.message : err);
+          console.error("[commands] action:next error:", errMsg(err));
         }
         break;
 
@@ -318,7 +319,7 @@ export function registerCommands(
           await safeAnswer(ctx,);
           await deliverGrammarCard(chatId);
         } catch (err) {
-          console.error("[commands] action:grammar error:", err instanceof Error ? err.message : err);
+          console.error("[commands] action:grammar error:", errMsg(err));
         }
         break;
 
@@ -327,7 +328,7 @@ export function registerCommands(
         try {
           await startQuiz(bot, chatId, ekilexApiKey);
         } catch (err) {
-          console.error("[commands] action:quiz error:", err instanceof Error ? err.message : err);
+          console.error("[commands] action:quiz error:", errMsg(err));
         }
         break;
 
@@ -342,7 +343,7 @@ export function registerCommands(
 
       case "stop":
         await removeSubscriber(chatId);
-        refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
+        refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", errMsg(err)));
         await safeAnswer(ctx,{ text: "Stopped." });
         await safeEditMessage(ctx,"Stopped. Send /start to resume.");
         break;
@@ -396,7 +397,7 @@ export function registerCommands(
         if (!VALID_LEVELS.includes(value as CefrLevel)) break;
         await setSubscriberLevel(chatId, value as CefrLevel);
         invalidateQueue(chatId).catch(() => {}); // pre-built cards are for old level
-        refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
+        refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", errMsg(err)));
         const totalForLevel = getWordsForLevel(value as CefrLevel).length;
         await safeAnswer(ctx,{ text: `Level set to ${value} (${totalForLevel} words)` });
         await safeEditMessage(ctx,await getSettingsText(chatId), {
@@ -409,7 +410,7 @@ export function registerCommands(
         const preset = SCHEDULE_PRESETS[value];
         if (!preset) break;
         await setSubscriberSchedule(chatId, preset.cron);
-        refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
+        refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", errMsg(err)));
         await safeAnswer(ctx,{ text: `Schedule: ${preset.label}` });
         await safeEditMessage(ctx,await getSettingsText(chatId), {
           parse_mode: "HTML",

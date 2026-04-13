@@ -1,6 +1,7 @@
 import { Bot, InputFile } from "grammy";
 import type { DeliveryChannel } from "./types.js";
 import type { Flashcard } from "../flashcard/types.js";
+import { errMsg } from "../utils.js";
 
 export function createTelegramChannel(token: string): { channel: DeliveryChannel; bot: Bot } {
   const bot = new Bot(token);
@@ -33,7 +34,7 @@ export function createTelegramChannel(token: string): { channel: DeliveryChannel
 
         return true;
       } catch (err) {
-        console.error(`[telegram] Failed to send to ${chatId}:`, err instanceof Error ? err.message : err);
+        console.error(`[telegram] Failed to send to ${chatId}:`, errMsg(err));
         return false;
       }
     },

@@ -1,4 +1,5 @@
 import { getCachedJson, setCachedJson, TTL } from "./cache.js";
+import { errMsg } from "../utils.js";
 
 const UNSPLASH_API = "https://api.unsplash.com";
 
@@ -68,7 +69,7 @@ export async function searchPhoto(
 
     return result;
   } catch (err) {
-    console.error(`[unsplash] Error searching for "${query}":`, err instanceof Error ? err.message : err);
+    console.error(`[unsplash] Error searching for "${query}":`, errMsg(err));
     return null;
   }
 }

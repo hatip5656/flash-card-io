@@ -18,6 +18,7 @@ import { popPrebuilt, pushPrebuilt, getQueueSize, cleanupStaleEntries, QUEUE_SIZ
 import { Cron } from "croner";
 import type { DeliveryChannel } from "./channels/types.js";
 import type { Bot } from "grammy";
+import { errMsg } from "./utils.js";
 
 const config = loadConfig();
 
@@ -207,24 +208,46 @@ async function refillQueue(chatId: number): Promise<void> {
   const buildOpts = { audioEnabled: prefs.audio, voiceName: prefs.voiceName, wordFormsEnabled: prefs.wordForms };
   const sentIds = await getSentWordIds(chatId);
   const unsent = getUnsent(level, sentIds);
-  if (unsent.length === 0) return;
+  const toFill = QUEUE_SIZE - queueSize;
 
-  const toFill = Math.min(QUEUE_SIZE - queueSize, unsent.length);
-
-  // Partial Fisher-Yates: only shuffle first `toFill` positions
-  for (let i = 0; i < toFill; i++) {
-    const j = i + Math.floor(Math.random() * (unsent.length - i));
-    [unsent[i], unsent[j]] = [unsent[j], unsent[i]];
+  // Pre-build from local words
+  if (unsent.length > 0) {
+    const localCount = Math.min(toFill, unsent.length);
+    for (let i = 0; i < localCount; i++) {
+      const j = i + Math.floor(Math.random() * (unsent.length - i));
+      [unsent[i], unsent[j]] = [unsent[j], unsent[i]];
+    }
+    for (let i = 0; i < localCount; i++) {
+      await acquireBuildSlot();
+      try {
+        const word = unsent[i];
+        const flashcard = await buildFlashcard(word, config.unsplashAccessKey, config.ekilexApiKey, buildOpts);
+        await pushPrebuilt(chatId, { flashcard, wordId: word.id, wordValue: word.estonian, english: word.english, level });
+      } catch (err) {
+        console.error(`[prebuild] Build error for ${chatId}:`, errMsg(err));
+      } finally {
+        releaseBuildSlot();
+      }
+    }
+    return;
   }
+
+  // Local words exhausted — pre-build from Ekilex if available
+  if (!config.ekilexApiKey) return;
+  const sentValues = await getSentWordValues(chatId);
 
   for (let i = 0; i < toFill; i++) {
     await acquireBuildSlot();
     try {
-      const word = unsent[i];
-      const flashcard = await buildFlashcard(word, config.unsplashAccessKey, config.ekilexApiKey, buildOpts);
-      await pushPrebuilt(chatId, { flashcard, wordId: word.id, wordValue: word.estonian, english: word.english, level });
+      const ekilexWord = await getRandomWordForLevel(level as CefrLevel, sentValues, config.ekilexApiKey);
+      if (!ekilexWord) break;
+      const wordForms = await getWordFormsForValue(ekilexWord.wordValue, config.ekilexApiKey).catch(() => null);
+      const flashcard = await buildFlashcardFromEkilex(ekilexWord, config.unsplashAccessKey, wordForms, buildOpts);
+      const wordId = `ekilex-${ekilexWord.wordId}`;
+      await pushPrebuilt(chatId, { flashcard, wordId, wordValue: ekilexWord.wordValue, english: flashcard.word.english, level });
+      sentValues.add(ekilexWord.wordValue); // prevent duplicates within this refill batch
     } catch (err) {
-      console.error(`[prebuild] Build error for ${chatId}:`, err instanceof Error ? err.message : err);
+      console.error(`[prebuild] Ekilex build error for ${chatId}:`, errMsg(err));
     } finally {
       releaseBuildSlot();
     }
@@ -241,7 +264,7 @@ async function warmAllQueues(): Promise<void> {
       await refillQueue(sub.chatId);
     }
   } catch (err) {
-    console.error("[prebuild] Warm-up error:", err instanceof Error ? err.message : err);
+    console.error("[prebuild] Warm-up error:", errMsg(err));
   }
 }
 
@@ -317,7 +340,7 @@ async function main(): Promise<void> {
         msg += `\nKeep learning! Use /review to practice words due today.`;
         await bot.api.sendMessage(sub.chatId, msg, { parse_mode: "HTML" });
       } catch (err) {
-        console.error(`[main] Weekly report error for ${sub.chatId}:`, err instanceof Error ? err.message : err);
+        console.error(`[main] Weekly report error for ${sub.chatId}:`, errMsg(err));
       }
     }
   });
@@ -340,7 +363,7 @@ async function main(): Promise<void> {
         if (streak >= 3) msg += `\nKeep it up! 💪`;
         await bot.api.sendMessage(sub.chatId, msg, { parse_mode: "HTML" });
       } catch (err) {
-        console.error(`[main] Daily summary error for ${sub.chatId}:`, err instanceof Error ? err.message : err);
+        console.error(`[main] Daily summary error for ${sub.chatId}:`, errMsg(err));
       }
     }
   });

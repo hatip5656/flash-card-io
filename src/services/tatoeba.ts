@@ -1,3 +1,5 @@
+import { errMsg } from "../utils.js";
+
 export interface TatoebaSentence {
   id: number;
   estonian: string;
@@ -48,7 +50,7 @@ export async function searchSentences(
 
     return sentences;
   } catch (err) {
-    console.error(`[tatoeba] Error searching for "${word}":`, err instanceof Error ? err.message : err);
+    console.error(`[tatoeba] Error searching for "${word}":`, errMsg(err));
     return [];
   }
 }

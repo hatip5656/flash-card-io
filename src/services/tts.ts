@@ -5,6 +5,7 @@ import { join } from "path";
 import { readFile, writeFile, unlink } from "fs/promises";
 import { randomBytes } from "crypto";
 import { getCachedBuffer, setCachedBuffer, TTL } from "./cache.js";
+import { errMsg } from "../utils.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -81,7 +82,7 @@ export async function synthesizeSpeech(word: string, sentence?: string, voiceNam
 
     return audio;
   } catch (err) {
-    console.error(`[tts] Error synthesizing "${word}":`, err instanceof Error ? err.message : err);
+    console.error(`[tts] Error synthesizing "${word}":`, errMsg(err));
     return null;
   }
 }

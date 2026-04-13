@@ -1,5 +1,6 @@
 import type { WordForm } from "../flashcard/types.js";
 import { getCachedJson, setCachedJson, TTL } from "./cache.js";
+import { shuffle, errMsg } from "../utils.js";
 
 const API_BASE = "https://ekilex.ee/api";
 const MAX_DETAIL_LOOKUPS = 10;
@@ -79,7 +80,7 @@ async function apiRequest<T>(path: string, apiKey: string): Promise<T | null> {
     }
     return (await res.json()) as T;
   } catch (err) {
-    console.error(`[ekilex] Request failed for ${path}:`, err instanceof Error ? err.message : err);
+    console.error(`[ekilex] Request failed for ${path}:`, errMsg(err));
     return null;
   }
 }
@@ -156,14 +157,6 @@ function extractForms(paradigms: EkilexParadigm[]): WordForm[] {
   return forms;
 }
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
 
 // --- Public API ---
 

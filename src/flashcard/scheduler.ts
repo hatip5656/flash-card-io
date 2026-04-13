@@ -1,5 +1,6 @@
 import { Cron } from "croner";
 import type { Subscriber } from "../db/progress.js";
+import { errMsg } from "../utils.js";
 
 interface UserJob {
   chatId: number;
@@ -21,7 +22,7 @@ export function startGlobalScheduler(
     try {
       await onTick();
     } catch (err) {
-      console.error("[scheduler] Error in global tick:", err instanceof Error ? err.message : err);
+      console.error("[scheduler] Error in global tick:", errMsg(err));
     }
   });
 
@@ -69,7 +70,7 @@ export function syncUserJobs(
       try {
         await deliverToUser(sub.chatId);
       } catch (err) {
-        console.error(`[scheduler] Error delivering to ${sub.chatId}:`, err instanceof Error ? err.message : err);
+        console.error(`[scheduler] Error delivering to ${sub.chatId}:`, errMsg(err));
       }
     });
 
@@ -122,7 +123,7 @@ export function scheduleRandomGrammarJobs(
       try {
         await deliverGrammarCard(sub.chatId);
       } catch (err) {
-        console.error(`[scheduler] Error delivering grammar to ${sub.chatId}:`, err instanceof Error ? err.message : err);
+        console.error(`[scheduler] Error delivering grammar to ${sub.chatId}:`, errMsg(err));
       }
     });
 
@@ -147,7 +148,7 @@ export function scheduleGrammarJobForUser(
     try {
       await deliverGrammarCard(chatId);
     } catch (err) {
-      console.error(`[scheduler] Error delivering grammar to ${chatId}:`, err instanceof Error ? err.message : err);
+      console.error(`[scheduler] Error delivering grammar to ${chatId}:`, errMsg(err));
     }
   });
 
