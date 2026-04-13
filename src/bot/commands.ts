@@ -83,6 +83,16 @@ async function safeEditMessage(ctx: any, text: string, extra?: any): Promise<voi
   }
 }
 
+async function safeAnswer(ctx: any, opts?: { text?: string }): Promise<void> {
+  try {
+    await safeAnswer(ctx,opts);
+  } catch (err: any) {
+    // Ignore expired/invalid callback queries (user clicked old buttons)
+    if (err?.description?.includes("query is too old") || err?.description?.includes("query ID is invalid")) return;
+    throw err;
+  }
+}
+
 async function getSettingsText(chatId: number): Promise<string> {
   const [{ sent, level, schedule }, quiz, streak, today] = await Promise.all([
     getStats(chatId),
@@ -294,7 +304,7 @@ export function registerCommands(
     switch (action) {
       case "next":
         try {
-          await ctx.answerCallbackQuery();
+          await safeAnswer(ctx,);
           await deliverFlashcard(chatId);
         } catch (err) {
           console.error("[commands] action:next error:", err instanceof Error ? err.message : err);
@@ -303,7 +313,7 @@ export function registerCommands(
 
       case "grammar":
         try {
-          await ctx.answerCallbackQuery();
+          await safeAnswer(ctx,);
           await deliverGrammarCard(chatId);
         } catch (err) {
           console.error("[commands] action:grammar error:", err instanceof Error ? err.message : err);
@@ -311,7 +321,7 @@ export function registerCommands(
         break;
 
       case "quiz":
-        await ctx.answerCallbackQuery();
+        await safeAnswer(ctx,);
         try {
           await startQuiz(bot, chatId, ekilexApiKey);
         } catch (err) {
@@ -320,7 +330,7 @@ export function registerCommands(
         break;
 
       case "stats": {
-        await ctx.answerCallbackQuery();
+        await safeAnswer(ctx,);
         await safeEditMessage(ctx,await getSettingsText(chatId), {
           parse_mode: "HTML",
           reply_markup: mainMenuKeyboard(),
@@ -331,13 +341,13 @@ export function registerCommands(
       case "stop":
         await removeSubscriber(chatId);
         refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
-        await ctx.answerCallbackQuery({ text: "Stopped." });
+        await safeAnswer(ctx,{ text: "Stopped." });
         await safeEditMessage(ctx,"Stopped. Send /start to resume.");
         break;
 
       case "preferences": {
         const prefs = await getPreferences(chatId);
-        await ctx.answerCallbackQuery();
+        await safeAnswer(ctx,);
         await safeEditMessage(ctx,"<b>⚙️ Preferences</b>\n\nTap to toggle:", {
           parse_mode: "HTML",
           reply_markup: preferencesKeyboard(prefs),
@@ -351,7 +361,7 @@ export function registerCommands(
     const chatId = ctx.chat?.id;
     if (!chatId) return;
     const field = ctx.callbackQuery.data!.replace("edit_", "");
-    await ctx.answerCallbackQuery();
+    await safeAnswer(ctx,);
 
     switch (field) {
       case "level": {
@@ -385,7 +395,7 @@ export function registerCommands(
         await setSubscriberLevel(chatId, value as CefrLevel);
         refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
         const totalForLevel = getWordsForLevel(value as CefrLevel).length;
-        await ctx.answerCallbackQuery({ text: `Level set to ${value} (${totalForLevel} words)` });
+        await safeAnswer(ctx,{ text: `Level set to ${value} (${totalForLevel} words)` });
         await safeEditMessage(ctx,await getSettingsText(chatId), {
           parse_mode: "HTML",
           reply_markup: mainMenuKeyboard(),
@@ -397,7 +407,7 @@ export function registerCommands(
         if (!preset) break;
         await setSubscriberSchedule(chatId, preset.cron);
         refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
-        await ctx.answerCallbackQuery({ text: `Schedule: ${preset.label}` });
+        await safeAnswer(ctx,{ text: `Schedule: ${preset.label}` });
         await safeEditMessage(ctx,await getSettingsText(chatId), {
           parse_mode: "HTML",
           reply_markup: mainMenuKeyboard(),
@@ -406,7 +416,7 @@ export function registerCommands(
       }
       case "voice": {
         await updatePreference(chatId, "voiceName", value);
-        await ctx.answerCallbackQuery({ text: `Voice: ${value}` });
+        await safeAnswer(ctx,{ text: `Voice: ${value}` });
         const prefs = await getPreferences(chatId);
         await safeEditMessage(ctx,"<b>⚙️ Preferences</b>\n\nTap to toggle:", {
           parse_mode: "HTML",
@@ -424,7 +434,7 @@ export function registerCommands(
 
     if (key === "voicePicker") {
       const prefs = await getPreferences(chatId);
-      await ctx.answerCallbackQuery();
+      await safeAnswer(ctx,);
       await safeEditMessage(ctx,"<b>🎤 Select Voice</b>\n\nChoose an Estonian voice:", {
         parse_mode: "HTML",
         reply_markup: voicePicker(prefs.voiceName),
@@ -438,7 +448,7 @@ export function registerCommands(
     if (typeof current === "boolean") {
       await updatePreference(chatId, key, !current);
       const updated = await getPreferences(chatId);
-      await ctx.answerCallbackQuery({ text: `${key}: ${!current ? "ON" : "OFF"}` });
+      await safeAnswer(ctx,{ text: `${key}: ${!current ? "ON" : "OFF"}` });
       await safeEditMessage(ctx,"<b>⚙️ Preferences</b>\n\nTap to toggle:", {
         parse_mode: "HTML",
         reply_markup: preferencesKeyboard(updated),
@@ -451,7 +461,7 @@ export function registerCommands(
   bot.callbackQuery("back_menu", async (ctx) => {
     const chatId = ctx.chat?.id;
     if (!chatId) return;
-    await ctx.answerCallbackQuery();
+    await safeAnswer(ctx,);
     await safeEditMessage(ctx,await getSettingsText(chatId), {
       parse_mode: "HTML",
       reply_markup: mainMenuKeyboard(),

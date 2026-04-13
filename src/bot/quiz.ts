@@ -4,6 +4,15 @@ import { getWordFormsForValue } from "../services/ekilex.js";
 import { escapeHtml } from "../flashcard/builder.js";
 import { selectForms } from "../flashcard/grammar-builder.js";
 
+async function safeAnswer(ctx: any, opts?: { text?: string }): Promise<void> {
+  try {
+    await ctx.answerCallbackQuery(opts);
+  } catch (err: any) {
+    if (err?.description?.includes("query is too old") || err?.description?.includes("query ID is invalid")) return;
+    throw err;
+  }
+}
+
 // --- Types ---
 
 type QuizType = "est-to-eng" | "eng-to-est" | "type-answer" | "case-form" | "fill-blank";
@@ -397,7 +406,7 @@ export function registerQuiz(bot: Bot, ekilexApiKey?: string | null): void {
     const session = quizSessions.get(chatId);
     if (!session || isSessionExpired(session)) {
       quizSessions.delete(chatId);
-      await ctx.answerCallbackQuery({ text: "Quiz expired. Use /quiz to start a new one." });
+      await safeAnswer(ctx,{ text: "Quiz expired. Use /quiz to start a new one." });
       return;
     }
 
@@ -406,25 +415,25 @@ export function registerQuiz(bot: Bot, ekilexApiKey?: string | null): void {
     const oIdx = Number(parts[2]);
 
     if (session.answeredQuestions.has(qIdx)) {
-      await ctx.answerCallbackQuery({ text: "Already answered." });
+      await safeAnswer(ctx,{ text: "Already answered." });
       return;
     }
 
     if (qIdx !== session.currentIndex) {
-      await ctx.answerCallbackQuery({ text: "Already answered." });
+      await safeAnswer(ctx,{ text: "Already answered." });
       return;
     }
 
     const question = session.questions[qIdx];
     if (!question.options || oIdx < 0 || oIdx >= question.options.length) {
-      await ctx.answerCallbackQuery();
+      await safeAnswer(ctx,);
       return;
     }
 
     session.answeredQuestions.add(qIdx);
     const chosen = question.options[oIdx];
 
-    await ctx.answerCallbackQuery({
+    await safeAnswer(ctx,{
       text: chosen === question.correctAnswer ? "Correct! ✓" : `Wrong. Answer: ${question.correctAnswer}`,
     });
 
