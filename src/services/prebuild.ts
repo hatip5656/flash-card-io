@@ -160,7 +160,7 @@ export async function cleanupStaleEntries(): Promise<number> {
     const files = await readdir(dir).catch(() => [] as string[]);
     const now = Date.now();
     for (const f of files) {
-      if (!f.endsWith(".json")) continue;
+      if (!f.endsWith(".json") || f.endsWith(".meta.json")) continue;
       try {
         const info = await stat(join(dir, f));
         if (now - info.mtimeMs > STALE_MS) {

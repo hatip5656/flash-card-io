@@ -12,6 +12,6 @@ export function shuffle<T>(arr: T[]): T[] {
 }
 
 /** Extract error message safely from unknown catch values. */
-export function errMsg(err: unknown): string | unknown {
-  return err instanceof Error ? err.message : err;
+export function errMsg(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
 }

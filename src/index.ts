@@ -239,7 +239,7 @@ async function refillQueue(chatId: number): Promise<void> {
   for (let i = 0; i < toFill; i++) {
     await acquireBuildSlot();
     try {
-      const ekilexWord = await getRandomWordForLevel(level as CefrLevel, sentValues, config.ekilexApiKey);
+      const ekilexWord = await getRandomWordForLevel(level, sentValues, config.ekilexApiKey);
       if (!ekilexWord) break;
       const wordForms = await getWordFormsForValue(ekilexWord.wordValue, config.ekilexApiKey).catch(() => null);
       const flashcard = await buildFlashcardFromEkilex(ekilexWord, config.unsplashAccessKey, wordForms, buildOpts);
