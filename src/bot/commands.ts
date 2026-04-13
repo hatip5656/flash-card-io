@@ -1,6 +1,7 @@
 import type { Bot } from "grammy";
 import type { CefrLevel } from "../config.js";
 import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity, getWordsDueForReview, getPreferences, updatePreference } from "../db/progress.js";
+import { invalidateQueue } from "../services/prebuild.js";
 import { getWordsForLevel } from "../flashcard/word-bank.js";
 import { getAllCategories } from "../flashcard/categories.js";
 import { mainMenuKeyboard, levelPicker, schedulePicker, preferencesKeyboard, voicePicker } from "./keyboards.js";
@@ -85,7 +86,7 @@ async function safeEditMessage(ctx: any, text: string, extra?: any): Promise<voi
 
 async function safeAnswer(ctx: any, opts?: { text?: string }): Promise<void> {
   try {
-    await safeAnswer(ctx,opts);
+    await ctx.answerCallbackQuery(opts);
   } catch (err: any) {
     // Ignore expired/invalid callback queries (user clicked old buttons)
     if (err?.description?.includes("query is too old") || err?.description?.includes("query ID is invalid")) return;
@@ -177,6 +178,7 @@ export function registerCommands(
       return;
     }
     await setSubscriberLevel(ctx.chat.id, arg as CefrLevel);
+    invalidateQueue(ctx.chat.id).catch(() => {});
     refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
     const totalForLevel = getWordsForLevel(arg as CefrLevel).length;
     await ctx.reply(`Level set to ${arg}.\n📖 ${totalForLevel} local words available + live Ekilex queries for more.`);
@@ -393,6 +395,7 @@ export function registerCommands(
       case "level": {
         if (!VALID_LEVELS.includes(value as CefrLevel)) break;
         await setSubscriberLevel(chatId, value as CefrLevel);
+        invalidateQueue(chatId).catch(() => {}); // pre-built cards are for old level
         refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", err instanceof Error ? err.message : err));
         const totalForLevel = getWordsForLevel(value as CefrLevel).length;
         await safeAnswer(ctx,{ text: `Level set to ${value} (${totalForLevel} words)` });

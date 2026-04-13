@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { loadConfig } from "./config.js";
+import { loadConfig, type CefrLevel } from "./config.js";
 import { startHealthServer, setReady } from "./health.js";
 import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, backfillEnglish, getSentGrammarIds, markGrammarSent, logWordActivity, getStreak, getTodayActivity, getStats, getQuizStats, getPreferences } from "./db/progress.js";
 import { loadWordBank, getUnsent, getWordById } from "./flashcard/word-bank.js";
@@ -14,6 +14,7 @@ import { registerCommands } from "./bot/commands.js";
 import { registerQuiz } from "./bot/quiz.js";
 import { getRandomWordForLevel, getWordFormsForValue } from "./services/ekilex.js";
 import { evictExpired, TTL, getCacheStats } from "./services/cache.js";
+import { popPrebuilt, pushPrebuilt, getQueueSize, cleanupStaleEntries, QUEUE_SIZE } from "./services/prebuild.js";
 import { Cron } from "croner";
 import type { DeliveryChannel } from "./channels/types.js";
 import type { Bot } from "grammy";
@@ -70,16 +71,41 @@ function releaseBuildSlot(): void {
 }
 
 async function deliverFlashcard(chatId: number): Promise<void> {
+  const level = await getSubscriberLevel(chatId);
+
+  const prebuilt = await popPrebuilt(chatId, level);
+  if (prebuilt) {
+    console.error(`[main] Serving pre-built "${prebuilt.wordValue}" → chat ${chatId}`);
+    await sendAndRecord(chatId, prebuilt.flashcard, prebuilt.wordId, prebuilt.wordValue, prebuilt.english);
+    refillQueue(chatId).catch(() => {});
+    return;
+  }
+
   await acquireBuildSlot();
   try {
-    await _deliverFlashcard(chatId);
+    await _deliverFlashcard(chatId, level);
   } finally {
     releaseBuildSlot();
   }
+  refillQueue(chatId).catch(() => {});
 }
 
-async function _deliverFlashcard(chatId: number): Promise<void> {
-  const [level, prefs] = await Promise.all([getSubscriberLevel(chatId), getPreferences(chatId)]);
+async function sendAndRecord(chatId: number, flashcard: any, wordId: string, wordValue: string, english: string): Promise<void> {
+  for (const channel of channels) {
+    const sent = await channel.sendFlashcard(chatId, flashcard);
+    if (sent) {
+      await markWordSent(chatId, wordId, wordValue, english);
+      const { milestone } = await logWordActivity(chatId).catch(() => ({ totalWords: 0, milestone: null }));
+      if (milestone && bot) {
+        await bot.api.sendMessage(chatId, `🎉 <b>Milestone!</b> You've learned <b>${milestone}</b> words!`, { parse_mode: "HTML" });
+      }
+      console.error(`[main] Sent "${wordValue}" to ${chatId} via ${channel.name}`);
+    }
+  }
+}
+
+async function _deliverFlashcard(chatId: number, level: CefrLevel): Promise<void> {
+  const prefs = await getPreferences(chatId);
   const buildOpts = { audioEnabled: prefs.audio, voiceName: prefs.voiceName, wordFormsEnabled: prefs.wordForms };
   const sentIds = await getSentWordIds(chatId);
   const unsent = getUnsent(level, sentIds);
@@ -137,17 +163,7 @@ async function _deliverFlashcard(chatId: number): Promise<void> {
     return;
   }
 
-  for (const channel of channels) {
-    const sent = await channel.sendFlashcard(chatId, flashcard);
-    if (sent) {
-      await markWordSent(chatId, wordId, wordValue, flashcard.word.english);
-      const { milestone } = await logWordActivity(chatId).catch(() => ({ totalWords: 0, milestone: null }));
-      if (milestone && bot) {
-        await bot.api.sendMessage(chatId, `🎉 <b>Milestone!</b> You've learned <b>${milestone}</b> words!`, { parse_mode: "HTML" });
-      }
-      console.error(`[main] Sent "${wordValue}" to ${chatId} via ${channel.name}`);
-    }
-  }
+  await sendAndRecord(chatId, flashcard, wordId, wordValue, flashcard.word.english);
 }
 
 async function deliverGrammarCard(chatId: number): Promise<void> {
@@ -176,6 +192,56 @@ async function refreshUserJobs(): Promise<void> {
   // Ensure new subscribers get grammar cards without waiting for midnight reroll
   for (const sub of subscribers) {
     scheduleGrammarJobForUser(sub.chatId, config.cronTimezone, deliverGrammarCard);
+  }
+}
+
+/**
+ * Refill a user's pre-build queue with upcoming flashcards.
+ * Runs in background — errors are logged, never thrown.
+ */
+async function refillQueue(chatId: number): Promise<void> {
+  const queueSize = await getQueueSize(chatId);
+  if (queueSize >= QUEUE_SIZE) return;
+
+  const [level, prefs] = await Promise.all([getSubscriberLevel(chatId), getPreferences(chatId)]);
+  const buildOpts = { audioEnabled: prefs.audio, voiceName: prefs.voiceName, wordFormsEnabled: prefs.wordForms };
+  const sentIds = await getSentWordIds(chatId);
+  const unsent = getUnsent(level, sentIds);
+  if (unsent.length === 0) return;
+
+  const toFill = Math.min(QUEUE_SIZE - queueSize, unsent.length);
+
+  // Partial Fisher-Yates: only shuffle first `toFill` positions
+  for (let i = 0; i < toFill; i++) {
+    const j = i + Math.floor(Math.random() * (unsent.length - i));
+    [unsent[i], unsent[j]] = [unsent[j], unsent[i]];
+  }
+
+  for (let i = 0; i < toFill; i++) {
+    await acquireBuildSlot();
+    try {
+      const word = unsent[i];
+      const flashcard = await buildFlashcard(word, config.unsplashAccessKey, config.ekilexApiKey, buildOpts);
+      await pushPrebuilt(chatId, { flashcard, wordId: word.id, wordValue: word.estonian, english: word.english, level });
+    } catch (err) {
+      console.error(`[prebuild] Build error for ${chatId}:`, err instanceof Error ? err.message : err);
+    } finally {
+      releaseBuildSlot();
+    }
+  }
+}
+
+/**
+ * Warm pre-build queues for all active subscribers during idle time.
+ */
+async function warmAllQueues(): Promise<void> {
+  try {
+    const subs = await getActiveSubscribers();
+    for (const sub of subs) {
+      await refillQueue(sub.chatId);
+    }
+  } catch (err) {
+    console.error("[prebuild] Warm-up error:", err instanceof Error ? err.message : err);
   }
 }
 
@@ -299,6 +365,16 @@ async function main(): Promise<void> {
     }
   });
 
+  // Pre-build warm-up: fill queues at 3 AM (low-traffic) and clean stale entries
+  const prebuildWarmupJob = new Cron("0 3 * * *", { timezone: config.cronTimezone }, async () => {
+    const cleaned = await cleanupStaleEntries();
+    if (cleaned > 0) console.error(`[prebuild] Cleaned ${cleaned} stale entries`);
+    await warmAllQueues();
+  });
+
+  // Also warm queues 30 seconds after startup (once initial load settles)
+  setTimeout(() => warmAllQueues().catch(() => {}), 30_000);
+
   // Log cache stats on startup (async, non-blocking)
   getCacheStats().then((stats) => {
     const entries = Object.entries(stats);
@@ -322,6 +398,7 @@ async function main(): Promise<void> {
     clearInterval(refreshInterval);
     weeklyReportJob.stop();
     cacheEvictionJob.stop();
+    prebuildWarmupJob.stop();
     dailySummaryJob.stop();
     grammarRerollJob.stop();
     stopAllGrammarJobs();

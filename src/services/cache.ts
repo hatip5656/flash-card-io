@@ -7,13 +7,13 @@ import { mkdir, readFile, writeFile, stat, readdir, unlink } from "fs/promises";
 import { join } from "path";
 import { createHash } from "crypto";
 
-const CACHE_DIR = process.env.CACHE_DIR || "./cache";
+export const CACHE_DIR = process.env.CACHE_DIR || "./cache";
 
 function hashKey(input: string): string {
   return createHash("sha256").update(input).digest("hex").slice(0, 16);
 }
 
-async function ensureDir(dir: string): Promise<void> {
+export async function ensureDir(dir: string): Promise<void> {
   await mkdir(dir, { recursive: true });
 }
 
