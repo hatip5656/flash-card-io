@@ -19,4 +19,4 @@ USER node
 
 EXPOSE 8080
 ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["node", "--max-old-space-size=200", "dist/index.js"]
+CMD ["node", "--max-old-space-size=384", "dist/index.js"]

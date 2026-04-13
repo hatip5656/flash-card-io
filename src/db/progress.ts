@@ -34,7 +34,12 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
   }
 
   // Now connect to the actual database
-  pool = new Pool({ connectionString });
+  pool = new Pool({
+    connectionString,
+    max: 5,                    // limit connections (default 10 is too many for small server)
+    idleTimeoutMillis: 30_000, // close idle connections after 30s
+    connectionTimeoutMillis: 5_000, // fail fast if DB is unreachable
+  });
   await pool.query(`
     CREATE TABLE IF NOT EXISTS subscribers (
       chat_id BIGINT PRIMARY KEY,

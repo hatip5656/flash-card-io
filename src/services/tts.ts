@@ -55,7 +55,7 @@ export async function synthesizeSpeech(word: string, sentence?: string, voiceNam
         speaker: voiceName || TTS_SPEAKER,
         speed: 0.85,
       }),
-      signal: AbortSignal.timeout(30_000),
+      signal: AbortSignal.timeout(15_000),  // 15s max — don't block the event loop too long
     });
 
     if (!res.ok) {

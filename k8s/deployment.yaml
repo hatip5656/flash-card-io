@@ -71,7 +71,7 @@ spec:
             - name: TTS_SPEAKER
               value: "mari"
             - name: NODE_OPTIONS
-              value: "--max-old-space-size=200"
+              value: "--max-old-space-size=384"
           startupProbe:
             httpGet:
               path: /healthz
@@ -95,10 +95,10 @@ spec:
             failureThreshold: 3
           resources:
             requests:
-              cpu: 50m
-              memory: 192Mi
-            limits:
-              cpu: 500m
+              cpu: 100m
               memory: 384Mi
+            limits:
+              cpu: 1000m
+              memory: 512Mi
       imagePullSecrets:
         - name: ghcr-secret

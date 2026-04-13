@@ -43,7 +43,41 @@ if (config.ekilexApiKey) {
 }
 
 
+// Concurrency limiter — prevent OOM from too many simultaneous flashcard builds
+// Each build can use ~30-50MB (image fetch + TTS audio + ffmpeg)
+const MAX_CONCURRENT_BUILDS = 3;
+let activeBuildCount = 0;
+const buildQueue: Array<{ resolve: () => void }> = [];
+
+async function acquireBuildSlot(): Promise<void> {
+  if (activeBuildCount < MAX_CONCURRENT_BUILDS) {
+    activeBuildCount++;
+    return;
+  }
+  return new Promise((resolve) => {
+    buildQueue.push({ resolve });
+  });
+}
+
+function releaseBuildSlot(): void {
+  activeBuildCount--;
+  const next = buildQueue.shift();
+  if (next) {
+    activeBuildCount++;
+    next.resolve();
+  }
+}
+
 async function deliverFlashcard(chatId: number): Promise<void> {
+  await acquireBuildSlot();
+  try {
+    await _deliverFlashcard(chatId);
+  } finally {
+    releaseBuildSlot();
+  }
+}
+
+async function _deliverFlashcard(chatId: number): Promise<void> {
   const [level, prefs] = await Promise.all([getSubscriberLevel(chatId), getPreferences(chatId)]);
   const buildOpts = { audioEnabled: prefs.audio, voiceName: prefs.voiceName, wordFormsEnabled: prefs.wordForms };
   const sentIds = await getSentWordIds(chatId);
