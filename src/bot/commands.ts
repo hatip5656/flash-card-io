@@ -498,12 +498,13 @@ export function registerCommands(
     const wordValue = parts.slice(2).join(":");
     await safeAnswer(ctx);
 
+    const noKeyboard = { reply_markup: { inline_keyboard: [] } };
     if (action === "got") {
       await updateSm2(chatId, wordValue, 4);
-      await safeEditMessage(ctx, "✅ Nice! Moving on.");
+      await safeEditMessage(ctx, "✅ Nice! Moving on.", noKeyboard);
     } else if (action === "again") {
       await updateSm2(chatId, wordValue, 1);
-      await safeEditMessage(ctx, "🔄 We'll show this again soon.");
+      await safeEditMessage(ctx, "🔄 We'll show this again soon.", noKeyboard);
     }
   });
 }
