@@ -142,6 +142,22 @@ export async function getQueueSize(chatId: number): Promise<number> {
   return files.filter(f => f.endsWith(".json") && !f.endsWith(".meta.json")).length;
 }
 
+/** Get word IDs already queued for a user (to avoid duplicates during refill). */
+export async function getQueuedWordIds(chatId: number): Promise<Set<string>> {
+  const ids = new Set<string>();
+  const dir = userDir(chatId);
+  const files = await readdir(dir).catch(() => [] as string[]);
+  for (const f of files) {
+    if (!f.endsWith(".json") || f.endsWith(".meta.json")) continue;
+    try {
+      const raw = await readFile(join(dir, f), "utf-8");
+      const stored: StoredCard = JSON.parse(raw);
+      ids.add(stored.wordId);
+    } catch { /* skip corrupt entries */ }
+  }
+  return ids;
+}
+
 export async function invalidateQueue(chatId: number): Promise<void> {
   const dir = userDir(chatId);
   const files = await readdir(dir).catch(() => [] as string[]);

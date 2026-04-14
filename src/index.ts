@@ -14,7 +14,7 @@ import { registerCommands } from "./bot/commands.js";
 import { registerQuiz } from "./bot/quiz.js";
 import { getRandomWordForLevel, getWordFormsForValue } from "./services/ekilex.js";
 import { evictExpired, TTL, getCacheStats } from "./services/cache.js";
-import { popPrebuilt, pushPrebuilt, getQueueSize, cleanupStaleEntries, QUEUE_SIZE } from "./services/prebuild.js";
+import { popPrebuilt, pushPrebuilt, getQueueSize, getQueuedWordIds, cleanupStaleEntries, QUEUE_SIZE } from "./services/prebuild.js";
 import { Cron } from "croner";
 import type { DeliveryChannel } from "./channels/types.js";
 import type { Bot } from "grammy";
@@ -73,8 +73,16 @@ function releaseBuildSlot(): void {
 
 async function deliverFlashcard(chatId: number): Promise<void> {
   const level = await getSubscriberLevel(chatId);
+  const sentIds = new Set(await getSentWordIds(chatId));
 
-  const prebuilt = await popPrebuilt(chatId, level);
+  // Try pre-built cards, skipping any that were already sent
+  // (can happen if cron or concurrent /next delivered the same word)
+  let prebuilt = await popPrebuilt(chatId, level);
+  while (prebuilt && sentIds.has(prebuilt.wordId)) {
+    console.error(`[main] Skipping pre-built "${prebuilt.wordValue}" (already sent) → chat ${chatId}`);
+    prebuilt = await popPrebuilt(chatId, level);
+  }
+
   if (prebuilt) {
     console.error(`[main] Serving pre-built "${prebuilt.wordValue}" → chat ${chatId}`);
     await sendAndRecord(chatId, prebuilt.flashcard, prebuilt.wordId, prebuilt.wordValue, prebuilt.english);
@@ -206,11 +214,13 @@ async function refillQueue(chatId: number): Promise<void> {
 
   const [level, prefs] = await Promise.all([getSubscriberLevel(chatId), getPreferences(chatId)]);
   const buildOpts = { audioEnabled: prefs.audio, voiceName: prefs.voiceName, wordFormsEnabled: prefs.wordForms };
-  const sentIds = await getSentWordIds(chatId);
-  const unsent = getUnsent(level, sentIds);
+  const [sentIds, queuedIds] = await Promise.all([getSentWordIds(chatId), getQueuedWordIds(chatId)]);
+
+  // Exclude both sent words AND words already queued
+  const excludeIds = new Set([...sentIds, ...queuedIds]);
+  const unsent = getUnsent(level, [...excludeIds]);
   const toFill = QUEUE_SIZE - queueSize;
 
-  // Pre-build from local words
   if (unsent.length > 0) {
     const localCount = Math.min(toFill, unsent.length);
     for (let i = 0; i < localCount; i++) {
