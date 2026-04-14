@@ -1,6 +1,6 @@
 import type { Bot } from "grammy";
 import type { CefrLevel } from "../config.js";
-import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity, getWordsDueForReview, getPreferences, updatePreference, updateNextDelivery, scheduleNextGrammar } from "../db/progress.js";
+import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity, getWordsDueForReview, getPreferences, updatePreference, updateNextDelivery, scheduleNextGrammar, updateSm2 } from "../db/progress.js";
 import { invalidateQueue } from "../services/prebuild.js";
 import { getWordsForLevel } from "../flashcard/word-bank.js";
 import { getAllCategories } from "../flashcard/categories.js";
@@ -134,10 +134,22 @@ export function registerCommands(
     const schedule = await getSubscriberSchedule(chatId);
     updateNextDelivery(chatId, schedule, cronTimezone).catch((err) => console.error("[commands] updateNextDelivery error:", errMsg(err)));
     scheduleNextGrammar(chatId, cronTimezone).catch((err) => console.error("[commands] scheduleNextGrammar error:", errMsg(err)));
-    await ctx.reply(await getSettingsText(chatId), {
-      parse_mode: "HTML",
-      reply_markup: mainMenuKeyboard(),
-    });
+
+    const { sent } = await getStats(chatId);
+    if (sent === 0) {
+      const current = await getSubscriberLevel(chatId);
+      await ctx.reply(
+        "🇪🇪 <b>Welcome to Estonian Flash Cards!</b>\n\n" +
+        "I'll help you learn Estonian with visual flashcards, pronunciation, and quizzes.\n\n" +
+        "Let's get started — pick your level:",
+        { parse_mode: "HTML", reply_markup: levelPicker(current) },
+      );
+    } else {
+      await ctx.reply(await getSettingsText(chatId), {
+        parse_mode: "HTML",
+        reply_markup: mainMenuKeyboard(),
+      });
+    }
   });
 
   bot.command("settings", async (ctx) => {
@@ -154,6 +166,7 @@ export function registerCommands(
 
   bot.command("next", async (ctx) => {
     try {
+      await ctx.api.sendChatAction(ctx.chat.id, "typing");
       await deliverFlashcard(ctx.chat.id);
     } catch (err) {
       await ctx.reply("Failed to send flashcard. Try again later.");
@@ -308,6 +321,7 @@ export function registerCommands(
       case "next":
         try {
           await safeAnswer(ctx);
+          await bot.api.sendChatAction(chatId, "typing");
           await deliverFlashcard(chatId);
         } catch (err) {
           console.error("[commands] action:next error:", errMsg(err));
@@ -340,12 +354,6 @@ export function registerCommands(
         });
         break;
       }
-
-      case "stop":
-        await removeSubscriber(chatId);
-        await safeAnswer(ctx, { text: "Stopped." });
-        await safeEditMessage(ctx,"Stopped. Send /start to resume.");
-        break;
 
       case "preferences": {
         const prefs = await getPreferences(chatId);
@@ -398,10 +406,22 @@ export function registerCommands(
         invalidateQueue(chatId).catch(() => {}); // pre-built cards are for old level
         const totalForLevel = getWordsForLevel(value as CefrLevel).length;
         await safeAnswer(ctx, { text: `Level set to ${value} (${totalForLevel} words)` });
-        await safeEditMessage(ctx,await getSettingsText(chatId), {
-          parse_mode: "HTML",
-          reply_markup: mainMenuKeyboard(),
-        });
+
+        const { sent: levelSent } = await getStats(chatId);
+        if (levelSent === 0) {
+          await safeEditMessage(ctx, `Level set to <b>${value}</b>. Here's your first card!`, { parse_mode: "HTML" });
+          await bot.api.sendChatAction(chatId, "typing");
+          try {
+            await deliverFlashcard(chatId);
+          } catch (err) {
+            console.error("[commands] first-card delivery error:", errMsg(err));
+          }
+        } else {
+          await safeEditMessage(ctx, await getSettingsText(chatId), {
+            parse_mode: "HTML",
+            reply_markup: mainMenuKeyboard(),
+          });
+        }
         break;
       }
       case "schedule": {
@@ -468,5 +488,22 @@ export function registerCommands(
       parse_mode: "HTML",
       reply_markup: mainMenuKeyboard(),
     });
+  });
+
+  bot.callbackQuery(/^recall:/, async (ctx) => {
+    const chatId = ctx.chat?.id;
+    if (!chatId) return;
+    const parts = ctx.callbackQuery.data!.split(":");
+    const action = parts[1];
+    const wordValue = parts.slice(2).join(":");
+    await safeAnswer(ctx);
+
+    if (action === "got") {
+      await updateSm2(chatId, wordValue, 4);
+      await safeEditMessage(ctx, "✅ Nice! Moving on.");
+    } else if (action === "again") {
+      await updateSm2(chatId, wordValue, 1);
+      await safeEditMessage(ctx, "🔄 We'll show this again soon.");
+    }
   });
 }

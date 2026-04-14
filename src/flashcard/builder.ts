@@ -22,14 +22,20 @@ interface CaptionParams {
   forms?: WordForm[];
   pos?: string | null;
   source?: string;
+  isReview?: boolean;
 }
 
 function buildCaption(params: CaptionParams): string {
-  let caption = `📚 <b>${escapeHtml(params.estonian)}</b>\n🔄 <tg-spoiler>${escapeHtml(params.english)}</tg-spoiler>\n🌐 ET → EN\n🏷️ ${escapeHtml(params.cefrLevel)}`;
+  const isReview = params.isReview ?? false;
+  const englishText = escapeHtml(params.english);
+  const englishDisplay = isReview ? `<tg-spoiler>${englishText}</tg-spoiler>` : englishText;
+
+  let caption = `📚 <b>${escapeHtml(params.estonian)}</b>\n🔄 ${englishDisplay}\n🌐 ET → EN\n🏷️ ${escapeHtml(params.cefrLevel)}`;
 
   caption += `\n\n💬 <i>${escapeHtml(params.sentence.estonian)}</i>`;
   if (params.sentence.english && params.sentence.english !== params.sentence.estonian) {
-    caption += `\n📝 <tg-spoiler>${escapeHtml(params.sentence.english)}</tg-spoiler>`;
+    const sentenceEnglish = escapeHtml(params.sentence.english);
+    caption += `\n📝 ${isReview ? `<tg-spoiler>${sentenceEnglish}</tg-spoiler>` : sentenceEnglish}`;
   }
 
   if (params.forms && params.forms.length > 0) {
@@ -57,6 +63,7 @@ export interface BuildOptions {
   audioEnabled?: boolean;
   voiceName?: string;
   wordFormsEnabled?: boolean;
+  isReview?: boolean;
 }
 
 export async function buildFlashcard(
@@ -85,6 +92,7 @@ export async function buildFlashcard(
     photo,
     forms: wordForms?.forms,
     pos: wordForms?.pos,
+    isReview: options?.isReview,
   });
 
   const audio = (options?.audioEnabled ?? true)
@@ -135,6 +143,7 @@ export async function buildFlashcardFromEkilex(
     forms: wordForms?.forms,
     pos: wordForms?.pos ?? ekilexWord.pos,
     source: "Source: Ekilex/Sõnaveeb",
+    isReview: options?.isReview,
   });
 
   const audio = (options?.audioEnabled ?? true)

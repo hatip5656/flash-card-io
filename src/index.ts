@@ -90,6 +90,10 @@ async function deliverFlashcard(chatId: number): Promise<void> {
     return;
   }
 
+  // No pre-built card available — send typing indicator before live build
+  if (bot) {
+    await bot.api.sendChatAction(chatId, "typing").catch(() => {});
+  }
   await acquireBuildSlot();
   try {
     await _deliverFlashcard(chatId, level);

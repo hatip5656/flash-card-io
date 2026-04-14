@@ -1,6 +1,7 @@
 import { Bot, InputFile } from "grammy";
 import type { DeliveryChannel } from "./types.js";
 import type { Flashcard } from "../flashcard/types.js";
+import { recallKeyboard } from "../bot/keyboards.js";
 import { errMsg } from "../utils.js";
 
 export function createTelegramChannel(token: string): { channel: DeliveryChannel; bot: Bot } {
@@ -30,6 +31,13 @@ export function createTelegramChannel(token: string): { channel: DeliveryChannel
         // Send pronunciation audio if available
         if (flashcard.audio) {
           await bot.api.sendVoice(chatId, new InputFile(flashcard.audio, "pronunciation.wav"));
+        }
+
+        // Send recall buttons if this is a real flashcard (has a word value)
+        if (flashcard.word.estonian) {
+          await bot.api.sendMessage(chatId, "How did you do?", {
+            reply_markup: recallKeyboard(flashcard.word.estonian),
+          });
         }
 
         return true;

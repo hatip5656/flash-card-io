@@ -7,15 +7,19 @@ export function mainMenuKeyboard(): InlineKeyboard {
   return new InlineKeyboard()
     .text("📚 Next Card", "action:next")
     .text("📖 Grammar", "action:grammar")
-    .row()
     .text("🧠 Quiz", "action:quiz")
-    .text("📊 Stats", "action:stats")
     .row()
+    .text("📊 Stats", "action:stats")
     .text("🏷️ Level", "edit_level")
     .text("⏰ Schedule", "edit_schedule")
     .row()
-    .text("⚙️ Preferences", "action:preferences")
-    .text("🛑 Stop", "action:stop");
+    .text("⚙️ Preferences", "action:preferences");
+}
+
+export function recallKeyboard(wordValue: string): InlineKeyboard {
+  return new InlineKeyboard()
+    .text("Got it ✅", `recall:got:${wordValue}`)
+    .text("Again 🔄", `recall:again:${wordValue}`);
 }
 
 export function levelPicker(current: CefrLevel): InlineKeyboard {
