@@ -111,7 +111,7 @@ metadata:
   labels:
     app: tts-worker
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: tts-worker
@@ -155,17 +155,17 @@ spec:
             - name: MQ_PASSWORD
               value: "tts"
             - name: MKL_NUM_THREADS
-              value: "4"
+              value: "2"
           volumeMounts:
             - name: models
               mountPath: /app/models
           resources:
             requests:
-              cpu: 1000m
-              memory: 1536Mi
+              cpu: 500m
+              memory: 1Gi
             limits:
-              cpu: 3000m
-              memory: 3Gi
+              cpu: 1500m
+              memory: 2Gi
           # Restart worker if it stops responding (e.g. stuck inference)
           livenessProbe:
             exec:

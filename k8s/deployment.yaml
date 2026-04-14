@@ -73,7 +73,7 @@ spec:
             - name: TTS_SPEAKER
               value: "mari"
             - name: NODE_OPTIONS
-              value: "--max-old-space-size=384"
+              value: "--max-old-space-size=512"
           startupProbe:
             httpGet:
               path: /healthz
@@ -100,14 +100,14 @@ spec:
               mountPath: /app/cache
           resources:
             requests:
-              cpu: 100m
-              memory: 384Mi
+              cpu: 200m
+              memory: 512Mi
             limits:
               cpu: 1000m
-              memory: 512Mi
+              memory: 768Mi
       volumes:
         - name: cache
-          emptyDir:
-            sizeLimit: 500Mi
+          persistentVolumeClaim:
+            claimName: flash-card-cache
       imagePullSecrets:
         - name: ghcr-secret

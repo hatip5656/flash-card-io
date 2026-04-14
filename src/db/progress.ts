@@ -1,4 +1,5 @@
 import pg from "pg";
+import { Cron } from "croner";
 import type { CefrLevel } from "../config.js";
 
 const { Pool } = pg;
@@ -36,9 +37,9 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
   // Now connect to the actual database
   pool = new Pool({
     connectionString,
-    max: 5,                    // limit connections (default 10 is too many for small server)
+    max: 20,                    // sized for ~1K concurrent users
     idleTimeoutMillis: 30_000, // close idle connections after 30s
-    connectionTimeoutMillis: 5_000, // fail fast if DB is unreachable
+    connectionTimeoutMillis: 10_000, // allow more time under load
   });
   await pool.query(`
     CREATE TABLE IF NOT EXISTS subscribers (
@@ -114,6 +115,10 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
       is_correct BOOLEAN NOT NULL
     )
   `);
+
+  // Scheduler columns for single-cron architecture
+  await pool.query(`ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS next_delivery_at TIMESTAMPTZ`);
+  await pool.query(`ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS next_grammar_at TIMESTAMPTZ`);
 
   // Index for streak calculation
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_activity_log_chat_date ON activity_log (chat_id, activity_date DESC)`);
@@ -454,6 +459,68 @@ export async function getSubscriberSchedule(chatId: number): Promise<string> {
 
 export async function setSubscriberSchedule(chatId: number, schedule: string): Promise<void> {
   await pool.query("UPDATE subscribers SET schedule = $1 WHERE chat_id = $2", [schedule, chatId]);
+}
+
+// --- Scheduler DB functions (single-cron architecture) ---
+
+export interface DueUser {
+  chatId: number;
+}
+
+type ScheduleColumn = "next_delivery_at" | "next_grammar_at";
+
+async function getUsersDue(column: ScheduleColumn): Promise<DueUser[]> {
+  const res = await pool.query(
+    `SELECT chat_id FROM subscribers WHERE active = TRUE AND ${column} IS NOT NULL AND ${column} <= NOW()`,
+  );
+  return res.rows.map((r) => ({ chatId: Number(r.chat_id) }));
+}
+
+export function getUsersDueForDelivery(): Promise<DueUser[]> {
+  return getUsersDue("next_delivery_at");
+}
+
+export function getUsersDueForGrammar(): Promise<DueUser[]> {
+  return getUsersDue("next_grammar_at");
+}
+
+export async function updateNextDelivery(chatId: number, schedule: string, timezone: string): Promise<void> {
+  const next = new Cron(schedule, { timezone }).nextRun();
+  if (!next) return;
+  await pool.query("UPDATE subscribers SET next_delivery_at = $1 WHERE chat_id = $2", [next, chatId]);
+}
+
+export async function scheduleNextGrammar(chatId: number, timezone: string): Promise<void> {
+  const hour = 8 + Math.floor(Math.random() * 14); // 8..21
+  const minute = Math.floor(Math.random() * 60);
+  const schedule = `${minute} ${hour} * * *`;
+  const next = new Cron(schedule, { timezone }).nextRun();
+  if (!next) return;
+  await pool.query("UPDATE subscribers SET next_grammar_at = $1 WHERE chat_id = $2", [next, chatId]);
+}
+
+export async function initNextDeliveryForAll(timezone: string): Promise<number> {
+  const res = await pool.query(
+    "SELECT chat_id, schedule FROM subscribers WHERE active = TRUE AND next_delivery_at IS NULL",
+  );
+  for (const row of res.rows) {
+    const schedule = row.schedule || "0 9 * * *";
+    const next = new Cron(schedule, { timezone }).nextRun();
+    if (next) {
+      await pool.query("UPDATE subscribers SET next_delivery_at = $1 WHERE chat_id = $2", [next, row.chat_id]);
+    }
+  }
+  return res.rowCount ?? 0;
+}
+
+export async function initNextGrammarForAll(timezone: string): Promise<number> {
+  const res = await pool.query(
+    "SELECT chat_id FROM subscribers WHERE active = TRUE AND next_grammar_at IS NULL",
+  );
+  for (const row of res.rows) {
+    await scheduleNextGrammar(Number(row.chat_id), timezone);
+  }
+  return res.rowCount ?? 0;
 }
 
 export async function markWordSent(chatId: number, wordId: string, wordValue?: string, english?: string): Promise<void> {

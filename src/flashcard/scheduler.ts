@@ -1,168 +1,79 @@
 import { Cron } from "croner";
-import type { Subscriber } from "../db/progress.js";
+import { getUsersDueForDelivery, getUsersDueForGrammar, updateNextDelivery, scheduleNextGrammar, getSubscriberSchedule } from "../db/progress.js";
 import { errMsg } from "../utils.js";
 
-interface UserJob {
-  chatId: number;
-  cron: Cron;
-  schedule: string;
+interface SchedulerHandle {
+  stop: () => void;
 }
 
-const userJobs = new Map<number, UserJob>();
-
-export function startGlobalScheduler(
-  defaultSchedule: string,
-  timezone: string,
-  onTick: () => Promise<void>,
-): { stop: () => void } {
-  console.error(`[scheduler] Starting global fallback cron: "${defaultSchedule}" (${timezone})`);
-
-  const job = new Cron(defaultSchedule, { timezone }, async () => {
-    console.error(`[scheduler] Global tick at ${new Date().toISOString()}`);
-    try {
-      await onTick();
-    } catch (err) {
-      console.error("[scheduler] Error in global tick:", errMsg(err));
-    }
+/**
+ * Dispatch to due users with random jitter spread over `spreadMs` to avoid
+ * thundering-herd when many users share the same minute slot.
+ */
+async function dispatchWithJitter(
+  users: Array<{ chatId: number }>,
+  fn: (chatId: number) => Promise<void>,
+  spreadMs: number,
+): Promise<void> {
+  const tasks = users.map(({ chatId }) => {
+    const delay = Math.floor(Math.random() * spreadMs);
+    return new Promise<void>((resolve) => {
+      setTimeout(async () => {
+        try {
+          await fn(chatId);
+        } catch (err) {
+          console.error(`[scheduler] Dispatch error for chat ${chatId}:`, errMsg(err));
+        }
+        resolve();
+      }, delay);
+    });
   });
+  await Promise.all(tasks);
+}
+
+/**
+ * Start the single-cron scheduler. Creates exactly 2 Cron jobs (one for
+ * flashcard delivery, one for grammar) that tick every minute, query the DB
+ * for users whose next_delivery_at / next_grammar_at has passed, dispatch,
+ * and reschedule.
+ */
+export function startScheduler(
+  timezone: string,
+  deliverFlashcard: (chatId: number) => Promise<void>,
+  deliverGrammarCard: (chatId: number) => Promise<void>,
+): SchedulerHandle {
+  const JITTER_SPREAD_MS = 30_000;
+
+  const deliveryJob = new Cron("* * * * *", { timezone, protect: true }, async () => {
+    const due = await getUsersDueForDelivery();
+    if (due.length === 0) return;
+    console.error(`[scheduler] Delivery tick: ${due.length} user(s) due`);
+
+    await dispatchWithJitter(due, async (chatId) => {
+      await deliverFlashcard(chatId);
+      const schedule = await getSubscriberSchedule(chatId);
+      await updateNextDelivery(chatId, schedule, timezone);
+    }, JITTER_SPREAD_MS);
+  });
+
+  const grammarJob = new Cron("* * * * *", { timezone, protect: true }, async () => {
+    const due = await getUsersDueForGrammar();
+    if (due.length === 0) return;
+    console.error(`[scheduler] Grammar tick: ${due.length} user(s) due`);
+
+    await dispatchWithJitter(due, async (chatId) => {
+      await deliverGrammarCard(chatId);
+      await scheduleNextGrammar(chatId, timezone);
+    }, JITTER_SPREAD_MS);
+  });
+
+  console.error("[scheduler] Single-cron scheduler started (delivery + grammar, every minute)");
 
   return {
     stop: () => {
-      job.stop();
-      stopAllUserJobs();
-      console.error("[scheduler] All jobs stopped");
+      deliveryJob.stop();
+      grammarJob.stop();
+      console.error("[scheduler] Scheduler stopped");
     },
   };
-}
-
-export function syncUserJobs(
-  subscribers: Subscriber[],
-  timezone: string,
-  deliverToUser: (chatId: number) => Promise<void>,
-): void {
-  const activeIds = new Set(subscribers.map((s) => s.chatId));
-
-  // Remove jobs for unsubscribed users
-  for (const [chatId, job] of userJobs) {
-    if (!activeIds.has(chatId)) {
-      job.cron.stop();
-      userJobs.delete(chatId);
-      console.error(`[scheduler] Removed job for chat ${chatId}`);
-    }
-  }
-
-  // Add/update jobs for active subscribers
-  for (const sub of subscribers) {
-    const existing = userJobs.get(sub.chatId);
-
-    if (existing && existing.schedule === sub.schedule) {
-      continue; // No change needed
-    }
-
-    // Stop old job if schedule changed
-    if (existing) {
-      existing.cron.stop();
-      console.error(`[scheduler] Updated schedule for chat ${sub.chatId}: ${existing.schedule} → ${sub.schedule}`);
-    }
-
-    const cron = new Cron(sub.schedule, { timezone }, async () => {
-      console.error(`[scheduler] User tick for chat ${sub.chatId} at ${new Date().toISOString()}`);
-      try {
-        await deliverToUser(sub.chatId);
-      } catch (err) {
-        console.error(`[scheduler] Error delivering to ${sub.chatId}:`, errMsg(err));
-      }
-    });
-
-    userJobs.set(sub.chatId, {
-      chatId: sub.chatId,
-      cron,
-      schedule: sub.schedule,
-    });
-
-    if (!existing) {
-      console.error(`[scheduler] Created job for chat ${sub.chatId}: ${sub.schedule}`);
-    }
-  }
-}
-
-export function stopAllUserJobs(): void {
-  for (const [, job] of userJobs) {
-    job.cron.stop();
-  }
-  userJobs.clear();
-}
-
-// --- Random grammar card scheduling ---
-
-const grammarJobs = new Map<number, Cron>();
-
-function randomTimeBetween(startHour: number, endHour: number): { hour: number; minute: number } {
-  const totalMinutes = (endHour - startHour) * 60;
-  const randomMinute = Math.floor(Math.random() * totalMinutes);
-  return {
-    hour: startHour + Math.floor(randomMinute / 60),
-    minute: randomMinute % 60,
-  };
-}
-
-export function scheduleRandomGrammarJobs(
-  subscribers: Subscriber[],
-  timezone: string,
-  deliverGrammarCard: (chatId: number) => Promise<void>,
-): void {
-  // Clear existing grammar jobs
-  stopAllGrammarJobs();
-
-  for (const sub of subscribers) {
-    const { hour, minute } = randomTimeBetween(8, 22);
-    const schedule = `${minute} ${hour} * * *`;
-
-    const cron = new Cron(schedule, { timezone }, async () => {
-      console.error(`[scheduler] Grammar tick for chat ${sub.chatId} at ${new Date().toISOString()}`);
-      try {
-        await deliverGrammarCard(sub.chatId);
-      } catch (err) {
-        console.error(`[scheduler] Error delivering grammar to ${sub.chatId}:`, errMsg(err));
-      }
-    });
-
-    grammarJobs.set(sub.chatId, cron);
-    console.error(`[scheduler] Scheduled grammar card for chat ${sub.chatId} at ${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`);
-  }
-}
-
-export function scheduleGrammarJobForUser(
-  chatId: number,
-  timezone: string,
-  deliverGrammarCard: (chatId: number) => Promise<void>,
-): void {
-  // Skip if already scheduled
-  if (grammarJobs.has(chatId)) return;
-
-  const { hour, minute } = randomTimeBetween(8, 22);
-  const schedule = `${minute} ${hour} * * *`;
-
-  const cron = new Cron(schedule, { timezone }, async () => {
-    console.error(`[scheduler] Grammar tick for chat ${chatId} at ${new Date().toISOString()}`);
-    try {
-      await deliverGrammarCard(chatId);
-    } catch (err) {
-      console.error(`[scheduler] Error delivering grammar to ${chatId}:`, errMsg(err));
-    }
-  });
-
-  grammarJobs.set(chatId, cron);
-  console.error(`[scheduler] Scheduled grammar card for chat ${chatId} at ${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`);
-}
-
-export function stopAllGrammarJobs(): void {
-  for (const [, job] of grammarJobs) {
-    job.stop();
-  }
-  grammarJobs.clear();
-}
-
-export function getActiveJobCount(): number {
-  return userJobs.size;
 }

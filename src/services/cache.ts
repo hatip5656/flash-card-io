@@ -130,7 +130,7 @@ export async function getCacheStats(): Promise<Record<string, { files: number; s
 // TTL constants (in milliseconds)
 export const TTL = {
   TTS: 30 * 24 * 60 * 60 * 1000,       // 30 days
-  UNSPLASH: 7 * 24 * 60 * 60 * 1000,    // 7 days
+  UNSPLASH: 90 * 24 * 60 * 60 * 1000,   // 90 days — photos don't change
   EKILEX: 90 * 24 * 60 * 60 * 1000,     // 90 days
   TATOEBA: 14 * 24 * 60 * 60 * 1000,    // 14 days
 };

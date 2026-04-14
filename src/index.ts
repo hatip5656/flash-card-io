@@ -2,12 +2,12 @@
 
 import { loadConfig, type CefrLevel } from "./config.js";
 import { startHealthServer, setReady } from "./health.js";
-import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, backfillEnglish, getSentGrammarIds, markGrammarSent, logWordActivity, getStreak, getTodayActivity, getStats, getQuizStats, getPreferences } from "./db/progress.js";
+import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, backfillEnglish, getSentGrammarIds, markGrammarSent, logWordActivity, getStreak, getTodayActivity, getStats, getQuizStats, getPreferences, initNextDeliveryForAll, initNextGrammarForAll } from "./db/progress.js";
 import { loadWordBank, getUnsent, getWordById } from "./flashcard/word-bank.js";
 import { loadGrammarBank, getRandomLesson } from "./flashcard/grammar-bank.js";
 import { loadCategories } from "./flashcard/categories.js";
 import { buildFlashcard, buildFlashcardFromEkilex } from "./flashcard/builder.js";
-import { startGlobalScheduler, syncUserJobs, scheduleRandomGrammarJobs, scheduleGrammarJobForUser, stopAllGrammarJobs } from "./flashcard/scheduler.js";
+import { startScheduler } from "./flashcard/scheduler.js";
 import { createTelegramChannel } from "./channels/telegram.js";
 import { createWhatsAppChannel } from "./channels/whatsapp.js";
 import { registerCommands } from "./bot/commands.js";
@@ -195,12 +195,23 @@ async function deliverGrammarCard(chatId: number): Promise<void> {
   await bot.api.sendMessage(chatId, "You've seen all grammar lessons for your level! Use /level to try a different level.");
 }
 
-async function refreshUserJobs(): Promise<void> {
-  const subscribers = await getActiveSubscribers();
-  syncUserJobs(subscribers, config.cronTimezone, deliverFlashcard);
-  // Ensure new subscribers get grammar cards without waiting for midnight reroll
-  for (const sub of subscribers) {
-    scheduleGrammarJobForUser(sub.chatId, config.cronTimezone, deliverGrammarCard);
+/**
+ * Send to users in batches with a 1-second pause between batches to avoid
+ * hitting Telegram rate limits during broadcast-style sends.
+ */
+async function broadcastWithThrottle<T>(
+  users: T[],
+  fn: (user: T) => Promise<void>,
+  batchSize = 25,
+): Promise<void> {
+  for (let i = 0; i < users.length; i += batchSize) {
+    const batch = users.slice(i, i + batchSize);
+    await Promise.all(batch.map((user) => fn(user).catch((err) => {
+      console.error("[broadcast] Error:", errMsg(err));
+    })));
+    if (i + batchSize < users.length) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
   }
 }
 
@@ -293,97 +304,76 @@ async function main(): Promise<void> {
     console.error(`[main] Backfilled english for ${backfilled} previously learned words`);
   }
 
+  // Seed next_delivery_at / next_grammar_at for existing subscribers that lack them
+  const [deliverySeeded, grammarSeeded] = await Promise.all([
+    initNextDeliveryForAll(config.cronTimezone),
+    initNextGrammarForAll(config.cronTimezone),
+  ]);
+  if (deliverySeeded > 0) console.error(`[main] Seeded next_delivery_at for ${deliverySeeded} subscribers`);
+  if (grammarSeeded > 0) console.error(`[main] Seeded next_grammar_at for ${grammarSeeded} subscribers`);
+
   // Register bot commands
   if (bot) {
-    registerCommands(bot, deliverFlashcard, deliverGrammarCard, refreshUserJobs, config.ekilexApiKey);
+    registerCommands(bot, deliverFlashcard, deliverGrammarCard, config.cronTimezone, config.ekilexApiKey);
     registerQuiz(bot, config.ekilexApiKey);
     bot.start({
       onStart: () => console.error("[main] Telegram bot polling started"),
     });
   }
 
-  // Initial sync of user jobs
-  await refreshUserJobs();
-
-  // Schedule random grammar card deliveries
-  const subscribers = await getActiveSubscribers();
-  scheduleRandomGrammarJobs(subscribers, config.cronTimezone, deliverGrammarCard);
-
-  // Periodically refresh user jobs
-  const refreshInterval = setInterval(() => refreshUserJobs(), 60_000);
-
-  // Daily reroll of random grammar times at 00:05
-  const grammarRerollJob = new Cron("5 0 * * *", { timezone: config.cronTimezone }, async () => {
-    console.error(`[scheduler] Rerolling grammar card times at ${new Date().toISOString()}`);
-    const subs = await getActiveSubscribers();
-    scheduleRandomGrammarJobs(subs, config.cronTimezone, deliverGrammarCard);
-  });
+  // Start single-cron scheduler (replaces per-user Cron objects)
+  const scheduler = startScheduler(config.cronTimezone, deliverFlashcard, deliverGrammarCard);
 
   // Weekly progress report — Sundays at 10 AM
   const weeklyReportJob = new Cron("0 10 * * 0", { timezone: config.cronTimezone }, async () => {
     if (!bot) return;
     const subs = await getActiveSubscribers();
-    for (const sub of subs) {
-      try {
-        const prefs = await getPreferences(sub.chatId);
-        if (!prefs.weeklyReport) continue;
-        const [{ sent, level }, quiz, streak] = await Promise.all([
-          getStats(sub.chatId),
-          getQuizStats(sub.chatId),
-          getStreak(sub.chatId),
-        ]);
-        if (sent === 0) continue;
-        const streakEmoji = streak >= 7 ? "🔥" : streak >= 3 ? "⚡" : "📅";
-        let msg = `📊 <b>Weekly Progress Report</b>\n\n`;
-        msg += `${streakEmoji} Streak: <b>${streak} day${streak !== 1 ? "s" : ""}</b>\n`;
-        msg += `🏷️ Level: <b>${level}</b>\n`;
-        msg += `📚 Total words learned: <b>${sent}</b>\n`;
-        if (quiz.totalQuizzes > 0) {
-          msg += `🧠 Quizzes taken: <b>${quiz.totalQuizzes}</b>\n`;
-          msg += `📊 Average score: <b>${quiz.avgPercentage}%</b>\n`;
-          if (quiz.recentTrend !== null) {
-            const arrow = quiz.recentTrend > 0 ? "📈" : quiz.recentTrend < 0 ? "📉" : "➡️";
-            const sign = quiz.recentTrend > 0 ? "+" : "";
-            msg += `${arrow} Trend: <b>${sign}${quiz.recentTrend}%</b>\n`;
-          }
+    await broadcastWithThrottle(subs, async (sub) => {
+      const prefs = await getPreferences(sub.chatId);
+      if (!prefs.weeklyReport) return;
+      const [{ sent, level }, quiz, streak] = await Promise.all([
+        getStats(sub.chatId),
+        getQuizStats(sub.chatId),
+        getStreak(sub.chatId),
+      ]);
+      if (sent === 0) return;
+      const streakEmoji = streak >= 7 ? "🔥" : streak >= 3 ? "⚡" : "📅";
+      let msg = `📊 <b>Weekly Progress Report</b>\n\n`;
+      msg += `${streakEmoji} Streak: <b>${streak} day${streak !== 1 ? "s" : ""}</b>\n`;
+      msg += `🏷️ Level: <b>${level}</b>\n`;
+      msg += `📚 Total words learned: <b>${sent}</b>\n`;
+      if (quiz.totalQuizzes > 0) {
+        msg += `🧠 Quizzes taken: <b>${quiz.totalQuizzes}</b>\n`;
+        msg += `📊 Average score: <b>${quiz.avgPercentage}%</b>\n`;
+        if (quiz.recentTrend !== null) {
+          const arrow = quiz.recentTrend > 0 ? "📈" : quiz.recentTrend < 0 ? "📉" : "➡️";
+          const sign = quiz.recentTrend > 0 ? "+" : "";
+          msg += `${arrow} Trend: <b>${sign}${quiz.recentTrend}%</b>\n`;
         }
-        msg += `\nKeep learning! Use /review to practice words due today.`;
-        await bot.api.sendMessage(sub.chatId, msg, { parse_mode: "HTML" });
-      } catch (err) {
-        console.error(`[main] Weekly report error for ${sub.chatId}:`, errMsg(err));
       }
-    }
+      msg += `\nKeep learning! Use /review to practice words due today.`;
+      await bot!.api.sendMessage(sub.chatId, msg, { parse_mode: "HTML" });
+    });
   });
 
   // Daily summary at 9 PM
   const dailySummaryJob = new Cron("0 21 * * *", { timezone: config.cronTimezone }, async () => {
     if (!bot) return;
     const subs = await getActiveSubscribers();
-    for (const sub of subs) {
-      try {
-        const prefs = await getPreferences(sub.chatId);
-        if (!prefs.dailySummary) continue;
-        const [streak, today] = await Promise.all([getStreak(sub.chatId), getTodayActivity(sub.chatId)]);
-        if (today.wordsLearned === 0 && today.quizzesTaken === 0) continue; // Skip inactive users
-        const streakEmoji = streak >= 7 ? "🔥" : streak >= 3 ? "⚡" : "📅";
-        let msg = `${streakEmoji} <b>Daily Summary</b>\n\n`;
-        msg += `📚 Words learned today: <b>${today.wordsLearned}</b>\n`;
-        msg += `🧠 Quizzes taken: <b>${today.quizzesTaken}</b>\n`;
-        msg += `${streakEmoji} Streak: <b>${streak} day${streak !== 1 ? "s" : ""}</b>\n`;
-        if (streak >= 3) msg += `\nKeep it up! 💪`;
-        await bot.api.sendMessage(sub.chatId, msg, { parse_mode: "HTML" });
-      } catch (err) {
-        console.error(`[main] Daily summary error for ${sub.chatId}:`, errMsg(err));
-      }
-    }
+    await broadcastWithThrottle(subs, async (sub) => {
+      const prefs = await getPreferences(sub.chatId);
+      if (!prefs.dailySummary) return;
+      const [streak, today] = await Promise.all([getStreak(sub.chatId), getTodayActivity(sub.chatId)]);
+      if (today.wordsLearned === 0 && today.quizzesTaken === 0) return;
+      const streakEmoji = streak >= 7 ? "🔥" : streak >= 3 ? "⚡" : "📅";
+      let msg = `${streakEmoji} <b>Daily Summary</b>\n\n`;
+      msg += `📚 Words learned today: <b>${today.wordsLearned}</b>\n`;
+      msg += `🧠 Quizzes taken: <b>${today.quizzesTaken}</b>\n`;
+      msg += `${streakEmoji} Streak: <b>${streak} day${streak !== 1 ? "s" : ""}</b>\n`;
+      if (streak >= 3) msg += `\nKeep it up! 💪`;
+      await bot!.api.sendMessage(sub.chatId, msg, { parse_mode: "HTML" });
+    });
   });
-
-  // Global scheduler as fallback
-  const globalScheduler = startGlobalScheduler(
-    config.cronSchedule,
-    config.cronTimezone,
-    async () => { await refreshUserJobs(); },
-  );
 
   // Mark as ready — all systems initialized
   setReady(true);
@@ -428,14 +418,11 @@ async function main(): Promise<void> {
   const shutdown = async () => {
     console.error("[main] Shutting down...");
     setReady(false);
-    clearInterval(refreshInterval);
+    scheduler.stop();
     weeklyReportJob.stop();
     cacheEvictionJob.stop();
     prebuildWarmupJob.stop();
     dailySummaryJob.stop();
-    grammarRerollJob.stop();
-    stopAllGrammarJobs();
-    globalScheduler.stop();
     if (bot) bot.stop();
     await closeDb();
     process.exit(0);

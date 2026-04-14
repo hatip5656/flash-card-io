@@ -1,6 +1,6 @@
 import type { Bot } from "grammy";
 import type { CefrLevel } from "../config.js";
-import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity, getWordsDueForReview, getPreferences, updatePreference } from "../db/progress.js";
+import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity, getWordsDueForReview, getPreferences, updatePreference, updateNextDelivery, scheduleNextGrammar } from "../db/progress.js";
 import { invalidateQueue } from "../services/prebuild.js";
 import { getWordsForLevel } from "../flashcard/word-bank.js";
 import { getAllCategories } from "../flashcard/categories.js";
@@ -109,7 +109,7 @@ export function registerCommands(
   bot: Bot,
   deliverFlashcard: (chatId: number) => Promise<void>,
   deliverGrammarCard: (chatId: number) => Promise<void>,
-  refreshUserJobs?: () => Promise<void>,
+  cronTimezone: string,
   ekilexApiKey?: string | null,
 ): void {
   bot.api.setMyCommands([
@@ -131,7 +131,9 @@ export function registerCommands(
   bot.command("start", async (ctx) => {
     const chatId = ctx.chat.id;
     await addSubscriber(chatId, "telegram", ctx.from?.username, ctx.from?.first_name);
-    refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", errMsg(err)));
+    const schedule = await getSubscriberSchedule(chatId);
+    updateNextDelivery(chatId, schedule, cronTimezone).catch((err) => console.error("[commands] updateNextDelivery error:", errMsg(err)));
+    scheduleNextGrammar(chatId, cronTimezone).catch((err) => console.error("[commands] scheduleNextGrammar error:", errMsg(err)));
     await ctx.reply(await getSettingsText(chatId), {
       parse_mode: "HTML",
       reply_markup: mainMenuKeyboard(),
@@ -147,7 +149,6 @@ export function registerCommands(
 
   bot.command("stop", async (ctx) => {
     await removeSubscriber(ctx.chat.id);
-    refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", errMsg(err)));
     await ctx.reply("Stopped. Send /start to resume.");
   });
 
@@ -180,7 +181,6 @@ export function registerCommands(
     }
     await setSubscriberLevel(ctx.chat.id, arg as CefrLevel);
     invalidateQueue(ctx.chat.id).catch(() => {});
-    refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", errMsg(err)));
     const totalForLevel = getWordsForLevel(arg as CefrLevel).length;
     await ctx.reply(`Level set to ${arg}.\n📖 ${totalForLevel} local words available + live Ekilex queries for more.`);
   });
@@ -196,7 +196,7 @@ export function registerCommands(
     }
     const preset = SCHEDULE_PRESETS[arg];
     await setSubscriberSchedule(ctx.chat.id, preset.cron);
-    refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", errMsg(err)));
+    updateNextDelivery(ctx.chat.id, preset.cron, cronTimezone).catch((err) => console.error("[commands] updateNextDelivery error:", errMsg(err)));
     await ctx.reply(`⏰ Schedule set to: ${preset.label}`);
   });
 
@@ -343,7 +343,6 @@ export function registerCommands(
 
       case "stop":
         await removeSubscriber(chatId);
-        refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", errMsg(err)));
         await safeAnswer(ctx, { text: "Stopped." });
         await safeEditMessage(ctx,"Stopped. Send /start to resume.");
         break;
@@ -397,7 +396,6 @@ export function registerCommands(
         if (!VALID_LEVELS.includes(value as CefrLevel)) break;
         await setSubscriberLevel(chatId, value as CefrLevel);
         invalidateQueue(chatId).catch(() => {}); // pre-built cards are for old level
-        refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", errMsg(err)));
         const totalForLevel = getWordsForLevel(value as CefrLevel).length;
         await safeAnswer(ctx, { text: `Level set to ${value} (${totalForLevel} words)` });
         await safeEditMessage(ctx,await getSettingsText(chatId), {
@@ -410,7 +408,7 @@ export function registerCommands(
         const preset = SCHEDULE_PRESETS[value];
         if (!preset) break;
         await setSubscriberSchedule(chatId, preset.cron);
-        refreshUserJobs?.().catch((err) => console.error("[commands] refreshUserJobs error:", errMsg(err)));
+        updateNextDelivery(chatId, preset.cron, cronTimezone).catch((err) => console.error("[commands] updateNextDelivery error:", errMsg(err)));
         await safeAnswer(ctx, { text: `Schedule: ${preset.label}` });
         await safeEditMessage(ctx,await getSettingsText(chatId), {
           parse_mode: "HTML",
