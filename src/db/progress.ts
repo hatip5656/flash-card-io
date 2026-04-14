@@ -314,7 +314,7 @@ export async function updateSm2(chatId: number, wordValue: string, quality: numb
 
   await pool.query(
     `UPDATE sent_words SET ease_factor = $1, interval_days = $2, repetitions = $3,
-     next_review = CURRENT_DATE + $2
+     next_review = CURRENT_DATE + $2::INTEGER
      WHERE chat_id = $4 AND word_value = $5`,
     [ef, interval, reps, chatId, wordValue],
   );

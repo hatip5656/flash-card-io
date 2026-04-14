@@ -320,6 +320,9 @@ async function main(): Promise<void> {
   if (bot) {
     registerCommands(bot, deliverFlashcard, deliverGrammarCard, config.cronTimezone, config.ekilexApiKey);
     registerQuiz(bot, config.ekilexApiKey);
+    bot.catch((err) => {
+      console.error("[bot] Unhandled error:", errMsg(err.error));
+    });
     bot.start({
       onStart: () => console.error("[main] Telegram bot polling started"),
     });
