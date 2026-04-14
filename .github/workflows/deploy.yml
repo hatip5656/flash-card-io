@@ -126,6 +126,7 @@ jobs:
 
             # Apply manifests
             kubectl apply -f namespace.yaml
+            kubectl apply -f tts-models-pvc.yaml
             kubectl apply -f neurokone.yaml
             kubectl apply -f cache-pvc.yaml
             kubectl apply -f deployment.yaml

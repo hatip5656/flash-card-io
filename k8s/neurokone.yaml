@@ -111,7 +111,7 @@ metadata:
   labels:
     app: tts-worker
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: tts-worker
@@ -182,4 +182,5 @@ spec:
             failureThreshold: 12
       volumes:
         - name: models
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: tts-models
