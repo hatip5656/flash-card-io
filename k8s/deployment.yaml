@@ -70,7 +70,7 @@ spec:
             - name: TTS_SPEAKER
               value: "mari"
             - name: FEATURE_DEEPFILTER
-              value: "true"
+              value: "false"
             - name: NODE_OPTIONS
               value: "--max-old-space-size=512"
           startupProbe:
