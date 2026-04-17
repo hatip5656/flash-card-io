@@ -11,6 +11,8 @@ const execFileAsync = promisify(execFile);
 
 const TTS_API_URL = process.env.TTS_API_URL || "http://tts-api:8000";
 const TTS_SPEAKER = process.env.TTS_SPEAKER || "mari";
+// Bump this when the audio processing pipeline changes to invalidate cached audio
+const CACHE_VERSION = "v2";
 
 async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
   const id = randomBytes(6).toString("hex");
@@ -24,15 +26,22 @@ async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
       "-af", [
         "silenceremove=start_periods=1:start_silence=0.05:start_threshold=-40dB",
         "asetpts=PTS-STARTPTS",
-        "highpass=f=100",
-        "lowpass=f=7500",
-        "afftdn=nf=-25",
-        "agate=threshold=0.01:attack=5:release=50",
-        "afade=t=in:d=0.03",
-        "loudnorm=I=-16:TP=-1.5",
+        "aresample=out_sample_rate=48000",
+        "highpass=f=80",
+        "lowpass=f=14000",
+        "equalizer=f=3000:t=q:w=1.5:g=3",
+        "equalizer=f=8000:t=q:w=1.0:g=1.5",
+        "acompressor=threshold=0.05:ratio=3:attack=5:release=100:makeup=2",
+        "afade=t=in:d=0.02",
+        "loudnorm=I=-16:TP=-1.5:LRA=11",
       ].join(","),
       "-c:a", "libopus",
-      "-b:a", "64k",
+      "-b:a", "32k",
+      "-application", "voip",
+      "-vbr", "on",
+      "-compression_level", "10",
+      "-frame_duration", "20",
+      "-ar", "48000",
       "-y",
       oggFile,
     ], { timeout: 10_000 });
@@ -46,7 +55,7 @@ async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
 export async function synthesizeSpeech(word: string, sentence?: string, voiceName?: string): Promise<Buffer | null> {
   const voice = voiceName || TTS_SPEAKER;
   const text = sentence && sentence !== word ? `${word}. ... ${sentence}` : word;
-  const cacheKey = `${text}\0${voice}`;
+  const cacheKey = `${CACHE_VERSION}\0${text}\0${voice}`;
 
   // Check disk cache first
   const cached = await getCachedBuffer("tts", cacheKey, "ogg", TTL.TTS);
