@@ -15,9 +15,10 @@ const DEEPFILTER_ENABLED = process.env.FEATURE_DEEPFILTER === "true";
 // Bump this when the audio processing pipeline changes to invalidate cached audio
 const CACHE_VERSION = DEEPFILTER_ENABLED ? "v3-df" : "v3";
 
-/** Run DeepFilterNet enhancement on a WAV file in-place. */
+/** Run DeepFilterNet enhancement on a WAV file. */
 async function enhanceWithDeepFilter(wavFile: string, outDir: string): Promise<string> {
-  await execFileAsync("deep-filter", [wavFile, "-o", outDir], { timeout: 15_000 });
+  // Use python3 -m df to avoid PATH issues with the deep-filter entry point
+  await execFileAsync("python3", ["-m", "df", wavFile, "-o", outDir], { timeout: 15_000 });
   // deep-filter writes to outDir with same filename
   const enhanced = join(outDir, wavFile.split("/").pop()!);
   return enhanced;
