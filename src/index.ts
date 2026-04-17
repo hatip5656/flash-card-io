@@ -18,7 +18,7 @@ import { popPrebuilt, pushPrebuilt, getQueueSize, getQueuedWordIds, cleanupStale
 import { Cron } from "croner";
 import type { DeliveryChannel } from "./channels/types.js";
 import type { Bot } from "grammy";
-import { errMsg } from "./utils.js";
+import { errMsg, streakEmoji } from "./utils.js";
 
 const config = loadConfig();
 
@@ -344,9 +344,8 @@ async function main(): Promise<void> {
         getStreak(sub.chatId),
       ]);
       if (sent === 0) return;
-      const streakEmoji = streak >= 7 ? "🔥" : streak >= 3 ? "⚡" : "📅";
       let msg = `📊 <b>Weekly Progress Report</b>\n\n`;
-      msg += `${streakEmoji} Streak: <b>${streak} day${streak !== 1 ? "s" : ""}</b>\n`;
+      msg += `${streakEmoji(streak)} Streak: <b>${streak} day${streak !== 1 ? "s" : ""}</b>\n`;
       msg += `🏷️ Level: <b>${level}</b>\n`;
       msg += `📚 Total words learned: <b>${sent}</b>\n`;
       if (quiz.totalQuizzes > 0) {
@@ -372,11 +371,10 @@ async function main(): Promise<void> {
       if (!prefs.dailySummary) return;
       const [streak, today] = await Promise.all([getStreak(sub.chatId), getTodayActivity(sub.chatId)]);
       if (today.wordsLearned === 0 && today.quizzesTaken === 0) return;
-      const streakEmoji = streak >= 7 ? "🔥" : streak >= 3 ? "⚡" : "📅";
-      let msg = `${streakEmoji} <b>Daily Summary</b>\n\n`;
+      let msg = `${streakEmoji(streak)} <b>Daily Summary</b>\n\n`;
       msg += `📚 Words learned today: <b>${today.wordsLearned}</b>\n`;
       msg += `🧠 Quizzes taken: <b>${today.quizzesTaken}</b>\n`;
-      msg += `${streakEmoji} Streak: <b>${streak} day${streak !== 1 ? "s" : ""}</b>\n`;
+      msg += `${streakEmoji(streak)} Streak: <b>${streak} day${streak !== 1 ? "s" : ""}</b>\n`;
       if (streak >= 3) msg += `\nKeep it up! 💪`;
       await bot!.api.sendMessage(sub.chatId, msg, { parse_mode: "HTML" });
     });

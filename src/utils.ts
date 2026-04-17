@@ -11,6 +11,11 @@ export function shuffle<T>(arr: T[]): T[] {
   return arr;
 }
 
+/** Streak emoji based on day count. */
+export function streakEmoji(streak: number): string {
+  return streak >= 7 ? "🔥" : streak >= 3 ? "⚡" : "📅";
+}
+
 /** Extract error message safely from unknown catch values. */
 export function errMsg(err: unknown): string {
   return err instanceof Error ? err.message : String(err);

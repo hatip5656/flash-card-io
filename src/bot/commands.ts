@@ -1,22 +1,23 @@
 import type { Bot } from "grammy";
 import type { CefrLevel } from "../config.js";
-import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity, getWordsDueForReview, getPreferences, updatePreference, updateNextDelivery, scheduleNextGrammar, updateSm2 } from "../db/progress.js";
+import { addSubscriber, removeSubscriber, setSubscriberLevel, setSubscriberSchedule, getStats, getSubscriberLevel, getSubscriberSchedule, getQuizStats, getQuizHistory, getStreak, getTodayActivity, getWordsDueForReview, getPreferences, updatePreference, updateNextDelivery, scheduleNextGrammar, updateSm2, SCHEDULE_OFF } from "../db/progress.js";
 import { invalidateQueue } from "../services/prebuild.js";
 import { getWordsForLevel } from "../flashcard/word-bank.js";
 import { getAllCategories } from "../flashcard/categories.js";
 import { mainMenuKeyboard, levelPicker, schedulePicker, preferencesKeyboard, voicePicker } from "./keyboards.js";
 import { startQuiz } from "./quiz.js";
 import { escapeHtml } from "../flashcard/builder.js";
-import { errMsg } from "../utils.js";
+import { errMsg, streakEmoji } from "../utils.js";
 
 const VALID_LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2"];
 
 export const SCHEDULE_PRESETS: Record<string, { cron: string; label: string }> = {
-  "1h": { cron: "0 * * * *", label: "Every hour" },
-  "2h": { cron: "0 */2 * * *", label: "Every 2 hours" },
-  "4h": { cron: "0 */4 * * *", label: "Every 4 hours" },
+  "off": { cron: SCHEDULE_OFF, label: "Off" },
   "morning": { cron: "0 9 * * *", label: "Daily at 9 AM" },
-  "3x": { cron: "0 9,14,20 * * *", label: "3x daily (9 AM, 2 PM, 8 PM)" },
+  "3x": { cron: "0 9,14,20 * * *", label: "3× daily (9, 14, 20)" },
+  "morning_hourly": { cron: "0 9-12 * * *", label: "Hourly 9 AM – 12 PM" },
+  "daytime": { cron: "0 9-21 * * *", label: "Hourly 9 AM – 9 PM" },
+  "1h": { cron: "0 * * * *", label: "Every hour (24h)" },
 };
 
 interface QuizStatsInfo {
@@ -42,12 +43,10 @@ function formatSettings(
   const scheduleLabel = Object.entries(SCHEDULE_PRESETS).find(([, v]) => v.cron === schedule)?.[1].label ?? schedule;
   const pct = totalForLevel > 0 ? Math.round((sent / totalForLevel) * 100) : 0;
 
-  const streakEmoji = (streak ?? 0) >= 7 ? "🔥" : (streak ?? 0) >= 3 ? "⚡" : "📅";
-
   const lines = [
     "<b>🇪🇪 Flash Card IO</b>",
     "",
-    `${streakEmoji} Streak: <b>${streak ?? 0} day${(streak ?? 0) !== 1 ? "s" : ""}</b>`,
+    `${streakEmoji(streak ?? 0)} Streak: <b>${streak ?? 0} day${(streak ?? 0) !== 1 ? "s" : ""}</b>`,
     `🏷️ Level: <b>${level}</b>`,
     `⏰ Schedule: <b>${escapeHtml(scheduleLabel)}</b>`,
     `📚 Words learned: <b>${sent}</b>`,
@@ -427,10 +426,15 @@ export function registerCommands(
       case "schedule": {
         const preset = SCHEDULE_PRESETS[value];
         if (!preset) break;
+        const currentCron = await getSubscriberSchedule(chatId);
+        if (currentCron === preset.cron) {
+          await safeAnswer(ctx, { text: `Already set to ${preset.label}` });
+          break;
+        }
         await setSubscriberSchedule(chatId, preset.cron);
-        updateNextDelivery(chatId, preset.cron, cronTimezone).catch((err) => console.error("[commands] updateNextDelivery error:", errMsg(err)));
+        await updateNextDelivery(chatId, preset.cron, cronTimezone);
         await safeAnswer(ctx, { text: `Schedule: ${preset.label}` });
-        await safeEditMessage(ctx,await getSettingsText(chatId), {
+        await safeEditMessage(ctx, await getSettingsText(chatId), {
           parse_mode: "HTML",
           reply_markup: mainMenuKeyboard(),
         });

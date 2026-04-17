@@ -21,3 +21,4 @@ data/db/
 # OS
 .DS_Store
 Thumbs.db
+/opencode.json

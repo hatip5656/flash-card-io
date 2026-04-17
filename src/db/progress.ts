@@ -2,6 +2,9 @@ import pg from "pg";
 import { Cron } from "croner";
 import type { CefrLevel } from "../config.js";
 
+export const SCHEDULE_OFF = "off";
+export const DEFAULT_SCHEDULE = "0 9 * * *";
+
 const { Pool } = pg;
 
 export interface Subscriber {
@@ -180,32 +183,41 @@ export async function getMostMissedWords(chatId: number, limit = 20): Promise<Ar
 
 export async function getQuizHistory(chatId: number, limit = 5): Promise<QuizResult[]> {
   const res = await pool.query(
-    "SELECT id, score, total, percentage, completed_at FROM quiz_results WHERE chat_id = $1 ORDER BY completed_at DESC LIMIT $2",
-    [chatId, limit],
+    `SELECT qr.id, qr.score, qr.total, qr.percentage, qr.completed_at,
+            qa.estonian, qa.correct_answer, qa.user_answer, qa.is_correct
+     FROM quiz_results qr
+     LEFT JOIN quiz_answers qa ON qa.quiz_id = qr.id
+     WHERE qr.chat_id = $1
+     ORDER BY qr.completed_at DESC, qr.id DESC, qa.id ASC
+     LIMIT $2`,
+    [chatId, limit * 20],
   );
 
-  const results: QuizResult[] = [];
+  const quizMap = new Map<number, QuizResult>();
   for (const r of res.rows) {
-    const answersRes = await pool.query(
-      "SELECT estonian, correct_answer, user_answer, is_correct FROM quiz_answers WHERE quiz_id = $1 ORDER BY id",
-      [r.id],
-    );
-    results.push({
-      id: Number(r.id),
-      score: Number(r.score),
-      total: Number(r.total),
-      percentage: Number(r.percentage),
-      completedAt: new Date(r.completed_at),
-      answers: answersRes.rows.map((a) => ({
-        estonian: a.estonian,
-        correctAnswer: a.correct_answer,
-        userAnswer: a.user_answer,
-        isCorrect: a.is_correct,
-      })),
-    });
+    const qid = Number(r.id);
+    if (!quizMap.has(qid)) {
+      if (quizMap.size >= limit) break;
+      quizMap.set(qid, {
+        id: qid,
+        score: Number(r.score),
+        total: Number(r.total),
+        percentage: Number(r.percentage),
+        completedAt: new Date(r.completed_at),
+        answers: [],
+      });
+    }
+    if (r.estonian) {
+      quizMap.get(qid)!.answers.push({
+        estonian: r.estonian,
+        correctAnswer: r.correct_answer,
+        userAnswer: r.user_answer,
+        isCorrect: r.is_correct,
+      });
+    }
   }
 
-  return results;
+  return [...quizMap.values()];
 }
 
 export async function getQuizStats(chatId: number): Promise<{ totalQuizzes: number; avgPercentage: number; recentTrend: number | null }> {
@@ -438,7 +450,7 @@ export async function getActiveSubscribers(): Promise<Subscriber[]> {
     chatId: Number(r.chat_id),
     channel: r.channel,
     cefrLevel: r.cefr_level as CefrLevel,
-    schedule: r.schedule || "0 9 * * *",
+    schedule: r.schedule || DEFAULT_SCHEDULE,
     active: r.active,
   }));
 }
@@ -454,7 +466,7 @@ export async function setSubscriberLevel(chatId: number, level: CefrLevel): Prom
 
 export async function getSubscriberSchedule(chatId: number): Promise<string> {
   const res = await pool.query("SELECT schedule FROM subscribers WHERE chat_id = $1", [chatId]);
-  return res.rows[0]?.schedule ?? "0 9 * * *";
+  return res.rows[0]?.schedule ?? DEFAULT_SCHEDULE;
 }
 
 export async function setSubscriberSchedule(chatId: number, schedule: string): Promise<void> {
@@ -471,7 +483,8 @@ type ScheduleColumn = "next_delivery_at" | "next_grammar_at";
 
 async function getUsersDue(column: ScheduleColumn): Promise<DueUser[]> {
   const res = await pool.query(
-    `SELECT chat_id FROM subscribers WHERE active = TRUE AND ${column} IS NOT NULL AND ${column} <= NOW()`,
+    `SELECT chat_id FROM subscribers WHERE active = TRUE AND schedule != $1 AND ${column} IS NOT NULL AND ${column} <= NOW()`,
+    [SCHEDULE_OFF],
   );
   return res.rows.map((r) => ({ chatId: Number(r.chat_id) }));
 }
@@ -485,6 +498,10 @@ export function getUsersDueForGrammar(): Promise<DueUser[]> {
 }
 
 export async function updateNextDelivery(chatId: number, schedule: string, timezone: string): Promise<void> {
+  if (schedule === SCHEDULE_OFF) {
+    await pool.query("UPDATE subscribers SET next_delivery_at = NULL WHERE chat_id = $1", [chatId]);
+    return;
+  }
   const next = new Cron(schedule, { timezone }).nextRun();
   if (!next) return;
   await pool.query("UPDATE subscribers SET next_delivery_at = $1 WHERE chat_id = $2", [next, chatId]);
@@ -501,10 +518,11 @@ export async function scheduleNextGrammar(chatId: number, timezone: string): Pro
 
 export async function initNextDeliveryForAll(timezone: string): Promise<number> {
   const res = await pool.query(
-    "SELECT chat_id, schedule FROM subscribers WHERE active = TRUE AND next_delivery_at IS NULL",
+    "SELECT chat_id, schedule FROM subscribers WHERE active = TRUE AND next_delivery_at IS NULL AND schedule != $1",
+    [SCHEDULE_OFF],
   );
   for (const row of res.rows) {
-    const schedule = row.schedule || "0 9 * * *";
+    const schedule = row.schedule || DEFAULT_SCHEDULE;
     const next = new Cron(schedule, { timezone }).nextRun();
     if (next) {
       await pool.query("UPDATE subscribers SET next_delivery_at = $1 WHERE chat_id = $2", [next, row.chat_id]);
@@ -578,11 +596,11 @@ export async function getStats(chatId: number): Promise<{ sent: number; level: C
     [chatId],
   );
   if (res.rows.length === 0) {
-    return { sent: 0, level: "A1" as CefrLevel, schedule: "0 9 * * *" };
+    return { sent: 0, level: "A1" as CefrLevel, schedule: DEFAULT_SCHEDULE };
   }
   return {
     sent: Number(res.rows[0].sent),
     level: (res.rows[0].cefr_level ?? "A1") as CefrLevel,
-    schedule: res.rows[0].schedule ?? "0 9 * * *",
+    schedule: res.rows[0].schedule ?? DEFAULT_SCHEDULE,
   };
 }

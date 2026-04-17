@@ -33,10 +33,13 @@ export function levelPicker(current: CefrLevel): InlineKeyboard {
 
 export function schedulePicker(currentCron: string): InlineKeyboard {
   const kb = new InlineKeyboard();
-  for (const [key, p] of Object.entries(SCHEDULE_PRESETS)) {
+  const entries = Object.entries(SCHEDULE_PRESETS);
+  for (let i = 0; i < entries.length; i++) {
+    const [key, p] = entries[i];
     kb.text(p.cron === currentCron ? `✅ ${p.label}` : p.label, `set:schedule:${key}`);
-    kb.row();
+    if (i % 2 === 1) kb.row();
   }
+  if (entries.length % 2 === 1) kb.row();
   kb.text("« Back", "back_menu");
   return kb;
 }
