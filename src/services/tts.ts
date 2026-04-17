@@ -18,7 +18,8 @@ const CACHE_VERSION = DEEPFILTER_ENABLED ? "v3-df" : "v3";
 /** Run DeepFilterNet enhancement on a WAV file. */
 async function enhanceWithDeepFilter(wavFile: string, outDir: string): Promise<string> {
   // Use python3 -m df to avoid PATH issues with the deep-filter entry point
-  await execFileAsync("python3", ["-m", "df", wavFile, "-o", outDir], { timeout: 15_000 });
+  // First run downloads model (~50MB), so allow 60s; subsequent runs take <1s
+  await execFileAsync("python3", ["-m", "df", wavFile, "-o", outDir], { timeout: 60_000 });
   // deep-filter writes to outDir with same filename
   const enhanced = join(outDir, wavFile.split("/").pop()!);
   return enhanced;
@@ -40,8 +41,10 @@ async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
         const dfOutDir = join(tmpdir(), `df-${id}`);
         await mkdir(dfOutDir, { recursive: true });
         inputFile = await enhanceWithDeepFilter(wavFile, dfOutDir);
-      } catch (err) {
-        console.error("[tts] DeepFilterNet enhancement failed, using raw WAV:", errMsg(err));
+      } catch (err: any) {
+        const stderr = err?.stderr || "";
+        const stdout = err?.stdout || "";
+        console.error("[tts] DeepFilterNet failed:", errMsg(err), stderr ? `\nstderr: ${stderr}` : "", stdout ? `\nstdout: ${stdout}` : "");
         inputFile = wavFile;
       }
     }

@@ -23,6 +23,10 @@ COPY data/ ./data/
 RUN mkdir -p /app/cache && chown 1000:1000 /app/cache
 ENV CACHE_DIR=/app/cache
 
+# DeepFilterNet model cache (needs writable dir for auto-download)
+RUN mkdir -p /home/node/.cache && chown -R 1000:1000 /home/node
+ENV DF_MODEL_BASE_DIR=/home/node/.cache/DeepFilterNet
+
 # Run as non-root (node user exists as uid 1000 in node images)
 USER node
 
