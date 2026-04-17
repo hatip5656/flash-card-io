@@ -10,6 +10,7 @@ export interface AppConfig {
   cefrLevels: CefrLevel[];
   featureTelegram: boolean;
   featureWhatsapp: boolean;
+  featureDeepfilter: boolean;
 }
 
 const VALID_LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2"];
@@ -17,6 +18,7 @@ const VALID_LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2"];
 export function loadConfig(): AppConfig {
   const featureTelegram = process.env.FEATURE_TELEGRAM !== "false";
   const featureWhatsapp = process.env.FEATURE_WHATSAPP === "true";
+  const featureDeepfilter = process.env.FEATURE_DEEPFILTER === "true";
 
   if (featureTelegram && !process.env.TELEGRAM_BOT_TOKEN) {
     throw new Error("TELEGRAM_BOT_TOKEN is required when FEATURE_TELEGRAM is enabled");
@@ -47,5 +49,6 @@ export function loadConfig(): AppConfig {
     cefrLevels,
     featureTelegram,
     featureWhatsapp,
+    featureDeepfilter,
   };
 }

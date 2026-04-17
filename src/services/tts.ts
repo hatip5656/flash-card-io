@@ -2,7 +2,7 @@ import { execFile } from "child_process";
 import { promisify } from "util";
 import { tmpdir } from "os";
 import { join } from "path";
-import { readFile, writeFile, unlink } from "fs/promises";
+import { readFile, writeFile, unlink, mkdir } from "fs/promises";
 import { randomBytes } from "crypto";
 import { getCachedBuffer, setCachedBuffer, TTL } from "./cache.js";
 import { errMsg } from "../utils.js";
@@ -11,18 +11,42 @@ const execFileAsync = promisify(execFile);
 
 const TTS_API_URL = process.env.TTS_API_URL || "http://tts-api:8000";
 const TTS_SPEAKER = process.env.TTS_SPEAKER || "mari";
+const DEEPFILTER_ENABLED = process.env.FEATURE_DEEPFILTER === "true";
 // Bump this when the audio processing pipeline changes to invalidate cached audio
-const CACHE_VERSION = "v2";
+const CACHE_VERSION = DEEPFILTER_ENABLED ? "v3-df" : "v3";
+
+/** Run DeepFilterNet enhancement on a WAV file in-place. */
+async function enhanceWithDeepFilter(wavFile: string, outDir: string): Promise<string> {
+  await execFileAsync("deep-filter", [wavFile, "-o", outDir], { timeout: 15_000 });
+  // deep-filter writes to outDir with same filename
+  const enhanced = join(outDir, wavFile.split("/").pop()!);
+  return enhanced;
+}
 
 async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
   const id = randomBytes(6).toString("hex");
   const wavFile = join(tmpdir(), `tts-${id}.wav`);
+  const enhancedFile = join(tmpdir(), `tts-${id}-enhanced.wav`);
   const oggFile = join(tmpdir(), `tts-${id}.ogg`);
 
   try {
     await writeFile(wavFile, wavBuffer);
+
+    // Speech enhancement via DeepFilterNet (if enabled)
+    let inputFile = wavFile;
+    if (DEEPFILTER_ENABLED) {
+      try {
+        const dfOutDir = join(tmpdir(), `df-${id}`);
+        await mkdir(dfOutDir, { recursive: true });
+        inputFile = await enhanceWithDeepFilter(wavFile, dfOutDir);
+      } catch (err) {
+        console.error("[tts] DeepFilterNet enhancement failed, using raw WAV:", errMsg(err));
+        inputFile = wavFile;
+      }
+    }
+
     await execFileAsync("ffmpeg", [
-      "-i", wavFile,
+      "-i", inputFile,
       "-af", [
         "silenceremove=start_periods=1:start_silence=0.05:start_threshold=-40dB",
         "asetpts=PTS-STARTPTS",
@@ -49,6 +73,11 @@ async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
   } finally {
     await unlink(wavFile).catch(() => {});
     await unlink(oggFile).catch(() => {});
+    // Clean up DeepFilterNet output dir
+    const dfOutDir = join(tmpdir(), `df-${id}`);
+    const dfFile = join(dfOutDir, `tts-${id}.wav`);
+    await unlink(dfFile).catch(() => {});
+    await unlink(dfOutDir).catch(() => {}); // rmdir empty dir
   }
 }
 

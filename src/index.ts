@@ -418,6 +418,7 @@ async function main(): Promise<void> {
   console.error(`[main] Levels: ${config.cefrLevels.join(", ")}`);
   console.error(`[main] Channels: ${channels.map((c) => c.name).join(", ")}`);
   console.error(`[main] Ekilex: ${config.ekilexApiKey ? "enabled" : "disabled"}`);
+  console.error(`[main] DeepFilterNet: ${config.featureDeepfilter ? "enabled" : "disabled"}`);
 
   // Graceful shutdown
   const shutdown = async () => {
