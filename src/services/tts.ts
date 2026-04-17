@@ -55,34 +55,39 @@ export async function synthesizeSpeech(word: string, sentence?: string, voiceNam
     return cached;
   }
 
-  try {
-    const res = await fetch(`${TTS_API_URL}/v2`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, speaker: voice, speed: 0.85 }),
-      signal: AbortSignal.timeout(15_000),
-    });
+  const body = JSON.stringify({ text, speaker: voice, speed: 0.85 });
 
-    if (!res.ok) {
-      console.error(`[tts] API error ${res.status}: ${await res.text()}`);
-      return null;
-    }
-
-    const wavBuffer = Buffer.from(await res.arrayBuffer());
-
-    let audio: Buffer;
+  for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      audio = await convertWavToOgg(wavBuffer);
-    } catch {
-      audio = wavBuffer;
+      const res = await fetch(`${TTS_API_URL}/v2`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body,
+        signal: AbortSignal.timeout(25_000),
+      });
+
+      if (!res.ok) {
+        console.error(`[tts] API error ${res.status} (attempt ${attempt + 1}): ${await res.text()}`);
+        continue;
+      }
+
+      const wavBuffer = Buffer.from(await res.arrayBuffer());
+
+      let audio: Buffer;
+      try {
+        audio = await convertWavToOgg(wavBuffer);
+      } catch {
+        audio = wavBuffer;
+      }
+
+      // Cache to disk (fire-and-forget)
+      setCachedBuffer("tts", cacheKey, "ogg", audio).catch(() => {});
+
+      return audio;
+    } catch (err) {
+      console.error(`[tts] Error synthesizing "${word}" (attempt ${attempt + 1}):`, errMsg(err));
     }
-
-    // Cache to disk (fire-and-forget)
-    setCachedBuffer("tts", cacheKey, "ogg", audio).catch(() => {});
-
-    return audio;
-  } catch (err) {
-    console.error(`[tts] Error synthesizing "${word}":`, errMsg(err));
-    return null;
   }
+
+  return null;
 }
