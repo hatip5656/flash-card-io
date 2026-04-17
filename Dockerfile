@@ -11,7 +11,7 @@ WORKDIR /app
 RUN apt-get update \
     && apt-get install -y --no-install-recommends tini ffmpeg python3 python3-pip \
     && pip3 install --no-cache-dir --break-system-packages \
-       torch --extra-index-url https://download.pytorch.org/whl/cpu \
+       torch torchaudio --extra-index-url https://download.pytorch.org/whl/cpu \
     && pip3 install --no-cache-dir --break-system-packages deepfilternet \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY package.json package-lock.json ./
