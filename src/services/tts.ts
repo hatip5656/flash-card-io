@@ -13,7 +13,7 @@ const TTS_API_URL = process.env.TTS_API_URL || "http://tts-api:8000";
 const TTS_SPEAKER = process.env.TTS_SPEAKER || "mari";
 const DEEPFILTER_ENABLED = process.env.FEATURE_DEEPFILTER === "true";
 // Bump this when the audio processing pipeline changes to invalidate cached audio
-const CACHE_VERSION = DEEPFILTER_ENABLED ? "v3-df" : "v3";
+const CACHE_VERSION = DEEPFILTER_ENABLED ? "v4-df" : "v4";
 
 /** Run DeepFilterNet enhancement on a WAV file. */
 async function enhanceWithDeepFilter(wavFile: string, outDir: string): Promise<string> {
@@ -56,10 +56,9 @@ async function convertWavToOgg(wavBuffer: Buffer): Promise<Buffer> {
         "asetpts=PTS-STARTPTS",
         "aresample=out_sample_rate=48000",
         "highpass=f=80",
-        "lowpass=f=14000",
-        "equalizer=f=3000:t=q:w=1.5:g=3",
-        "equalizer=f=8000:t=q:w=1.0:g=1.5",
-        "acompressor=threshold=0.05:ratio=3:attack=5:release=100:makeup=2",
+        "lowpass=f=12000",
+        "equalizer=f=3000:t=q:w=2.0:g=1.5",
+        "acompressor=threshold=0.1:ratio=2:attack=10:release=150:makeup=1",
         "afade=t=in:d=0.02",
         "loudnorm=I=-16:TP=-1.5:LRA=11",
       ].join(","),
