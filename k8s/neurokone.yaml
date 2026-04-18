@@ -166,20 +166,21 @@ spec:
             limits:
               cpu: 1500m
               memory: 2Gi
-          # Restart worker if it stops responding (e.g. stuck inference)
+          # Lenient probe — worker CPU is fully used during inference,
+          # so python3 probe startup can easily exceed tight timeouts
           livenessProbe:
             exec:
-              command: ["python3", "-c", "import os; os.getpid()"]
+              command: ["test", "-d", "/proc/1"]
             initialDelaySeconds: 120
-            periodSeconds: 30
-            timeoutSeconds: 5
-            failureThreshold: 3
+            periodSeconds: 60
+            timeoutSeconds: 10
+            failureThreshold: 5
           startupProbe:
             exec:
-              command: ["python3", "-c", "import os; os.getpid()"]
-            initialDelaySeconds: 60
+              command: ["test", "-d", "/proc/1"]
+            initialDelaySeconds: 30
             periodSeconds: 10
-            failureThreshold: 12
+            failureThreshold: 18
       volumes:
         - name: models
           persistentVolumeClaim:
