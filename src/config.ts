@@ -13,7 +13,7 @@ export interface AppConfig {
   featureDeepfilter: boolean;
 }
 
-const VALID_LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2"];
+export const VALID_LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2"];
 
 export function loadConfig(): AppConfig {
   const featureTelegram = process.env.FEATURE_TELEGRAM !== "false";

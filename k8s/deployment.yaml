@@ -71,6 +71,8 @@ spec:
               value: "mari"
             - name: FEATURE_DEEPFILTER
               value: "true"
+            - name: FEATURE_API
+              value: "true"
             - name: NODE_OPTIONS
               value: "--max-old-space-size=512"
           startupProbe:

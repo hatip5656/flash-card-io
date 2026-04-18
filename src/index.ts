@@ -19,6 +19,7 @@ import { Cron } from "croner";
 import type { DeliveryChannel } from "./channels/types.js";
 import type { Bot } from "grammy";
 import { errMsg, streakEmoji } from "./utils.js";
+import { createApiApp } from "./api/server.js";
 
 const config = loadConfig();
 
@@ -294,8 +295,11 @@ async function warmAllQueues(): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  // Start health server early so k8s can probe during startup
-  startHealthServer(8080);
+  // Start health + API server
+  const featureApi = process.env.FEATURE_API !== "false"; // enabled by default
+  const apiApp = featureApi ? createApiApp(config.cronTimezone) : undefined;
+  startHealthServer(8080, apiApp);
+  if (featureApi) console.error("[main] REST API enabled at /api");
 
   await initDb(config.databaseUrl);
 
