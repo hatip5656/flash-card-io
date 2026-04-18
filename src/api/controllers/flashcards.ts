@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
-import { getSubscriberLevel, getPreferences, markWordSent, logWordActivity, getSentWordIds, getWordsDueForReview, updateSm2, getSentGrammarIds, markGrammarSent } from "../../db/progress.js";
-import { popPrebuilt, getQueueSize } from "../../services/prebuild.js";
+import { getSubscriberLevel, markWordSent, logWordActivity, getSentWordIds, getWordsDueForReview, updateSm2, getSentGrammarIds, markGrammarSent } from "../../db/progress.js";
+import { popPrebuilt } from "../../services/prebuild.js";
 import type { Flashcard } from "../../flashcard/types.js";
 import { getRandomLesson } from "../../flashcard/grammar-bank.js";
 

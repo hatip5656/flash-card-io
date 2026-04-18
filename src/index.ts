@@ -332,6 +332,23 @@ async function main(): Promise<void> {
     });
   }
 
+  // Wire API build function (for live flashcard builds when pre-built queue is empty)
+  if (apiApp) {
+    apiApp.set("buildFlashcardFn", async (chatId: number) => {
+      const level = await getSubscriberLevel(chatId);
+      const prefs = await getPreferences(chatId);
+      const buildOpts = { audioEnabled: prefs.audio, voiceName: prefs.voiceName, wordFormsEnabled: prefs.wordForms };
+      const sentIds = await getSentWordIds(chatId);
+      const unsent = getUnsent(level, sentIds);
+      if (unsent.length === 0) return null;
+      const word = unsent[Math.floor(Math.random() * unsent.length)];
+      const fc = await buildFlashcard(word, config.unsplashAccessKey, config.ekilexApiKey, buildOpts);
+      await markWordSent(chatId, word.id, word.estonian, word.english);
+      await logWordActivity(chatId);
+      return fc;
+    });
+  }
+
   // Start single-cron scheduler (replaces per-user Cron objects)
   const scheduler = startScheduler(config.cronTimezone, deliverFlashcard, deliverGrammarCard);
 
