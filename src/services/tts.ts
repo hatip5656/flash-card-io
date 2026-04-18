@@ -17,9 +17,8 @@ const CACHE_VERSION = DEEPFILTER_ENABLED ? "v4-df" : "v4";
 
 /** Run DeepFilterNet enhancement on a WAV file. */
 async function enhanceWithDeepFilter(wavFile: string, outDir: string): Promise<string> {
-  // Use python3 -m df to avoid PATH issues with the deep-filter entry point
   // First run downloads model (~50MB), so allow 60s; subsequent runs take <1s
-  await execFileAsync("python3", ["-m", "df", wavFile, "-o", outDir], { timeout: 60_000 });
+  await execFileAsync("python3", ["-m", "df.enhance", wavFile, "-o", outDir], { timeout: 60_000 });
   // deep-filter writes to outDir with same filename
   const enhanced = join(outDir, wavFile.split("/").pop()!);
   return enhanced;
