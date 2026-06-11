@@ -1,39 +1,52 @@
-import { readFileSync } from "fs";
-import { join, dirname } from "path";
-import { fileURLToPath } from "url";
+import type pg from "pg";
 import type { CefrLevel } from "../config.js";
 import type { Word } from "./types.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = join(__dirname, "..", "..", "data", "words");
-
 let words: Word[] = [];
+let wordMap: Map<string, Word> = new Map();
 
-export function loadWordBank(): void {
-  words = [];
-  const levels: CefrLevel[] = ["A1", "A2", "B1", "B2"];
+export async function loadWordBankFromDb(pool: pg.Pool): Promise<void> {
+  const wordsRes = await pool.query(
+    `SELECT id, estonian, english, turkish, cefr_level, image_query FROM words ORDER BY id`,
+  );
+  const sentencesRes = await pool.query(
+    `SELECT word_id, estonian, english, turkish FROM word_sentences ORDER BY word_id, sort_order`,
+  );
 
-  for (const level of levels) {
-    const filePath = join(DATA_DIR, `${level.toLowerCase()}.json`);
-    try {
-      const raw = readFileSync(filePath, "utf-8");
-      const parsed = JSON.parse(raw) as Word[];
-      words.push(...parsed);
-      console.error(`[word-bank] Loaded ${parsed.length} ${level} words`);
-    } catch {
-      console.error(`[word-bank] No word file for ${level} (${filePath})`);
-    }
+  // Group sentences by word_id
+  const sentenceMap = new Map<string, Array<{ estonian: string; english: string; turkish?: string }>>();
+  for (const row of sentencesRes.rows) {
+    if (!sentenceMap.has(row.word_id)) sentenceMap.set(row.word_id, []);
+    sentenceMap.get(row.word_id)!.push({
+      estonian: row.estonian,
+      english: row.english,
+      turkish: row.turkish ?? undefined,
+    });
   }
 
-  console.error(`[word-bank] Total: ${words.length} words loaded`);
+  words = wordsRes.rows.map((r) => ({
+    id: r.id,
+    estonian: r.estonian,
+    english: r.english,
+    turkish: r.turkish ?? undefined,
+    cefrLevel: r.cefr_level as CefrLevel,
+    imageQuery: r.image_query ?? undefined,
+    sentences: sentenceMap.get(r.id) ?? [],
+  }));
+
+  wordMap = new Map(words.map((w) => [w.id, w]));
+  console.error(`[word-bank] Loaded ${words.length} words from database`);
 }
+
+// Keep the old JSON-based loader as fallback
+export { loadWordBankFromDb as loadWordBank };
 
 export function getWordsForLevel(level: CefrLevel): Word[] {
   return words.filter((w) => w.cefrLevel === level);
 }
 
 export function getWordById(id: string): Word | undefined {
-  return words.find((w) => w.id === id);
+  return wordMap.get(id);
 }
 
 export function getUnsent(level: CefrLevel, sentIds: string[]): Word[] {

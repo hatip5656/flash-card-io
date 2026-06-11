@@ -1,6 +1,8 @@
 import pg from "pg";
 import { Cron } from "croner";
 import type { CefrLevel } from "../config.js";
+import { runMigrations } from "./migrate.js";
+import { seedWords, seedStories } from "./seed.js";
 
 export const SCHEDULE_OFF = "off";
 export const DEFAULT_SCHEDULE = "0 9 * * *";
@@ -40,123 +42,17 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
   // Now connect to the actual database
   pool = new Pool({
     connectionString,
-    max: 20,                    // sized for ~1K concurrent users
-    idleTimeoutMillis: 30_000, // close idle connections after 30s
-    connectionTimeoutMillis: 10_000, // allow more time under load
+    max: 20,
+    idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 10_000,
   });
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS subscribers (
-      chat_id BIGINT PRIMARY KEY,
-      channel TEXT NOT NULL DEFAULT 'telegram',
-      cefr_level TEXT NOT NULL DEFAULT 'A1',
-      schedule TEXT NOT NULL DEFAULT '0 9 * * *',
-      registered_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      active BOOLEAN NOT NULL DEFAULT TRUE
-    )
-  `);
 
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS sent_words (
-      chat_id BIGINT NOT NULL,
-      word_id TEXT NOT NULL,
-      word_value TEXT,
-      sent_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      PRIMARY KEY (chat_id, word_id)
-    )
-  `);
+  // Run SQL migrations
+  await runMigrations(pool);
 
-  // Migrations
-  await pool.query(`ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS username TEXT`);
-  await pool.query(`ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS first_name TEXT`);
-  await pool.query(`ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS preferences JSONB NOT NULL DEFAULT '{}'::jsonb`);
-  await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS english TEXT`);
-  await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS quiz_count INTEGER NOT NULL DEFAULT 0`);
-  // SM-2 spaced repetition fields
-  await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS ease_factor REAL NOT NULL DEFAULT 2.5`);
-  await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS interval_days INTEGER NOT NULL DEFAULT 1`);
-  await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS next_review DATE NOT NULL DEFAULT CURRENT_DATE`);
-  await pool.query(`ALTER TABLE sent_words ADD COLUMN IF NOT EXISTS repetitions INTEGER NOT NULL DEFAULT 0`);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS sent_grammar (
-      chat_id BIGINT NOT NULL,
-      lesson_id TEXT NOT NULL,
-      sent_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      PRIMARY KEY (chat_id, lesson_id)
-    )
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS quiz_results (
-      id SERIAL PRIMARY KEY,
-      chat_id BIGINT NOT NULL,
-      score INTEGER NOT NULL,
-      total INTEGER NOT NULL,
-      percentage INTEGER NOT NULL,
-      completed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS activity_log (
-      id SERIAL PRIMARY KEY,
-      chat_id BIGINT NOT NULL,
-      activity_date DATE NOT NULL DEFAULT CURRENT_DATE,
-      words_learned INTEGER NOT NULL DEFAULT 0,
-      quizzes_taken INTEGER NOT NULL DEFAULT 0,
-      UNIQUE (chat_id, activity_date)
-    )
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS quiz_answers (
-      id SERIAL PRIMARY KEY,
-      quiz_id INTEGER NOT NULL REFERENCES quiz_results(id),
-      estonian TEXT NOT NULL,
-      correct_answer TEXT NOT NULL,
-      user_answer TEXT NOT NULL,
-      is_correct BOOLEAN NOT NULL
-    )
-  `);
-
-  // Scheduler columns for single-cron architecture
-  await pool.query(`ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS next_delivery_at TIMESTAMPTZ`);
-  await pool.query(`ALTER TABLE subscribers ADD COLUMN IF NOT EXISTS next_grammar_at TIMESTAMPTZ`);
-
-  // Index for streak calculation
-  await pool.query(`CREATE INDEX IF NOT EXISTS idx_activity_log_chat_date ON activity_log (chat_id, activity_date DESC)`);
-
-  // Saved words (bookmarks for mobile app)
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS saved_words (
-      chat_id BIGINT NOT NULL,
-      word_id TEXT NOT NULL,
-      saved_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      PRIMARY KEY (chat_id, word_id)
-    )
-  `);
-
-  // Story read tracking (grammar stories for mobile app)
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS story_reads (
-      chat_id BIGINT NOT NULL,
-      story_id TEXT NOT NULL,
-      read_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      PRIMARY KEY (chat_id, story_id)
-    )
-  `);
-
-  // Word comments
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS word_comments (
-      id SERIAL PRIMARY KEY,
-      chat_id BIGINT NOT NULL,
-      word_id TEXT NOT NULL,
-      comment TEXT NOT NULL,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `);
-  await pool.query(`CREATE INDEX IF NOT EXISTS idx_word_comments_word ON word_comments (word_id, created_at DESC)`);
+  // Seed word data from JSON files (only if tables are empty)
+  await seedWords(pool);
+  await seedStories(pool);
 
   console.error(`[db] Connected to PostgreSQL database "${dbName}"`);
   return pool;

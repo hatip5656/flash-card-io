@@ -6,6 +6,7 @@ import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValue
 import { loadWordBank, getUnsent, getWordById } from "./flashcard/word-bank.js";
 import { loadGrammarBank, getRandomLesson } from "./flashcard/grammar-bank.js";
 import { loadStoryBank } from "./flashcard/story-bank.js";
+import type pg from "pg";
 import { loadCategories } from "./flashcard/categories.js";
 import { buildFlashcard, buildFlashcardFromEkilex } from "./flashcard/builder.js";
 import { startScheduler } from "./flashcard/scheduler.js";
@@ -24,9 +25,6 @@ import { createApiApp } from "./api/server.js";
 
 const config = loadConfig();
 
-loadWordBank();
-loadGrammarBank();
-loadStoryBank();
 loadCategories();
 
 const channels: DeliveryChannel[] = [];
@@ -303,7 +301,12 @@ async function main(): Promise<void> {
   startHealthServer(8080, apiApp);
   if (featureApi) console.error("[main] REST API enabled at /api");
 
-  await initDb(config.databaseUrl);
+  const pool = await initDb(config.databaseUrl);
+
+  // Load word data from database
+  await loadWordBank(pool);
+  await loadStoryBank(pool);
+  loadGrammarBank();
 
   // Backfill english column for words learned before quiz feature
   const backfilled = await backfillEnglish((wordId) => {
