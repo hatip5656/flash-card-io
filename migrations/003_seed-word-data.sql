@@ -2077,36 +2077,985 @@ INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VAL
 INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VALUES ('b2-kole', 'Kole kallis korter.', 'Kole kallis korter.', 'Aşırı pahalı daire.', 1);
 INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VALUES ('b2-kole', 'Kole naljakas lugu.', 'Kole naljakas lugu.', 'Aşırı komik bir hikâye.', 2);
 
--- Grammar stories: 32
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a1-personal-pronouns', 'A1', 'Zamirler', '👤', '[{"title": "Estonca Kişisel Zamirler", "body": "Estoncada, tıpkı Türkçe gibi 6 kişi zamiri vardır.\nHer birinin uzun (resmi/yazılı) ve kısa (günlük konuşma) formu bulunur.\n\nHepsini öğrenelim!"}, {"title": "Tekil Zamirler", "body": "Tekil zamirler ve kısa formları:\n\nmina (ma) - ben\nsina (sa) - sen\ntema (ta) - o\n\nNot: Estoncada cinsiyet ayrımı yoktur. \"tema\" hem erkek, hem kadın, hem de nesne için kullanılır.", "examples": [{"estonian": "Ma olen tudeng.", "english": "I am a student.", "turkish": "Ben öğrenciyim."}, {"estonian": "Sa oled ilus.", "english": "You are beautiful.", "turkish": "Sen güzelsin."}, {"estonian": "Ta on arst.", "english": "He/She is a doctor.", "turkish": "O bir doktor."}]}, {"title": "Çoğul Zamirler", "body": "Çoğul zamirler ve kısa formları:\n\nmeie (me) - biz\nteie (te) - siz (çoğul veya resmi)\nnemad (nad) - onlar\n\n\"Teie\" ayrıca yabancılara veya büyüklere hitap ederken resmi \"siz\" olarak da kullanılır.", "examples": [{"estonian": "Me oleme siin.", "english": "We are here.", "turkish": "Biz buradayız."}, {"estonian": "Te olete head.", "english": "You are good.", "turkish": "Siz iyisiniz."}, {"estonian": "Nad on kodus.", "english": "They are at home.", "turkish": "Onlar evdeler."}]}, {"title": "Özet", "body": "Uzun formlar: mina, sina, tema, meie, teie, nemad\nKısa formlar: ma, sa, ta, me, te, nad\n\nKısa formlar günlük konuşmada kullanılır.\nEstoncada dilbilgisel cinsiyet yoktur - ta hem erkek, hem kadın, hem de nesne anlamına gelir.", "highlight": "Günlük konuşmada kısa formları (ma, sa, ta, me, te, nad) kullanın. Uzun formlar vurgu veya resmi yazı içindir."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a1-olema-present', 'A1', 'Olmak', '🔵', '[{"title": "\"olema\" Fiili (olmak)", "body": "\"Olema\" Estoncadaki en önemli fiildir.\nTürkçedeki \"-dır/-dir\" ve \"olmak\" gibi çalışır.\n\nŞimdi geniş zamandaki çekimini öğrenelim."}, {"title": "Geniş Zaman Çekimi", "body": "\"olema\" fiilinin her kişi için değişimi:\n\nma olen - ben ...-ım/im\nsa oled - sen ...-sın/sin\nta on - o ...-dır/dir\nme oleme - biz ...-ız/iz\nte olete - siz ...-sınız/siniz\nnad on - onlar ...-dırlar/dirler\n\nDikkat: ta ve nad aynı formu \"on\" paylaşır.", "examples": [{"estonian": "Ma olen eestlane.", "english": "I am Estonian.", "turkish": "Ben Estonyalıyım."}, {"estonian": "Sa oled mu sõber.", "english": "You are my friend.", "turkish": "Sen benim arkadaşımsın."}, {"estonian": "Ta on õpetaja.", "english": "He/She is a teacher.", "turkish": "O bir öğretmen."}]}, {"title": "Olumsuz Form", "body": "Olumsuz form çok basittir: TÜM kişiler için \"ei ole\" kullanılır.\nFormu değiştirmeye gerek yoktur - hep aynı kalır.\n\nma ei ole - ben değilim\nsa ei ole - sen değilsin\nta ei ole - o değildir\nme ei ole - biz değiliz\nte ei ole - siz değilsiniz\nnad ei ole - onlar değildir", "examples": [{"estonian": "Ta ei ole kodus.", "english": "He/She is not at home.", "turkish": "O evde değil."}, {"estonian": "Me ei ole valmis.", "english": "We are not ready.", "turkish": "Biz hazır değiliz."}]}, {"title": "Özet", "body": "Olumlu: olen, oled, on, oleme, olete, on\nOlumsuz: ei ole (tüm kişiler için aynı)\n\nBu, Estoncada öğrenmeniz gereken ilk fiildir.", "highlight": "olema fiilinin olumsuz hali her zaman \"ei ole\"dir. Kişiye göre çekim gerekmez!"}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a1-basic-word-order', 'A1', 'Söz Dizimi', '📝', '[{"title": "Estoncada Temel Sözcük Dizilişi", "body": "Estonca genellikle ÖFN kalıbını izler:\nÖzne - Fiil - Nesne\n\nBu düzen İngilizce ile aynıdır. Türkçedeki Özne-Nesne-Fiil düzeninden farklıdır.\nCümlelerin nasıl kurulduğunu görelim."}, {"title": "Düz Cümle Sözcük Dizilişi (ÖFN)", "body": "Normal cümlelerde önce özne, sonra fiil, sonra nesne gelir.\n\nBu, çoğu basit cümle için standart kalıptır.", "examples": [{"estonian": "Ma söön leiba.", "english": "I eat bread.", "turkish": "Ben ekmek yerim."}, {"estonian": "Ta loeb raamatut.", "english": "He reads a book.", "turkish": "O bir kitap okuyor."}, {"estonian": "Me joome kohvi.", "english": "We drink coffee.", "turkish": "Biz kahve içiyoruz."}]}, {"title": "\"Kas\" ile Soru Sormak", "body": "Evet/hayır sorusu oluşturmak için cümlenin başına \"Kas\" eklenir.\n\"Kas\" soru edatıdır - bir sorunun geldiğini belirtir.\n\n\"Kas\"tan sonra sözcük dizilişi düz cümledeki gibi kalır.", "examples": [{"estonian": "Kas sa räägid eesti keelt?", "english": "Do you speak Estonian?", "turkish": "Estonca konuşuyor musun?"}, {"estonian": "Kas ta on kodus?", "english": "Is he/she at home?", "turkish": "O evde mi?"}, {"estonian": "Kas te olete valmis?", "english": "Are you ready?", "turkish": "Hazır mısınız?"}]}, {"title": "Özet", "body": "Düz cümleler: Özne + Fiil + Nesne (Ma söön leiba.)\nSorular: Kas + Özne + Fiil + Nesne? (Kas sa söön leiba?)\n\nEstonca sözcük dizilişi esnektir, ancak ÖFN başlangıç seviyesi için güvenli tercihtir.", "highlight": "Düz cümleler için ÖFN kullanın ve evet/hayır soruları için başa \"Kas\" ekleyin."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a1-nominative-case', 'A1', 'Yalın Hal', '📗', '[{"title": "Yalın Hal (nimetav)", "body": "Yalın hal, bir sözcüğün temel formudur.\nSözlükte bulacağınız form budur.\n\nEn basit haldir - hiçbir ek eklenmez.\nNe zaman kullanıldığını görelim."}, {"title": "Yalın Hal Ne Zaman Kullanılır", "body": "Yalın hal şu durumlarda kullanılır:\n\n1. Cümlenin öznesi (eylemi yapan kim/ne)\n2. \"olema\" (olmak) fiilinden sonra\n3. Herhangi bir ismin sözlük/temel formu", "examples": [{"estonian": "Koer on suur.", "english": "The dog is big.", "turkish": "Köpek büyük."}, {"estonian": "See on raamat.", "english": "This is a book.", "turkish": "Bu bir kitap."}, {"estonian": "Laps magab.", "english": "The child is sleeping.", "turkish": "Çocuk uyuyor."}]}, {"title": "Özet", "body": "Yalın hal = sözlük/temel form.\nHiçbir ek eklenmez.\n\nÖzneler ve \"olema\" (olmak) fiilinden sonra kullanılır.\n\nÖrnekler: koer (köpek), raamat (kitap), maja (ev), laps (çocuk)", "highlight": "Yalın hal, ek almamış sözlük formudur. Cümlenin öznesi ve olema fiilinden sonra kullanılır."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a1-genitive-case', 'A1', 'Tamlayan', '🔑', '[{"title": "Tamlayan Hali (omastav)", "body": "Tamlayan hali iyelik (sahiplik) bildirir (Türkçedeki \"-nın/-nin\" gibi).\nAma Estoncada bundan çok daha önemlidir.\n\nTamlayan formu diğer hallerin çoğunu oluşturmak için KÖKÜ sağlar.\nBu yüzden ezberlenecek en önemli haldir."}, {"title": "Nasıl Çalışır", "body": "Tamlayan hali sözcük sonunu değiştirerek oluşturulur.\nNe yazık ki değişiklikler her zaman tahmin edilemez - öğrenmeniz gerekir.\n\nkoer -> koera (köpeğin)\nraamat -> raamatu (kitabın)\nmaja -> maja (evin - aynı kalıyor!)\nlaps -> lapse (çocuğun)", "examples": [{"estonian": "See on koera nimi.", "english": "This is the dog''s name.", "turkish": "Bu köpeğin adı."}, {"estonian": "Raamatu hind on kõrge.", "english": "The book''s price is high.", "turkish": "Kitabın fiyatı yüksek."}, {"estonian": "Maja uks on avatud.", "english": "The house''s door is open.", "turkish": "Evin kapısı açık."}]}, {"title": "Özet", "body": "Tamlayan hali iyelik bildirir VE diğer haller için temel oluşturur.\n\nHer yeni ismin tamlayan formunu öğrenmelisiniz.\nSözlükler şöyle listeler: yalın -> tamlayan -> kısmi.\n\nÖrnekler: koer/koera, raamat/raamatu, maja/maja, laps/lapse", "highlight": "Yeni isimlerin tamlayan formunu her zaman öğrenin. Bu, neredeyse tüm diğer Estonca hallerin temel yapı taşıdır."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a1-partitive-case', 'A1', 'Kısmi Hal', '🧩', '[{"title": "Kısmi Hal (osastav)", "body": "Kısmi hal, Estoncadaki en çok kullanılan hallerden biridir.\n\"Bir şeyin bir kısmını\" veya tamamlanmamış/devam eden bir eylemi ifade eder.\n\nSürekli karşılaşacaksınız, o yüzden temellerini öğrenelim."}, {"title": "Kısmi Hal Ne Zaman Kullanılır", "body": "Kısmi hal şu durumlarda kullanılır:\n\n1. Kısmi veya sayılmamış nesneler (biraz süt, biraz ekmek)\n2. 2 ve üzeri sayılardan sonra (kaks koera = iki köpek)\n3. Olumsuz cümlelerde (Bende kitap yok)\n4. Devam eden veya tamamlanmamış eylemler", "examples": [{"estonian": "Ma joon piima.", "english": "I drink milk.", "turkish": "Ben süt içiyorum."}, {"estonian": "Kaks koera.", "english": "Two dogs.", "turkish": "İki köpek."}, {"estonian": "Mul ei ole raamatut.", "english": "I don''t have a book.", "turkish": "Bende kitap yok."}]}, {"title": "Yaygın Kısmi Hal Formları", "body": "Bazı yaygın sözcüklerin kısmi hal formları:\n\nkoer -> koera\nraamat -> raamatut\npiim -> piima\nmaja -> maja\nleib -> leiba\nvesi -> vett", "examples": [{"estonian": "Ma söön leiba.", "english": "I eat bread.", "turkish": "Ben ekmek yerim."}, {"estonian": "Kolm maja.", "english": "Three houses.", "turkish": "Üç ev."}]}, {"title": "Özet", "body": "Kısmi hal; kısmi nesneler, sayılardan (2+) sonra ve olumsuz cümlelerde kullanılır.\n\nHer ismin üç temel formunu öğrenin:\nyalın -> tamlayan -> kısmi\nkoer -> koera -> koera\nraamat -> raamatu -> raamatut", "highlight": "Kısmi hal = kısmi/sayılmamış nesneler, 2+ sayılardan sonra ve olumsuz cümleler. Ezberlenecek üçüncü en önemli formdur."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a1-question-words', 'A1', 'Sorular', '❓', '[{"title": "Estonca Soru Sözcükleri", "body": "Soru sormak iletişim için gereklidir.\nEstoncada ilk günden ihtiyaç duyacağınız soru sözcükleri vardır.\n\nEn önemli 9 tanesini öğrenelim."}, {"title": "Kim, Ne, Nerede", "body": "Temel soru sözcükleri:\n\nkes? - kim?\nmis? - ne?\nkus? - nerede? (konum)\nkuhu? - nereye? (yön)\nkust? - nereden? (kaynak)\n\nNot: Estonca \"nerede\" (konum), \"nereye\" (yön) ve \"nereden\" (kaynak) ayrımını yapar.", "examples": [{"estonian": "Kes sa oled?", "english": "Who are you?", "turkish": "Sen kimsin?"}, {"estonian": "Mis see on?", "english": "What is this?", "turkish": "Bu ne?"}, {"estonian": "Kus sa elad?", "english": "Where do you live?", "turkish": "Nerede yaşıyorsun?"}]}, {"title": "Ne Zaman, Nasıl, Neden, Ne Kadar", "body": "Diğer temel soru sözcükleri:\n\nmillal? - ne zaman?\nkuidas? - nasıl?\nmiks? - neden?\nkui palju? - ne kadar/kaç tane?", "examples": [{"estonian": "Millal sa tuled?", "english": "When are you coming?", "turkish": "Ne zaman geliyorsun?"}, {"estonian": "Kuidas läheb?", "english": "How is it going?", "turkish": "Nasıl gidiyor?"}, {"estonian": "Miks sa nutad?", "english": "Why are you crying?", "turkish": "Neden ağlıyorsun?"}, {"estonian": "Kui palju see maksab?", "english": "How much does this cost?", "turkish": "Bu ne kadar?"}]}, {"title": "Özet", "body": "9 temel soru sözcüğü:\nkes (kim), mis (ne), kus (nerede),\nkuhu (nereye), kust (nereden),\nmillal (ne zaman), kuidas (nasıl), miks (neden),\nkui palju (ne kadar/kaç tane)\n\nEstoncada konum, yön ve kaynak için ÜÇ ayrı \"nerede\" sözcüğü vardır.", "highlight": "Üç \"nerede\" sözcüğünü hatırlayın: kus (nerede), kuhu (nereye), kust (nereden). Bu konum/yön/kaynak kalıbı tüm Estonca hallerde geçerlidir."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a1-numbers', 'A1', 'Sayılar', '🔢', '[{"title": "Estoncada 1-10 Sayıları", "body": "Sayılar her dilde öğrenilecek ilk şeyler arasındadır.\nEstonca 1-10 arası sayılar ezberlenmelidir.\n\nAyrıca sayılardan sonra isimlerin nasıl davrandığına dair önemli bir dilbilgisi kuralı vardır."}, {"title": "1''den 10''a Kadar Sayılar", "body": "1 - üks\n2 - kaks\n3 - kolm\n4 - neli\n5 - viis\n6 - kuus\n7 - seitse\n8 - kaheksa\n9 - üheksa\n10 - kümme", "examples": [{"estonian": "Mul on üks koer.", "english": "I have one dog.", "turkish": "Benim bir köpeğim var."}, {"estonian": "Siin on viis inimest.", "english": "There are five people here.", "turkish": "Burada beş kişi var."}]}, {"title": "Sayılar ve Kısmi Hal Kuralı", "body": "Önemli kural: 2 ve üzeri sayılardan sonra isim TEKİL KISMİ HAL formunu alır.\n\n\"üks\" (bir) den sonra isim yalın halde kalır.\n\nüks koer - bir köpek (yalın hal)\nkaks koera - iki köpek (kısmi hal)\nkolm raamatut - üç kitap (kısmi hal)\nviis last - beş çocuk (kısmi hal)", "examples": [{"estonian": "Kolm raamatut.", "english": "Three books.", "turkish": "Üç kitap."}, {"estonian": "Neli kassi.", "english": "Four cats.", "turkish": "Dört kedi."}, {"estonian": "Kümme aastat.", "english": "Ten years.", "turkish": "On yıl."}]}, {"title": "Özet", "body": "1: üks, 2: kaks, 3: kolm, 4: neli, 5: viis\n6: kuus, 7: seitse, 8: kaheksa, 9: üheksa, 10: kümme\n\n2 ve üzeri sayılardan sonra isimler tekil kısmi hal alır.", "highlight": "2 ve üzeri sayılardan sonra her zaman tekil kısmi hal kullanın: kaks koera (iki köpek), kaks koerad değil."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a1-negation', 'A1', 'Olumsuzluk', '🚫', '[{"title": "Estoncada Olumsuzluk", "body": "Estoncada olumsuz cümle kurmak şaşırtıcı derecede basittir.\nFiilin önüne \"ei\" (değil) sözcüğü koyulur.\n\nTemel kural: \"ei\"den sonra fiil kişi ekini KAYBEDER."}, {"title": "Olumsuzluk Nasıl Çalışır", "body": "Formül: özne + ei + fiil KÖKÜ (kişi eki yok)\n\nOlumlu: ma söön (yerim) -> Olumsuz: ma ei söö\nOlumlu: sa räägid (konuşursun) -> Olumsuz: sa ei räägi\nOlumlu: ta loeb (okur) -> Olumsuz: ta ei loe\n\nFiil kökü olumsuzda TÜM kişiler için aynıdır.", "examples": [{"estonian": "Ma ei söö liha.", "english": "I don''t eat meat.", "turkish": "Ben et yemem."}, {"estonian": "Ta ei räägi eesti keelt.", "english": "He doesn''t speak Estonian.", "turkish": "O Estonca konuşmuyor."}, {"estonian": "Me ei tea.", "english": "We don''t know.", "turkish": "Biz bilmiyoruz."}]}, {"title": "Özet", "body": "Olumsuzluk = ei + fiil kökü (kişi eki olmadan)\n\nma söön -> ma ei söö\nsa räägid -> sa ei räägi\nta loeb -> ta ei loe\nme sööme -> me ei söö\nte sööte -> te ei söö\nnad söövad -> nad ei söö\n\n\"ei\"den sonraki fiil formu herkes için aynıdır.", "highlight": "\"ei\"den sonra fiil kişi ekini düşürür ve yalın köküne döner. Kök tüm kişiler için aynı kalır."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a2-past-simple', 'A2', 'Geçmiş', '⏪', '[{"title": "Basit Geçmiş Zaman (lihtminevik)", "body": "Basit geçmiş zaman, geçmişte tamamlanmış eylemleri anlatır.\nFiil köküne ekler eklenerek oluşturulur.\n\nEn yaygın belirteçler -s ve -si''dir."}, {"title": "Çekim Kalıbı", "body": "\"sööma\" (yemek) fiilini örnek alalım:\n\nma sõin - yedim\nsa sõid - yedin\nta sõi - yedi\nme sõime - yedik\nte sõite - yediniz\nnad sõid - yediler\n\nÜnlü değişimleri fiilin derece değişimi kalıbının bir parçasıdır.", "examples": [{"estonian": "Ma sõin eile suppi.", "english": "I ate soup yesterday.", "turkish": "Dün çorba yedim."}, {"estonian": "Ta kirjutas kirja.", "english": "He/She wrote a letter.", "turkish": "O bir mektup yazdı."}, {"estonian": "Me kõisime Tallinnas.", "english": "We walked in Tallinn.", "turkish": "Tallinn''de yürüyüş yaptık."}]}, {"title": "Olumsuz Geçmiş Zaman", "body": "Olumsuz geçmiş zaman: ei + nud-formu (tüm kişiler için)\n\nma ei söönud - yemedim\nsa ei söönud - yemedin\nta ei söönud - yemedi\n\n-nud formu, tıpkı geniş zaman olumsuzluğu gibi, tüm kişiler için aynıdır.", "examples": [{"estonian": "Ta ei söönud midagi.", "english": "He didn''t eat anything.", "turkish": "O hiçbir şey yemedi."}, {"estonian": "Me ei näinud teda.", "english": "We didn''t see him.", "turkish": "Biz onu görmedik."}]}, {"title": "Özet", "body": "Basit geçmiş: fiil köküne -s/-si ve kişi ekleri eklenir.\nOlumsuz geçmiş: ei + -nud formu (tüm kişiler için aynı).\n\nOlumlu: ma sõin, sa sõid, ta sõi\nOlumsuz: ma/sa/ta ei söönud", "highlight": "Olumlu geçmiş zamanda kişi ekleri (-in, -id, -i, -ime, -ite, -id) kullanılır. Olumsuz geçmiş zamanda tüm kişiler için \"ei\" + -nud ortacı kullanılır."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a2-present-perfect', 'A2', 'Bitmiş', '✅', '[{"title": "Yakın Geçmiş Zaman (täisminevik)", "body": "Yakın geçmiş zaman, şimdiki zamanla bağlantılı geçmiş eylemleri anlatır.\nolema (geniş zaman) + -nud ortacı ile oluşturulur.\n\nİngilizce karşılığı: \"I have eaten\", \"She has seen\"."}, {"title": "Nasıl Oluşturulur", "body": "Formül: olen/oled/on + fiil-nud\n\nma olen söönud - yemişim / yemiş bulunuyorum\nsa oled söönud - yemişsin\nta on söönud - yemiş\nme oleme söönud - yemişiz\nte olete söönud - yemişsiniz\nnad on söönud - yemişler", "examples": [{"estonian": "Ma olen Tallinnas elanud viis aastat.", "english": "I have lived in Tallinn for five years.", "turkish": "Beş yıldır Tallinn''de yaşıyorum."}, {"estonian": "Kas sa oled seda filmi näinud?", "english": "Have you seen this movie?", "turkish": "Bu filmi gördün mü?"}]}, {"title": "Olumsuz Yakın Geçmiş", "body": "Olumsuz: ei ole + -nud (tüm kişiler için aynı)\n\nma ei ole söönud - yememişim\nsa ei ole söönud - yememişsin\nta ei ole söönud - yememiş", "examples": [{"estonian": "Ma ei ole seal kunagi käinud.", "english": "I have never been there.", "turkish": "Orada hiç bulunmadım."}, {"estonian": "Ta ei ole veel vastanud.", "english": "He/She has not answered yet.", "turkish": "O henüz cevap vermedi."}]}, {"title": "Özet", "body": "Yakın geçmiş = olema (çekimli) + -nud ortacı\nOlumsuz = ei ole + -nud\n\nŞimdiki zamanla bağlantılı geçmiş olaylar için kullanılır.", "highlight": "Yakın geçmiş = olen/oled/on + -nud. Deneyimler ve şimdiki zamanla ilgili eylemler için kullanılır."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a2-illative-case', 'A2', 'İçe Hal', '📥', '[{"title": "İçe Yönelme Hali - İÇİNE Hareket", "body": "İçe yönelme hali, bir şeyin İÇİNE veya bir yere DOĞRU hareketi ifade eder.\n\"kuhu?\" (nereye?) sorusuna cevap verir.\n\nEstoncada iki formu vardır: kısa içe yönelme ve uzun içe yönelme (-sse)."}, {"title": "Kısa İçe Yönelme (en yaygın)", "body": "Kısa içe yönelme günlük konuşmada daha sık kullanılır.\nSözcük kökünde değişiklikler içerir:\n\nmaja -> majja (evin içine)\nlinn -> linna (şehre)\nkool -> kooli (okula)\npood -> poodi (dükkana)", "examples": [{"estonian": "Ma lähen linna.", "english": "I''m going to the city.", "turkish": "Şehre gidiyorum."}, {"estonian": "Lapsed lähevad kooli.", "english": "Children go to school.", "turkish": "Çocuklar okula gidiyor."}, {"estonian": "Tule majja!", "english": "Come into the house!", "turkish": "Eve gel!"}]}, {"title": "Uzun İçe Yönelme (-sse)", "body": "Uzun içe yönelme, tamlayan formuna -sse eklenerek yapılır.\nUzun sözcüklerde veya kısa formun belirsiz olduğu durumlarda kullanılır:\n\nraamatukogu -> raamatukokku veya raamatukogusse\nhaigla -> haiglasse (hastaneye)\nülikool -> ülikooli (üniversiteye)", "examples": [{"estonian": "Ma lähen haiglasse.", "english": "I''m going to the hospital.", "turkish": "Hastaneye gidiyorum."}, {"estonian": "Ta astus autosse.", "english": "He/She got into the car.", "turkish": "O arabaya bindi."}]}, {"title": "Özet", "body": "İçe yönelme = bir şeyin İÇİNE hareket.\nCevaplar: kuhu? (nereye?)\n\nKısa içe yönelme: majja, linna, kooli (daha yaygın)\nUzun içe yönelme: tamlayan formuna -sse eklenir (haiglasse, autosse)", "highlight": "İçe yönelme hali \"kuhu?\" (nereye?) sorusuna cevap verir. Kısa formlar (linna, kooli) konuşmada daha yaygındır; uzun formlar (-sse) uzun sözcükler için kullanılır."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a2-inessive-elative', 'A2', 'İçinde/Dışa', '📦', '[{"title": "İçinde Kalma ve İçinden Çıkma Halleri", "body": "Bu iki hal, içe yönelme ile birlikte \"iç yer\" üçlüsünü tamamlar.\n\nİçinde kalma (-s) = İÇİNDE olma (kus? - nerede?)\nİçinden çıkma (-st) = İÇİNDEN çıkma (kust? - nereden?)\n\nBirlikte: İÇİNE (içe yönelme) -> İÇİNDE (içinde kalma) -> İÇİNDEN (içinden çıkma)"}, {"title": "İçinde Kalma Hali (-s) - İÇİNDE", "body": "\"İçinde\" veya \"dahilinde\" demek için tamlayan formuna -s eklenir.\n\nlinn -> linnas (şehirde)\nkool -> koolis (okulda)\nmaja -> majas (evde)\nTallinn -> Tallinnas (Tallinn''de)", "examples": [{"estonian": "Ma elan Tallinnas.", "english": "I live in Tallinn.", "turkish": "Tallinn''de yaşıyorum."}, {"estonian": "Lapsed on koolis.", "english": "The children are in school.", "turkish": "Çocuklar okulda."}, {"estonian": "Mis on karbis?", "english": "What is in the box?", "turkish": "Kutuda ne var?"}]}, {"title": "İçinden Çıkma Hali (-st) - İÇİNDEN", "body": "\"İçinden\" veya \"-den/-dan\" demek için tamlayan formuna -st eklenir.\n\nlinn -> linnast (şehirden)\nkool -> koolist (okuldan)\nmaja -> majast (evden)", "examples": [{"estonian": "Ta tuleb koolist.", "english": "He comes from school.", "turkish": "O okuldan geliyor."}, {"estonian": "Ma tulin linnast.", "english": "I came from the city.", "turkish": "Şehirden geldim."}, {"estonian": "Võta see majast välja.", "english": "Take it out of the house.", "turkish": "Onu evden çıkar."}]}, {"title": "Özet", "body": "İç yer halleri (tamlayan formuna eklenir):\nİçe yönelme = İÇİNE (kuhu?) -> linna\nİçinde kalma -s = İÇİNDE (kus?) -> linnas\nİçinden çıkma -st = İÇİNDEN (kust?) -> linnast\n\nBunları bir hareket üçlüsü olarak düşünün: içine -> içinde -> içinden.", "highlight": "İçinde kalma (-s) = içinde, İçinden çıkma (-st) = içinden/-den. Her ikisi de tamlayan formuna eklenir. İçe yönelme ile birlikte iç yer hali üçlüsünü oluştururlar."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a2-allative-adessive-ablative', 'A2', 'Yüzeyler', '🔲', '[{"title": "Yüzey Halleri (Dış Yer Halleri)", "body": "Estoncada yüzeyler için üç \"dış\" yer hali vardır:\n\nÜstüne yönelme (-le) = BİR yüzeyin ÜZERİNE (kuhu?)\nÜstünde kalma (-l) = BİR yüzeyin ÜZERİNDE (kus?)\nÜstünden ayrılma (-lt) = BİR yüzeyDEN (kust?)\n\nBunlar iç hallerin aynısıdır ama açık/düz yüzeyler içindir."}, {"title": "Üstüne Yönelme (-le) - ÜZERİNE", "body": "Bir yüzeyin ÜZERİNE hareketi ifade etmek için tamlayan formuna -le eklenir.\n\nlaud -> lauale (masanın üzerine)\npõld -> põlvule (tarlanın üzerine)\ntänav -> tänavale (caddenin üzerine)", "examples": [{"estonian": "Pane raamat lauale.", "english": "Put the book on the table.", "turkish": "Kitabı masaya koy."}, {"estonian": "Lapsed jooksevad väljakule.", "english": "Children run onto the field.", "turkish": "Çocuklar sahaya koşuyor."}]}, {"title": "Üstünde Kalma (-l) - ÜZERİNDE / Üstünden Ayrılma (-lt) - ÜZERİNDEN", "body": "Üstünde kalma (-l) = bir yüzeyin ÜZERİNDE olma:\nlaud -> laual (masanın üzerinde)\n\nÜstünden ayrılma (-lt) = bir yüzeyDEN ayrılma:\nlaud -> laualt (masanın üzerinden)", "examples": [{"estonian": "Raamat on laual.", "english": "The book is on the table.", "turkish": "Kitap masada."}, {"estonian": "Võta raamat laualt.", "english": "Take the book off the table.", "turkish": "Kitabı masadan al."}, {"estonian": "Mul on raha.", "english": "I have money. (lit: On me is money)", "turkish": "Bende para var."}]}, {"title": "Özet", "body": "Dış yer halleri (tamlayan formuna eklenir):\nÜstüne yönelme -le = ÜZERİNE (kuhu?) -> lauale\nÜstünde kalma -l = ÜZERİNDE (kus?) -> laual\nÜstünden ayrılma -lt = ÜZERİNDEN (kust?) -> laualt\n\nNot: Üstünde kalma hali iyelik için de kullanılır (mul on = bende var).", "highlight": "Yüzey halleri: -le (üzerine), -l (üzerinde), -lt (üzerinden). Üstünde kalma hali (-l) ayrıca sahiplik ifade eder: mul on = bende var."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a2-postpositions', 'A2', 'Sontakılar', '📍', '[{"title": "Estoncada Sontakılar", "body": "Türkçede edatlar isimden SONRA gelir: \"evin önünde\".\nEstoncada da sontakılar isimden SONRA gelir: \"maja ees\".\n\nSontakıdan önceki isim genellikle tamlayan halindedir.", "examples": []}, {"title": "Yaygın Sontakılar", "body": "Konum sözcükleri (tamlayan hali ile kullanılır):\n\nees - önünde\ntaga - arkasında\nkõrval - yanında\nsees - içinde\npeal - üstünde\nall - altında\njuures - yakınında\nvahel - arasında", "examples": [{"estonian": "Auto on maja ees.", "english": "The car is in front of the house.", "turkish": "Araba evin önünde."}, {"estonian": "Kass istub laua all.", "english": "The cat sits under the table.", "turkish": "Kedi masanın altında oturuyor."}, {"estonian": "Pood on kooli kõrval.", "english": "The shop is next to the school.", "turkish": "Dükkan okulun yanında."}]}, {"title": "Yön Bildiren Sontakılar", "body": "Bazı sontakılar yön belirtmek için form değiştirir:\n\nees (önünde) -> ette (önüne) -> eest (önünden)\ntaga (arkasında) -> taha (arkasına) -> tagant (arkasından)\nall (altında) -> alla (altına) -> alt (altından)\n\nBu, kus/kuhu/kust kalıbını yansıtır.", "examples": [{"estonian": "Ta seisis maja ees.", "english": "He stood in front of the house.", "turkish": "O evin önünde durdu."}, {"estonian": "Ta läks maja taha.", "english": "He went behind the house.", "turkish": "O evin arkasına gitti."}]}, {"title": "Özet", "body": "Estonca, öntakılar değil sontakılar (isimden sonra gelen) kullanır.\nİsim tamlayan halini alır.\n\nmaja ees = evin önünde\nlaua all = masanın altında\nkooli kõrval = okulun yanında", "highlight": "Sontakılar tamlayan halindeki isimden SONRA gelir: maja ees (evin önünde). Bu yapı Türkçedeki sontakılara benzer."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a2-ma-da-infinitive', 'A2', 'Mastarlar', '🔀', '[{"title": "İki Mastar Formu: -ma ve -da", "body": "Estoncada her fiilin iki mastar formu vardır:\n\nma-mastarı: sööma (yemek)\nda-mastarı: süüa (yemek)\n\nFarklı bağlamlarda kullanılırlar. Her birinin ne zaman kullanıldığını öğrenelim."}, {"title": "ma-mastarı: Amaç ve Hareket", "body": "Hareket fiillerinden sonra veya amaç ifade ederken (bir şey yapmaya gitmek) ma-mastarı kullanılır.\n\nŞöyle düşünün: \"Bir şey yapmaya gidiyorum\"", "examples": [{"estonian": "Ma lähen sööma.", "english": "I''m going to eat.", "turkish": "Yemek yemeye gidiyorum."}, {"estonian": "Ta tuli õppima.", "english": "He came to study.", "turkish": "O okumaya geldi."}, {"estonian": "Me lähme jalutama.", "english": "We''re going for a walk.", "turkish": "Yürüyüşe gidiyoruz."}]}, {"title": "da-mastarı: Kip Fiilleri", "body": "Kip fiillerinden sonra da-mastarı kullanılır:\ntahtma (istemek), saama (yapabilmek), pidama (zorunda olmak), oskama (bilmek/becermek).\n\nŞöyle düşünün: \"Bir şey istiyorum/yapabilirim/yapmalıyım\"", "examples": [{"estonian": "Ma tahan süüa.", "english": "I want to eat.", "turkish": "Yemek yemek istiyorum."}, {"estonian": "Sa pead õppida.", "english": "You have to study.", "turkish": "Çalışmak zorundasın."}, {"estonian": "Kas sa oskad ujuda?", "english": "Can you swim?", "turkish": "Yüzme biliyor musun?"}]}, {"title": "Özet", "body": "ma-mastarı -> hareket fiillerinden sonra (lähen sööma)\nda-mastarı -> kip fiillerinden sonra (tahan süüa)\n\nKural:\nBir yere gidip yapacaksan? -> ma\nİstemek/yapabilmek/zorunda olmak? -> da", "highlight": "Hareket fiilleri ma-mastarı kullanır (lähen sööma). Kip fiilleri da-mastarı kullanır (tahan süüa). Tereddütte: gitmek = -ma, istemek = -da."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a2-comparatives', 'A2', 'Karşılaştır', '⚖️', '[{"title": "Karşılaştırma ve Üstünlük Dereceleri", "body": "Estoncada karşılaştırma düzenli bir kalıp izler:\n\nKarşılaştırma (daha büyük): tamlayan kökü + -m\nÜstünlük (en büyük): kõige + karşılaştırma formu\n\nNasıl çalıştığını görelim."}, {"title": "Karşılaştırma Derecesi Oluşturma", "body": "Sıfatın tamlayan formunu alıp -m ekleyin:\n\nsuur (büyük) -> suurem (daha büyük)\nilus (güzel) -> ilusam (daha güzel)\nvana (yaşlı) -> vanem (daha yaşlı)\nnoor (genç) -> noorem (daha genç)\n\nKarşılaştırma için \"kui\" (den/dan) kullanılır.", "examples": [{"estonian": "Tallinn on suurem kui Tartu.", "english": "Tallinn is bigger than Tartu.", "turkish": "Tallinn, Tartu''dan daha büyük."}, {"estonian": "Ta on vanem kui mina.", "english": "He is older than me.", "turkish": "O benden daha yaşlı."}]}, {"title": "Üstünlük Derecesi Oluşturma", "body": "Karşılaştırma formunun önüne \"kõige\" ekleyin:\n\nsuurem -> kõige suurem (en büyük)\nilusam -> kõige ilusam (en güzel)\nvanem -> kõige vanem (en yaşlı)", "examples": [{"estonian": "See on kõige ilusam linn.", "english": "This is the most beautiful city.", "turkish": "Bu en güzel şehir."}, {"estonian": "Ta on kõige targem õpilane.", "english": "He is the smartest student.", "turkish": "O en akıllı öğrenci."}]}, {"title": "Özet", "body": "Karşılaştırma: tamlayan + -m (suurem = daha büyük)\nÜstünlük: kõige + karşılaştırma (kõige suurem = en büyük)\nKarşılaştırma sözcüğü: kui (-den/-dan)\n\nsuur -> suurem -> kõige suurem", "highlight": "Karşılaştırma = tamlayan + -m, Üstünlük = kõige + karşılaştırma. \"kui\" sözcüğü \"-den/-dan\" anlamında kullanılır: suurem kui = -den daha büyük."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-a2-numbers-11-100', 'A2', 'Sayılar+', '💯', '[{"title": "11-100 Arası Sayılar ve Sıra Sayıları", "body": "Şimdi 1-10''un ötesine geçelim.\nEstonca sayı oluşturma mantıklıdır ve net kalıplar izler.\n\nAyrıca sıra sayılarını da (birinci, ikinci, üçüncü...) öğreneceğiz."}, {"title": "Onlu Sayılar (11-19)", "body": "Onlu sayılar temel sayıya \"-teist\" eklenerek oluşturulur:\n\n11 - üksteist\n12 - kaksteist\n13 - kolmteist\n14 - neliteist\n15 - viisteist\n16 - kuusteist\n17 - seitseteist\n18 - kaheksateist\n19 - üheksateist\n\nKalıp: [sayı] + teist", "examples": [{"estonian": "Mul on kaksteist õuna.", "english": "I have twelve apples.", "turkish": "Benim on iki elmam var."}, {"estonian": "Ta on viisteist aastane.", "english": "He/She is fifteen years old.", "turkish": "O on beş yaşında."}]}, {"title": "Onlar Basamağı (20-100)", "body": "Onlar basamağı \"-kümmend\" ile oluşturulur:\n\n20 - kakskümmend\n30 - kolmkümmend\n40 - nelikümmend\n50 - viiskümmend\n60 - kuuskümmend\n70 - seitsekümmend\n80 - kaheksakümmend\n90 - üheksakümmend\n100 - sada\n\nBirleşimler: kakskümmend üks (21), kolmkümmend viis (35)", "examples": [{"estonian": "Ma elan kolmandal korrusel.", "english": "I live on the third floor.", "turkish": "Üçüncü katta yaşıyorum."}, {"estonian": "Siin on kakskümmend viis inimest.", "english": "There are 25 people here.", "turkish": "Burada yirmi beş kişi var."}]}, {"title": "Sıra Sayıları", "body": "Sıra sayıları (birinci, ikinci...) -s eki ile oluşturulur:\n\n1. - esimene (düzensiz)\n2. - teine (düzensiz)\n3. - kolmas\n4. - neljas\n5. - viies\n6. - kuues\n7. - seitsmes\n8. - kaheksas\n9. - üheksas\n10. - kümnes", "examples": [{"estonian": "See on esimene kord.", "english": "This is the first time.", "turkish": "Bu ilk seferdir."}, {"estonian": "Teine uks vasakul.", "english": "Second door on the left.", "turkish": "Solda ikinci kapı."}]}, {"title": "Özet", "body": "Onlu sayılar: sayı + teist (kaksteist = 12)\nOnlar basamağı: sayı + kümmend (kakskümmend = 20)\n100 = sada\n\nSıra sayıları: çoğunlukla -s eki, ama esimene (1.) ve teine (2.) düzensizdir.", "highlight": "Onlu sayılar = [sayı]teist, Onlar basamağı = [sayı]kümmend, 100 = sada. Unutmayın: esimene (1.) ve teine (2.) düzensiz sıra sayılarıdır."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-b1-conditional', 'B1', 'Koşul', '💭', '[{"title": "Dilek-Şart Kipi (tingiv kõneviis)", "body": "Dilek-şart kipi varsayımsal durumları ve kibar istekleri ifade eder - Türkçedeki \"-sA/-rdı\" gibi.\n-ks eki ile oluşturulur.\n\nGünlük konuşma için en yararlı kiplerden biridir."}, {"title": "Dilek-Şart Kipini Oluşturma", "body": "Fiil köküne -ks, ardından kişi ekleri eklenir:\n\nma sööksin - yerdim / yesem\nsa sööksid - yerdin / yesen\nta sööks - yerdi / yese\nme söökime - yerdik / yesek\nte söösite - yerdiniz / yeseniz\nnad sööksid - yerlerdi / yeseler\n\nOlumsuz: ei sööks (tüm kişiler için aynı)", "examples": [{"estonian": "Ma tahaksin kohvi.", "english": "I would like coffee.", "turkish": "Kahve isterdim."}, {"estonian": "Kas sa tuleksid minuga?", "english": "Would you come with me?", "turkish": "Benimle gelir misin?"}]}, {"title": "Dilek-Şart Kipi Ne Zaman Kullanılır", "body": "Dilek-şart kipi şu durumlarda kullanılır:\n\n1. Kibar istekler (tahaksin = isterdim)\n2. Varsayımsal durumlar (eğer olsaydım...)\n3. Dilekler ve hayaller\n4. İfadeleri yumuşatma", "examples": [{"estonian": "Ma sööksin praegu magada.", "english": "I would like to sleep now.", "turkish": "Şimdi uyumak isterdim."}, {"estonian": "See oleks tore.", "english": "That would be nice.", "turkish": "Bu güzel olurdu."}, {"estonian": "Kui ma oleksin rikas, reisiksin palju.", "english": "If I were rich, I would travel a lot.", "turkish": "Zengin olsam, çok seyahat ederdim."}]}, {"title": "Özet", "body": "Dilek-şart = fiil kökü + -ks + kişi ekleri\nOlumsuz = ei + fiil-ks\n\nKibar istekler için en çok kullanılan formlar: tahaksin (isterdim), saaksin (yapabilir miyim).", "highlight": "-ks eki dilek-şart kipini oluşturur. Günlük hayatta kibar istekler için \"tahaksin\" (isterdim) ve \"saaksin\" (yapabilir miyim) kullanın."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-b1-passive', 'B1', 'Edilgen', '🔄', '[{"title": "Edilgen Çatı (umbisikuline tegumood)", "body": "Estoncada edilgen çatı kişisizdir - özne yoktur.\nEylemi vurgular, yapanı değil.\n\nGeniş zaman edilgen: -takse/-dakse\nGeçmiş zaman edilgen: -ti/-di"}, {"title": "Geniş Zaman Edilgen", "body": "Fiil köküne -takse veya -dakse eklenerek oluşturulur.\nÖzne gerekmez - eylemin kendisi odak noktasıdır.\n\nrääkima -> räägitakse (konuşulur)\navama -> avatakse (açılır)\nmüüma -> müüakse (satılır)", "examples": [{"estonian": "Siin räägitakse eesti keelt.", "english": "Estonian is spoken here.", "turkish": "Burada Estonca konuşulur."}, {"estonian": "Ukse avatakse kell 9.", "english": "The door is opened at 9.", "turkish": "Kapı saat 9''da açılır."}]}, {"title": "Geçmiş Zaman Edilgen", "body": "Fiil köküne -ti veya -di eklenerek oluşturulur.\n\nehitama -> ehitati (inşa edildi)\navama -> avati (açıldı)\nkirjutama -> kirjutati (yazıldı)", "examples": [{"estonian": "Maja ehitati 1990. aastal.", "english": "The house was built in 1990.", "turkish": "Ev 1990 yılında inşa edildi."}, {"estonian": "See raamat kirjutati eesti keeles.", "english": "This book was written in Estonian.", "turkish": "Bu kitap Estonca yazıldı."}]}, {"title": "Özet", "body": "Geniş zaman edilgen: -takse/-dakse (räägitakse = konuşulur)\nGeçmiş zaman edilgen: -ti/-di (ehitati = inşa edildi)\n\nÖzne gerekmez. Odak eylem üzerindedir.", "highlight": "Edilgen çatı kişisizdir: -takse (geniş zaman), -ti (geçmiş zaman). Özne gerekmez. Tabelâlarda çok yaygın: \"Siin räägitakse eesti keelt\" (Burada Estonca konuşulur)."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-b1-translative-case', 'B1', 'Oluş Hali', '🦋', '[{"title": "Dönüşüm Hali (-ks) - Olma/Dönüşme", "body": "Dönüşüm hali değişim veya dönüşümü ifade eder.\n\"kelleks?\" (kime?) veya \"milleks?\" (neye?) sorularına cevap verir.\n\nTamlayan formuna -ks eklenerek oluşturulur."}, {"title": "Dönüşüm Hali Nasıl Kullanılır", "body": "Yaygın kalıplar:\n\nBir meslek sahibi olmak: õpetaja -> õpetajaks\nBir duruma geçmek: haige -> haigeks\nBir şeye dönüşmek: suur -> suureks\n\nŞu fiillerle kullanılır: saama (olmak/dönüşmek), jääma (kalmak/olmak), kasvama (büyümek), õppima (olmak için okumak).", "examples": [{"estonian": "Ta õpib arstiks.", "english": "He''s studying to become a doctor.", "turkish": "O doktor olmak için okuyor."}, {"estonian": "Ma jäin haigeks.", "english": "I got sick.", "turkish": "Hastalandım."}, {"estonian": "Laps kasvab suureks.", "english": "The child is growing up.", "turkish": "Çocuk büyüyor."}]}, {"title": "Özet", "body": "Dönüşüm hali = tamlayan + -ks\nDönüşüm, değişim veya olma ifade eder.\n\nõpetaja -> õpetajaks (öğretmen olmak)\nhaige -> haigeks (hasta olmak)\n\nCevaplar: kelleks? milleks? (neye/kime?)", "highlight": "Dönüşüm hali -ks = bir şeye dönüşme. saama, jääma, kasvama, õppima ile kullanılır: \"Ta saab õpetajaks\" (O öğretmen olur)."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-b1-terminative-essive-abessive', 'B1', '3 Hal', '🏷️', '[{"title": "Daha Az Yaygın Üç Hal", "body": "Estoncada daha az sıklıkla kullanılan ama yine de önemli üç hal vardır:\n\nSınır hali (-ni) = -e kadar\nGörev hali (-na) = olarak\nYoksunluk hali (-ta) = -sız/-siz\n\nÜçü de tamlayan formuna eklenir."}, {"title": "Sınır Hali (-ni) - -e Kadar", "body": "Zaman veya mekanda bir sınırı ifade eder.\nTamlayan formuna eklenir.\n\nõhtu -> õhtuni (akşama kadar)\nmets -> metsani (ormana kadar)\nlõppu -> lõpuni (sonuna kadar)", "examples": [{"estonian": "Ma jooksen metsani.", "english": "I run up to the forest.", "turkish": "Ormana kadar koşuyorum."}, {"estonian": "Õhtuni on aega.", "english": "There''s time until evening.", "turkish": "Akşama kadar zaman var."}]}, {"title": "Görev Hali (-na) ve Yoksunluk Hali (-ta)", "body": "Görev hali (-na) = bir görev/rol olarak:\nõpetaja -> õpetajana (öğretmen olarak)\n\nYoksunluk hali (-ta) = -sız/-siz, olmadan:\nraha -> rahata (parasız)\nprobleem -> probleemita (sorunsuz)", "examples": [{"estonian": "Ta töötab õpetajana.", "english": "He works as a teacher.", "turkish": "O öğretmen olarak çalışıyor."}, {"estonian": "Ma tulin rahata.", "english": "I came without money.", "turkish": "Parasız geldim."}, {"estonian": "Probleemita!", "english": "No problem!", "turkish": "Sorun yok!"}]}, {"title": "Özet", "body": "Sınır hali -ni = -e kadar (õhtuni)\nGörev hali -na = olarak (õpetajana)\nYoksunluk hali -ta = -sız/-siz (rahata)\n\nÜçü de tamlayan formuna eklenir.", "highlight": "Üç yararlı hal: -ni (-e kadar), -na (olarak), -ta (-sız/-siz). Hepsi tamlayan formuna eklenir. En yaygınları: õpetajana (öğretmen olarak), rahata (parasız)."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-b1-relative-clauses', 'B1', 'İlgi Cml', '🔗', '[{"title": "İlgi Cümleleri", "body": "İlgi cümleleri bir isim hakkında ek bilgi verir.\nEstonca şu ilgi sözcüklerini kullanır:\n\nkes - kim (kişiler için)\nmis - hangi/ki (nesneler için)\nkus - nerede (yerler için)"}, {"title": "\"kes\" ve \"mis\" Kullanımı", "body": "\"kes\" kişiler için kullanılır ve bir isim gibi çekilir.\n\"mis\" nesneler için kullanılır ve o da çekilir.\n\nmis -> mida (kısmi), mille (tamlayan), milles (içinde kalma)...\n\nİlgi sözcüğü, cümle içindeki görevine uygun halde olmalıdır.", "examples": [{"estonian": "Mees, kes seal istub, on mu isa.", "english": "The man who sits there is my father.", "turkish": "Orada oturan adam benim babam."}, {"estonian": "Raamat, mida ma loen, on huvitav.", "english": "The book that I''m reading is interesting.", "turkish": "Okuduğum kitap ilginç."}, {"estonian": "Linn, kus ma elan, on ilus.", "english": "The city where I live is beautiful.", "turkish": "Yaşadığım şehir güzel."}]}, {"title": "Özet", "body": "İlgi zamirleri:\nkes = kim (kişiler)\nmis/mida/mille = hangi/ki (nesneler)\nkus = nerede (yerler)\n\nKendilerinden önceki ismi tanımlayan bir cümle başlatırlar.\nNot: \"mis\" dilbilgisel görevine göre form değiştirir.", "highlight": "Kişiler için kes, nesneler için mis, yerler için kus kullanın. mis sözcüğünün çekildiğini unutmayın: mida (kısmi), mille (tamlayan) vb."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-b1-verb-rection', 'B1', 'Fiil Hali', '🎯', '[{"title": "Fiil Yönetimi - Hangi Hal Kullanılmalı?", "body": "Estoncadaki en zor özelliklerden biri: bazı fiiller nesneleri için her zaman belirli bir hal gerektirir.\n\nKısmi, tamlayan ve yalın hal nesnesi arasındaki seçim fiil türüne ve eylemin tamamlanma durumuna bağlıdır."}, {"title": "Kısmi Hal Gerektiren Fiiller", "body": "Bazı fiiller tamamlanma durumundan bağımsız olarak HER ZAMAN kısmi hal nesnesi alır:\n\narmastama (sevmek) -> her zaman kısmi hal\nootama (beklemek) -> her zaman kısmi hal\nkartma (korkmak) -> her zaman kısmi hal\naitama (yardım etmek) -> her zaman kısmi hal", "examples": [{"estonian": "Ma armastan sind.", "english": "I love you.", "turkish": "Seni seviyorum."}, {"estonian": "Ma ootan bussi.", "english": "I''m waiting for the bus.", "turkish": "Otobüs bekliyorum."}, {"estonian": "Ta aitab mind.", "english": "He helps me.", "turkish": "O bana yardım ediyor."}]}, {"title": "Tamlayan Hali ve Kısmi Hal Nesnesi Karşılaştırması", "body": "Diğer fiillerde hal seçimi anlam farkı yaratır:\n\nTamlayan nesnesi = tamamlanmış eylem (bitirdim)\nKısmi hal nesnesi = devam eden/kısmi eylem (yapıyordum)\n\nBu ayrım Estonca dilbilgisinin temelidir.", "examples": [{"estonian": "Ma lugesin raamatu läbi.", "english": "I read the book (finished it).", "turkish": "Kitabı okudum (bitirdim)."}, {"estonian": "Ma lugesin raamatut.", "english": "I was reading the book.", "turkish": "Kitabı okuyordum."}, {"estonian": "Ma sõin suppi.", "english": "I was eating soup. (partitive = ongoing)", "turkish": "Çorba içiyordum."}]}, {"title": "Özet", "body": "Bazı fiiller her zaman kısmi hal gerektirir (armastama, ootama, kartma).\nDiğer fiillerde:\n- Tamlayan nesnesi = tamamlanmış eylem\n- Kısmi hal nesnesi = devam eden/kısmi eylem\n\nBu, Estonca dilbilgisinin en zor kısımlarından biridir.", "highlight": "Tamlayan nesnesi = tamamlanmış eylem (lugesin raamatu läbi). Kısmi hal nesnesi = devam eden/kısmi eylem (lugesin raamatut). Bazı fiiller her zaman kısmi hal alır."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-b1-reported-speech', 'B1', 'Aktarım', '💬', '[{"title": "Aktarılan Konuşma (kaudne kõneviis)", "body": "Estoncada aktarılan konuşma için özel bir kip vardır: nakil kipi.\n-vat eki kullanılır.\n\nBu ek, başka birinin söylediğini aktardığınızı, doğruluğunu teyit etmeden, belirtir."}, {"title": "Nakil Kipini Oluşturma", "body": "Fiil köküne -vat eklenir:\n\nolema -> olevat (olduğu söyleniyor)\nminema -> minevat (gittiği söyleniyor)\ntulema -> tulevat (geldiği söyleniyor)\n\nGeçmiş formu: olevat + -nud ortacı", "examples": [{"estonian": "Ta olevat haige.", "english": "He is said to be sick.", "turkish": "Hasta olduğu söyleniyor."}, {"estonian": "Ilm minevat külmaks.", "english": "The weather is said to be getting cold.", "turkish": "Havanın soğuduğu söyleniyor."}, {"estonian": "Ta olevat tulnud Eestist.", "english": "He is said to have come from Estonia.", "turkish": "Estonya''dan geldiği söyleniyor."}]}, {"title": "Özet", "body": "Nakil kipi: fiil kökü + -vat\nGeçmiş nakil: olevat + -nud\n\nBaşkalarının söylediğini, doğruluğunu teyit etmeden aktarmak için kullanılır.\nBu kip Estonca ve Finceye özgüdür.", "highlight": "-vat eki aktarılan/duyulan bilgiyi belirtir. \"Ta olevat haige\" = Hasta OLDUĞU SÖYLENİYOR. Bilginin asıl kaynağı siz değilseniz bu kipi kullanın."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-b2-comitative-case', 'B2', 'Birlikte', '🤝', '[{"title": "Birliktelik Hali (-ga) - İle/Birlikte", "body": "Birliktelik hali \"-ile\" veya \"birlikte\" anlamını ifade eder.\nEstoncadaki 14. ve son haldir.\n\nTamlayan formuna -ga eklenerek oluşturulur."}, {"title": "Nasıl Oluşturulur ve Kullanılır", "body": "Formül: tamlayan formu + -ga\n\nauto -> autoga (arabayla)\nsõber -> sõbraga (bir arkadaşla)\nsina -> sinuga (seninle)\nbuss -> bussiga (otobüsle)\n\nEşlik ve ulaşım aracı için kullanılır.", "examples": [{"estonian": "Ma tulen autoga.", "english": "I''ll come by car.", "turkish": "Arabayla geleceğim."}, {"estonian": "Ta elab koos sõbraga.", "english": "He lives with a friend.", "turkish": "O bir arkadaşıyla yaşıyor."}, {"estonian": "Mis sinuga juhtus?", "english": "What happened to you?", "turkish": "Sana ne oldu?"}]}, {"title": "Özet", "body": "Birliktelik hali = tamlayan + -ga\nAnlamı: ile, vasıtasıyla, birlikte\n\nautoga (arabayla), sõbraga (bir arkadaşla), sinuga (seninle)\n\nBu, Estoncadaki 14. ve son haldir!", "highlight": "Birliktelik hali -ga = ile/vasıtasıyla. Tamlayan formuna eklenir. autoga (arabayla), sinuga (seninle). Estoncadaki 14. ve son haldir."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-b2-nud-tud-participles', 'B2', 'Ortaçlar', '📖', '[{"title": "Sıfat Olarak Kullanılan Ortaçlar", "body": "Estoncada sıfat olarak çalışan dört ortaç formu vardır:\n\n-nud = etken geçmiş (bir şeyi yapan)\n-tud = edilgen geçmiş (yapılmış olan)\n-v = etken geniş zaman (yapmakta olan)\n-tav = edilgen geniş zaman (yapılmakta olan)"}, {"title": "-nud ve -tud (Geçmiş Zaman Ortaçları)", "body": "-nud (etken, geçmiş): bir şeyi YAPAN\nväsinud (yorgun = yorulan kişi)\nõpinud (eğitimli = okumuş kişi)\n\n-tud (edilgen, geçmiş): YAPILMIŞ olan\nsuletud (kapalı = kapatılmış olan)\ntehtud (yapılmış = üretilmiş olan)", "examples": [{"estonian": "Väsinud mees istus pingile.", "english": "The tired man sat on the bench.", "turkish": "Yorgun adam banka oturdu."}, {"estonian": "Suletud uks.", "english": "A closed door.", "turkish": "Kapalı bir kapı."}, {"estonian": "Hästi tehtud!", "english": "Well done!", "turkish": "Aferin!"}]}, {"title": "-v ve -tav (Geniş Zaman Ortaçları)", "body": "-v (etken, geniş zaman): YAPMAKTA olan\nmagav (uyuyan = uyumakta olan)\nnaerev (gülen = gülmekte olan)\n\n-tav (edilgen, geniş zaman): YAPILMAKTA olan / yapılabilir\nloetav (okunabilir = okunabilen)\nsoovitav (tavsiye edilen = önerilen)", "examples": [{"estonian": "Magav laps.", "english": "A sleeping child.", "turkish": "Uyuyan çocuk."}, {"estonian": "Loetav raamat.", "english": "A readable book.", "turkish": "Okunabilir bir kitap."}]}, {"title": "Özet", "body": "Dört ortaç:\n-nud = etken geçmiş (väsinud = yorgun)\n-tud = edilgen geçmiş (suletud = kapalı)\n-v = etken geniş zaman (magav = uyuyan)\n-tav = edilgen geniş zaman (loetav = okunabilir)\n\nİsimlerin önünde sıfat olarak işlev görürler.", "highlight": "Dört ortaç türü: -nud (yapan), -tud (yapılmış), -v (yapmakta olan), -tav (yapılmakta olan). Hepsi isimlerin önünde sıfat olarak kullanılır."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-b2-imperative', 'B2', 'Emirler', '📢', '[{"title": "Emir Kipi - Emirler", "body": "Emir kipi, emir ve istekler için kullanılır.\nEstoncada farklı formlar vardır:\n\n- Tekil (sa) emirler\n- Çoğul/resmi (te) emirler\n- Olumsuz emirler\n- \"Hadi yapalım\" önerileri"}, {"title": "Tekil ve Çoğul Emirler", "body": "Tekil (sa): sadece fiil kökü\nÇoğul/resmi (te): kök + -ge/-ke\n\nTekil form en basit olanıdır - sadece yalın kök.\nÇoğul forma -ge (ünlülerden sonra) veya -ke (ünsüzlerden sonra) eklenir.", "examples": [{"estonian": "Tule siia!", "english": "Come here! (singular)", "turkish": "Buraya gel!"}, {"estonian": "Istu maha!", "english": "Sit down! (singular)", "turkish": "Otur!"}, {"estonian": "Tulge siia!", "english": "Come here! (plural/formal)", "turkish": "Buraya gelin!"}, {"estonian": "Istuge maha!", "english": "Sit down! (plural/formal)", "turkish": "Oturun!"}]}, {"title": "Olumsuz Emirler ve Hadi Yapalım", "body": "Olumsuz tekil: ära + fiil kökü\nOlumsuz çoğul: ärge + fiil kökü\n\n\"Hadi yapalım\" formu: kök + -gem/-kem\n\nära/ärge olumsuz emir edatlarıdır.", "examples": [{"estonian": "Ära mine!", "english": "Don''t go!", "turkish": "Gitme!"}, {"estonian": "Ärge unustage!", "english": "Don''t forget! (plural)", "turkish": "Unutmayın!"}, {"estonian": "Lähme!", "english": "Let''s go!", "turkish": "Hadi gidelim!"}]}, {"title": "Özet", "body": "Tekil emir: yalın fiil kökü (tule!)\nÇoğul/resmi: kök + -ge/-ke (tulge!)\nOlumsuz: ära/ärge + kök (ära mine! / ärge minge!)\nHadi yapalım: kök + -gem/-kem (lähme!)", "highlight": "Emirler: tekil = kök (tule!), çoğul = kök + -ge (tulge!), olumsuz = ära/ärge + kök (ära mine!), hadi = kök + -gem (lähme!)."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-b2-word-formation', 'B2', 'Sözcük Yap', '🧱', '[{"title": "Estoncada Sözcük Türetme", "body": "Estonca, birleştirme ve ekler yoluyla yeni sözcükler türetir.\nBu kalıpları anlamak, tanımadığınız sözcükleri çözmenize yardımcı olur.\n\nEn yaygın sözcük oluşturma yöntemlerini inceleyelim."}, {"title": "Bileşik Sözcükler", "body": "Estonca bileşik sözcükleri sever - iki veya daha fazla sözcük birleştirilir.\nİlk sözcük genellikle tamlayan halindedir.\n\nraamat + kogu -> raamatukogu (kütüphane)\nlinn + hall -> linnahall (belediye binası)\nkool + maja -> koolimaja (okul binası)\nauto + juht -> autojuht (şoför)\n\nUzun sözcükleri parçalarına ayırarak anlayın.", "examples": [{"estonian": "Ma lähen raamatukokku.", "english": "I''m going to the library.", "turkish": "Kütüphaneye gidiyorum."}, {"estonian": "Autojuht peatus.", "english": "The driver stopped.", "turkish": "Şoför durdu."}]}, {"title": "Yaygın Ekler", "body": "Sözcük türetmek için yararlı ekler:\n\n-ja = yapan kişi: õpetama -> õpetaja (öğretmen)\n-mine = eylem ismi: õppima -> õppimine (çalışma)\n-lik = sıfat: sõber -> sõbralik (cana yakın)\n-tu = -sız/-siz: süü -> süütu (masum)\n-kas = nitelik: jõud -> jõukas (varlıklı)\n-lane = -li (bir yerden olan): Eesti -> eestlane (Estonyalı)", "examples": [{"estonian": "Õpetaja on sõbralik.", "english": "The teacher is friendly.", "turkish": "Öğretmen cana yakın."}, {"estonian": "Õppimine on oluline.", "english": "Studying is important.", "turkish": "Çalışmak önemli."}]}, {"title": "Özet", "body": "Bileşik sözcükler: sözcükleri birleştirin (tamlayan + isim)\nTemel ekler: -ja (yapan), -mine (eylem), -lik (sıfat), -tu (-sız), -kas (nitelik), -lane (-li/bir yerden olan)\n\nUzun bir Estonca sözcük gördüğünüzde, parçalarına ayırın.", "highlight": "Uzun bileşik sözcükleri parçalarına ayırın: raamatukogu = raamatu (kitabın) + kogu (koleksiyon) = kütüphane. Ekleri öğrenin: -ja (yapan), -mine (eylem), -lik (sıfat)."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-b2-clause-connectors', 'B2', 'Bağlaçlar', '🔗', '[{"title": "Cümle Bağlaçları", "body": "Karmaşık cümleler kurmak için bağlaçlara ihtiyaç vardır.\nEstoncada sıralama bağlaçları (eşit cümleleri birleştirir) ve alt sıralama bağlaçları (bağımlı cümleler ekler) bulunur."}, {"title": "Sıralama Bağlaçları", "body": "İki eşit, bağımsız cümleyi birleştirirler:\n\nja - ve\naga / kuid - ama\nvõi - veya\nning - ve (daha resmi, edebi)\n\nCümleleri aynı düzeyde bağlarlar.", "examples": [{"estonian": "Ma õpin ja töötan.", "english": "I study and work.", "turkish": "Okuyorum ve çalışıyorum."}, {"estonian": "Ta on vaikne, aga tark.", "english": "He is quiet but smart.", "turkish": "O sessiz ama akıllı."}, {"estonian": "Kas sa tuled või jääd?", "english": "Are you coming or staying?", "turkish": "Geliyor musun yoksa kalıyor musun?"}]}, {"title": "Alt Sıralama Bağlaçları", "body": "Bağımlı cümleler başlatırlar:\n\net - ki/-dığını\nsest / kuna - çünkü\nkui - -dığında / eğer\nkuigi - rağmen/-masına rağmen\nselleks et - için/amacıyla\nkuni - -e kadar/iken", "examples": [{"estonian": "Ma õpin, sest tahan eksamit sooritada.", "english": "I study because I want to pass the exam.", "turkish": "Çalışıyorum çünkü sınavı geçmek istiyorum."}, {"estonian": "Kuigi sajab, me lähme välja.", "english": "Although it rains, we''ll go out.", "turkish": "Yağmur yağmasına rağmen dışarı çıkacağız."}, {"estonian": "Ma tean, et sa tuled.", "english": "I know that you will come.", "turkish": "Geleceğini biliyorum."}]}, {"title": "Özet", "body": "Sıralama: ja (ve), aga/kuid (ama), või (veya)\nAlt sıralama: et (ki), sest/kuna (çünkü), kui (-dığında/eğer), kuigi (rağmen), selleks et (için)\n\nBu bağlaçlar karmaşık cümleler kurmak için gereklidir.", "highlight": "Şu bağlaçları öğrenin: ja (ve), aga (ama), sest (çünkü), et (ki), kui (-dığında/eğer), kuigi (rağmen). Bunlar karmaşık Estonca cümlelerin yapıştırıcısıdır."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-b2-pluperfect', 'B2', 'Uzak Geçm', '⏮️', '[{"title": "Uzak Geçmiş Zaman (enneminevik)", "body": "Uzak geçmiş zaman, başka bir geçmiş eylemden ÖNCE tamamlanmış bir eylemi anlatır.\nTürkçe karşılığı: \"-mıştı/-mişti\".\n\nFormül: olin/olid/oli + -nud ortacı"}, {"title": "Uzak Geçmiş Zamanın Oluşturulması", "body": "olema fiilinin GEÇMİŞ ZAMAN formu + -nud ortacı kullanılır:\n\nma olin söönud - yemiştim\nsa olid söönud - yemiştin\nta oli söönud - yemişti\nme olime söönud - yemiştik\nte olite söönud - yemiştiniz\nnad olid söönud - yemişlerdi\n\nYakın geçmiş ile karşılaştırma: ma OLEN söönud (yemişim)\nUzak geçmiş: ma OLIN söönud (yemiştim)", "examples": [{"estonian": "Kui ma tulin, ta oli juba lahkunud.", "english": "When I arrived, he had already left.", "turkish": "Ben geldiğimde, o çoktan gitmişti."}, {"estonian": "Me olime söönud, enne kui nad tulid.", "english": "We had eaten before they came.", "turkish": "Onlar gelmeden önce yemek yemiştik."}]}, {"title": "Özet", "body": "Uzak geçmiş = olema geçmiş zaman (olin/olid/oli) + -nud ortacı\n\nBaşka bir geçmiş olaydan ÖNCE tamamlanmış eylemler için kullanılır.\n\nYakın geçmiş: olen söönud (yemişim)\nUzak geçmiş: olin söönud (yemiştim)", "highlight": "Uzak geçmiş = olin + -nud. \"Daha önceki geçmişi\" anlatır - başka bir geçmiş olaydan önce olan bir şey. Temel fark: olen söönud (yemişim) ve olin söönud (yemiştim)."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
-INSERT INTO grammar_stories (id, cefr_level, topic, icon, slides) VALUES ('story-b2-object-rules', 'B2', 'Nesneler', '📐', '[{"title": "Estonca Nesne Hali Kuralları", "body": "Üçlü nesne ayrımı (yalın / tamlayan / kısmi) Estonca dilbilgisinin ayırt edici özelliğidir.\n\nDoğru hal; eylemin tamamlanma durumuna, cümle türüne ve fiil türüne bağlıdır.\nTüm kuralları öğrenelim."}, {"title": "Yalın Hal Nesnesi", "body": "Yalın hal (temel form) nesnesini şu durumlarda kullanın:\n\n1. Emir cümleleri: Ava uks! (Kapıyı aç!)\n2. Kişisiz/edilgen cümleler: Uks avatakse. (Kapı açılır.)\n\nYalın hal, bu özel yapılarda tam ve bütün bir nesneyi ifade eder.", "examples": [{"estonian": "Ava uks!", "english": "Open the door!", "turkish": "Kapıyı aç!"}, {"estonian": "Kirjuta kiri!", "english": "Write the letter!", "turkish": "Mektubu yaz!"}]}, {"title": "Tamlayan Hali Nesnesi", "body": "Olumlu bir cümlede TAMAMLANMIŞ tekil bir eylem için tamlayan hali nesnesi kullanılır.\nEylem bitmiştir, nesne tamamen etkilenmiştir.\n\nBu şunu ifade eder: \"Tamamen yaptım, bitti.\"", "examples": [{"estonian": "Ma avasin ukse.", "english": "I opened the door. (completed)", "turkish": "Kapıyı açtım. (tamamlandı)"}, {"estonian": "Ta luges raamatu läbi.", "english": "He read the whole book.", "turkish": "Kitabın tamamını okudu."}]}, {"title": "Kısmi Hal Nesnesi", "body": "Kısmi hal nesnesini şu durumlarda kullanın:\n\n1. Devam eden veya tamamlanmamış eylemler\n2. Olumsuz cümleler (her zaman kısmi hal)\n3. Kısmi miktarlar\n4. Kısmi hal gerektiren fiillerden sonra (armastama, ootama...)", "examples": [{"estonian": "Ma avan ust.", "english": "I''m opening the door. (ongoing)", "turkish": "Kapıyı açıyorum. (devam ediyor)"}, {"estonian": "Ma ei avanud ust.", "english": "I didn''t open the door. (negative)", "turkish": "Kapıyı açmadım. (olumsuz)"}, {"estonian": "Ma joon vett.", "english": "I drink water. (partial)", "turkish": "Su içiyorum. (kısmi)"}]}, {"title": "Özet", "body": "Yalın hal nesnesi: emirler ve edilgen (Ava uks!)\nTamlayan nesnesi: tamamlanmış eylem (Avasin ukse.)\nKısmi hal nesnesi: devam eden, olumsuz, kısmi (Avan ust.)\n\nOlumsuz cümleler HER ZAMAN kısmi hal kullanır.\nBu üçlü sistem Estonca dilbilgisinin çekirdeğidir.", "highlight": "Yalın = emirler/edilgen, Tamlayan = tamamlanmış eylem, Kısmi = devam eden/olumsuz/kısmi. Tereddütte kısmi hal güvenli tercihtir - en yaygın nesne halidir."}]'::jsonb) ON CONFLICT (id) DO NOTHING;
+-- Grammar stories: 32 stories
+
+-- Story: Zamirler
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a1-personal-pronouns', 'A1', 'Zamirler', '👤') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-personal-pronouns', 'Estonca Kişisel Zamirler', 'Estoncada, tıpkı Türkçe gibi 6 kişi zamiri vardır.
+Her birinin uzun (resmi/yazılı) ve kısa (günlük konuşma) formu bulunur.
+
+Hepsini öğrenelim!', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-personal-pronouns', 'Tekil Zamirler', 'Tekil zamirler ve kısa formları:
+
+mina (ma) - ben
+sina (sa) - sen
+tema (ta) - o
+
+Not: Estoncada cinsiyet ayrımı yoktur. "tema" hem erkek, hem kadın, hem de nesne için kullanılır.', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma olen tudeng.', 'I am a student.', 'Ben öğrenciyim.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Sa oled ilus.', 'You are beautiful.', 'Sen güzelsin.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta on arst.', 'He/She is a doctor.', 'O bir doktor.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-personal-pronouns', 'Çoğul Zamirler', 'Çoğul zamirler ve kısa formları:
+
+meie (me) - biz
+teie (te) - siz (çoğul veya resmi)
+nemad (nad) - onlar
+
+"Teie" ayrıca yabancılara veya büyüklere hitap ederken resmi "siz" olarak da kullanılır.', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Me oleme siin.', 'We are here.', 'Biz buradayız.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Te olete head.', 'You are good.', 'Siz iyisiniz.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Nad on kodus.', 'They are at home.', 'Onlar evdeler.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-personal-pronouns', 'Özet', 'Uzun formlar: mina, sina, tema, meie, teie, nemad
+Kısa formlar: ma, sa, ta, me, te, nad
+
+Kısa formlar günlük konuşmada kullanılır.
+Estoncada dilbilgisel cinsiyet yoktur - ta hem erkek, hem kadın, hem de nesne anlamına gelir.', 'Günlük konuşmada kısa formları (ma, sa, ta, me, te, nad) kullanın. Uzun formlar vurgu veya resmi yazı içindir.', 3);
+
+-- Story: Olmak
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a1-olema-present', 'A1', 'Olmak', '🔵') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-olema-present', '"olema" Fiili (olmak)', '"Olema" Estoncadaki en önemli fiildir.
+Türkçedeki "-dır/-dir" ve "olmak" gibi çalışır.
+
+Şimdi geniş zamandaki çekimini öğrenelim.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-olema-present', 'Geniş Zaman Çekimi', '"olema" fiilinin her kişi için değişimi:
+
+ma olen - ben ...-ım/im
+sa oled - sen ...-sın/sin
+ta on - o ...-dır/dir
+me oleme - biz ...-ız/iz
+te olete - siz ...-sınız/siniz
+nad on - onlar ...-dırlar/dirler
+
+Dikkat: ta ve nad aynı formu "on" paylaşır.', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma olen eestlane.', 'I am Estonian.', 'Ben Estonyalıyım.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Sa oled mu sõber.', 'You are my friend.', 'Sen benim arkadaşımsın.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta on õpetaja.', 'He/She is a teacher.', 'O bir öğretmen.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-olema-present', 'Olumsuz Form', 'Olumsuz form çok basittir: TÜM kişiler için "ei ole" kullanılır.
+Formu değiştirmeye gerek yoktur - hep aynı kalır.
+
+ma ei ole - ben değilim
+sa ei ole - sen değilsin
+ta ei ole - o değildir
+me ei ole - biz değiliz
+te ei ole - siz değilsiniz
+nad ei ole - onlar değildir', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta ei ole kodus.', 'He/She is not at home.', 'O evde değil.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Me ei ole valmis.', 'We are not ready.', 'Biz hazır değiliz.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-olema-present', 'Özet', 'Olumlu: olen, oled, on, oleme, olete, on
+Olumsuz: ei ole (tüm kişiler için aynı)
+
+Bu, Estoncada öğrenmeniz gereken ilk fiildir.', 'olema fiilinin olumsuz hali her zaman "ei ole"dir. Kişiye göre çekim gerekmez!', 3);
+
+-- Story: Söz Dizimi
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a1-basic-word-order', 'A1', 'Söz Dizimi', '📝') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-basic-word-order', 'Estoncada Temel Sözcük Dizilişi', 'Estonca genellikle ÖFN kalıbını izler:
+Özne - Fiil - Nesne
+
+Bu düzen İngilizce ile aynıdır. Türkçedeki Özne-Nesne-Fiil düzeninden farklıdır.
+Cümlelerin nasıl kurulduğunu görelim.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-basic-word-order', 'Düz Cümle Sözcük Dizilişi (ÖFN)', 'Normal cümlelerde önce özne, sonra fiil, sonra nesne gelir.
+
+Bu, çoğu basit cümle için standart kalıptır.', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma söön leiba.', 'I eat bread.', 'Ben ekmek yerim.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta loeb raamatut.', 'He reads a book.', 'O bir kitap okuyor.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Me joome kohvi.', 'We drink coffee.', 'Biz kahve içiyoruz.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-basic-word-order', '"Kas" ile Soru Sormak', 'Evet/hayır sorusu oluşturmak için cümlenin başına "Kas" eklenir.
+"Kas" soru edatıdır - bir sorunun geldiğini belirtir.
+
+"Kas"tan sonra sözcük dizilişi düz cümledeki gibi kalır.', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kas sa räägid eesti keelt?', 'Do you speak Estonian?', 'Estonca konuşuyor musun?', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kas ta on kodus?', 'Is he/she at home?', 'O evde mi?', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kas te olete valmis?', 'Are you ready?', 'Hazır mısınız?', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-basic-word-order', 'Özet', 'Düz cümleler: Özne + Fiil + Nesne (Ma söön leiba.)
+Sorular: Kas + Özne + Fiil + Nesne? (Kas sa söön leiba?)
+
+Estonca sözcük dizilişi esnektir, ancak ÖFN başlangıç seviyesi için güvenli tercihtir.', 'Düz cümleler için ÖFN kullanın ve evet/hayır soruları için başa "Kas" ekleyin.', 3);
+
+-- Story: Yalın Hal
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a1-nominative-case', 'A1', 'Yalın Hal', '📗') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-nominative-case', 'Yalın Hal (nimetav)', 'Yalın hal, bir sözcüğün temel formudur.
+Sözlükte bulacağınız form budur.
+
+En basit haldir - hiçbir ek eklenmez.
+Ne zaman kullanıldığını görelim.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-nominative-case', 'Yalın Hal Ne Zaman Kullanılır', 'Yalın hal şu durumlarda kullanılır:
+
+1. Cümlenin öznesi (eylemi yapan kim/ne)
+2. "olema" (olmak) fiilinden sonra
+3. Herhangi bir ismin sözlük/temel formu', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Koer on suur.', 'The dog is big.', 'Köpek büyük.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'See on raamat.', 'This is a book.', 'Bu bir kitap.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Laps magab.', 'The child is sleeping.', 'Çocuk uyuyor.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-nominative-case', 'Özet', 'Yalın hal = sözlük/temel form.
+Hiçbir ek eklenmez.
+
+Özneler ve "olema" (olmak) fiilinden sonra kullanılır.
+
+Örnekler: koer (köpek), raamat (kitap), maja (ev), laps (çocuk)', 'Yalın hal, ek almamış sözlük formudur. Cümlenin öznesi ve olema fiilinden sonra kullanılır.', 2);
+
+-- Story: Tamlayan
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a1-genitive-case', 'A1', 'Tamlayan', '🔑') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-genitive-case', 'Tamlayan Hali (omastav)', 'Tamlayan hali iyelik (sahiplik) bildirir (Türkçedeki "-nın/-nin" gibi).
+Ama Estoncada bundan çok daha önemlidir.
+
+Tamlayan formu diğer hallerin çoğunu oluşturmak için KÖKÜ sağlar.
+Bu yüzden ezberlenecek en önemli haldir.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-genitive-case', 'Nasıl Çalışır', 'Tamlayan hali sözcük sonunu değiştirerek oluşturulur.
+Ne yazık ki değişiklikler her zaman tahmin edilemez - öğrenmeniz gerekir.
+
+koer -> koera (köpeğin)
+raamat -> raamatu (kitabın)
+maja -> maja (evin - aynı kalıyor!)
+laps -> lapse (çocuğun)', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'See on koera nimi.', 'This is the dog''s name.', 'Bu köpeğin adı.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Raamatu hind on kõrge.', 'The book''s price is high.', 'Kitabın fiyatı yüksek.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Maja uks on avatud.', 'The house''s door is open.', 'Evin kapısı açık.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-genitive-case', 'Özet', 'Tamlayan hali iyelik bildirir VE diğer haller için temel oluşturur.
+
+Her yeni ismin tamlayan formunu öğrenmelisiniz.
+Sözlükler şöyle listeler: yalın -> tamlayan -> kısmi.
+
+Örnekler: koer/koera, raamat/raamatu, maja/maja, laps/lapse', 'Yeni isimlerin tamlayan formunu her zaman öğrenin. Bu, neredeyse tüm diğer Estonca hallerin temel yapı taşıdır.', 2);
+
+-- Story: Kısmi Hal
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a1-partitive-case', 'A1', 'Kısmi Hal', '🧩') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-partitive-case', 'Kısmi Hal (osastav)', 'Kısmi hal, Estoncadaki en çok kullanılan hallerden biridir.
+"Bir şeyin bir kısmını" veya tamamlanmamış/devam eden bir eylemi ifade eder.
+
+Sürekli karşılaşacaksınız, o yüzden temellerini öğrenelim.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-partitive-case', 'Kısmi Hal Ne Zaman Kullanılır', 'Kısmi hal şu durumlarda kullanılır:
+
+1. Kısmi veya sayılmamış nesneler (biraz süt, biraz ekmek)
+2. 2 ve üzeri sayılardan sonra (kaks koera = iki köpek)
+3. Olumsuz cümlelerde (Bende kitap yok)
+4. Devam eden veya tamamlanmamış eylemler', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma joon piima.', 'I drink milk.', 'Ben süt içiyorum.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kaks koera.', 'Two dogs.', 'İki köpek.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Mul ei ole raamatut.', 'I don''t have a book.', 'Bende kitap yok.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-partitive-case', 'Yaygın Kısmi Hal Formları', 'Bazı yaygın sözcüklerin kısmi hal formları:
+
+koer -> koera
+raamat -> raamatut
+piim -> piima
+maja -> maja
+leib -> leiba
+vesi -> vett', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma söön leiba.', 'I eat bread.', 'Ben ekmek yerim.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kolm maja.', 'Three houses.', 'Üç ev.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-partitive-case', 'Özet', 'Kısmi hal; kısmi nesneler, sayılardan (2+) sonra ve olumsuz cümlelerde kullanılır.
+
+Her ismin üç temel formunu öğrenin:
+yalın -> tamlayan -> kısmi
+koer -> koera -> koera
+raamat -> raamatu -> raamatut', 'Kısmi hal = kısmi/sayılmamış nesneler, 2+ sayılardan sonra ve olumsuz cümleler. Ezberlenecek üçüncü en önemli formdur.', 3);
+
+-- Story: Sorular
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a1-question-words', 'A1', 'Sorular', '❓') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-question-words', 'Estonca Soru Sözcükleri', 'Soru sormak iletişim için gereklidir.
+Estoncada ilk günden ihtiyaç duyacağınız soru sözcükleri vardır.
+
+En önemli 9 tanesini öğrenelim.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-question-words', 'Kim, Ne, Nerede', 'Temel soru sözcükleri:
+
+kes? - kim?
+mis? - ne?
+kus? - nerede? (konum)
+kuhu? - nereye? (yön)
+kust? - nereden? (kaynak)
+
+Not: Estonca "nerede" (konum), "nereye" (yön) ve "nereden" (kaynak) ayrımını yapar.', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kes sa oled?', 'Who are you?', 'Sen kimsin?', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Mis see on?', 'What is this?', 'Bu ne?', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kus sa elad?', 'Where do you live?', 'Nerede yaşıyorsun?', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-question-words', 'Ne Zaman, Nasıl, Neden, Ne Kadar', 'Diğer temel soru sözcükleri:
+
+millal? - ne zaman?
+kuidas? - nasıl?
+miks? - neden?
+kui palju? - ne kadar/kaç tane?', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Millal sa tuled?', 'When are you coming?', 'Ne zaman geliyorsun?', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kuidas läheb?', 'How is it going?', 'Nasıl gidiyor?', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Miks sa nutad?', 'Why are you crying?', 'Neden ağlıyorsun?', 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kui palju see maksab?', 'How much does this cost?', 'Bu ne kadar?', 3);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-question-words', 'Özet', '9 temel soru sözcüğü:
+kes (kim), mis (ne), kus (nerede),
+kuhu (nereye), kust (nereden),
+millal (ne zaman), kuidas (nasıl), miks (neden),
+kui palju (ne kadar/kaç tane)
+
+Estoncada konum, yön ve kaynak için ÜÇ ayrı "nerede" sözcüğü vardır.', 'Üç "nerede" sözcüğünü hatırlayın: kus (nerede), kuhu (nereye), kust (nereden). Bu konum/yön/kaynak kalıbı tüm Estonca hallerde geçerlidir.', 3);
+
+-- Story: Sayılar
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a1-numbers', 'A1', 'Sayılar', '🔢') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-numbers', 'Estoncada 1-10 Sayıları', 'Sayılar her dilde öğrenilecek ilk şeyler arasındadır.
+Estonca 1-10 arası sayılar ezberlenmelidir.
+
+Ayrıca sayılardan sonra isimlerin nasıl davrandığına dair önemli bir dilbilgisi kuralı vardır.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-numbers', '1''den 10''a Kadar Sayılar', '1 - üks
+2 - kaks
+3 - kolm
+4 - neli
+5 - viis
+6 - kuus
+7 - seitse
+8 - kaheksa
+9 - üheksa
+10 - kümme', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Mul on üks koer.', 'I have one dog.', 'Benim bir köpeğim var.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Siin on viis inimest.', 'There are five people here.', 'Burada beş kişi var.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-numbers', 'Sayılar ve Kısmi Hal Kuralı', 'Önemli kural: 2 ve üzeri sayılardan sonra isim TEKİL KISMİ HAL formunu alır.
+
+"üks" (bir) den sonra isim yalın halde kalır.
+
+üks koer - bir köpek (yalın hal)
+kaks koera - iki köpek (kısmi hal)
+kolm raamatut - üç kitap (kısmi hal)
+viis last - beş çocuk (kısmi hal)', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kolm raamatut.', 'Three books.', 'Üç kitap.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Neli kassi.', 'Four cats.', 'Dört kedi.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kümme aastat.', 'Ten years.', 'On yıl.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-numbers', 'Özet', '1: üks, 2: kaks, 3: kolm, 4: neli, 5: viis
+6: kuus, 7: seitse, 8: kaheksa, 9: üheksa, 10: kümme
+
+2 ve üzeri sayılardan sonra isimler tekil kısmi hal alır.', '2 ve üzeri sayılardan sonra her zaman tekil kısmi hal kullanın: kaks koera (iki köpek), kaks koerad değil.', 3);
+
+-- Story: Olumsuzluk
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a1-negation', 'A1', 'Olumsuzluk', '🚫') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-negation', 'Estoncada Olumsuzluk', 'Estoncada olumsuz cümle kurmak şaşırtıcı derecede basittir.
+Fiilin önüne "ei" (değil) sözcüğü koyulur.
+
+Temel kural: "ei"den sonra fiil kişi ekini KAYBEDER.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-negation', 'Olumsuzluk Nasıl Çalışır', 'Formül: özne + ei + fiil KÖKÜ (kişi eki yok)
+
+Olumlu: ma söön (yerim) -> Olumsuz: ma ei söö
+Olumlu: sa räägid (konuşursun) -> Olumsuz: sa ei räägi
+Olumlu: ta loeb (okur) -> Olumsuz: ta ei loe
+
+Fiil kökü olumsuzda TÜM kişiler için aynıdır.', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma ei söö liha.', 'I don''t eat meat.', 'Ben et yemem.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta ei räägi eesti keelt.', 'He doesn''t speak Estonian.', 'O Estonca konuşmuyor.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Me ei tea.', 'We don''t know.', 'Biz bilmiyoruz.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a1-negation', 'Özet', 'Olumsuzluk = ei + fiil kökü (kişi eki olmadan)
+
+ma söön -> ma ei söö
+sa räägid -> sa ei räägi
+ta loeb -> ta ei loe
+me sööme -> me ei söö
+te sööte -> te ei söö
+nad söövad -> nad ei söö
+
+"ei"den sonraki fiil formu herkes için aynıdır.', '"ei"den sonra fiil kişi ekini düşürür ve yalın köküne döner. Kök tüm kişiler için aynı kalır.', 2);
+
+-- Story: Geçmiş
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a2-past-simple', 'A2', 'Geçmiş', '⏪') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-past-simple', 'Basit Geçmiş Zaman (lihtminevik)', 'Basit geçmiş zaman, geçmişte tamamlanmış eylemleri anlatır.
+Fiil köküne ekler eklenerek oluşturulur.
+
+En yaygın belirteçler -s ve -si''dir.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-past-simple', 'Çekim Kalıbı', '"sööma" (yemek) fiilini örnek alalım:
+
+ma sõin - yedim
+sa sõid - yedin
+ta sõi - yedi
+me sõime - yedik
+te sõite - yediniz
+nad sõid - yediler
+
+Ünlü değişimleri fiilin derece değişimi kalıbının bir parçasıdır.', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma sõin eile suppi.', 'I ate soup yesterday.', 'Dün çorba yedim.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta kirjutas kirja.', 'He/She wrote a letter.', 'O bir mektup yazdı.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Me kõisime Tallinnas.', 'We walked in Tallinn.', 'Tallinn''de yürüyüş yaptık.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-past-simple', 'Olumsuz Geçmiş Zaman', 'Olumsuz geçmiş zaman: ei + nud-formu (tüm kişiler için)
+
+ma ei söönud - yemedim
+sa ei söönud - yemedin
+ta ei söönud - yemedi
+
+-nud formu, tıpkı geniş zaman olumsuzluğu gibi, tüm kişiler için aynıdır.', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta ei söönud midagi.', 'He didn''t eat anything.', 'O hiçbir şey yemedi.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Me ei näinud teda.', 'We didn''t see him.', 'Biz onu görmedik.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-past-simple', 'Özet', 'Basit geçmiş: fiil köküne -s/-si ve kişi ekleri eklenir.
+Olumsuz geçmiş: ei + -nud formu (tüm kişiler için aynı).
+
+Olumlu: ma sõin, sa sõid, ta sõi
+Olumsuz: ma/sa/ta ei söönud', 'Olumlu geçmiş zamanda kişi ekleri (-in, -id, -i, -ime, -ite, -id) kullanılır. Olumsuz geçmiş zamanda tüm kişiler için "ei" + -nud ortacı kullanılır.', 3);
+
+-- Story: Bitmiş
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a2-present-perfect', 'A2', 'Bitmiş', '✅') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-present-perfect', 'Yakın Geçmiş Zaman (täisminevik)', 'Yakın geçmiş zaman, şimdiki zamanla bağlantılı geçmiş eylemleri anlatır.
+olema (geniş zaman) + -nud ortacı ile oluşturulur.
+
+İngilizce karşılığı: "I have eaten", "She has seen".', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-present-perfect', 'Nasıl Oluşturulur', 'Formül: olen/oled/on + fiil-nud
+
+ma olen söönud - yemişim / yemiş bulunuyorum
+sa oled söönud - yemişsin
+ta on söönud - yemiş
+me oleme söönud - yemişiz
+te olete söönud - yemişsiniz
+nad on söönud - yemişler', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma olen Tallinnas elanud viis aastat.', 'I have lived in Tallinn for five years.', 'Beş yıldır Tallinn''de yaşıyorum.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kas sa oled seda filmi näinud?', 'Have you seen this movie?', 'Bu filmi gördün mü?', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-present-perfect', 'Olumsuz Yakın Geçmiş', 'Olumsuz: ei ole + -nud (tüm kişiler için aynı)
+
+ma ei ole söönud - yememişim
+sa ei ole söönud - yememişsin
+ta ei ole söönud - yememiş', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma ei ole seal kunagi käinud.', 'I have never been there.', 'Orada hiç bulunmadım.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta ei ole veel vastanud.', 'He/She has not answered yet.', 'O henüz cevap vermedi.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-present-perfect', 'Özet', 'Yakın geçmiş = olema (çekimli) + -nud ortacı
+Olumsuz = ei ole + -nud
+
+Şimdiki zamanla bağlantılı geçmiş olaylar için kullanılır.', 'Yakın geçmiş = olen/oled/on + -nud. Deneyimler ve şimdiki zamanla ilgili eylemler için kullanılır.', 3);
+
+-- Story: İçe Hal
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a2-illative-case', 'A2', 'İçe Hal', '📥') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-illative-case', 'İçe Yönelme Hali - İÇİNE Hareket', 'İçe yönelme hali, bir şeyin İÇİNE veya bir yere DOĞRU hareketi ifade eder.
+"kuhu?" (nereye?) sorusuna cevap verir.
+
+Estoncada iki formu vardır: kısa içe yönelme ve uzun içe yönelme (-sse).', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-illative-case', 'Kısa İçe Yönelme (en yaygın)', 'Kısa içe yönelme günlük konuşmada daha sık kullanılır.
+Sözcük kökünde değişiklikler içerir:
+
+maja -> majja (evin içine)
+linn -> linna (şehre)
+kool -> kooli (okula)
+pood -> poodi (dükkana)', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma lähen linna.', 'I''m going to the city.', 'Şehre gidiyorum.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Lapsed lähevad kooli.', 'Children go to school.', 'Çocuklar okula gidiyor.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Tule majja!', 'Come into the house!', 'Eve gel!', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-illative-case', 'Uzun İçe Yönelme (-sse)', 'Uzun içe yönelme, tamlayan formuna -sse eklenerek yapılır.
+Uzun sözcüklerde veya kısa formun belirsiz olduğu durumlarda kullanılır:
+
+raamatukogu -> raamatukokku veya raamatukogusse
+haigla -> haiglasse (hastaneye)
+ülikool -> ülikooli (üniversiteye)', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma lähen haiglasse.', 'I''m going to the hospital.', 'Hastaneye gidiyorum.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta astus autosse.', 'He/She got into the car.', 'O arabaya bindi.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-illative-case', 'Özet', 'İçe yönelme = bir şeyin İÇİNE hareket.
+Cevaplar: kuhu? (nereye?)
+
+Kısa içe yönelme: majja, linna, kooli (daha yaygın)
+Uzun içe yönelme: tamlayan formuna -sse eklenir (haiglasse, autosse)', 'İçe yönelme hali "kuhu?" (nereye?) sorusuna cevap verir. Kısa formlar (linna, kooli) konuşmada daha yaygındır; uzun formlar (-sse) uzun sözcükler için kullanılır.', 3);
+
+-- Story: İçinde/Dışa
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a2-inessive-elative', 'A2', 'İçinde/Dışa', '📦') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-inessive-elative', 'İçinde Kalma ve İçinden Çıkma Halleri', 'Bu iki hal, içe yönelme ile birlikte "iç yer" üçlüsünü tamamlar.
+
+İçinde kalma (-s) = İÇİNDE olma (kus? - nerede?)
+İçinden çıkma (-st) = İÇİNDEN çıkma (kust? - nereden?)
+
+Birlikte: İÇİNE (içe yönelme) -> İÇİNDE (içinde kalma) -> İÇİNDEN (içinden çıkma)', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-inessive-elative', 'İçinde Kalma Hali (-s) - İÇİNDE', '"İçinde" veya "dahilinde" demek için tamlayan formuna -s eklenir.
+
+linn -> linnas (şehirde)
+kool -> koolis (okulda)
+maja -> majas (evde)
+Tallinn -> Tallinnas (Tallinn''de)', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma elan Tallinnas.', 'I live in Tallinn.', 'Tallinn''de yaşıyorum.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Lapsed on koolis.', 'The children are in school.', 'Çocuklar okulda.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Mis on karbis?', 'What is in the box?', 'Kutuda ne var?', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-inessive-elative', 'İçinden Çıkma Hali (-st) - İÇİNDEN', '"İçinden" veya "-den/-dan" demek için tamlayan formuna -st eklenir.
+
+linn -> linnast (şehirden)
+kool -> koolist (okuldan)
+maja -> majast (evden)', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta tuleb koolist.', 'He comes from school.', 'O okuldan geliyor.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma tulin linnast.', 'I came from the city.', 'Şehirden geldim.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Võta see majast välja.', 'Take it out of the house.', 'Onu evden çıkar.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-inessive-elative', 'Özet', 'İç yer halleri (tamlayan formuna eklenir):
+İçe yönelme = İÇİNE (kuhu?) -> linna
+İçinde kalma -s = İÇİNDE (kus?) -> linnas
+İçinden çıkma -st = İÇİNDEN (kust?) -> linnast
+
+Bunları bir hareket üçlüsü olarak düşünün: içine -> içinde -> içinden.', 'İçinde kalma (-s) = içinde, İçinden çıkma (-st) = içinden/-den. Her ikisi de tamlayan formuna eklenir. İçe yönelme ile birlikte iç yer hali üçlüsünü oluştururlar.', 3);
+
+-- Story: Yüzeyler
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a2-allative-adessive-ablative', 'A2', 'Yüzeyler', '🔲') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-allative-adessive-ablative', 'Yüzey Halleri (Dış Yer Halleri)', 'Estoncada yüzeyler için üç "dış" yer hali vardır:
+
+Üstüne yönelme (-le) = BİR yüzeyin ÜZERİNE (kuhu?)
+Üstünde kalma (-l) = BİR yüzeyin ÜZERİNDE (kus?)
+Üstünden ayrılma (-lt) = BİR yüzeyDEN (kust?)
+
+Bunlar iç hallerin aynısıdır ama açık/düz yüzeyler içindir.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-allative-adessive-ablative', 'Üstüne Yönelme (-le) - ÜZERİNE', 'Bir yüzeyin ÜZERİNE hareketi ifade etmek için tamlayan formuna -le eklenir.
+
+laud -> lauale (masanın üzerine)
+põld -> põlvule (tarlanın üzerine)
+tänav -> tänavale (caddenin üzerine)', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Pane raamat lauale.', 'Put the book on the table.', 'Kitabı masaya koy.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Lapsed jooksevad väljakule.', 'Children run onto the field.', 'Çocuklar sahaya koşuyor.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-allative-adessive-ablative', 'Üstünde Kalma (-l) - ÜZERİNDE / Üstünden Ayrılma (-lt) - ÜZERİNDEN', 'Üstünde kalma (-l) = bir yüzeyin ÜZERİNDE olma:
+laud -> laual (masanın üzerinde)
+
+Üstünden ayrılma (-lt) = bir yüzeyDEN ayrılma:
+laud -> laualt (masanın üzerinden)', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Raamat on laual.', 'The book is on the table.', 'Kitap masada.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Võta raamat laualt.', 'Take the book off the table.', 'Kitabı masadan al.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Mul on raha.', 'I have money. (lit: On me is money)', 'Bende para var.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-allative-adessive-ablative', 'Özet', 'Dış yer halleri (tamlayan formuna eklenir):
+Üstüne yönelme -le = ÜZERİNE (kuhu?) -> lauale
+Üstünde kalma -l = ÜZERİNDE (kus?) -> laual
+Üstünden ayrılma -lt = ÜZERİNDEN (kust?) -> laualt
+
+Not: Üstünde kalma hali iyelik için de kullanılır (mul on = bende var).', 'Yüzey halleri: -le (üzerine), -l (üzerinde), -lt (üzerinden). Üstünde kalma hali (-l) ayrıca sahiplik ifade eder: mul on = bende var.', 3);
+
+-- Story: Sontakılar
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a2-postpositions', 'A2', 'Sontakılar', '📍') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-postpositions', 'Estoncada Sontakılar', 'Türkçede edatlar isimden SONRA gelir: "evin önünde".
+Estoncada da sontakılar isimden SONRA gelir: "maja ees".
+
+Sontakıdan önceki isim genellikle tamlayan halindedir.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-postpositions', 'Yaygın Sontakılar', 'Konum sözcükleri (tamlayan hali ile kullanılır):
+
+ees - önünde
+taga - arkasında
+kõrval - yanında
+sees - içinde
+peal - üstünde
+all - altında
+juures - yakınında
+vahel - arasında', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Auto on maja ees.', 'The car is in front of the house.', 'Araba evin önünde.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kass istub laua all.', 'The cat sits under the table.', 'Kedi masanın altında oturuyor.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Pood on kooli kõrval.', 'The shop is next to the school.', 'Dükkan okulun yanında.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-postpositions', 'Yön Bildiren Sontakılar', 'Bazı sontakılar yön belirtmek için form değiştirir:
+
+ees (önünde) -> ette (önüne) -> eest (önünden)
+taga (arkasında) -> taha (arkasına) -> tagant (arkasından)
+all (altında) -> alla (altına) -> alt (altından)
+
+Bu, kus/kuhu/kust kalıbını yansıtır.', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta seisis maja ees.', 'He stood in front of the house.', 'O evin önünde durdu.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta läks maja taha.', 'He went behind the house.', 'O evin arkasına gitti.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-postpositions', 'Özet', 'Estonca, öntakılar değil sontakılar (isimden sonra gelen) kullanır.
+İsim tamlayan halini alır.
+
+maja ees = evin önünde
+laua all = masanın altında
+kooli kõrval = okulun yanında', 'Sontakılar tamlayan halindeki isimden SONRA gelir: maja ees (evin önünde). Bu yapı Türkçedeki sontakılara benzer.', 3);
+
+-- Story: Mastarlar
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a2-ma-da-infinitive', 'A2', 'Mastarlar', '🔀') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-ma-da-infinitive', 'İki Mastar Formu: -ma ve -da', 'Estoncada her fiilin iki mastar formu vardır:
+
+ma-mastarı: sööma (yemek)
+da-mastarı: süüa (yemek)
+
+Farklı bağlamlarda kullanılırlar. Her birinin ne zaman kullanıldığını öğrenelim.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-ma-da-infinitive', 'ma-mastarı: Amaç ve Hareket', 'Hareket fiillerinden sonra veya amaç ifade ederken (bir şey yapmaya gitmek) ma-mastarı kullanılır.
+
+Şöyle düşünün: "Bir şey yapmaya gidiyorum"', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma lähen sööma.', 'I''m going to eat.', 'Yemek yemeye gidiyorum.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta tuli õppima.', 'He came to study.', 'O okumaya geldi.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Me lähme jalutama.', 'We''re going for a walk.', 'Yürüyüşe gidiyoruz.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-ma-da-infinitive', 'da-mastarı: Kip Fiilleri', 'Kip fiillerinden sonra da-mastarı kullanılır:
+tahtma (istemek), saama (yapabilmek), pidama (zorunda olmak), oskama (bilmek/becermek).
+
+Şöyle düşünün: "Bir şey istiyorum/yapabilirim/yapmalıyım"', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma tahan süüa.', 'I want to eat.', 'Yemek yemek istiyorum.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Sa pead õppida.', 'You have to study.', 'Çalışmak zorundasın.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kas sa oskad ujuda?', 'Can you swim?', 'Yüzme biliyor musun?', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-ma-da-infinitive', 'Özet', 'ma-mastarı -> hareket fiillerinden sonra (lähen sööma)
+da-mastarı -> kip fiillerinden sonra (tahan süüa)
+
+Kural:
+Bir yere gidip yapacaksan? -> ma
+İstemek/yapabilmek/zorunda olmak? -> da', 'Hareket fiilleri ma-mastarı kullanır (lähen sööma). Kip fiilleri da-mastarı kullanır (tahan süüa). Tereddütte: gitmek = -ma, istemek = -da.', 3);
+
+-- Story: Karşılaştır
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a2-comparatives', 'A2', 'Karşılaştır', '⚖️') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-comparatives', 'Karşılaştırma ve Üstünlük Dereceleri', 'Estoncada karşılaştırma düzenli bir kalıp izler:
+
+Karşılaştırma (daha büyük): tamlayan kökü + -m
+Üstünlük (en büyük): kõige + karşılaştırma formu
+
+Nasıl çalıştığını görelim.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-comparatives', 'Karşılaştırma Derecesi Oluşturma', 'Sıfatın tamlayan formunu alıp -m ekleyin:
+
+suur (büyük) -> suurem (daha büyük)
+ilus (güzel) -> ilusam (daha güzel)
+vana (yaşlı) -> vanem (daha yaşlı)
+noor (genç) -> noorem (daha genç)
+
+Karşılaştırma için "kui" (den/dan) kullanılır.', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Tallinn on suurem kui Tartu.', 'Tallinn is bigger than Tartu.', 'Tallinn, Tartu''dan daha büyük.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta on vanem kui mina.', 'He is older than me.', 'O benden daha yaşlı.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-comparatives', 'Üstünlük Derecesi Oluşturma', 'Karşılaştırma formunun önüne "kõige" ekleyin:
+
+suurem -> kõige suurem (en büyük)
+ilusam -> kõige ilusam (en güzel)
+vanem -> kõige vanem (en yaşlı)', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'See on kõige ilusam linn.', 'This is the most beautiful city.', 'Bu en güzel şehir.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta on kõige targem õpilane.', 'He is the smartest student.', 'O en akıllı öğrenci.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-comparatives', 'Özet', 'Karşılaştırma: tamlayan + -m (suurem = daha büyük)
+Üstünlük: kõige + karşılaştırma (kõige suurem = en büyük)
+Karşılaştırma sözcüğü: kui (-den/-dan)
+
+suur -> suurem -> kõige suurem', 'Karşılaştırma = tamlayan + -m, Üstünlük = kõige + karşılaştırma. "kui" sözcüğü "-den/-dan" anlamında kullanılır: suurem kui = -den daha büyük.', 3);
+
+-- Story: Sayılar+
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-a2-numbers-11-100', 'A2', 'Sayılar+', '💯') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-numbers-11-100', '11-100 Arası Sayılar ve Sıra Sayıları', 'Şimdi 1-10''un ötesine geçelim.
+Estonca sayı oluşturma mantıklıdır ve net kalıplar izler.
+
+Ayrıca sıra sayılarını da (birinci, ikinci, üçüncü...) öğreneceğiz.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-numbers-11-100', 'Onlu Sayılar (11-19)', 'Onlu sayılar temel sayıya "-teist" eklenerek oluşturulur:
+
+11 - üksteist
+12 - kaksteist
+13 - kolmteist
+14 - neliteist
+15 - viisteist
+16 - kuusteist
+17 - seitseteist
+18 - kaheksateist
+19 - üheksateist
+
+Kalıp: [sayı] + teist', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Mul on kaksteist õuna.', 'I have twelve apples.', 'Benim on iki elmam var.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta on viisteist aastane.', 'He/She is fifteen years old.', 'O on beş yaşında.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-numbers-11-100', 'Onlar Basamağı (20-100)', 'Onlar basamağı "-kümmend" ile oluşturulur:
+
+20 - kakskümmend
+30 - kolmkümmend
+40 - nelikümmend
+50 - viiskümmend
+60 - kuuskümmend
+70 - seitsekümmend
+80 - kaheksakümmend
+90 - üheksakümmend
+100 - sada
+
+Birleşimler: kakskümmend üks (21), kolmkümmend viis (35)', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma elan kolmandal korrusel.', 'I live on the third floor.', 'Üçüncü katta yaşıyorum.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Siin on kakskümmend viis inimest.', 'There are 25 people here.', 'Burada yirmi beş kişi var.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-numbers-11-100', 'Sıra Sayıları', 'Sıra sayıları (birinci, ikinci...) -s eki ile oluşturulur:
+
+1. - esimene (düzensiz)
+2. - teine (düzensiz)
+3. - kolmas
+4. - neljas
+5. - viies
+6. - kuues
+7. - seitsmes
+8. - kaheksas
+9. - üheksas
+10. - kümnes', NULL, 3);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'See on esimene kord.', 'This is the first time.', 'Bu ilk seferdir.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Teine uks vasakul.', 'Second door on the left.', 'Solda ikinci kapı.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-a2-numbers-11-100', 'Özet', 'Onlu sayılar: sayı + teist (kaksteist = 12)
+Onlar basamağı: sayı + kümmend (kakskümmend = 20)
+100 = sada
+
+Sıra sayıları: çoğunlukla -s eki, ama esimene (1.) ve teine (2.) düzensizdir.', 'Onlu sayılar = [sayı]teist, Onlar basamağı = [sayı]kümmend, 100 = sada. Unutmayın: esimene (1.) ve teine (2.) düzensiz sıra sayılarıdır.', 4);
+
+-- Story: Koşul
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-b1-conditional', 'B1', 'Koşul', '💭') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-conditional', 'Dilek-Şart Kipi (tingiv kõneviis)', 'Dilek-şart kipi varsayımsal durumları ve kibar istekleri ifade eder - Türkçedeki "-sA/-rdı" gibi.
+-ks eki ile oluşturulur.
+
+Günlük konuşma için en yararlı kiplerden biridir.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-conditional', 'Dilek-Şart Kipini Oluşturma', 'Fiil köküne -ks, ardından kişi ekleri eklenir:
+
+ma sööksin - yerdim / yesem
+sa sööksid - yerdin / yesen
+ta sööks - yerdi / yese
+me söökime - yerdik / yesek
+te söösite - yerdiniz / yeseniz
+nad sööksid - yerlerdi / yeseler
+
+Olumsuz: ei sööks (tüm kişiler için aynı)', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma tahaksin kohvi.', 'I would like coffee.', 'Kahve isterdim.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kas sa tuleksid minuga?', 'Would you come with me?', 'Benimle gelir misin?', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-conditional', 'Dilek-Şart Kipi Ne Zaman Kullanılır', 'Dilek-şart kipi şu durumlarda kullanılır:
+
+1. Kibar istekler (tahaksin = isterdim)
+2. Varsayımsal durumlar (eğer olsaydım...)
+3. Dilekler ve hayaller
+4. İfadeleri yumuşatma', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma sööksin praegu magada.', 'I would like to sleep now.', 'Şimdi uyumak isterdim.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'See oleks tore.', 'That would be nice.', 'Bu güzel olurdu.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kui ma oleksin rikas, reisiksin palju.', 'If I were rich, I would travel a lot.', 'Zengin olsam, çok seyahat ederdim.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-conditional', 'Özet', 'Dilek-şart = fiil kökü + -ks + kişi ekleri
+Olumsuz = ei + fiil-ks
+
+Kibar istekler için en çok kullanılan formlar: tahaksin (isterdim), saaksin (yapabilir miyim).', '-ks eki dilek-şart kipini oluşturur. Günlük hayatta kibar istekler için "tahaksin" (isterdim) ve "saaksin" (yapabilir miyim) kullanın.', 3);
+
+-- Story: Edilgen
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-b1-passive', 'B1', 'Edilgen', '🔄') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-passive', 'Edilgen Çatı (umbisikuline tegumood)', 'Estoncada edilgen çatı kişisizdir - özne yoktur.
+Eylemi vurgular, yapanı değil.
+
+Geniş zaman edilgen: -takse/-dakse
+Geçmiş zaman edilgen: -ti/-di', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-passive', 'Geniş Zaman Edilgen', 'Fiil köküne -takse veya -dakse eklenerek oluşturulur.
+Özne gerekmez - eylemin kendisi odak noktasıdır.
+
+rääkima -> räägitakse (konuşulur)
+avama -> avatakse (açılır)
+müüma -> müüakse (satılır)', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Siin räägitakse eesti keelt.', 'Estonian is spoken here.', 'Burada Estonca konuşulur.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ukse avatakse kell 9.', 'The door is opened at 9.', 'Kapı saat 9''da açılır.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-passive', 'Geçmiş Zaman Edilgen', 'Fiil köküne -ti veya -di eklenerek oluşturulur.
+
+ehitama -> ehitati (inşa edildi)
+avama -> avati (açıldı)
+kirjutama -> kirjutati (yazıldı)', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Maja ehitati 1990. aastal.', 'The house was built in 1990.', 'Ev 1990 yılında inşa edildi.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'See raamat kirjutati eesti keeles.', 'This book was written in Estonian.', 'Bu kitap Estonca yazıldı.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-passive', 'Özet', 'Geniş zaman edilgen: -takse/-dakse (räägitakse = konuşulur)
+Geçmiş zaman edilgen: -ti/-di (ehitati = inşa edildi)
+
+Özne gerekmez. Odak eylem üzerindedir.', 'Edilgen çatı kişisizdir: -takse (geniş zaman), -ti (geçmiş zaman). Özne gerekmez. Tabelâlarda çok yaygın: "Siin räägitakse eesti keelt" (Burada Estonca konuşulur).', 3);
+
+-- Story: Oluş Hali
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-b1-translative-case', 'B1', 'Oluş Hali', '🦋') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-translative-case', 'Dönüşüm Hali (-ks) - Olma/Dönüşme', 'Dönüşüm hali değişim veya dönüşümü ifade eder.
+"kelleks?" (kime?) veya "milleks?" (neye?) sorularına cevap verir.
+
+Tamlayan formuna -ks eklenerek oluşturulur.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-translative-case', 'Dönüşüm Hali Nasıl Kullanılır', 'Yaygın kalıplar:
+
+Bir meslek sahibi olmak: õpetaja -> õpetajaks
+Bir duruma geçmek: haige -> haigeks
+Bir şeye dönüşmek: suur -> suureks
+
+Şu fiillerle kullanılır: saama (olmak/dönüşmek), jääma (kalmak/olmak), kasvama (büyümek), õppima (olmak için okumak).', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta õpib arstiks.', 'He''s studying to become a doctor.', 'O doktor olmak için okuyor.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma jäin haigeks.', 'I got sick.', 'Hastalandım.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Laps kasvab suureks.', 'The child is growing up.', 'Çocuk büyüyor.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-translative-case', 'Özet', 'Dönüşüm hali = tamlayan + -ks
+Dönüşüm, değişim veya olma ifade eder.
+
+õpetaja -> õpetajaks (öğretmen olmak)
+haige -> haigeks (hasta olmak)
+
+Cevaplar: kelleks? milleks? (neye/kime?)', 'Dönüşüm hali -ks = bir şeye dönüşme. saama, jääma, kasvama, õppima ile kullanılır: "Ta saab õpetajaks" (O öğretmen olur).', 2);
+
+-- Story: 3 Hal
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-b1-terminative-essive-abessive', 'B1', '3 Hal', '🏷️') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-terminative-essive-abessive', 'Daha Az Yaygın Üç Hal', 'Estoncada daha az sıklıkla kullanılan ama yine de önemli üç hal vardır:
+
+Sınır hali (-ni) = -e kadar
+Görev hali (-na) = olarak
+Yoksunluk hali (-ta) = -sız/-siz
+
+Üçü de tamlayan formuna eklenir.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-terminative-essive-abessive', 'Sınır Hali (-ni) - -e Kadar', 'Zaman veya mekanda bir sınırı ifade eder.
+Tamlayan formuna eklenir.
+
+õhtu -> õhtuni (akşama kadar)
+mets -> metsani (ormana kadar)
+lõppu -> lõpuni (sonuna kadar)', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma jooksen metsani.', 'I run up to the forest.', 'Ormana kadar koşuyorum.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Õhtuni on aega.', 'There''s time until evening.', 'Akşama kadar zaman var.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-terminative-essive-abessive', 'Görev Hali (-na) ve Yoksunluk Hali (-ta)', 'Görev hali (-na) = bir görev/rol olarak:
+õpetaja -> õpetajana (öğretmen olarak)
+
+Yoksunluk hali (-ta) = -sız/-siz, olmadan:
+raha -> rahata (parasız)
+probleem -> probleemita (sorunsuz)', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta töötab õpetajana.', 'He works as a teacher.', 'O öğretmen olarak çalışıyor.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma tulin rahata.', 'I came without money.', 'Parasız geldim.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Probleemita!', 'No problem!', 'Sorun yok!', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-terminative-essive-abessive', 'Özet', 'Sınır hali -ni = -e kadar (õhtuni)
+Görev hali -na = olarak (õpetajana)
+Yoksunluk hali -ta = -sız/-siz (rahata)
+
+Üçü de tamlayan formuna eklenir.', 'Üç yararlı hal: -ni (-e kadar), -na (olarak), -ta (-sız/-siz). Hepsi tamlayan formuna eklenir. En yaygınları: õpetajana (öğretmen olarak), rahata (parasız).', 3);
+
+-- Story: İlgi Cml
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-b1-relative-clauses', 'B1', 'İlgi Cml', '🔗') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-relative-clauses', 'İlgi Cümleleri', 'İlgi cümleleri bir isim hakkında ek bilgi verir.
+Estonca şu ilgi sözcüklerini kullanır:
+
+kes - kim (kişiler için)
+mis - hangi/ki (nesneler için)
+kus - nerede (yerler için)', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-relative-clauses', '"kes" ve "mis" Kullanımı', '"kes" kişiler için kullanılır ve bir isim gibi çekilir.
+"mis" nesneler için kullanılır ve o da çekilir.
+
+mis -> mida (kısmi), mille (tamlayan), milles (içinde kalma)...
+
+İlgi sözcüğü, cümle içindeki görevine uygun halde olmalıdır.', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Mees, kes seal istub, on mu isa.', 'The man who sits there is my father.', 'Orada oturan adam benim babam.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Raamat, mida ma loen, on huvitav.', 'The book that I''m reading is interesting.', 'Okuduğum kitap ilginç.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Linn, kus ma elan, on ilus.', 'The city where I live is beautiful.', 'Yaşadığım şehir güzel.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-relative-clauses', 'Özet', 'İlgi zamirleri:
+kes = kim (kişiler)
+mis/mida/mille = hangi/ki (nesneler)
+kus = nerede (yerler)
+
+Kendilerinden önceki ismi tanımlayan bir cümle başlatırlar.
+Not: "mis" dilbilgisel görevine göre form değiştirir.', 'Kişiler için kes, nesneler için mis, yerler için kus kullanın. mis sözcüğünün çekildiğini unutmayın: mida (kısmi), mille (tamlayan) vb.', 2);
+
+-- Story: Fiil Hali
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-b1-verb-rection', 'B1', 'Fiil Hali', '🎯') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-verb-rection', 'Fiil Yönetimi - Hangi Hal Kullanılmalı?', 'Estoncadaki en zor özelliklerden biri: bazı fiiller nesneleri için her zaman belirli bir hal gerektirir.
+
+Kısmi, tamlayan ve yalın hal nesnesi arasındaki seçim fiil türüne ve eylemin tamamlanma durumuna bağlıdır.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-verb-rection', 'Kısmi Hal Gerektiren Fiiller', 'Bazı fiiller tamamlanma durumundan bağımsız olarak HER ZAMAN kısmi hal nesnesi alır:
+
+armastama (sevmek) -> her zaman kısmi hal
+ootama (beklemek) -> her zaman kısmi hal
+kartma (korkmak) -> her zaman kısmi hal
+aitama (yardım etmek) -> her zaman kısmi hal', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma armastan sind.', 'I love you.', 'Seni seviyorum.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma ootan bussi.', 'I''m waiting for the bus.', 'Otobüs bekliyorum.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta aitab mind.', 'He helps me.', 'O bana yardım ediyor.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-verb-rection', 'Tamlayan Hali ve Kısmi Hal Nesnesi Karşılaştırması', 'Diğer fiillerde hal seçimi anlam farkı yaratır:
+
+Tamlayan nesnesi = tamamlanmış eylem (bitirdim)
+Kısmi hal nesnesi = devam eden/kısmi eylem (yapıyordum)
+
+Bu ayrım Estonca dilbilgisinin temelidir.', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma lugesin raamatu läbi.', 'I read the book (finished it).', 'Kitabı okudum (bitirdim).', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma lugesin raamatut.', 'I was reading the book.', 'Kitabı okuyordum.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma sõin suppi.', 'I was eating soup. (partitive = ongoing)', 'Çorba içiyordum.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-verb-rection', 'Özet', 'Bazı fiiller her zaman kısmi hal gerektirir (armastama, ootama, kartma).
+Diğer fiillerde:
+- Tamlayan nesnesi = tamamlanmış eylem
+- Kısmi hal nesnesi = devam eden/kısmi eylem
+
+Bu, Estonca dilbilgisinin en zor kısımlarından biridir.', 'Tamlayan nesnesi = tamamlanmış eylem (lugesin raamatu läbi). Kısmi hal nesnesi = devam eden/kısmi eylem (lugesin raamatut). Bazı fiiller her zaman kısmi hal alır.', 3);
+
+-- Story: Aktarım
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-b1-reported-speech', 'B1', 'Aktarım', '💬') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-reported-speech', 'Aktarılan Konuşma (kaudne kõneviis)', 'Estoncada aktarılan konuşma için özel bir kip vardır: nakil kipi.
+-vat eki kullanılır.
+
+Bu ek, başka birinin söylediğini aktardığınızı, doğruluğunu teyit etmeden, belirtir.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-reported-speech', 'Nakil Kipini Oluşturma', 'Fiil köküne -vat eklenir:
+
+olema -> olevat (olduğu söyleniyor)
+minema -> minevat (gittiği söyleniyor)
+tulema -> tulevat (geldiği söyleniyor)
+
+Geçmiş formu: olevat + -nud ortacı', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta olevat haige.', 'He is said to be sick.', 'Hasta olduğu söyleniyor.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ilm minevat külmaks.', 'The weather is said to be getting cold.', 'Havanın soğuduğu söyleniyor.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta olevat tulnud Eestist.', 'He is said to have come from Estonia.', 'Estonya''dan geldiği söyleniyor.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b1-reported-speech', 'Özet', 'Nakil kipi: fiil kökü + -vat
+Geçmiş nakil: olevat + -nud
+
+Başkalarının söylediğini, doğruluğunu teyit etmeden aktarmak için kullanılır.
+Bu kip Estonca ve Finceye özgüdür.', '-vat eki aktarılan/duyulan bilgiyi belirtir. "Ta olevat haige" = Hasta OLDUĞU SÖYLENİYOR. Bilginin asıl kaynağı siz değilseniz bu kipi kullanın.', 2);
+
+-- Story: Birlikte
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-b2-comitative-case', 'B2', 'Birlikte', '🤝') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-comitative-case', 'Birliktelik Hali (-ga) - İle/Birlikte', 'Birliktelik hali "-ile" veya "birlikte" anlamını ifade eder.
+Estoncadaki 14. ve son haldir.
+
+Tamlayan formuna -ga eklenerek oluşturulur.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-comitative-case', 'Nasıl Oluşturulur ve Kullanılır', 'Formül: tamlayan formu + -ga
+
+auto -> autoga (arabayla)
+sõber -> sõbraga (bir arkadaşla)
+sina -> sinuga (seninle)
+buss -> bussiga (otobüsle)
+
+Eşlik ve ulaşım aracı için kullanılır.', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma tulen autoga.', 'I''ll come by car.', 'Arabayla geleceğim.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta elab koos sõbraga.', 'He lives with a friend.', 'O bir arkadaşıyla yaşıyor.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Mis sinuga juhtus?', 'What happened to you?', 'Sana ne oldu?', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-comitative-case', 'Özet', 'Birliktelik hali = tamlayan + -ga
+Anlamı: ile, vasıtasıyla, birlikte
+
+autoga (arabayla), sõbraga (bir arkadaşla), sinuga (seninle)
+
+Bu, Estoncadaki 14. ve son haldir!', 'Birliktelik hali -ga = ile/vasıtasıyla. Tamlayan formuna eklenir. autoga (arabayla), sinuga (seninle). Estoncadaki 14. ve son haldir.', 2);
+
+-- Story: Ortaçlar
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-b2-nud-tud-participles', 'B2', 'Ortaçlar', '📖') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-nud-tud-participles', 'Sıfat Olarak Kullanılan Ortaçlar', 'Estoncada sıfat olarak çalışan dört ortaç formu vardır:
+
+-nud = etken geçmiş (bir şeyi yapan)
+-tud = edilgen geçmiş (yapılmış olan)
+-v = etken geniş zaman (yapmakta olan)
+-tav = edilgen geniş zaman (yapılmakta olan)', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-nud-tud-participles', '-nud ve -tud (Geçmiş Zaman Ortaçları)', '-nud (etken, geçmiş): bir şeyi YAPAN
+väsinud (yorgun = yorulan kişi)
+õpinud (eğitimli = okumuş kişi)
+
+-tud (edilgen, geçmiş): YAPILMIŞ olan
+suletud (kapalı = kapatılmış olan)
+tehtud (yapılmış = üretilmiş olan)', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Väsinud mees istus pingile.', 'The tired man sat on the bench.', 'Yorgun adam banka oturdu.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Suletud uks.', 'A closed door.', 'Kapalı bir kapı.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Hästi tehtud!', 'Well done!', 'Aferin!', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-nud-tud-participles', '-v ve -tav (Geniş Zaman Ortaçları)', '-v (etken, geniş zaman): YAPMAKTA olan
+magav (uyuyan = uyumakta olan)
+naerev (gülen = gülmekte olan)
+
+-tav (edilgen, geniş zaman): YAPILMAKTA olan / yapılabilir
+loetav (okunabilir = okunabilen)
+soovitav (tavsiye edilen = önerilen)', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Magav laps.', 'A sleeping child.', 'Uyuyan çocuk.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Loetav raamat.', 'A readable book.', 'Okunabilir bir kitap.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-nud-tud-participles', 'Özet', 'Dört ortaç:
+-nud = etken geçmiş (väsinud = yorgun)
+-tud = edilgen geçmiş (suletud = kapalı)
+-v = etken geniş zaman (magav = uyuyan)
+-tav = edilgen geniş zaman (loetav = okunabilir)
+
+İsimlerin önünde sıfat olarak işlev görürler.', 'Dört ortaç türü: -nud (yapan), -tud (yapılmış), -v (yapmakta olan), -tav (yapılmakta olan). Hepsi isimlerin önünde sıfat olarak kullanılır.', 3);
+
+-- Story: Emirler
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-b2-imperative', 'B2', 'Emirler', '📢') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-imperative', 'Emir Kipi - Emirler', 'Emir kipi, emir ve istekler için kullanılır.
+Estoncada farklı formlar vardır:
+
+- Tekil (sa) emirler
+- Çoğul/resmi (te) emirler
+- Olumsuz emirler
+- "Hadi yapalım" önerileri', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-imperative', 'Tekil ve Çoğul Emirler', 'Tekil (sa): sadece fiil kökü
+Çoğul/resmi (te): kök + -ge/-ke
+
+Tekil form en basit olanıdır - sadece yalın kök.
+Çoğul forma -ge (ünlülerden sonra) veya -ke (ünsüzlerden sonra) eklenir.', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Tule siia!', 'Come here! (singular)', 'Buraya gel!', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Istu maha!', 'Sit down! (singular)', 'Otur!', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Tulge siia!', 'Come here! (plural/formal)', 'Buraya gelin!', 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Istuge maha!', 'Sit down! (plural/formal)', 'Oturun!', 3);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-imperative', 'Olumsuz Emirler ve Hadi Yapalım', 'Olumsuz tekil: ära + fiil kökü
+Olumsuz çoğul: ärge + fiil kökü
+
+"Hadi yapalım" formu: kök + -gem/-kem
+
+ära/ärge olumsuz emir edatlarıdır.', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ära mine!', 'Don''t go!', 'Gitme!', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ärge unustage!', 'Don''t forget! (plural)', 'Unutmayın!', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Lähme!', 'Let''s go!', 'Hadi gidelim!', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-imperative', 'Özet', 'Tekil emir: yalın fiil kökü (tule!)
+Çoğul/resmi: kök + -ge/-ke (tulge!)
+Olumsuz: ära/ärge + kök (ära mine! / ärge minge!)
+Hadi yapalım: kök + -gem/-kem (lähme!)', 'Emirler: tekil = kök (tule!), çoğul = kök + -ge (tulge!), olumsuz = ära/ärge + kök (ära mine!), hadi = kök + -gem (lähme!).', 3);
+
+-- Story: Sözcük Yap
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-b2-word-formation', 'B2', 'Sözcük Yap', '🧱') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-word-formation', 'Estoncada Sözcük Türetme', 'Estonca, birleştirme ve ekler yoluyla yeni sözcükler türetir.
+Bu kalıpları anlamak, tanımadığınız sözcükleri çözmenize yardımcı olur.
+
+En yaygın sözcük oluşturma yöntemlerini inceleyelim.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-word-formation', 'Bileşik Sözcükler', 'Estonca bileşik sözcükleri sever - iki veya daha fazla sözcük birleştirilir.
+İlk sözcük genellikle tamlayan halindedir.
+
+raamat + kogu -> raamatukogu (kütüphane)
+linn + hall -> linnahall (belediye binası)
+kool + maja -> koolimaja (okul binası)
+auto + juht -> autojuht (şoför)
+
+Uzun sözcükleri parçalarına ayırarak anlayın.', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma lähen raamatukokku.', 'I''m going to the library.', 'Kütüphaneye gidiyorum.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Autojuht peatus.', 'The driver stopped.', 'Şoför durdu.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-word-formation', 'Yaygın Ekler', 'Sözcük türetmek için yararlı ekler:
+
+-ja = yapan kişi: õpetama -> õpetaja (öğretmen)
+-mine = eylem ismi: õppima -> õppimine (çalışma)
+-lik = sıfat: sõber -> sõbralik (cana yakın)
+-tu = -sız/-siz: süü -> süütu (masum)
+-kas = nitelik: jõud -> jõukas (varlıklı)
+-lane = -li (bir yerden olan): Eesti -> eestlane (Estonyalı)', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Õpetaja on sõbralik.', 'The teacher is friendly.', 'Öğretmen cana yakın.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Õppimine on oluline.', 'Studying is important.', 'Çalışmak önemli.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-word-formation', 'Özet', 'Bileşik sözcükler: sözcükleri birleştirin (tamlayan + isim)
+Temel ekler: -ja (yapan), -mine (eylem), -lik (sıfat), -tu (-sız), -kas (nitelik), -lane (-li/bir yerden olan)
+
+Uzun bir Estonca sözcük gördüğünüzde, parçalarına ayırın.', 'Uzun bileşik sözcükleri parçalarına ayırın: raamatukogu = raamatu (kitabın) + kogu (koleksiyon) = kütüphane. Ekleri öğrenin: -ja (yapan), -mine (eylem), -lik (sıfat).', 3);
+
+-- Story: Bağlaçlar
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-b2-clause-connectors', 'B2', 'Bağlaçlar', '🔗') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-clause-connectors', 'Cümle Bağlaçları', 'Karmaşık cümleler kurmak için bağlaçlara ihtiyaç vardır.
+Estoncada sıralama bağlaçları (eşit cümleleri birleştirir) ve alt sıralama bağlaçları (bağımlı cümleler ekler) bulunur.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-clause-connectors', 'Sıralama Bağlaçları', 'İki eşit, bağımsız cümleyi birleştirirler:
+
+ja - ve
+aga / kuid - ama
+või - veya
+ning - ve (daha resmi, edebi)
+
+Cümleleri aynı düzeyde bağlarlar.', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma õpin ja töötan.', 'I study and work.', 'Okuyorum ve çalışıyorum.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta on vaikne, aga tark.', 'He is quiet but smart.', 'O sessiz ama akıllı.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kas sa tuled või jääd?', 'Are you coming or staying?', 'Geliyor musun yoksa kalıyor musun?', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-clause-connectors', 'Alt Sıralama Bağlaçları', 'Bağımlı cümleler başlatırlar:
+
+et - ki/-dığını
+sest / kuna - çünkü
+kui - -dığında / eğer
+kuigi - rağmen/-masına rağmen
+selleks et - için/amacıyla
+kuni - -e kadar/iken', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma õpin, sest tahan eksamit sooritada.', 'I study because I want to pass the exam.', 'Çalışıyorum çünkü sınavı geçmek istiyorum.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kuigi sajab, me lähme välja.', 'Although it rains, we''ll go out.', 'Yağmur yağmasına rağmen dışarı çıkacağız.', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma tean, et sa tuled.', 'I know that you will come.', 'Geleceğini biliyorum.', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-clause-connectors', 'Özet', 'Sıralama: ja (ve), aga/kuid (ama), või (veya)
+Alt sıralama: et (ki), sest/kuna (çünkü), kui (-dığında/eğer), kuigi (rağmen), selleks et (için)
+
+Bu bağlaçlar karmaşık cümleler kurmak için gereklidir.', 'Şu bağlaçları öğrenin: ja (ve), aga (ama), sest (çünkü), et (ki), kui (-dığında/eğer), kuigi (rağmen). Bunlar karmaşık Estonca cümlelerin yapıştırıcısıdır.', 3);
+
+-- Story: Uzak Geçm
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-b2-pluperfect', 'B2', 'Uzak Geçm', '⏮️') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-pluperfect', 'Uzak Geçmiş Zaman (enneminevik)', 'Uzak geçmiş zaman, başka bir geçmiş eylemden ÖNCE tamamlanmış bir eylemi anlatır.
+Türkçe karşılığı: "-mıştı/-mişti".
+
+Formül: olin/olid/oli + -nud ortacı', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-pluperfect', 'Uzak Geçmiş Zamanın Oluşturulması', 'olema fiilinin GEÇMİŞ ZAMAN formu + -nud ortacı kullanılır:
+
+ma olin söönud - yemiştim
+sa olid söönud - yemiştin
+ta oli söönud - yemişti
+me olime söönud - yemiştik
+te olite söönud - yemiştiniz
+nad olid söönud - yemişlerdi
+
+Yakın geçmiş ile karşılaştırma: ma OLEN söönud (yemişim)
+Uzak geçmiş: ma OLIN söönud (yemiştim)', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kui ma tulin, ta oli juba lahkunud.', 'When I arrived, he had already left.', 'Ben geldiğimde, o çoktan gitmişti.', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Me olime söönud, enne kui nad tulid.', 'We had eaten before they came.', 'Onlar gelmeden önce yemek yemiştik.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-pluperfect', 'Özet', 'Uzak geçmiş = olema geçmiş zaman (olin/olid/oli) + -nud ortacı
+
+Başka bir geçmiş olaydan ÖNCE tamamlanmış eylemler için kullanılır.
+
+Yakın geçmiş: olen söönud (yemişim)
+Uzak geçmiş: olin söönud (yemiştim)', 'Uzak geçmiş = olin + -nud. "Daha önceki geçmişi" anlatır - başka bir geçmiş olaydan önce olan bir şey. Temel fark: olen söönud (yemişim) ve olin söönud (yemiştim).', 2);
+
+-- Story: Nesneler
+INSERT INTO grammar_stories (id, cefr_level, topic, icon) VALUES ('story-b2-object-rules', 'B2', 'Nesneler', '📐') ON CONFLICT (id) DO NOTHING;
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-object-rules', 'Estonca Nesne Hali Kuralları', 'Üçlü nesne ayrımı (yalın / tamlayan / kısmi) Estonca dilbilgisinin ayırt edici özelliğidir.
+
+Doğru hal; eylemin tamamlanma durumuna, cümle türüne ve fiil türüne bağlıdır.
+Tüm kuralları öğrenelim.', NULL, 0);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-object-rules', 'Yalın Hal Nesnesi', 'Yalın hal (temel form) nesnesini şu durumlarda kullanın:
+
+1. Emir cümleleri: Ava uks! (Kapıyı aç!)
+2. Kişisiz/edilgen cümleler: Uks avatakse. (Kapı açılır.)
+
+Yalın hal, bu özel yapılarda tam ve bütün bir nesneyi ifade eder.', NULL, 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ava uks!', 'Open the door!', 'Kapıyı aç!', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Kirjuta kiri!', 'Write the letter!', 'Mektubu yaz!', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-object-rules', 'Tamlayan Hali Nesnesi', 'Olumlu bir cümlede TAMAMLANMIŞ tekil bir eylem için tamlayan hali nesnesi kullanılır.
+Eylem bitmiştir, nesne tamamen etkilenmiştir.
+
+Bu şunu ifade eder: "Tamamen yaptım, bitti."', NULL, 2);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma avasin ukse.', 'I opened the door. (completed)', 'Kapıyı açtım. (tamamlandı)', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ta luges raamatu läbi.', 'He read the whole book.', 'Kitabın tamamını okudu.', 1);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-object-rules', 'Kısmi Hal Nesnesi', 'Kısmi hal nesnesini şu durumlarda kullanın:
+
+1. Devam eden veya tamamlanmamış eylemler
+2. Olumsuz cümleler (her zaman kısmi hal)
+3. Kısmi miktarlar
+4. Kısmi hal gerektiren fiillerden sonra (armastama, ootama...)', NULL, 3);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma avan ust.', 'I''m opening the door. (ongoing)', 'Kapıyı açıyorum. (devam ediyor)', 0);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma ei avanud ust.', 'I didn''t open the door. (negative)', 'Kapıyı açmadım. (olumsuz)', 1);
+INSERT INTO grammar_slide_examples (slide_id, estonian, english, turkish, sort_order) VALUES (currval('grammar_story_slides_id_seq'), 'Ma joon vett.', 'I drink water. (partial)', 'Su içiyorum. (kısmi)', 2);
+INSERT INTO grammar_story_slides (story_id, title, body, highlight, sort_order) VALUES ('story-b2-object-rules', 'Özet', 'Yalın hal nesnesi: emirler ve edilgen (Ava uks!)
+Tamlayan nesnesi: tamamlanmış eylem (Avasin ukse.)
+Kısmi hal nesnesi: devam eden, olumsuz, kısmi (Avan ust.)
+
+Olumsuz cümleler HER ZAMAN kısmi hal kullanır.
+Bu üçlü sistem Estonca dilbilgisinin çekirdeğidir.', 'Yalın = emirler/edilgen, Tamlayan = tamamlanmış eylem, Kısmi = devam eden/olumsuz/kısmi. Tereddütte kısmi hal güvenli tercihtir - en yaygın nesne halidir.', 4);
+
