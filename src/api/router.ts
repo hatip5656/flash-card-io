@@ -21,6 +21,7 @@ export function createApiRouter(): Router {
   router.get("/idioms", h(content.getIdioms));
   router.get("/idioms/random", h(content.getRandomIdiom));
   router.get("/schedules", h(users.getSchedulePresets));
+  router.get("/audio/:word", h(audio.getWordAudio));
 
   // --- User registration ---
   router.post("/users", h(users.register));
@@ -72,9 +73,6 @@ export function createApiRouter(): Router {
   // Comments
   router.get("/comments/:wordId", h(comments.getWordComments));
   router.post("/comments/:wordId", h(comments.postComment));
-
-  // Audio pronunciation
-  router.get("/audio/:word", h(audio.getWordAudio));
 
   return router;
 }

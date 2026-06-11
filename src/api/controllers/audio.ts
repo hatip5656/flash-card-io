@@ -1,9 +1,7 @@
 import type { Request, Response } from "express";
 import { synthesizeSpeech } from "../../services/tts.js";
-import { getPreferences } from "../../db/progress.js";
 
 export async function getWordAudio(req: Request, res: Response): Promise<void> {
-  const chatId = req.userId!;
   const word = req.params.word as string;
 
   if (!word || word.length > 100) {
@@ -11,8 +9,7 @@ export async function getWordAudio(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  const prefs = await getPreferences(chatId);
-  const voice = prefs.voiceName || "mari";
+  const voice = (req.query.voice as string) || "mari";
 
   try {
     const audio = await synthesizeSpeech(word, undefined, voice);
