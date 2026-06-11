@@ -118,3 +118,18 @@ spec:
             claimName: flash-card-cache
       imagePullSecrets:
         - name: ghcr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flash-card-io-api
+  namespace: flash-card-io
+spec:
+  type: NodePort
+  selector:
+    app: flash-card-io
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30147
+      protocol: TCP
