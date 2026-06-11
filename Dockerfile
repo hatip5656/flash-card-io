@@ -18,6 +18,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 COPY --from=builder /app/dist/ ./dist/
 COPY data/ ./data/
+COPY migrations/ ./migrations/
 
 # Cache directory for TTS/Unsplash/Ekilex disk cache
 RUN mkdir -p /app/cache && chown 1000:1000 /app/cache
