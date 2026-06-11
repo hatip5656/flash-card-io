@@ -2,7 +2,6 @@ import pg from "pg";
 import { Cron } from "croner";
 import type { CefrLevel } from "../config.js";
 import { runMigrations } from "./migrate.js";
-import { seedWords, seedStories } from "./seed.js";
 
 export const SCHEDULE_OFF = "off";
 export const DEFAULT_SCHEDULE = "0 9 * * *";
@@ -47,12 +46,8 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
     connectionTimeoutMillis: 10_000,
   });
 
-  // Run SQL migrations
+  // Run SQL migrations (schema + seed data)
   await runMigrations(pool);
-
-  // Seed word data from JSON files (only if tables are empty)
-  await seedWords(pool);
-  await seedStories(pool);
 
   console.error(`[db] Connected to PostgreSQL database "${dbName}"`);
   return pool;
