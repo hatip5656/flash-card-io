@@ -1,11 +1,12 @@
 import type { Request, Response } from "express";
-import { getLearnedWordsForQuiz, getMostMissedWords, incrementQuizCount, saveQuizResult, logQuizActivity, getQuizHistory, getQuizStats } from "../../db/progress.js";
+import { getLearnedWordsForQuiz, getMostMissedWords, incrementQuizCount, saveQuizResult, logQuizActivity, getQuizHistory, getQuizStats, getPreferences } from "../../db/progress.js";
+import { getAllWords } from "../../flashcard/word-bank.js";
 import { shuffle } from "../../utils.js";
 import type { QuizAnswer } from "../../db/progress.js";
 
 interface QuizQuestion {
   index: number;
-  type: "est-to-eng" | "eng-to-est";
+  type: string;
   prompt: string;
   options: string[];
   correctIndex: number;
@@ -28,39 +29,72 @@ function cleanStaleSessions(): void {
   }
 }
 
+// Lazily built and cached lookup: estonian → turkish
+let turkishLookupCache: Map<string, string> | null = null;
+
+function getTurkishLookup(): Map<string, string> {
+  if (!turkishLookupCache) {
+    turkishLookupCache = new Map();
+    for (const w of getAllWords()) {
+      if (w.turkish) turkishLookupCache.set(w.estonian, w.turkish);
+    }
+  }
+  return turkishLookupCache;
+}
+
 export async function startQuiz(req: Request, res: Response): Promise<void> {
   const chatId = req.userId!;
   cleanStaleSessions();
 
+  const prefs = await getPreferences(chatId);
+  const useTurkish = prefs.nativeLanguage === "turkish";
+  const turkishLookup = useTurkish ? getTurkishLookup() : null;
+
   const allWords = await getLearnedWordsForQuiz(chatId);
   if (allWords.length < 4) {
-    res.status(400).json({ error: "Need at least 4 learned words to start a quiz. Keep learning!" });
+    const msg = useTurkish
+      ? "Quiz başlatmak için en az 4 kelime öğrenmelisin. Öğrenmeye devam et!"
+      : "Need at least 4 learned words to start a quiz. Keep learning!";
+    res.status(400).json({ error: msg });
     return;
   }
+
+  // Enrich with Turkish translations
+  const enriched = allWords.map((w) => ({
+    ...w,
+    turkish: turkishLookup?.get(w.estonian) ?? null,
+  }));
+
+  // Get the translation in the user's native language
+  const nativeTrans = (w: typeof enriched[0]) =>
+    useTurkish && w.turkish ? w.turkish : w.english;
 
   const missed = await getMostMissedWords(chatId, 10);
   const missedSet = new Set(missed.map((m) => m.estonian));
 
   // Prioritize missed words, then least-quizzed
   const prioritized = [
-    ...allWords.filter((w) => missedSet.has(w.estonian)),
-    ...allWords.filter((w) => !missedSet.has(w.estonian)),
+    ...enriched.filter((w) => missedSet.has(w.estonian)),
+    ...enriched.filter((w) => !missedSet.has(w.estonian)),
   ];
   const selected = prioritized.slice(0, 5);
 
+  const typeLabel = useTurkish ? "tr" : "eng";
+
   const questions: QuizQuestion[] = selected.map((word, i) => {
-    const isEstToEng = Math.random() > 0.5;
-    const correct = isEstToEng ? word.english : word.estonian;
-    const pool = allWords
+    const isEstToNative = Math.random() > 0.5;
+
+    const correct = isEstToNative ? nativeTrans(word) : word.estonian;
+    const pool = enriched
       .filter((w) => w.estonian !== word.estonian)
-      .map((w) => (isEstToEng ? w.english : w.estonian));
+      .map((w) => (isEstToNative ? nativeTrans(w) : w.estonian));
     const distractors = shuffle([...pool]).slice(0, 3);
     const options = shuffle([correct, ...distractors]);
 
     return {
       index: i,
-      type: isEstToEng ? "est-to-eng" : "eng-to-est",
-      prompt: isEstToEng ? word.estonian : word.english,
+      type: isEstToNative ? `est-to-${typeLabel}` : `${typeLabel}-to-est`,
+      prompt: isEstToNative ? word.estonian : nativeTrans(word),
       options,
       correctIndex: options.indexOf(correct),
     };
@@ -111,7 +145,6 @@ export async function submitAnswer(req: Request, res: Response): Promise<void> {
   const isComplete = session.answers.length >= session.questions.length;
 
   if (isComplete) {
-    // Save results
     const score = session.answers.filter((a) => a.correct).length;
     const total = session.questions.length;
     const quizAnswers: QuizAnswer[] = session.questions.map((q, i) => ({
@@ -139,7 +172,6 @@ export async function submitAnswer(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  // Next question
   const next = session.questions[qIndex + 1];
   res.json({
     correct,

@@ -5,6 +5,7 @@ import { startHealthServer, setReady } from "./health.js";
 import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, backfillEnglish, getSentGrammarIds, markGrammarSent, logWordActivity, getStreak, getTodayActivity, getStats, getQuizStats, getPreferences, initNextDeliveryForAll, initNextGrammarForAll } from "./db/progress.js";
 import { loadWordBank, getUnsent, getWordById } from "./flashcard/word-bank.js";
 import { loadGrammarBank, getRandomLesson } from "./flashcard/grammar-bank.js";
+import { loadStoryBank } from "./flashcard/story-bank.js";
 import { loadCategories } from "./flashcard/categories.js";
 import { buildFlashcard, buildFlashcardFromEkilex } from "./flashcard/builder.js";
 import { startScheduler } from "./flashcard/scheduler.js";
@@ -25,6 +26,7 @@ const config = loadConfig();
 
 loadWordBank();
 loadGrammarBank();
+loadStoryBank();
 loadCategories();
 
 const channels: DeliveryChannel[] = [];
@@ -297,7 +299,7 @@ async function warmAllQueues(): Promise<void> {
 async function main(): Promise<void> {
   // Start health + API server
   const featureApi = process.env.FEATURE_API !== "false"; // enabled by default
-  const apiApp = featureApi ? createApiApp(config.cronTimezone) : undefined;
+  const apiApp = featureApi ? createApiApp(config.cronTimezone, config.unsplashAccessKey, config.pexelsApiKey ?? undefined) : undefined;
   startHealthServer(8080, apiApp);
   if (featureApi) console.error("[main] REST API enabled at /api");
 

@@ -3,11 +3,13 @@
     "id": "b2-teadustöö",
     "estonian": "teadustöö",
     "english": "research / scientific work",
+    "turkish": "araştırma / bilimsel çalışma",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta avaldas oma teadustöö tulemused ajakirjas.",
-        "english": "He published the results of his research in a journal."
+        "english": "He published the results of his research in a journal.",
+        "turkish": "Araştırmasının sonuçlarını bir dergide yayımladı."
       }
     ]
   },
@@ -15,11 +17,13 @@
     "id": "b2-hüpotees",
     "estonian": "hüpotees",
     "english": "hypothesis",
+    "turkish": "hipotez",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Teadlased püstitasid uue hüpoteesi.",
-        "english": "The scientists put forward a new hypothesis."
+        "english": "The scientists put forward a new hypothesis.",
+        "turkish": "Bilim insanları yeni bir hipotez ortaya koydu."
       }
     ]
   },
@@ -27,11 +31,13 @@
     "id": "b2-analüüs",
     "estonian": "analüüs",
     "english": "analysis",
+    "turkish": "analiz",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Andmete analüüs näitas ootamatuid tulemusi.",
-        "english": "The data analysis showed unexpected results."
+        "english": "The data analysis showed unexpected results.",
+        "turkish": "Veri analizi beklenmedik sonuçlar gösterdi."
       }
     ]
   },
@@ -39,11 +45,13 @@
     "id": "b2-järeldus",
     "estonian": "järeldus",
     "english": "conclusion",
+    "turkish": "sonuç / çıkarım",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Millise järelduse te sellest teete?",
-        "english": "What conclusion do you draw from this?"
+        "english": "What conclusion do you draw from this?",
+        "turkish": "Bundan ne sonuç çıkarıyorsunuz?"
       }
     ]
   },
@@ -51,11 +59,13 @@
     "id": "b2-väitekiri",
     "estonian": "väitekiri",
     "english": "thesis / dissertation",
+    "turkish": "tez / doktora tezi",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta kaitses oma väitekirja edukalt.",
-        "english": "She defended her dissertation successfully."
+        "english": "She defended her dissertation successfully.",
+        "turkish": "Tezini başarıyla savundu."
       }
     ]
   },
@@ -63,11 +73,13 @@
     "id": "b2-viide",
     "estonian": "viide",
     "english": "reference / citation",
+    "turkish": "kaynak / atıf",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Palun lisage kõik viited töö lõppu.",
-        "english": "Please add all references at the end of the paper."
+        "english": "Please add all references at the end of the paper.",
+        "turkish": "Lütfen tüm kaynakları çalışmanın sonuna ekleyin."
       }
     ]
   },
@@ -75,11 +87,13 @@
     "id": "b2-kokkuvõte",
     "estonian": "kokkuvõte",
     "english": "summary",
+    "turkish": "özet",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Artikli kokkuvõte on selge ja lühike.",
-        "english": "The summary of the article is clear and concise."
+        "english": "The summary of the article is clear and concise.",
+        "turkish": "Makalenin özeti açık ve kısa."
       }
     ]
   },
@@ -87,11 +101,13 @@
     "id": "b2-uurimus",
     "estonian": "uurimus",
     "english": "study / investigation",
+    "turkish": "çalışma / araştırma",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "See uurimus hõlmas tuhandeid osalejaid.",
-        "english": "This study involved thousands of participants."
+        "english": "This study involved thousands of participants.",
+        "turkish": "Bu çalışma binlerce katılımcıyı kapsadı."
       }
     ]
   },
@@ -99,11 +115,13 @@
     "id": "b2-meetod",
     "estonian": "meetod",
     "english": "method",
+    "turkish": "yöntem",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Millist meetodit te kasutasite?",
-        "english": "Which method did you use?"
+        "english": "Which method did you use?",
+        "turkish": "Hangi yöntemi kullandınız?"
       }
     ]
   },
@@ -111,11 +129,13 @@
     "id": "b2-teooria",
     "estonian": "teooria",
     "english": "theory",
+    "turkish": "teori / kuram",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "See teooria on teaduslikult tõestatud.",
-        "english": "This theory has been scientifically proven."
+        "english": "This theory has been scientifically proven.",
+        "turkish": "Bu teori bilimsel olarak kanıtlanmıştır."
       }
     ]
   },
@@ -123,11 +143,13 @@
     "id": "b2-õigus",
     "estonian": "õigus",
     "english": "law / right",
+    "turkish": "hukuk / hak",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Igal inimesel on õigus haridusele.",
-        "english": "Every person has the right to education."
+        "english": "Every person has the right to education.",
+        "turkish": "Her insanın eğitim hakkı vardır."
       }
     ]
   },
@@ -135,11 +157,13 @@
     "id": "b2-kohus",
     "estonian": "kohus",
     "english": "court",
+    "turkish": "mahkeme",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Kohus tegi otsuse süüdistatava kasuks.",
-        "english": "The court ruled in favor of the defendant."
+        "english": "The court ruled in favor of the defendant.",
+        "turkish": "Mahkeme sanığın lehine karar verdi."
       }
     ]
   },
@@ -147,11 +171,13 @@
     "id": "b2-süüdistus",
     "estonian": "süüdistus",
     "english": "accusation / charge",
+    "turkish": "suçlama / itham",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Süüdistus põhines kaudsetel tõenditel.",
-        "english": "The accusation was based on circumstantial evidence."
+        "english": "The accusation was based on circumstantial evidence.",
+        "turkish": "Suçlama dolaylı delillere dayanıyordu."
       }
     ]
   },
@@ -159,11 +185,13 @@
     "id": "b2-kaitsja",
     "estonian": "kaitsja",
     "english": "defense lawyer / defender",
+    "turkish": "savunma avukatı / müdafi",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Kaitsja esitas uued tõendid.",
-        "english": "The defense lawyer presented new evidence."
+        "english": "The defense lawyer presented new evidence.",
+        "turkish": "Savunma avukatı yeni deliller sundu."
       }
     ]
   },
@@ -171,11 +199,13 @@
     "id": "b2-seadus",
     "estonian": "seadus",
     "english": "law / statute",
+    "turkish": "yasa / kanun",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Uus seadus jõustub järgmisest kuust.",
-        "english": "The new law takes effect from next month."
+        "english": "The new law takes effect from next month.",
+        "turkish": "Yeni yasa gelecek aydan itibaren yürürlüğe giriyor."
       }
     ]
   },
@@ -183,11 +213,13 @@
     "id": "b2-tunnistaja",
     "estonian": "tunnistaja",
     "english": "witness",
+    "turkish": "tanık",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Tunnistaja andis kohtuistungil ütluse.",
-        "english": "The witness gave testimony at the trial."
+        "english": "The witness gave testimony at the trial.",
+        "turkish": "Tanık duruşmada ifade verdi."
       }
     ]
   },
@@ -195,11 +227,13 @@
     "id": "b2-tõend",
     "estonian": "tõend",
     "english": "evidence / proof",
+    "turkish": "delil / kanıt",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Politsei kogus kuriteo kohta tõendeid.",
-        "english": "The police gathered evidence about the crime."
+        "english": "The police gathered evidence about the crime.",
+        "turkish": "Polis suçla ilgili delil topladı."
       }
     ]
   },
@@ -207,11 +241,13 @@
     "id": "b2-leping",
     "estonian": "leping",
     "english": "contract / agreement",
+    "turkish": "sözleşme / anlaşma",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Mõlemad pooled allkirjastasid lepingu.",
-        "english": "Both parties signed the contract."
+        "english": "Both parties signed the contract.",
+        "turkish": "Her iki taraf da sözleşmeyi imzaladı."
       }
     ]
   },
@@ -219,11 +255,13 @@
     "id": "b2-karistus",
     "estonian": "karistus",
     "english": "punishment / penalty",
+    "turkish": "ceza",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Karistus peab olema proportsionaalne kuriteoga.",
-        "english": "The punishment must be proportional to the crime."
+        "english": "The punishment must be proportional to the crime.",
+        "turkish": "Ceza suçla orantılı olmalıdır."
       }
     ]
   },
@@ -231,11 +269,13 @@
     "id": "b2-otsus",
     "estonian": "otsus",
     "english": "decision / ruling",
+    "turkish": "karar",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Kohtu otsus on lõplik ja edasikaebamisele ei kuulu.",
-        "english": "The court's decision is final and not subject to appeal."
+        "english": "The court's decision is final and not subject to appeal.",
+        "turkish": "Mahkemenin kararı kesindir ve temyize götürülemez."
       }
     ]
   },
@@ -243,11 +283,13 @@
     "id": "b2-inflatsioon",
     "estonian": "inflatsioon",
     "english": "inflation",
+    "turkish": "enflasyon",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Inflatsioon on viimasel aastal kiiresti kasvanud.",
-        "english": "Inflation has risen rapidly in the past year."
+        "english": "Inflation has risen rapidly in the past year.",
+        "turkish": "Enflasyon geçtiğimiz yıl hızla yükseldi."
       }
     ]
   },
@@ -255,11 +297,13 @@
     "id": "b2-investeering",
     "estonian": "investeering",
     "english": "investment",
+    "turkish": "yatırım",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "See oli pikaajaline investeering tulevikku.",
-        "english": "It was a long-term investment in the future."
+        "english": "It was a long-term investment in the future.",
+        "turkish": "Bu geleceğe yapılan uzun vadeli bir yatırımdı."
       }
     ]
   },
@@ -267,11 +311,13 @@
     "id": "b2-majanduskasv",
     "estonian": "majanduskasv",
     "english": "economic growth",
+    "turkish": "ekonomik büyüme",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Riigi majanduskasv aeglustus kolmandas kvartalis.",
-        "english": "The country's economic growth slowed in the third quarter."
+        "english": "The country's economic growth slowed in the third quarter.",
+        "turkish": "Ülkenin ekonomik büyümesi üçüncü çeyrekte yavaşladı."
       }
     ]
   },
@@ -279,11 +325,13 @@
     "id": "b2-tööpuudus",
     "estonian": "tööpuudus",
     "english": "unemployment",
+    "turkish": "işsizlik",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Tööpuudus noorte seas on murettekitav.",
-        "english": "Unemployment among young people is concerning."
+        "english": "Unemployment among young people is concerning.",
+        "turkish": "Gençler arasındaki işsizlik endişe verici."
       }
     ]
   },
@@ -291,11 +339,13 @@
     "id": "b2-eelarve",
     "estonian": "eelarve",
     "english": "budget",
+    "turkish": "bütçe",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Riigi eelarve on sel aastal defitsiidis.",
-        "english": "The state budget is in deficit this year."
+        "english": "The state budget is in deficit this year.",
+        "turkish": "Devlet bütçesi bu yıl açık veriyor."
       }
     ]
   },
@@ -303,11 +353,13 @@
     "id": "b2-käive",
     "estonian": "käive",
     "english": "turnover / revenue",
+    "turkish": "ciro / gelir",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ettevõtte käive kasvas eelmisel aastal kahekümne protsendi võrra.",
-        "english": "The company's turnover grew by twenty percent last year."
+        "english": "The company's turnover grew by twenty percent last year.",
+        "turkish": "Şirketin cirosu geçen yıl yüzde yirmi arttı."
       }
     ]
   },
@@ -315,11 +367,13 @@
     "id": "b2-kasum",
     "estonian": "kasum",
     "english": "profit",
+    "turkish": "kâr",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Firma teenis sel aastal rekordilist kasumit.",
-        "english": "The company earned record profit this year."
+        "english": "The company earned record profit this year.",
+        "turkish": "Şirket bu yıl rekor kâr elde etti."
       }
     ]
   },
@@ -327,11 +381,13 @@
     "id": "b2-laen",
     "estonian": "laen",
     "english": "loan",
+    "turkish": "kredi / borç",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta võttis pangast laenu maja ostmiseks.",
-        "english": "He took a loan from the bank to buy a house."
+        "english": "He took a loan from the bank to buy a house.",
+        "turkish": "Ev almak için bankadan kredi çekti."
       }
     ]
   },
@@ -339,11 +395,13 @@
     "id": "b2-maksustamine",
     "estonian": "maksustamine",
     "english": "taxation",
+    "turkish": "vergilendirme",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Õiglane maksustamine on ühiskonna alustala.",
-        "english": "Fair taxation is the foundation of society."
+        "english": "Fair taxation is the foundation of society.",
+        "turkish": "Adil vergilendirme toplumun temelidir."
       }
     ]
   },
@@ -351,11 +409,13 @@
     "id": "b2-konkurents",
     "estonian": "konkurents",
     "english": "competition",
+    "turkish": "rekabet",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Tihe konkurents sunnib ettevõtteid uuendusi tegema.",
-        "english": "Fierce competition forces companies to innovate."
+        "english": "Fierce competition forces companies to innovate.",
+        "turkish": "Yoğun rekabet şirketleri yenilik yapmaya zorluyor."
       }
     ]
   },
@@ -363,11 +423,13 @@
     "id": "b2-eetika",
     "estonian": "eetika",
     "english": "ethics",
+    "turkish": "etik / ahlak bilimi",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Meditsiinieetika nõuab patsiendi nõusolekut.",
-        "english": "Medical ethics requires the patient's consent."
+        "english": "Medical ethics requires the patient's consent.",
+        "turkish": "Tıp etiği hastanın onayını gerektirir."
       }
     ]
   },
@@ -375,11 +437,13 @@
     "id": "b2-moraal",
     "estonian": "moraal",
     "english": "morality / morale",
+    "turkish": "ahlak / moral",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ühiskonna moraal on pidevas muutumises.",
-        "english": "Society's morality is constantly changing."
+        "english": "Society's morality is constantly changing.",
+        "turkish": "Toplumun ahlak anlayışı sürekli değişiyor."
       }
     ]
   },
@@ -387,11 +451,13 @@
     "id": "b2-väärtus",
     "estonian": "väärtus",
     "english": "value",
+    "turkish": "değer",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ausus on üks olulisemaid väärtusi.",
-        "english": "Honesty is one of the most important values."
+        "english": "Honesty is one of the most important values.",
+        "turkish": "Dürüstlük en önemli değerlerden biridir."
       }
     ]
   },
@@ -399,11 +465,13 @@
     "id": "b2-põhimõte",
     "estonian": "põhimõte",
     "english": "principle",
+    "turkish": "ilke / prensip",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta ei loobu oma põhimõtetest.",
-        "english": "He does not give up his principles."
+        "english": "He does not give up his principles.",
+        "turkish": "İlkelerinden vazgeçmiyor."
       }
     ]
   },
@@ -411,11 +479,13 @@
     "id": "b2-südametunnistus",
     "estonian": "südametunnistus",
     "english": "conscience",
+    "turkish": "vicdan",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Tema südametunnistus ei lubanud valetada.",
-        "english": "His conscience did not allow him to lie."
+        "english": "His conscience did not allow him to lie.",
+        "turkish": "Vicdanı yalan söylemesine izin vermedi."
       }
     ]
   },
@@ -423,11 +493,13 @@
     "id": "b2-õiglus",
     "estonian": "õiglus",
     "english": "justice / fairness",
+    "turkish": "adalet / hakkaniyet",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Rahvas nõuab õiglust ja võrdsust.",
-        "english": "The people demand justice and equality."
+        "english": "The people demand justice and equality.",
+        "turkish": "Halk adalet ve eşitlik talep ediyor."
       }
     ]
   },
@@ -435,11 +507,13 @@
     "id": "b2-eelarvamus",
     "estonian": "eelarvamus",
     "english": "prejudice",
+    "turkish": "önyargı",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Eelarvamused takistavad ühiskonna arengut.",
-        "english": "Prejudices hinder the development of society."
+        "english": "Prejudices hinder the development of society.",
+        "turkish": "Önyargılar toplumun gelişimini engelliyor."
       }
     ]
   },
@@ -447,11 +521,13 @@
     "id": "b2-vastutus",
     "estonian": "vastutus",
     "english": "responsibility",
+    "turkish": "sorumluluk",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Iga kodanik kannab vastutust oma tegude eest.",
-        "english": "Every citizen bears responsibility for their actions."
+        "english": "Every citizen bears responsibility for their actions.",
+        "turkish": "Her vatandaş kendi eylemlerinin sorumluluğunu taşır."
       }
     ]
   },
@@ -459,11 +535,13 @@
     "id": "b2-skulptuur",
     "estonian": "skulptuur",
     "english": "sculpture",
+    "turkish": "heykel",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Pargis on paigaldatud uus skulptuur.",
-        "english": "A new sculpture has been installed in the park."
+        "english": "A new sculpture has been installed in the park.",
+        "turkish": "Parka yeni bir heykel yerleştirildi."
       }
     ]
   },
@@ -471,11 +549,13 @@
     "id": "b2-näitus",
     "estonian": "näitus",
     "english": "exhibition",
+    "turkish": "sergi",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Kunstimuuseumis on avatud uus näitus.",
-        "english": "A new exhibition has opened at the art museum."
+        "english": "A new exhibition has opened at the art museum.",
+        "turkish": "Sanat müzesinde yeni bir sergi açıldı."
       }
     ]
   },
@@ -483,11 +563,13 @@
     "id": "b2-lavastus",
     "estonian": "lavastus",
     "english": "production / staging",
+    "turkish": "sahne yapımı / tiyatro oyunu",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Teatri uus lavastus pälvis kriitikute kiitust.",
-        "english": "The theater's new production received praise from critics."
+        "english": "The theater's new production received praise from critics.",
+        "turkish": "Tiyatronun yeni yapımı eleştirmenlerden övgü aldı."
       }
     ]
   },
@@ -495,11 +577,13 @@
     "id": "b2-helilooja",
     "estonian": "helilooja",
     "english": "composer",
+    "turkish": "besteci",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Arvo Pärt on maailmakuulus eesti helilooja.",
-        "english": "Arvo Pärt is a world-famous Estonian composer."
+        "english": "Arvo Pärt is a world-famous Estonian composer.",
+        "turkish": "Arvo Pärt dünyaca ünlü bir Estonyalı bestecidir."
       }
     ]
   },
@@ -507,11 +591,13 @@
     "id": "b2-kirjandus",
     "estonian": "kirjandus",
     "english": "literature",
+    "turkish": "edebiyat",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Eesti kirjandus on rikas ja mitmekesine.",
-        "english": "Estonian literature is rich and diverse."
+        "english": "Estonian literature is rich and diverse.",
+        "turkish": "Estonya edebiyatı zengin ve çeşitlidir."
       }
     ]
   },
@@ -519,11 +605,13 @@
     "id": "b2-luuletus",
     "estonian": "luuletus",
     "english": "poem",
+    "turkish": "şiir",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta kirjutas kauneid luuletusi loodusest.",
-        "english": "She wrote beautiful poems about nature."
+        "english": "She wrote beautiful poems about nature.",
+        "turkish": "Doğa hakkında güzel şiirler yazdı."
       }
     ]
   },
@@ -531,11 +619,13 @@
     "id": "b2-looming",
     "estonian": "looming",
     "english": "creative work / oeuvre",
+    "turkish": "yaratıcı eser / yapıt",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Tema looming on mõjutanud tervet põlvkonda.",
-        "english": "His creative work has influenced an entire generation."
+        "english": "His creative work has influenced an entire generation.",
+        "turkish": "Eserleri bütün bir nesli etkilemiştir."
       }
     ]
   },
@@ -543,11 +633,13 @@
     "id": "b2-kultuuripärand",
     "estonian": "kultuuripärand",
     "english": "cultural heritage",
+    "turkish": "kültürel miras",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Vanalinn on osa meie kultuuripärandist.",
-        "english": "The old town is part of our cultural heritage."
+        "english": "The old town is part of our cultural heritage.",
+        "turkish": "Tarihi şehir merkezi kültürel mirasımızın bir parçasıdır."
       }
     ]
   },
@@ -555,11 +647,13 @@
     "id": "b2-stiil",
     "estonian": "stiil",
     "english": "style",
+    "turkish": "stil / tarz",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Kunstniku stiil on ainulaadne ja äratuntav.",
-        "english": "The artist's style is unique and recognizable."
+        "english": "The artist's style is unique and recognizable.",
+        "turkish": "Sanatçının tarzı benzersiz ve tanınabilir."
       }
     ]
   },
@@ -567,11 +661,13 @@
     "id": "b2-nördimus",
     "estonian": "nördimus",
     "english": "indignation / outrage",
+    "turkish": "öfke / infial",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Otsus tekitas avalikkuses suurt nördimust.",
-        "english": "The decision caused great indignation among the public."
+        "english": "The decision caused great indignation among the public.",
+        "turkish": "Karar kamuoyunda büyük öfkeye neden oldu."
       }
     ]
   },
@@ -579,11 +675,13 @@
     "id": "b2-kahetsus",
     "estonian": "kahetsus",
     "english": "regret / remorse",
+    "turkish": "pişmanlık",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta tundis sügavat kahetsust oma sõnade pärast.",
-        "english": "He felt deep regret about his words."
+        "english": "He felt deep regret about his words.",
+        "turkish": "Sözlerinden dolayı derin bir pişmanlık duydu."
       }
     ]
   },
@@ -591,11 +689,13 @@
     "id": "b2-igatsus",
     "estonian": "igatsus",
     "english": "longing / yearning",
+    "turkish": "özlem / hasret",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Kodu igatsus valdas teda välismaal.",
-        "english": "Homesickness overwhelmed him abroad."
+        "english": "Homesickness overwhelmed him abroad.",
+        "turkish": "Yurt dışındayken memleket hasreti onu sardı."
       }
     ]
   },
@@ -603,11 +703,13 @@
     "id": "b2-hämmastus",
     "estonian": "hämmastus",
     "english": "amazement / astonishment",
+    "turkish": "şaşkınlık / hayret",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta vaatas hämmastusega, kuidas jõehobu ujus.",
-        "english": "He watched in amazement as the hippopotamus swam."
+        "english": "He watched in amazement as the hippopotamus swam.",
+        "turkish": "Su aygırının yüzüşünü hayretle izledi."
       }
     ]
   },
@@ -615,11 +717,13 @@
     "id": "b2-pettumus",
     "estonian": "pettumus",
     "english": "disappointment",
+    "turkish": "hayal kırıklığı",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Pettumus oli tema näost selgelt näha.",
-        "english": "The disappointment was clearly visible on his face."
+        "english": "The disappointment was clearly visible on his face.",
+        "turkish": "Hayal kırıklığı yüzünden açıkça okunuyordu."
       }
     ]
   },
@@ -627,11 +731,13 @@
     "id": "b2-üksindus",
     "estonian": "üksindus",
     "english": "loneliness / solitude",
+    "turkish": "yalnızlık",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Üksindus võib mõjutada vaimset tervist.",
-        "english": "Loneliness can affect mental health."
+        "english": "Loneliness can affect mental health.",
+        "turkish": "Yalnızlık ruh sağlığını etkileyebilir."
       }
     ]
   },
@@ -639,11 +745,13 @@
     "id": "b2-uhkus",
     "estonian": "uhkus",
     "english": "pride",
+    "turkish": "gurur",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Vanemad tundsid lapse saavutuste üle uhkust.",
-        "english": "The parents felt pride in their child's achievements."
+        "english": "The parents felt pride in their child's achievements.",
+        "turkish": "Anne baba çocuklarının başarılarıyla gurur duydu."
       }
     ]
   },
@@ -651,11 +759,13 @@
     "id": "b2-kaastunne",
     "estonian": "kaastunne",
     "english": "compassion / sympathy",
+    "turkish": "merhamet / şefkat",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta näitas kaastunnet kannatajate vastu.",
-        "english": "She showed compassion towards the victims."
+        "english": "She showed compassion towards the victims.",
+        "turkish": "Mağdurlara karşı merhamet gösterdi."
       }
     ]
   },
@@ -663,11 +773,13 @@
     "id": "b2-ärevus",
     "estonian": "ärevus",
     "english": "anxiety",
+    "turkish": "kaygı / endişe",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ärevus enne eksamit on täiesti normaalne.",
-        "english": "Anxiety before an exam is completely normal."
+        "english": "Anxiety before an exam is completely normal.",
+        "turkish": "Sınav öncesi kaygı tamamen normaldir."
       }
     ]
   },
@@ -675,11 +787,13 @@
     "id": "b2-kiindumus",
     "estonian": "kiindumus",
     "english": "attachment / affection",
+    "turkish": "bağlılık / sevgi",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Lapse kiindumus vanemate vastu on loomulik.",
-        "english": "A child's attachment to parents is natural."
+        "english": "A child's attachment to parents is natural.",
+        "turkish": "Çocuğun anne babasına bağlılığı doğaldır."
       }
     ]
   },
@@ -687,11 +801,13 @@
     "id": "b2-käesolev",
     "estonian": "käesolev",
     "english": "present / current (formal)",
+    "turkish": "mevcut / işbu (resmi)",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Käesolev dokument jõustub allkirjastamise hetkest.",
-        "english": "The present document takes effect upon signing."
+        "english": "The present document takes effect upon signing.",
+        "turkish": "İşbu belge imzalanma anında yürürlüğe girer."
       }
     ]
   },
@@ -699,11 +815,13 @@
     "id": "b2-eelnimetatud",
     "estonian": "eelnimetatud",
     "english": "aforementioned",
+    "turkish": "yukarıda belirtilen / adı geçen",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Eelnimetatud tingimused kehtivad kõigile osapooltele.",
-        "english": "The aforementioned conditions apply to all parties."
+        "english": "The aforementioned conditions apply to all parties.",
+        "turkish": "Yukarıda belirtilen koşullar tüm taraflar için geçerlidir."
       }
     ]
   },
@@ -711,11 +829,13 @@
     "id": "b2-kooskõlas",
     "estonian": "kooskõlas",
     "english": "in accordance with",
+    "turkish": "uyarınca / uygun olarak",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Otsus tehti seadusega kooskõlas.",
-        "english": "The decision was made in accordance with the law."
+        "english": "The decision was made in accordance with the law.",
+        "turkish": "Karar yasaya uygun olarak alındı."
       }
     ]
   },
@@ -723,11 +843,13 @@
     "id": "b2-tulenevalt",
     "estonian": "tulenevalt",
     "english": "arising from / due to",
+    "turkish": "dolayı / kaynaklanan",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Sellest tulenevalt muudeti ka eelarvet.",
-        "english": "Arising from this, the budget was also changed."
+        "english": "Arising from this, the budget was also changed.",
+        "turkish": "Bundan dolayı bütçe de değiştirildi."
       }
     ]
   },
@@ -735,11 +857,13 @@
     "id": "b2-sealjuures",
     "estonian": "sealjuures",
     "english": "at the same time / moreover",
+    "turkish": "üstelik / aynı zamanda",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Projekt lõpetati õigel ajal, sealjuures jäädi eelarve piiresse.",
-        "english": "The project was completed on time, moreover staying within budget."
+        "english": "The project was completed on time, moreover staying within budget.",
+        "turkish": "Proje zamanında tamamlandı, üstelik bütçe sınırları içinde kalındı."
       }
     ]
   },
@@ -747,11 +871,13 @@
     "id": "b2-järelikult",
     "estonian": "järelikult",
     "english": "consequently / therefore",
+    "turkish": "dolayısıyla / demek ki",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta ei ilmunud kohale, järelikult ei olnud ta huvitatud.",
-        "english": "He did not show up, consequently he was not interested."
+        "english": "He did not show up, consequently he was not interested.",
+        "turkish": "Gelmedi, demek ki ilgilenmiyordu."
       }
     ]
   },
@@ -759,11 +885,13 @@
     "id": "b2-nimelt",
     "estonian": "nimelt",
     "english": "namely",
+    "turkish": "şöyle ki / yani",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Probleem on nimelt selles, et raha pole piisavalt.",
-        "english": "The problem is namely that there is not enough money."
+        "english": "The problem is namely that there is not enough money.",
+        "turkish": "Sorun şu ki yeterli para yok."
       }
     ]
   },
@@ -771,11 +899,13 @@
     "id": "b2-eelkõige",
     "estonian": "eelkõige",
     "english": "above all / primarily",
+    "turkish": "her şeyden önce / başta",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Eelkõige tuleb mõelda laste turvalisusele.",
-        "english": "Above all, we must think about children's safety."
+        "english": "Above all, we must think about children's safety.",
+        "turkish": "Her şeyden önce çocukların güvenliğini düşünmeliyiz."
       }
     ]
   },
@@ -783,11 +913,13 @@
     "id": "b2-siiski",
     "estonian": "siiski",
     "english": "however / nevertheless",
+    "turkish": "yine de / bununla birlikte",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ilm oli halb, siiski otsustasime minna.",
-        "english": "The weather was bad; however, we decided to go."
+        "english": "The weather was bad; however, we decided to go.",
+        "turkish": "Hava kötüydü; yine de gitmeye karar verdik."
       }
     ]
   },
@@ -795,11 +927,13 @@
     "id": "b2-vaatamata",
     "estonian": "vaatamata",
     "english": "despite / in spite of",
+    "turkish": "rağmen",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Raskustele vaatamata lõpetas ta ülikooli.",
-        "english": "Despite the difficulties, she graduated from university."
+        "english": "Despite the difficulties, she graduated from university.",
+        "turkish": "Zorluklara rağmen üniversiteyi bitirdi."
       }
     ]
   },
@@ -807,11 +941,13 @@
     "id": "b2-tõestama",
     "estonian": "tõestama",
     "english": "to prove",
+    "turkish": "kanıtlamak / ispatlamak",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Teadlased suutsid oma teooriat tõestada.",
-        "english": "The scientists managed to prove their theory."
+        "english": "The scientists managed to prove their theory.",
+        "turkish": "Bilim insanları teorilerini kanıtlamayı başardı."
       }
     ]
   },
@@ -819,11 +955,13 @@
     "id": "b2-rakendama",
     "estonian": "rakendama",
     "english": "to implement / to apply",
+    "turkish": "uygulamak",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Valitsus otsustas uut poliitikat rakendada.",
-        "english": "The government decided to implement the new policy."
+        "english": "The government decided to implement the new policy.",
+        "turkish": "Hükümet yeni politikayı uygulamaya karar verdi."
       }
     ]
   },
@@ -831,11 +969,13 @@
     "id": "b2-saavutama",
     "estonian": "saavutama",
     "english": "to achieve / to accomplish",
+    "turkish": "başarmak / elde etmek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta saavutas oma karjääris märkimisväärse edu.",
-        "english": "She achieved remarkable success in her career."
+        "english": "She achieved remarkable success in her career.",
+        "turkish": "Kariyerinde kayda değer bir başarı elde etti."
       }
     ]
   },
@@ -843,11 +983,13 @@
     "id": "b2-hindama",
     "estonian": "hindama",
     "english": "to evaluate / to appreciate",
+    "turkish": "değerlendirmek / takdir etmek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Eksperdid hindavad projekti tulemusi.",
-        "english": "Experts are evaluating the project's results."
+        "english": "Experts are evaluating the project's results.",
+        "turkish": "Uzmanlar projenin sonuçlarını değerlendiriyor."
       }
     ]
   },
@@ -855,11 +997,13 @@
     "id": "b2-väitma",
     "estonian": "väitma",
     "english": "to claim / to argue",
+    "turkish": "iddia etmek / ileri sürmek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Teadlane väidab, et kliimamuutused kiirenevad.",
-        "english": "The scientist claims that climate change is accelerating."
+        "english": "The scientist claims that climate change is accelerating.",
+        "turkish": "Bilim insanı iklim değişikliğinin hızlandığını iddia ediyor."
       }
     ]
   },
@@ -867,11 +1011,13 @@
     "id": "b2-eeldama",
     "estonian": "eeldama",
     "english": "to assume / to presume",
+    "turkish": "varsaymak / öngörmek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Me eeldame, et kõik osalejad on tutvunud materjalidega.",
-        "english": "We assume that all participants have reviewed the materials."
+        "english": "We assume that all participants have reviewed the materials.",
+        "turkish": "Tüm katılımcıların materyalleri incelediğini varsayıyoruz."
       }
     ]
   },
@@ -879,11 +1025,13 @@
     "id": "b2-kehtestama",
     "estonian": "kehtestama",
     "english": "to establish / to impose",
+    "turkish": "uygulamaya koymak / dayatmak",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Riik kehtestas uued piirangud.",
-        "english": "The state imposed new restrictions."
+        "english": "The state imposed new restrictions.",
+        "turkish": "Devlet yeni kısıtlamalar getirdi."
       }
     ]
   },
@@ -891,11 +1039,13 @@
     "id": "b2-tagama",
     "estonian": "tagama",
     "english": "to ensure / to guarantee",
+    "turkish": "sağlamak / garanti etmek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Riik peab tagama kodanike turvalisuse.",
-        "english": "The state must ensure the safety of its citizens."
+        "english": "The state must ensure the safety of its citizens.",
+        "turkish": "Devlet vatandaşlarının güvenliğini sağlamalıdır."
       }
     ]
   },
@@ -903,11 +1053,13 @@
     "id": "b2-vaidlema",
     "estonian": "vaidlema",
     "english": "to argue / to dispute",
+    "turkish": "tartışmak",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Nad vaidlesid tundide kaupa poliitika üle.",
-        "english": "They argued for hours about politics."
+        "english": "They argued for hours about politics.",
+        "turkish": "Saatlerce siyaset hakkında tartıştılar."
       }
     ]
   },
@@ -915,11 +1067,13 @@
     "id": "b2-mõjutama",
     "estonian": "mõjutama",
     "english": "to influence / to affect",
+    "turkish": "etkilemek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Reklaam mõjutab inimeste ostuotsuseid.",
-        "english": "Advertising influences people's purchasing decisions."
+        "english": "Advertising influences people's purchasing decisions.",
+        "turkish": "Reklamlar insanların satın alma kararlarını etkiler."
       }
     ]
   },
@@ -927,11 +1081,13 @@
     "id": "b2-kaaluma",
     "estonian": "kaaluma",
     "english": "to weigh / to consider",
+    "turkish": "tartmak / değerlendirmek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Tuleb hoolikalt kaaluda kõiki võimalusi.",
-        "english": "All options must be carefully considered."
+        "english": "All options must be carefully considered.",
+        "turkish": "Tüm seçenekler dikkatle değerlendirilmelidir."
       }
     ]
   },
@@ -939,11 +1095,13 @@
     "id": "b2-rõhutama",
     "estonian": "rõhutama",
     "english": "to emphasize / to stress",
+    "turkish": "vurgulamak",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Minister rõhutas koostöö tähtsust.",
-        "english": "The minister emphasized the importance of cooperation."
+        "english": "The minister emphasized the importance of cooperation.",
+        "turkish": "Bakan iş birliğinin önemini vurguladı."
       }
     ]
   },
@@ -951,11 +1109,13 @@
     "id": "b2-taastama",
     "estonian": "taastama",
     "english": "to restore / to recover",
+    "turkish": "restore etmek / eski haline getirmek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Vana hoone taastati algse ilme järgi.",
-        "english": "The old building was restored to its original appearance."
+        "english": "The old building was restored to its original appearance.",
+        "turkish": "Eski bina orijinal görünümüne kavuşturuldu."
       }
     ]
   },
@@ -963,11 +1123,13 @@
     "id": "b2-kaasama",
     "estonian": "kaasama",
     "english": "to involve / to include",
+    "turkish": "dahil etmek / katmak",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Projekti tuleb kaasata kõik osapooled.",
-        "english": "All parties must be involved in the project."
+        "english": "All parties must be involved in the project.",
+        "turkish": "Tüm taraflar projeye dahil edilmelidir."
       }
     ]
   },
@@ -975,11 +1137,13 @@
     "id": "b2-ümberlükkama",
     "estonian": "ümberlükkama",
     "english": "to refute / to disprove",
+    "turkish": "çürütmek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Uued andmed lükkasid vana teooria ümber.",
-        "english": "New data refuted the old theory."
+        "english": "New data refuted the old theory.",
+        "turkish": "Yeni veriler eski teoriyi çürüttü."
       }
     ]
   },
@@ -987,11 +1151,13 @@
     "id": "b2-silmapaistev",
     "estonian": "silmapaistev",
     "english": "outstanding / remarkable",
+    "turkish": "olağanüstü / göze çarpan",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta on silmapaistev teadlane oma valdkonnas.",
-        "english": "She is an outstanding scientist in her field."
+        "english": "She is an outstanding scientist in her field.",
+        "turkish": "Kendi alanında olağanüstü bir bilim insanıdır."
       }
     ]
   },
@@ -999,11 +1165,13 @@
     "id": "b2-põhjalik",
     "estonian": "põhjalik",
     "english": "thorough / comprehensive",
+    "turkish": "kapsamlı / ayrıntılı",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Arstid tegid põhjaliku läbivaatuse.",
-        "english": "The doctors performed a thorough examination."
+        "english": "The doctors performed a thorough examination.",
+        "turkish": "Doktorlar kapsamlı bir muayene yaptı."
       }
     ]
   },
@@ -1011,11 +1179,13 @@
     "id": "b2-mõõdukas",
     "estonian": "mõõdukas",
     "english": "moderate / temperate",
+    "turkish": "ılımlı / ölçülü",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Mõõdukas treenimine on tervisele kasulik.",
-        "english": "Moderate exercise is beneficial for health."
+        "english": "Moderate exercise is beneficial for health.",
+        "turkish": "Ölçülü egzersiz sağlık için faydalıdır."
       }
     ]
   },
@@ -1023,11 +1193,13 @@
     "id": "b2-jätkusuutlik",
     "estonian": "jätkusuutlik",
     "english": "sustainable",
+    "turkish": "sürdürülebilir",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Me peame leidma jätkusuutlikud lahendused.",
-        "english": "We must find sustainable solutions."
+        "english": "We must find sustainable solutions.",
+        "turkish": "Sürdürülebilir çözümler bulmalıyız."
       }
     ]
   },
@@ -1035,11 +1207,13 @@
     "id": "b2-erapooletu",
     "estonian": "erapooletu",
     "english": "impartial / unbiased",
+    "turkish": "tarafsız",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Kohtunik peab olema erapooletu.",
-        "english": "A judge must be impartial."
+        "english": "A judge must be impartial.",
+        "turkish": "Bir yargıç tarafsız olmalıdır."
       }
     ]
   },
@@ -1047,11 +1221,13 @@
     "id": "b2-vastuoluline",
     "estonian": "vastuoluline",
     "english": "contradictory / controversial",
+    "turkish": "çelişkili / tartışmalı",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ministri avaldus oli vastuoluline.",
-        "english": "The minister's statement was contradictory."
+        "english": "The minister's statement was contradictory.",
+        "turkish": "Bakanın açıklaması çelişkiliydi."
       }
     ]
   },
@@ -1059,11 +1235,13 @@
     "id": "b2-märkimisväärne",
     "estonian": "märkimisväärne",
     "english": "significant / noteworthy",
+    "turkish": "kayda değer / önemli",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Teaduses tehti märkimisväärne läbimurre.",
-        "english": "A significant breakthrough was made in science."
+        "english": "A significant breakthrough was made in science.",
+        "turkish": "Bilimde kayda değer bir atılım gerçekleştirildi."
       }
     ]
   },
@@ -1071,11 +1249,13 @@
     "id": "b2-ülekaalukas",
     "estonian": "ülekaalukas",
     "english": "predominant / overwhelming",
+    "turkish": "ezici / baskın",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ülekaalukas enamus hääletas ettepaneku poolt.",
-        "english": "The overwhelming majority voted in favor of the proposal."
+        "english": "The overwhelming majority voted in favor of the proposal.",
+        "turkish": "Ezici çoğunluk teklifin lehinde oy kullandı."
       }
     ]
   },
@@ -1083,11 +1263,13 @@
     "id": "b2-asjakohane",
     "estonian": "asjakohane",
     "english": "relevant / appropriate",
+    "turkish": "ilgili / uygun",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Palun esitage ainult asjakohaseid küsimusi.",
-        "english": "Please ask only relevant questions."
+        "english": "Please ask only relevant questions.",
+        "turkish": "Lütfen yalnızca konuyla ilgili sorular sorun."
       }
     ]
   },
@@ -1095,11 +1277,13 @@
     "id": "b2-tõhus",
     "estonian": "tõhus",
     "english": "efficient / effective",
+    "turkish": "verimli / etkili",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "See on kõige tõhusam viis probleemi lahendamiseks.",
-        "english": "This is the most efficient way to solve the problem."
+        "english": "This is the most efficient way to solve the problem.",
+        "turkish": "Bu, sorunu çözmenin en etkili yoludur."
       }
     ]
   },
@@ -1107,11 +1291,13 @@
     "id": "b2-keeruline",
     "estonian": "keeruline",
     "english": "complex / complicated",
+    "turkish": "karmaşık / zor",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "See on äärmiselt keeruline probleem.",
-        "english": "This is an extremely complex problem."
+        "english": "This is an extremely complex problem.",
+        "turkish": "Bu son derece karmaşık bir sorundur."
       }
     ]
   },
@@ -1119,11 +1305,13 @@
     "id": "b2-üleüldine",
     "estonian": "üleüldine",
     "english": "universal / general",
+    "turkish": "genel / evrensel",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Üleüldine arvamus oli otsuse vastu.",
-        "english": "The general opinion was against the decision."
+        "english": "The general opinion was against the decision.",
+        "turkish": "Genel kanı kararın alehineydi."
       }
     ]
   },
@@ -1131,11 +1319,13 @@
     "id": "b2-katsetus",
     "estonian": "katsetus",
     "english": "experiment / trial",
+    "turkish": "deney / deneme",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Esimene katsetus ebaõnnestus, kuid teine andis tulemusi.",
-        "english": "The first experiment failed, but the second yielded results."
+        "english": "The first experiment failed, but the second yielded results.",
+        "turkish": "İlk deney başarısız oldu ama ikincisi sonuç verdi."
       }
     ]
   },
@@ -1143,11 +1333,13 @@
     "id": "b2-tulemus",
     "estonian": "tulemus",
     "english": "result / outcome",
+    "turkish": "sonuç",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Uuringu tulemused avaldatakse homme.",
-        "english": "The study results will be published tomorrow."
+        "english": "The study results will be published tomorrow.",
+        "turkish": "Araştırmanın sonuçları yarın yayımlanacak."
       }
     ]
   },
@@ -1155,11 +1347,13 @@
     "id": "b2-protsess",
     "estonian": "protsess",
     "english": "process",
+    "turkish": "süreç",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Õppimine on pikaajaline protsess.",
-        "english": "Learning is a long-term process."
+        "english": "Learning is a long-term process.",
+        "turkish": "Öğrenme uzun vadeli bir süreçtir."
       }
     ]
   },
@@ -1167,11 +1361,13 @@
     "id": "b2-nähtus",
     "estonian": "nähtus",
     "english": "phenomenon",
+    "turkish": "olgu / fenomen",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Virmalised on haruldane loodusnähtus.",
-        "english": "The Northern Lights are a rare natural phenomenon."
+        "english": "The Northern Lights are a rare natural phenomenon.",
+        "turkish": "Kuzey ışıkları nadir görülen bir doğa olayıdır."
       }
     ]
   },
@@ -1179,11 +1375,13 @@
     "id": "b2-rakk",
     "estonian": "rakk",
     "english": "cell (biology)",
+    "turkish": "hücre (biyoloji)",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Inimkeha koosneb miljarditest rakkudest.",
-        "english": "The human body consists of billions of cells."
+        "english": "The human body consists of billions of cells.",
+        "turkish": "İnsan vücudu milyarlarca hücreden oluşur."
       }
     ]
   },
@@ -1191,11 +1389,13 @@
     "id": "b2-keskkond",
     "estonian": "keskkond",
     "english": "environment",
+    "turkish": "çevre",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Keskkonna kaitsmine on meie kõigi kohustus.",
-        "english": "Protecting the environment is everyone's duty."
+        "english": "Protecting the environment is everyone's duty.",
+        "turkish": "Çevreyi korumak hepimizin görevidir."
       }
     ]
   },
@@ -1203,11 +1403,13 @@
     "id": "b2-ökosüsteem",
     "estonian": "ökosüsteem",
     "english": "ecosystem",
+    "turkish": "ekosistem",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Metsade hävitamine ohustab tervet ökosüsteemi.",
-        "english": "Deforestation threatens the entire ecosystem."
+        "english": "Deforestation threatens the entire ecosystem.",
+        "turkish": "Ormanların yok edilmesi tüm ekosistemi tehdit ediyor."
       }
     ]
   },
@@ -1215,11 +1417,13 @@
     "id": "b2-kliima",
     "estonian": "kliima",
     "english": "climate",
+    "turkish": "iklim",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Kliima soojenemine on globaalne probleem.",
-        "english": "Climate warming is a global problem."
+        "english": "Climate warming is a global problem.",
+        "turkish": "İklim ısınması küresel bir sorundur."
       }
     ]
   },
@@ -1227,11 +1431,13 @@
     "id": "b2-säästev",
     "estonian": "säästev",
     "english": "sustainable / conserving",
+    "turkish": "sürdürülebilir / tasarruflu",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Säästev areng on tuleviku võti.",
-        "english": "Sustainable development is the key to the future."
+        "english": "Sustainable development is the key to the future.",
+        "turkish": "Sürdürülebilir kalkınma geleceğin anahtarıdır."
       }
     ]
   },
@@ -1239,11 +1445,13 @@
     "id": "b2-taastuv",
     "estonian": "taastuv",
     "english": "renewable",
+    "turkish": "yenilenebilir",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Taastuvenergia osakaal kasvab pidevalt.",
-        "english": "The share of renewable energy is constantly growing."
+        "english": "The share of renewable energy is constantly growing.",
+        "turkish": "Yenilenebilir enerjinin payı sürekli artıyor."
       }
     ]
   },
@@ -1251,11 +1459,13 @@
     "id": "b2-nagu-valatud",
     "estonian": "nagu valatud",
     "english": "fits like a glove (idiom)",
+    "turkish": "kalıp gibi oturmak (deyim)",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "See kleit on sulle nagu valatud.",
-        "english": "That dress fits you like a glove."
+        "english": "That dress fits you like a glove.",
+        "turkish": "O elbise sana kalıp gibi oturmuş."
       }
     ]
   },
@@ -1263,11 +1473,13 @@
     "id": "b2-käsi-peseb-kätt",
     "estonian": "käsi peseb kätt",
     "english": "one hand washes the other (idiom)",
+    "turkish": "sen benim sırtımı kaşı, ben senin sırtını kaşıyayım (deyim)",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Poliitikas kehtib tihti reegel: käsi peseb kätt.",
-        "english": "In politics, the rule often applies: one hand washes the other."
+        "english": "In politics, the rule often applies: one hand washes the other.",
+        "turkish": "Siyasette çoğu zaman şu kural geçerlidir: sen bana ben sana."
       }
     ]
   },
@@ -1275,11 +1487,13 @@
     "id": "b2-nüri-nagu-saapasäär",
     "estonian": "nüri nagu saapasäär",
     "english": "dull as dishwater (idiom, lit: dull as a boot shaft)",
+    "turkish": "sıkıcının teki (deyim)",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "See loeng oli nüri nagu saapasäär.",
-        "english": "That lecture was dull as dishwater."
+        "english": "That lecture was dull as dishwater.",
+        "turkish": "O ders bayıltacak kadar sıkıcıydı."
       }
     ]
   },
@@ -1287,11 +1501,13 @@
     "id": "b2-küll-leib-leiab-leiba",
     "estonian": "küll leib leiab leiba",
     "english": "bread always finds bread (idiom: the resourceful always find a way)",
+    "turkish": "her işin bir yolu var (deyim)",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ära muretse, küll leib leiab leiba.",
-        "english": "Don't worry, you'll find a way to get by."
+        "english": "Don't worry, you'll find a way to get by.",
+        "turkish": "Merak etme, bir yolunu bulursun."
       }
     ]
   },
@@ -1299,11 +1515,13 @@
     "id": "b2-kes-teisele-auku-kaevab",
     "estonian": "kes teisele auku kaevab, see ise sisse kukub",
     "english": "he who digs a pit for others falls in himself",
+    "turkish": "başkasına kuyu kazan kendisi düşer (atasözü)",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta sai karistada oma kavalduse eest — kes teisele auku kaevab, see ise sisse kukub.",
-        "english": "He was punished for his scheming — he who digs a pit for others falls in himself."
+        "english": "He was punished for his scheming — he who digs a pit for others falls in himself.",
+        "turkish": "Kurnazlığının cezasını çekti — başkasına kuyu kazan kendisi düşer."
       }
     ]
   },
@@ -1311,11 +1529,13 @@
     "id": "b2-kus-suitsu-seal-tuld",
     "estonian": "kus suitsu, seal tuld",
     "english": "where there's smoke, there's fire",
+    "turkish": "ateş olmayan yerden duman çıkmaz",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Kuulujutud osutusid tõeks — kus suitsu, seal tuld.",
-        "english": "The rumors turned out to be true — where there's smoke, there's fire."
+        "english": "The rumors turned out to be true — where there's smoke, there's fire.",
+        "turkish": "Dedikodular doğru çıktı — ateş olmayan yerden duman çıkmaz."
       }
     ]
   },
@@ -1323,11 +1543,13 @@
     "id": "b2-harjutamine-teeb-meistriks",
     "estonian": "harjutamine teeb meistriks",
     "english": "practice makes perfect",
+    "turkish": "tekrar başarının anasıdır",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ära anna alla, harjutamine teeb meistriks.",
-        "english": "Don't give up, practice makes perfect."
+        "english": "Don't give up, practice makes perfect.",
+        "turkish": "Pes etme, tekrar başarının anasıdır."
       }
     ]
   },
@@ -1335,11 +1557,13 @@
     "id": "b2-iga-algus-on-raske",
     "estonian": "iga algus on raske",
     "english": "every beginning is difficult",
+    "turkish": "her başlangıç zordur",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Uue keele õppimisel tasub meeles pidada — iga algus on raske.",
-        "english": "When learning a new language, remember — every beginning is difficult."
+        "english": "When learning a new language, remember — every beginning is difficult.",
+        "turkish": "Yeni bir dil öğrenirken unutma — her başlangıç zordur."
       }
     ]
   },
@@ -1347,11 +1571,13 @@
     "id": "b2-arutelu",
     "estonian": "arutelu",
     "english": "discussion / debate",
+    "turkish": "tartışma / müzakere",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Parlamendis toimus elav arutelu uue seaduse üle.",
-        "english": "A lively debate took place in parliament about the new law."
+        "english": "A lively debate took place in parliament about the new law.",
+        "turkish": "Parlamentoda yeni yasa hakkında canlı bir tartışma yapıldı."
       }
     ]
   },
@@ -1359,11 +1585,13 @@
     "id": "b2-seisukoht",
     "estonian": "seisukoht",
     "english": "viewpoint / position",
+    "turkish": "bakış açısı / görüş",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Mis on teie seisukoht selles küsimuses?",
-        "english": "What is your viewpoint on this matter?"
+        "english": "What is your viewpoint on this matter?",
+        "turkish": "Bu konudaki görüşünüz nedir?"
       }
     ]
   },
@@ -1371,11 +1599,13 @@
     "id": "b2-tõlgendus",
     "estonian": "tõlgendus",
     "english": "interpretation",
+    "turkish": "yorum / yorumlama",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Seaduse tõlgendus sõltub kontekstist.",
-        "english": "The interpretation of the law depends on the context."
+        "english": "The interpretation of the law depends on the context.",
+        "turkish": "Yasanın yorumu bağlama göre değişir."
       }
     ]
   },
@@ -1383,11 +1613,13 @@
     "id": "b2-mõiste",
     "estonian": "mõiste",
     "english": "concept / notion",
+    "turkish": "kavram",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "See mõiste vajab täpsemat defineerimist.",
-        "english": "This concept needs a more precise definition."
+        "english": "This concept needs a more precise definition.",
+        "turkish": "Bu kavram daha kesin bir tanıma ihtiyaç duyuyor."
       }
     ]
   },
@@ -1395,11 +1627,13 @@
     "id": "b2-pädevus",
     "estonian": "pädevus",
     "english": "competence / expertise",
+    "turkish": "yetkinlik / uzmanlık",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Tal on piisav pädevus selle otsuse tegemiseks.",
-        "english": "He has sufficient competence to make this decision."
+        "english": "He has sufficient competence to make this decision.",
+        "turkish": "Bu kararı vermek için yeterli yetkinliğe sahip."
       }
     ]
   },
@@ -1407,11 +1641,13 @@
     "id": "b2-ülevaade",
     "estonian": "ülevaade",
     "english": "overview / review",
+    "turkish": "genel bakış / özet",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Andke meile olukorrast lühike ülevaade.",
-        "english": "Give us a brief overview of the situation."
+        "english": "Give us a brief overview of the situation.",
+        "turkish": "Bize durumun kısa bir özetini verin."
       }
     ]
   },
@@ -1419,11 +1655,13 @@
     "id": "b2-eesmärk",
     "estonian": "eesmärk",
     "english": "goal / objective",
+    "turkish": "hedef / amaç",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Meie eesmärk on vähendada süsihappegaasi heidet.",
-        "english": "Our goal is to reduce carbon dioxide emissions."
+        "english": "Our goal is to reduce carbon dioxide emissions.",
+        "turkish": "Hedefimiz karbon dioksit emisyonlarını azaltmaktır."
       }
     ]
   },
@@ -1431,11 +1669,13 @@
     "id": "b2-strateegia",
     "estonian": "strateegia",
     "english": "strategy",
+    "turkish": "strateji",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ettevõte töötab välja uut turundusstrateegiat.",
-        "english": "The company is developing a new marketing strategy."
+        "english": "The company is developing a new marketing strategy.",
+        "turkish": "Şirket yeni bir pazarlama stratejisi geliştiriyor."
       }
     ]
   },
@@ -1443,11 +1683,13 @@
     "id": "b2-huvirühm",
     "estonian": "huvirühm",
     "english": "interest group / stakeholder group",
+    "turkish": "çıkar grubu / paydaş grubu",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Erinevad huvirühmad avaldasid oma arvamust.",
-        "english": "Various interest groups expressed their opinion."
+        "english": "Various interest groups expressed their opinion.",
+        "turkish": "Çeşitli çıkar grupları görüşlerini dile getirdi."
       }
     ]
   },
@@ -1455,11 +1697,13 @@
     "id": "b2-valitsus",
     "estonian": "valitsus",
     "english": "government",
+    "turkish": "hükümet",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Valitsus kiitis heaks uue reformikava.",
-        "english": "The government approved the new reform plan."
+        "english": "The government approved the new reform plan.",
+        "turkish": "Hükümet yeni reform planını onayladı."
       }
     ]
   },
@@ -1467,11 +1711,13 @@
     "id": "b2-demokraatia",
     "estonian": "demokraatia",
     "english": "democracy",
+    "turkish": "demokrasi",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Demokraatia eeldab kodanike aktiivset osalust.",
-        "english": "Democracy requires the active participation of citizens."
+        "english": "Democracy requires the active participation of citizens.",
+        "turkish": "Demokrasi vatandaşların aktif katılımını gerektirir."
       }
     ]
   },
@@ -1479,11 +1725,13 @@
     "id": "b2-bürokraatia",
     "estonian": "bürokraatia",
     "english": "bureaucracy",
+    "turkish": "bürokrasi",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Liigne bürokraatia aeglustab arengut.",
-        "english": "Excessive bureaucracy slows down development."
+        "english": "Excessive bureaucracy slows down development.",
+        "turkish": "Aşırı bürokrasi gelişmeyi yavaşlatır."
       }
     ]
   },
@@ -1491,11 +1739,13 @@
     "id": "b2-reform",
     "estonian": "reform",
     "english": "reform",
+    "turkish": "reform",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Haridusreform on hädavajalik.",
-        "english": "Education reform is urgently needed."
+        "english": "Education reform is urgently needed.",
+        "turkish": "Eğitim reformu acilen gereklidir."
       }
     ]
   },
@@ -1503,11 +1753,13 @@
     "id": "b2-kodakondsus",
     "estonian": "kodakondsus",
     "english": "citizenship",
+    "turkish": "vatandaşlık",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta taotles Eesti kodakondsust.",
-        "english": "He applied for Estonian citizenship."
+        "english": "He applied for Estonian citizenship.",
+        "turkish": "Estonya vatandaşlığına başvurdu."
       }
     ]
   },
@@ -1515,11 +1767,13 @@
     "id": "b2-läbirääkimised",
     "estonian": "läbirääkimised",
     "english": "negotiations",
+    "turkish": "müzakereler / görüşmeler",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Läbirääkimised kahe riigi vahel jätkuvad.",
-        "english": "Negotiations between the two countries continue."
+        "english": "Negotiations between the two countries continue.",
+        "turkish": "İki ülke arasındaki müzakereler devam ediyor."
       }
     ]
   },
@@ -1527,11 +1781,13 @@
     "id": "b2-kriis",
     "estonian": "kriis",
     "english": "crisis",
+    "turkish": "kriz",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Majanduskriis mõjutas kogu Euroopat.",
-        "english": "The economic crisis affected all of Europe."
+        "english": "The economic crisis affected all of Europe.",
+        "turkish": "Ekonomik kriz tüm Avrupa'yı etkiledi."
       }
     ]
   },
@@ -1539,11 +1795,13 @@
     "id": "b2-heaolu",
     "estonian": "heaolu",
     "english": "well-being / welfare",
+    "turkish": "refah / iyi oluş",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Kodanike heaolu peaks olema riigi prioriteet.",
-        "english": "Citizens' well-being should be the state's priority."
+        "english": "Citizens' well-being should be the state's priority.",
+        "turkish": "Vatandaşların refahı devletin önceliği olmalıdır."
       }
     ]
   },
@@ -1551,11 +1809,13 @@
     "id": "b2-ebavõrdsus",
     "estonian": "ebavõrdsus",
     "english": "inequality",
+    "turkish": "eşitsizlik",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Sooline ebavõrdsus on endiselt suur probleem.",
-        "english": "Gender inequality is still a major problem."
+        "english": "Gender inequality is still a major problem.",
+        "turkish": "Cinsiyet eşitsizliği hâlâ büyük bir sorundur."
       }
     ]
   },
@@ -1563,11 +1823,13 @@
     "id": "b2-globaliseerumine",
     "estonian": "globaliseerumine",
     "english": "globalization",
+    "turkish": "küreselleşme",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Globaliseerumine on muutnud maailma väiksemaks.",
-        "english": "Globalization has made the world smaller."
+        "english": "Globalization has made the world smaller.",
+        "turkish": "Küreselleşme dünyayı küçülttü."
       }
     ]
   },
@@ -1575,11 +1837,13 @@
     "id": "b2-pagulus",
     "estonian": "pagulus",
     "english": "exile / emigration",
+    "turkish": "sürgün / göç",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Paljud kirjanikud loovad paguluses.",
-        "english": "Many writers create in exile."
+        "english": "Many writers create in exile.",
+        "turkish": "Birçok yazar sürgünde eser veriyor."
       }
     ]
   },
@@ -1587,11 +1851,13 @@
     "id": "b2-lõimumine",
     "estonian": "lõimumine",
     "english": "integration",
+    "turkish": "entegrasyon / uyum",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Sisserändajate lõimumine võtab aega.",
-        "english": "The integration of immigrants takes time."
+        "english": "The integration of immigrants takes time.",
+        "turkish": "Göçmenlerin topluma uyumu zaman alır."
       }
     ]
   },
@@ -1599,11 +1865,13 @@
     "id": "b2-avaldama",
     "estonian": "avaldama",
     "english": "to publish / to express",
+    "turkish": "yayımlamak / ifade etmek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta avaldas oma arvamust avalikult.",
-        "english": "She expressed her opinion publicly."
+        "english": "She expressed her opinion publicly.",
+        "turkish": "Görüşünü alenen ifade etti."
       }
     ]
   },
@@ -1611,11 +1879,13 @@
     "id": "b2-edendama",
     "estonian": "edendama",
     "english": "to promote / to advance",
+    "turkish": "teşvik etmek / geliştirmek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Meie eesmärk on edendada tervislikku eluviisi.",
-        "english": "Our goal is to promote a healthy lifestyle."
+        "english": "Our goal is to promote a healthy lifestyle.",
+        "turkish": "Amacımız sağlıklı yaşam tarzını teşvik etmektir."
       }
     ]
   },
@@ -1623,11 +1893,13 @@
     "id": "b2-toetuma",
     "estonian": "toetuma",
     "english": "to be based on / to lean on",
+    "turkish": "dayanmak / temel almak",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Otsus toetub teaduslikele andmetele.",
-        "english": "The decision is based on scientific data."
+        "english": "The decision is based on scientific data.",
+        "turkish": "Karar bilimsel verilere dayanıyor."
       }
     ]
   },
@@ -1635,11 +1907,13 @@
     "id": "b2-soodustama",
     "estonian": "soodustama",
     "english": "to facilitate / to foster",
+    "turkish": "kolaylaştırmak / desteklemek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Hea haridus soodustab majanduslikku arengut.",
-        "english": "Good education fosters economic development."
+        "english": "Good education fosters economic development.",
+        "turkish": "İyi eğitim ekonomik gelişmeyi destekler."
       }
     ]
   },
@@ -1647,11 +1921,13 @@
     "id": "b2-kujundama",
     "estonian": "kujundama",
     "english": "to shape / to form",
+    "turkish": "şekillendirmek / biçimlendirmek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Lapsepõlv kujundab inimese iseloomu.",
-        "english": "Childhood shapes a person's character."
+        "english": "Childhood shapes a person's character.",
+        "turkish": "Çocukluk insanın karakterini şekillendirir."
       }
     ]
   },
@@ -1659,11 +1935,13 @@
     "id": "b2-vältima",
     "estonian": "vältima",
     "english": "to avoid",
+    "turkish": "kaçınmak",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta üritab konflikte vältida.",
-        "english": "He tries to avoid conflicts."
+        "english": "He tries to avoid conflicts.",
+        "turkish": "Çatışmalardan kaçınmaya çalışıyor."
       }
     ]
   },
@@ -1671,11 +1949,13 @@
     "id": "b2-tunnustama",
     "estonian": "tunnustama",
     "english": "to recognize / to acknowledge",
+    "turkish": "tanımak / takdir etmek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Riik tunnustas tema panust teadusesse.",
-        "english": "The state recognized his contribution to science."
+        "english": "The state recognized his contribution to science.",
+        "turkish": "Devlet onun bilime katkısını takdir etti."
       }
     ]
   },
@@ -1683,11 +1963,13 @@
     "id": "b2-süvenema",
     "estonian": "süvenema",
     "english": "to delve into / to immerse oneself",
+    "turkish": "derinlemesine incelemek / kendini vermek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta süvenes teemasse põhjalikult.",
-        "english": "She delved into the topic thoroughly."
+        "english": "She delved into the topic thoroughly.",
+        "turkish": "Konuyu derinlemesine inceledi."
       }
     ]
   },
@@ -1695,11 +1977,13 @@
     "id": "b2-käsitlema",
     "estonian": "käsitlema",
     "english": "to address / to deal with",
+    "turkish": "ele almak / işlemek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "See raamat käsitleb keerulisi filosoofilisi küsimusi.",
-        "english": "This book addresses complex philosophical questions."
+        "english": "This book addresses complex philosophical questions.",
+        "turkish": "Bu kitap karmaşık felsefi soruları ele alıyor."
       }
     ]
   },
@@ -1707,11 +1991,13 @@
     "id": "b2-kõhklema",
     "estonian": "kõhklema",
     "english": "to hesitate / to waver",
+    "turkish": "tereddüt etmek / kararsız kalmak",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta kõhkles pikalt enne otsuse tegemist.",
-        "english": "He hesitated for a long time before making a decision."
+        "english": "He hesitated for a long time before making a decision.",
+        "turkish": "Karar vermeden önce uzun süre tereddüt etti."
       }
     ]
   },
@@ -1719,11 +2005,13 @@
     "id": "b2-toimetulek",
     "estonian": "toimetulek",
     "english": "coping / getting by",
+    "turkish": "geçinme / başa çıkma",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Igapäevane toimetulek on osadele inimestele raske.",
-        "english": "Daily coping is difficult for some people."
+        "english": "Daily coping is difficult for some people.",
+        "turkish": "Günlük geçim bazı insanlar için zordur."
       }
     ]
   },
@@ -1731,11 +2019,13 @@
     "id": "b2-võimekus",
     "estonian": "võimekus",
     "english": "capability / capacity",
+    "turkish": "yetenek / kapasite",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Tema vaimne võimekus on erakordselt kõrge.",
-        "english": "His mental capability is exceptionally high."
+        "english": "His mental capability is exceptionally high.",
+        "turkish": "Zihinsel kapasitesi olağanüstü yüksek."
       }
     ]
   },
@@ -1743,11 +2033,13 @@
     "id": "b2-enesehinnang",
     "estonian": "enesehinnang",
     "english": "self-esteem",
+    "turkish": "özsaygı / özgüven",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Terve enesehinnang on vaimse tervise alus.",
-        "english": "Healthy self-esteem is the foundation of mental health."
+        "english": "Healthy self-esteem is the foundation of mental health.",
+        "turkish": "Sağlıklı özsaygı ruh sağlığının temelidir."
       }
     ]
   },
@@ -1755,11 +2047,13 @@
     "id": "b2-teadlikkus",
     "estonian": "teadlikkus",
     "english": "awareness",
+    "turkish": "farkındalık / bilinç",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ühiskonna teadlikkus vaimse tervise teemadel kasvab.",
-        "english": "Society's awareness of mental health issues is growing."
+        "english": "Society's awareness of mental health issues is growing.",
+        "turkish": "Toplumun ruh sağlığı konusundaki farkındalığı artıyor."
       }
     ]
   },
@@ -1767,11 +2061,13 @@
     "id": "b2-ennetamine",
     "estonian": "ennetamine",
     "english": "prevention",
+    "turkish": "önleme / koruma",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Haiguste ennetamine on parem kui ravi.",
-        "english": "Disease prevention is better than treatment."
+        "english": "Disease prevention is better than treatment.",
+        "turkish": "Hastalıkları önlemek tedavi etmekten iyidir."
       }
     ]
   },
@@ -1779,11 +2075,13 @@
     "id": "b2-tõrjutus",
     "estonian": "tõrjutus",
     "english": "exclusion / marginalization",
+    "turkish": "dışlanma / marjinalleşme",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Sotsiaalne tõrjutus mõjutab paljusid inimesi.",
-        "english": "Social exclusion affects many people."
+        "english": "Social exclusion affects many people.",
+        "turkish": "Sosyal dışlanma birçok insanı etkiliyor."
       }
     ]
   },
@@ -1791,11 +2089,13 @@
     "id": "b2-mitmekesisus",
     "estonian": "mitmekesisus",
     "english": "diversity",
+    "turkish": "çeşitlilik",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Kultuuriline mitmekesisus rikastab ühiskonda.",
-        "english": "Cultural diversity enriches society."
+        "english": "Cultural diversity enriches society.",
+        "turkish": "Kültürel çeşitlilik toplumu zenginleştirir."
       }
     ]
   },
@@ -1803,11 +2103,13 @@
     "id": "b2-pööre",
     "estonian": "pööre",
     "english": "turn / shift / revolution",
+    "turkish": "dönüşüm / devrim",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Tehnoloogiline pööre muutis tööturu.",
-        "english": "The technological revolution changed the labor market."
+        "english": "The technological revolution changed the labor market.",
+        "turkish": "Teknolojik devrim iş piyasasını değiştirdi."
       }
     ]
   },
@@ -1815,11 +2117,13 @@
     "id": "b2-sündmus",
     "estonian": "sündmus",
     "english": "event",
+    "turkish": "olay / etkinlik",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "See oli ajaloo üks olulisemaid sündmusi.",
-        "english": "It was one of the most significant events in history."
+        "english": "It was one of the most significant events in history.",
+        "turkish": "Tarihin en önemli olaylarından biriydi."
       }
     ]
   },
@@ -1827,11 +2131,13 @@
     "id": "b2-tagajärg",
     "estonian": "tagajärg",
     "english": "consequence",
+    "turkish": "sonuç / netice",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Otsuse tagajärjed olid etteaimamatud.",
-        "english": "The consequences of the decision were unpredictable."
+        "english": "The consequences of the decision were unpredictable.",
+        "turkish": "Kararın sonuçları öngörülemezdi."
       }
     ]
   },
@@ -1839,11 +2145,13 @@
     "id": "b2-mõju",
     "estonian": "mõju",
     "english": "impact / influence",
+    "turkish": "etki",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Sotsiaalmeedia mõju noortele on suur.",
-        "english": "The impact of social media on young people is great."
+        "english": "The impact of social media on young people is great.",
+        "turkish": "Sosyal medyanın gençler üzerindeki etkisi büyüktür."
       }
     ]
   },
@@ -1851,11 +2159,13 @@
     "id": "b2-suundumus",
     "estonian": "suundumus",
     "english": "trend / tendency",
+    "turkish": "eğilim / trend",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Linnadesse kolimise suundumus jätkub.",
-        "english": "The trend of moving to cities continues."
+        "english": "The trend of moving to cities continues.",
+        "turkish": "Şehirlere göç eğilimi devam ediyor."
       }
     ]
   },
@@ -1863,11 +2173,13 @@
     "id": "b2-õitseng",
     "estonian": "õitseng",
     "english": "prosperity / flourishing",
+    "turkish": "refah / parlak dönem",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Riik koges pärast sõda majanduslikku õitsengu perioodi.",
-        "english": "The country experienced a period of economic prosperity after the war."
+        "english": "The country experienced a period of economic prosperity after the war.",
+        "turkish": "Ülke savaştan sonra ekonomik bir refah dönemi yaşadı."
       }
     ]
   },
@@ -1875,11 +2187,13 @@
     "id": "b2-langus",
     "estonian": "langus",
     "english": "decline / fall",
+    "turkish": "düşüş / gerileme",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Sündimuse langus on demograafiline probleem.",
-        "english": "The decline in birth rate is a demographic problem."
+        "english": "The decline in birth rate is a demographic problem.",
+        "turkish": "Doğum oranındaki düşüş demografik bir sorundur."
       }
     ]
   },
@@ -1887,11 +2201,13 @@
     "id": "b2-andmebaaas",
     "estonian": "andmebaas",
     "english": "database",
+    "turkish": "veritabanı",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Kogu informatsioon on salvestatud andmebaasi.",
-        "english": "All information is stored in the database."
+        "english": "All information is stored in the database.",
+        "turkish": "Tüm bilgiler veritabanında saklanıyor."
       }
     ]
   },
@@ -1899,11 +2215,13 @@
     "id": "b2-tehisintellekt",
     "estonian": "tehisintellekt",
     "english": "artificial intelligence",
+    "turkish": "yapay zekâ",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Tehisintellekt muudab paljusid tööstusharusid.",
-        "english": "Artificial intelligence is transforming many industries."
+        "english": "Artificial intelligence is transforming many industries.",
+        "turkish": "Yapay zekâ birçok sektörü dönüştürüyor."
       }
     ]
   },
@@ -1911,11 +2229,13 @@
     "id": "b2-küberturvalisus",
     "estonian": "küberturvalisus",
     "english": "cybersecurity",
+    "turkish": "siber güvenlik",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Küberturvalisus on digiajastul ülioluline.",
-        "english": "Cybersecurity is crucial in the digital age."
+        "english": "Cybersecurity is crucial in the digital age.",
+        "turkish": "Siber güvenlik dijital çağda son derece önemlidir."
       }
     ]
   },
@@ -1923,11 +2243,13 @@
     "id": "b2-digipööre",
     "estonian": "digipööre",
     "english": "digital transformation",
+    "turkish": "dijital dönüşüm",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Eesti on digipöörde eestvedaja Euroopas.",
-        "english": "Estonia is a leader of digital transformation in Europe."
+        "english": "Estonia is a leader of digital transformation in Europe.",
+        "turkish": "Estonya Avrupa'da dijital dönüşümün öncüsüdür."
       }
     ]
   },
@@ -1935,11 +2257,13 @@
     "id": "b2-pühenduma",
     "estonian": "pühenduma",
     "english": "to devote oneself / to commit",
+    "turkish": "kendini adamak",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Ta pühendus täielikult oma uurimistööle.",
-        "english": "She devoted herself entirely to her research."
+        "english": "She devoted herself entirely to her research.",
+        "turkish": "Kendini tamamen araştırmasına adadı."
       }
     ]
   },
@@ -1947,11 +2271,13 @@
     "id": "b2-omistama",
     "estonian": "omistama",
     "english": "to attribute / to ascribe",
+    "turkish": "atfetmek / bağlamak",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Edu omistati meeskonnatööle.",
-        "english": "The success was attributed to teamwork."
+        "english": "The success was attributed to teamwork.",
+        "turkish": "Başarı ekip çalışmasına atfedildi."
       }
     ]
   },
@@ -1959,11 +2285,13 @@
     "id": "b2-nentima",
     "estonian": "nentima",
     "english": "to state / to acknowledge (a fact)",
+    "turkish": "kabul etmek / belirtmek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Peaminister nentis, et olukord on tõsine.",
-        "english": "The prime minister acknowledged that the situation is serious."
+        "english": "The prime minister acknowledged that the situation is serious.",
+        "turkish": "Başbakan durumun ciddi olduğunu kabul etti."
       }
     ]
   },
@@ -1971,11 +2299,13 @@
     "id": "b2-kõrvale-jätma",
     "estonian": "kõrvale jätma",
     "english": "to set aside / to disregard",
+    "turkish": "bir kenara bırakmak / göz ardı etmek",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Isiklikud eelistused tuleb kõrvale jätta.",
-        "english": "Personal preferences must be set aside."
+        "english": "Personal preferences must be set aside.",
+        "turkish": "Kişisel tercihler bir kenara bırakılmalıdır."
       }
     ]
   },
@@ -1983,11 +2313,13 @@
     "id": "b2-sõltuv",
     "estonian": "sõltuv",
     "english": "dependent",
+    "turkish": "bağımlı / bağlı",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Tulemus on sõltuv paljudest teguritest.",
-        "english": "The outcome is dependent on many factors."
+        "english": "The outcome is dependent on many factors.",
+        "turkish": "Sonuç birçok faktöre bağlıdır."
       }
     ]
   },
@@ -1995,11 +2327,13 @@
     "id": "b2-sõltumatu",
     "estonian": "sõltumatu",
     "english": "independent",
+    "turkish": "bağımsız",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Sõltumatu ajakirjandus on demokraatia alustala.",
-        "english": "Independent journalism is the cornerstone of democracy."
+        "english": "Independent journalism is the cornerstone of democracy.",
+        "turkish": "Bağımsız gazetecilik demokrasinin temel taşıdır."
       }
     ]
   },
@@ -2007,19 +2341,23 @@
     "id": "b2-silm",
     "estonian": "silm",
     "english": "lamprey",
+    "turkish": "taşemici balığı",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Silmud tulevad kuderändele.",
-        "english": "Silmud tulevad kuderändele."
+        "english": "Silmud tulevad kuderändele.",
+        "turkish": "Taşemici balıkları yumurtlama göçüne çıkıyor."
       },
       {
         "estonian": "Narva jõest püüavad kalurid juba väga vanast ajast kuni tänapäevani muude kalade kõrval silmusid ehk sutte.",
-        "english": "Narva jõest püüavad kalurid juba väga vanast ajast kuni tänapäevani muude kalade kõrval silmusid ehk sutte."
+        "english": "Narva jõest püüavad kalurid juba väga vanast ajast kuni tänapäevani muude kalade kõrval silmusid ehk sutte.",
+        "turkish": "Balıkçılar çok eski zamanlardan günümüze kadar Narva nehrinden diğer balıkların yanı sıra taşemici balığı da avlıyor."
       },
       {
         "estonian": "Isa püüdis jõest silmusid.",
-        "english": "Isa püüdis jõest silmusid."
+        "english": "Isa püüdis jõest silmusid.",
+        "turkish": "Babam nehirden taşemici balığı tuttu."
       }
     ]
   },
@@ -2027,15 +2365,18 @@
     "id": "b2-pea",
     "estonian": "pea",
     "english": "almost",
+    "turkish": "neredeyse / hemen hemen",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Esinemisi on pea igal nädalavahetusel.",
-        "english": "Esinemisi on pea igal nädalavahetusel."
+        "english": "Esinemisi on pea igal nädalavahetusel.",
+        "turkish": "Neredeyse her hafta sonu gösteri var."
       },
       {
         "estonian": "Pea kõik päevad olid päikeselised.",
-        "english": "Pea kõik päevad olid päikeselised."
+        "english": "Pea kõik päevad olid päikeselised.",
+        "turkish": "Neredeyse her gün güneşliydi."
       }
     ]
   },
@@ -2043,19 +2384,23 @@
     "id": "b2-kole",
     "estonian": "kole",
     "english": "terribly",
+    "turkish": "aşırı / çok",
     "cefrLevel": "B2",
     "sentences": [
       {
         "estonian": "Kole lühike seelik.",
-        "english": "Kole lühike seelik."
+        "english": "Kole lühike seelik.",
+        "turkish": "Aşırı kısa etek."
       },
       {
         "estonian": "Kole kallis korter.",
-        "english": "Kole kallis korter."
+        "english": "Kole kallis korter.",
+        "turkish": "Aşırı pahalı daire."
       },
       {
         "estonian": "Kole naljakas lugu.",
-        "english": "Kole naljakas lugu."
+        "english": "Kole naljakas lugu.",
+        "turkish": "Aşırı komik bir hikâye."
       }
     ]
   }

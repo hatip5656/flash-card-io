@@ -2,10 +2,12 @@ import express from "express";
 import { createApiRouter } from "./router.js";
 import { errorHandler } from "./middleware/errors.js";
 
-export function createApiApp(cronTimezone: string): express.Express {
+export function createApiApp(cronTimezone: string, unsplashAccessKey?: string, pexelsApiKey?: string): express.Express {
   const app = express();
 
   app.set("cronTimezone", cronTimezone);
+  if (unsplashAccessKey) app.set("unsplashAccessKey", unsplashAccessKey);
+  if (pexelsApiKey) app.set("pexelsApiKey", pexelsApiKey);
 
   // Parse JSON bodies
   app.use(express.json());

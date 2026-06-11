@@ -3,11 +3,13 @@
     "id": "a1-tere",
     "estonian": "tere",
     "english": "hello",
+    "turkish": "merhaba",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Tere, kuidas läheb?",
-        "english": "Hello, how are you?"
+        "english": "Hello, how are you?",
+        "turkish": "Merhaba, nasılsın?"
       }
     ]
   },
@@ -15,11 +17,13 @@
     "id": "a1-aitäh",
     "estonian": "aitäh",
     "english": "thank you",
+    "turkish": "teşekkürler",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Aitäh väga palju!",
-        "english": "Thank you very much!"
+        "english": "Thank you very much!",
+        "turkish": "Çok teşekkür ederim!"
       }
     ]
   },
@@ -27,11 +31,13 @@
     "id": "a1-jah",
     "estonian": "jah",
     "english": "yes",
+    "turkish": "evet",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Jah, ma olen nõus.",
-        "english": "Yes, I agree."
+        "english": "Yes, I agree.",
+        "turkish": "Evet, katılıyorum."
       }
     ]
   },
@@ -39,11 +45,13 @@
     "id": "a1-ei",
     "estonian": "ei",
     "english": "no",
+    "turkish": "hayır",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ei, ma ei taha.",
-        "english": "No, I don't want to."
+        "english": "No, I don't want to.",
+        "turkish": "Hayır, istemiyorum."
       }
     ]
   },
@@ -51,11 +59,13 @@
     "id": "a1-palun",
     "estonian": "palun",
     "english": "please",
+    "turkish": "lütfen",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Palun üks kohv.",
-        "english": "One coffee, please."
+        "english": "One coffee, please.",
+        "turkish": "Bir kahve, lütfen."
       }
     ]
   },
@@ -63,11 +73,13 @@
     "id": "a1-head-aega",
     "estonian": "head aega",
     "english": "goodbye",
+    "turkish": "hoşça kal",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Head aega, nägemiseni!",
-        "english": "Goodbye, see you!"
+        "english": "Goodbye, see you!",
+        "turkish": "Hoşça kal, görüşürüz!"
       }
     ]
   },
@@ -75,11 +87,13 @@
     "id": "a1-vabandust",
     "estonian": "vabandust",
     "english": "sorry / excuse me",
+    "turkish": "özür dilerim / pardon",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Vabandust, kus on raamatukogu?",
-        "english": "Excuse me, where is the library?"
+        "english": "Excuse me, where is the library?",
+        "turkish": "Pardon, kütüphane nerede?"
       }
     ]
   },
@@ -87,11 +101,13 @@
     "id": "a1-ma",
     "estonian": "ma",
     "english": "I",
+    "turkish": "ben",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma olen õpilane.",
-        "english": "I am a student."
+        "english": "I am a student.",
+        "turkish": "Ben öğrenciyim."
       }
     ]
   },
@@ -99,11 +115,13 @@
     "id": "a1-sa",
     "estonian": "sa",
     "english": "you",
+    "turkish": "sen",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Kust sa pärit oled?",
-        "english": "Where are you from?"
+        "english": "Where are you from?",
+        "turkish": "Sen nerelisin?"
       }
     ]
   },
@@ -111,11 +129,13 @@
     "id": "a1-tema",
     "estonian": "tema",
     "english": "he/she",
+    "turkish": "o",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Tema on minu sõber.",
-        "english": "He/she is my friend."
+        "english": "He/she is my friend.",
+        "turkish": "O benim arkadaşım."
       }
     ]
   },
@@ -123,11 +143,13 @@
     "id": "a1-me",
     "estonian": "me",
     "english": "we",
+    "turkish": "biz",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Me läheme koos.",
-        "english": "We go together."
+        "english": "We go together.",
+        "turkish": "Birlikte gidiyoruz."
       }
     ]
   },
@@ -135,11 +157,13 @@
     "id": "a1-vesi",
     "estonian": "vesi",
     "english": "water",
+    "turkish": "su",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Palun anna mulle klaas vett.",
-        "english": "Please give me a glass of water."
+        "english": "Please give me a glass of water.",
+        "turkish": "Lütfen bana bir bardak su ver."
       }
     ]
   },
@@ -147,11 +171,13 @@
     "id": "a1-leib",
     "estonian": "leib",
     "english": "bread",
+    "turkish": "ekmek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Eesti leib on väga hea.",
-        "english": "Estonian bread is very good."
+        "english": "Estonian bread is very good.",
+        "turkish": "Estonya ekmeği çok güzel."
       }
     ]
   },
@@ -159,11 +185,13 @@
     "id": "a1-piim",
     "estonian": "piim",
     "english": "milk",
+    "turkish": "süt",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma joon piima hommikul.",
-        "english": "I drink milk in the morning."
+        "english": "I drink milk in the morning.",
+        "turkish": "Sabahları süt içerim."
       }
     ]
   },
@@ -171,11 +199,13 @@
     "id": "a1-kohv",
     "estonian": "kohv",
     "english": "coffee",
+    "turkish": "kahve",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Üks kohv, palun.",
-        "english": "One coffee, please."
+        "english": "One coffee, please.",
+        "turkish": "Bir kahve, lütfen."
       }
     ]
   },
@@ -183,11 +213,13 @@
     "id": "a1-tee",
     "estonian": "tee",
     "english": "tea / road",
+    "turkish": "çay / yol",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma joon rohelist teed.",
-        "english": "I drink green tea."
+        "english": "I drink green tea.",
+        "turkish": "Yeşil çay içerim."
       }
     ]
   },
@@ -195,11 +227,13 @@
     "id": "a1-kodu",
     "estonian": "kodu",
     "english": "home",
+    "turkish": "ev",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma lähen koju.",
-        "english": "I am going home."
+        "english": "I am going home.",
+        "turkish": "Eve gidiyorum."
       }
     ]
   },
@@ -207,11 +241,13 @@
     "id": "a1-kool",
     "estonian": "kool",
     "english": "school",
+    "turkish": "okul",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Lapsed lähevad kooli.",
-        "english": "Children go to school."
+        "english": "Children go to school.",
+        "turkish": "Çocuklar okula gider."
       }
     ]
   },
@@ -219,11 +255,13 @@
     "id": "a1-töö",
     "estonian": "töö",
     "english": "work",
+    "turkish": "iş",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma lähen tööle.",
-        "english": "I am going to work."
+        "english": "I am going to work.",
+        "turkish": "İşe gidiyorum."
       }
     ]
   },
@@ -231,11 +269,13 @@
     "id": "a1-päev",
     "estonian": "päev",
     "english": "day",
+    "turkish": "gün",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Head päeva!",
-        "english": "Have a good day!"
+        "english": "Have a good day!",
+        "turkish": "İyi günler!"
       }
     ]
   },
@@ -243,11 +283,13 @@
     "id": "a1-öö",
     "estonian": "öö",
     "english": "night",
+    "turkish": "gece",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Head ööd!",
-        "english": "Good night!"
+        "english": "Good night!",
+        "turkish": "İyi geceler!"
       }
     ]
   },
@@ -255,11 +297,13 @@
     "id": "a1-hommik",
     "estonian": "hommik",
     "english": "morning",
+    "turkish": "sabah",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Tere hommikust!",
-        "english": "Good morning!"
+        "english": "Good morning!",
+        "turkish": "Günaydın!"
       }
     ]
   },
@@ -267,11 +311,13 @@
     "id": "a1-õhtu",
     "estonian": "õhtu",
     "english": "evening",
+    "turkish": "akşam",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Tere õhtust!",
-        "english": "Good evening!"
+        "english": "Good evening!",
+        "turkish": "İyi akşamlar!"
       }
     ]
   },
@@ -279,11 +325,13 @@
     "id": "a1-nimi",
     "estonian": "nimi",
     "english": "name",
+    "turkish": "isim",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mis su nimi on?",
-        "english": "What is your name?"
+        "english": "What is your name?",
+        "turkish": "Senin adın ne?"
       }
     ]
   },
@@ -291,11 +339,13 @@
     "id": "a1-sõber",
     "estonian": "sõber",
     "english": "friend",
+    "turkish": "arkadaş",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ta on minu parim sõber.",
-        "english": "He is my best friend."
+        "english": "He is my best friend.",
+        "turkish": "O benim en iyi arkadaşım."
       }
     ]
   },
@@ -303,11 +353,13 @@
     "id": "a1-pere",
     "estonian": "pere",
     "english": "family",
+    "turkish": "aile",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Minu pere on suur.",
-        "english": "My family is big."
+        "english": "My family is big.",
+        "turkish": "Ailem kalabalık."
       }
     ]
   },
@@ -315,11 +367,13 @@
     "id": "a1-ema",
     "estonian": "ema",
     "english": "mother",
+    "turkish": "anne",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Minu ema on arst.",
-        "english": "My mother is a doctor."
+        "english": "My mother is a doctor.",
+        "turkish": "Annem doktor."
       }
     ]
   },
@@ -327,11 +381,13 @@
     "id": "a1-isa",
     "estonian": "isa",
     "english": "father",
+    "turkish": "baba",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Minu isa töötab kontoris.",
-        "english": "My father works in an office."
+        "english": "My father works in an office.",
+        "turkish": "Babam ofiste çalışıyor."
       }
     ]
   },
@@ -339,11 +395,13 @@
     "id": "a1-laps",
     "estonian": "laps",
     "english": "child",
+    "turkish": "çocuk",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Laps mängib õues.",
-        "english": "The child plays outside."
+        "english": "The child plays outside.",
+        "turkish": "Çocuk dışarıda oynuyor."
       }
     ]
   },
@@ -351,11 +409,13 @@
     "id": "a1-koer",
     "estonian": "koer",
     "english": "dog",
+    "turkish": "köpek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Koer jookseb aias.",
-        "english": "The dog runs in the garden."
+        "english": "The dog runs in the garden.",
+        "turkish": "Köpek bahçede koşuyor."
       }
     ]
   },
@@ -363,11 +423,13 @@
     "id": "a1-kass",
     "estonian": "kass",
     "english": "cat",
+    "turkish": "kedi",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Kass magab diivanil.",
-        "english": "The cat sleeps on the couch."
+        "english": "The cat sleeps on the couch.",
+        "turkish": "Kedi koltukta uyuyor."
       }
     ]
   },
@@ -375,11 +437,13 @@
     "id": "a1-raamat",
     "estonian": "raamat",
     "english": "book",
+    "turkish": "kitap",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See raamat on väga huvitav.",
-        "english": "This book is very interesting."
+        "english": "This book is very interesting.",
+        "turkish": "Bu kitap çok ilginç."
       }
     ]
   },
@@ -387,11 +451,13 @@
     "id": "a1-auto",
     "estonian": "auto",
     "english": "car",
+    "turkish": "araba",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Minu auto on punane.",
-        "english": "My car is red."
+        "english": "My car is red.",
+        "turkish": "Arabam kırmızı."
       }
     ]
   },
@@ -399,11 +465,13 @@
     "id": "a1-maja",
     "estonian": "maja",
     "english": "house",
+    "turkish": "ev",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See maja on suur.",
-        "english": "This house is big."
+        "english": "This house is big.",
+        "turkish": "Bu ev büyük."
       }
     ]
   },
@@ -411,11 +479,13 @@
     "id": "a1-toit",
     "estonian": "toit",
     "english": "food",
+    "turkish": "yemek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Eesti toit on maitsev.",
-        "english": "Estonian food is tasty."
+        "english": "Estonian food is tasty.",
+        "turkish": "Estonya yemekleri lezzetli."
       }
     ]
   },
@@ -423,11 +493,13 @@
     "id": "a1-ilm",
     "estonian": "ilm",
     "english": "weather",
+    "turkish": "hava",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Milline ilm täna on?",
-        "english": "What is the weather like today?"
+        "english": "What is the weather like today?",
+        "turkish": "Bugün hava nasıl?"
       }
     ]
   },
@@ -435,11 +507,13 @@
     "id": "a1-päike",
     "estonian": "päike",
     "english": "sun",
+    "turkish": "güneş",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Päike paistab.",
-        "english": "The sun is shining."
+        "english": "The sun is shining.",
+        "turkish": "Güneş parlıyor."
       }
     ]
   },
@@ -447,11 +521,13 @@
     "id": "a1-vihm",
     "estonian": "vihm",
     "english": "rain",
+    "turkish": "yağmur",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Täna sajab vihma.",
-        "english": "It's raining today."
+        "english": "It's raining today.",
+        "turkish": "Bugün yağmur yağıyor."
       }
     ]
   },
@@ -459,11 +535,13 @@
     "id": "a1-lumi",
     "estonian": "lumi",
     "english": "snow",
+    "turkish": "kar",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Talvel sajab lund.",
-        "english": "It snows in winter."
+        "english": "It snows in winter.",
+        "turkish": "Kışın kar yağar."
       }
     ]
   },
@@ -471,11 +549,13 @@
     "id": "a1-suur",
     "estonian": "suur",
     "english": "big",
+    "turkish": "büyük",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See on suur linn.",
-        "english": "This is a big city."
+        "english": "This is a big city.",
+        "turkish": "Bu büyük bir şehir."
       }
     ]
   },
@@ -483,11 +563,13 @@
     "id": "a1-väike",
     "estonian": "väike",
     "english": "small",
+    "turkish": "küçük",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See on väike kass.",
-        "english": "This is a small cat."
+        "english": "This is a small cat.",
+        "turkish": "Bu küçük bir kedi."
       }
     ]
   },
@@ -495,11 +577,13 @@
     "id": "a1-hea",
     "estonian": "hea",
     "english": "good",
+    "turkish": "iyi",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See on väga hea.",
-        "english": "This is very good."
+        "english": "This is very good.",
+        "turkish": "Bu çok iyi."
       }
     ]
   },
@@ -507,11 +591,13 @@
     "id": "a1-halb",
     "estonian": "halb",
     "english": "bad",
+    "turkish": "kötü",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ilm on halb.",
-        "english": "The weather is bad."
+        "english": "The weather is bad.",
+        "turkish": "Hava kötü."
       }
     ]
   },
@@ -519,11 +605,13 @@
     "id": "a1-uus",
     "estonian": "uus",
     "english": "new",
+    "turkish": "yeni",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See on minu uus auto.",
-        "english": "This is my new car."
+        "english": "This is my new car.",
+        "turkish": "Bu benim yeni arabam."
       }
     ]
   },
@@ -531,11 +619,13 @@
     "id": "a1-vana",
     "estonian": "vana",
     "english": "old",
+    "turkish": "eski",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See maja on väga vana.",
-        "english": "This house is very old."
+        "english": "This house is very old.",
+        "turkish": "Bu ev çok eski."
       }
     ]
   },
@@ -543,11 +633,13 @@
     "id": "a1-armastus",
     "estonian": "armastus",
     "english": "love",
+    "turkish": "aşk",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Armastus on kõige tähtsam.",
-        "english": "Love is the most important thing."
+        "english": "Love is the most important thing.",
+        "turkish": "Aşk en önemli şeydir."
       }
     ]
   },
@@ -555,11 +647,13 @@
     "id": "a1-täna",
     "estonian": "täna",
     "english": "today",
+    "turkish": "bugün",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mis päev täna on?",
-        "english": "What day is it today?"
+        "english": "What day is it today?",
+        "turkish": "Bugün günlerden ne?"
       }
     ]
   },
@@ -567,11 +661,13 @@
     "id": "a1-homme",
     "estonian": "homme",
     "english": "tomorrow",
+    "turkish": "yarın",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Homme on reede.",
-        "english": "Tomorrow is Friday."
+        "english": "Tomorrow is Friday.",
+        "turkish": "Yarın cuma."
       }
     ]
   },
@@ -579,11 +675,13 @@
     "id": "a1-eile",
     "estonian": "eile",
     "english": "yesterday",
+    "turkish": "dün",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Eile oli ilus ilm.",
-        "english": "Yesterday the weather was nice."
+        "english": "Yesterday the weather was nice.",
+        "turkish": "Dün hava güzeldi."
       }
     ]
   },
@@ -591,11 +689,13 @@
     "id": "a1-üks",
     "estonian": "üks",
     "english": "one",
+    "turkish": "bir",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mul on üks vend.",
-        "english": "I have one brother."
+        "english": "I have one brother.",
+        "turkish": "Bir erkek kardeşim var."
       }
     ]
   },
@@ -603,11 +703,13 @@
     "id": "a1-kaks",
     "estonian": "kaks",
     "english": "two",
+    "turkish": "iki",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mul on kaks õde.",
-        "english": "I have two sisters."
+        "english": "I have two sisters.",
+        "turkish": "İki kız kardeşim var."
       }
     ]
   },
@@ -615,11 +717,13 @@
     "id": "a1-kolm",
     "estonian": "kolm",
     "english": "three",
+    "turkish": "üç",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Laual on kolm tasssi.",
-        "english": "There are three cups on the table."
+        "english": "There are three cups on the table.",
+        "turkish": "Masanın üstünde üç fincan var."
       }
     ]
   },
@@ -627,11 +731,13 @@
     "id": "a1-neli",
     "estonian": "neli",
     "english": "four",
+    "turkish": "dört",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Meil on neli tooli.",
-        "english": "We have four chairs."
+        "english": "We have four chairs.",
+        "turkish": "Dört sandalyemiz var."
       }
     ]
   },
@@ -639,11 +745,13 @@
     "id": "a1-viis",
     "estonian": "viis",
     "english": "five",
+    "turkish": "beş",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Käel on viis sõrme.",
-        "english": "A hand has five fingers."
+        "english": "A hand has five fingers.",
+        "turkish": "Bir elde beş parmak var."
       }
     ]
   },
@@ -651,11 +759,13 @@
     "id": "a1-kuus",
     "estonian": "kuus",
     "english": "six",
+    "turkish": "altı",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Kell on kuus.",
-        "english": "It is six o'clock."
+        "english": "It is six o'clock.",
+        "turkish": "Saat altı."
       }
     ]
   },
@@ -663,11 +773,13 @@
     "id": "a1-seitse",
     "estonian": "seitse",
     "english": "seven",
+    "turkish": "yedi",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Nädalas on seitse päeva.",
-        "english": "There are seven days in a week."
+        "english": "There are seven days in a week.",
+        "turkish": "Bir haftada yedi gün var."
       }
     ]
   },
@@ -675,11 +787,13 @@
     "id": "a1-kaheksa",
     "estonian": "kaheksa",
     "english": "eight",
+    "turkish": "sekiz",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma töötan kaheksa tundi.",
-        "english": "I work eight hours."
+        "english": "I work eight hours.",
+        "turkish": "Sekiz saat çalışıyorum."
       }
     ]
   },
@@ -687,11 +801,13 @@
     "id": "a1-üheksa",
     "estonian": "üheksa",
     "english": "nine",
+    "turkish": "dokuz",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Buss tuleb kell üheksa.",
-        "english": "The bus comes at nine o'clock."
+        "english": "The bus comes at nine o'clock.",
+        "turkish": "Otobüs saat dokuzda gelir."
       }
     ]
   },
@@ -699,11 +815,13 @@
     "id": "a1-kümme",
     "estonian": "kümme",
     "english": "ten",
+    "turkish": "on",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mul on kümme eurot.",
-        "english": "I have ten euros."
+        "english": "I have ten euros.",
+        "turkish": "On eurom var."
       }
     ]
   },
@@ -711,11 +829,13 @@
     "id": "a1-te",
     "estonian": "te",
     "english": "you (plural/formal)",
+    "turkish": "siz",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Kas te räägite inglise keelt?",
-        "english": "Do you speak English?"
+        "english": "Do you speak English?",
+        "turkish": "İngilizce konuşuyor musunuz?"
       }
     ]
   },
@@ -723,11 +843,13 @@
     "id": "a1-nemad",
     "estonian": "nemad",
     "english": "they",
+    "turkish": "onlar",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Nemad elavad Tallinnas.",
-        "english": "They live in Tallinn."
+        "english": "They live in Tallinn.",
+        "turkish": "Onlar Tallinn'de yaşıyor."
       }
     ]
   },
@@ -735,11 +857,13 @@
     "id": "a1-punane",
     "estonian": "punane",
     "english": "red",
+    "turkish": "kırmızı",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See lill on punane.",
-        "english": "This flower is red."
+        "english": "This flower is red.",
+        "turkish": "Bu çiçek kırmızı."
       }
     ]
   },
@@ -747,11 +871,13 @@
     "id": "a1-sinine",
     "estonian": "sinine",
     "english": "blue",
+    "turkish": "mavi",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Taevas on sinine.",
-        "english": "The sky is blue."
+        "english": "The sky is blue.",
+        "turkish": "Gökyüzü mavi."
       }
     ]
   },
@@ -759,11 +885,13 @@
     "id": "a1-roheline",
     "estonian": "roheline",
     "english": "green",
+    "turkish": "yeşil",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Rohi on roheline.",
-        "english": "The grass is green."
+        "english": "The grass is green.",
+        "turkish": "Çimen yeşil."
       }
     ]
   },
@@ -771,11 +899,13 @@
     "id": "a1-kollane",
     "estonian": "kollane",
     "english": "yellow",
+    "turkish": "sarı",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Päike on kollane.",
-        "english": "The sun is yellow."
+        "english": "The sun is yellow.",
+        "turkish": "Güneş sarı."
       }
     ]
   },
@@ -783,11 +913,13 @@
     "id": "a1-valge",
     "estonian": "valge",
     "english": "white",
+    "turkish": "beyaz",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Lumi on valge.",
-        "english": "Snow is white."
+        "english": "Snow is white.",
+        "turkish": "Kar beyaz."
       }
     ]
   },
@@ -795,11 +927,13 @@
     "id": "a1-must",
     "estonian": "must",
     "english": "black",
+    "turkish": "siyah",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Minu kass on must.",
-        "english": "My cat is black."
+        "english": "My cat is black.",
+        "turkish": "Kedim siyah."
       }
     ]
   },
@@ -807,11 +941,13 @@
     "id": "a1-hall",
     "estonian": "hall",
     "english": "grey",
+    "turkish": "gri",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Taevas on hall.",
-        "english": "The sky is grey."
+        "english": "The sky is grey.",
+        "turkish": "Gökyüzü gri."
       }
     ]
   },
@@ -819,11 +955,13 @@
     "id": "a1-pruun",
     "estonian": "pruun",
     "english": "brown",
+    "turkish": "kahverengi",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Koer on pruun.",
-        "english": "The dog is brown."
+        "english": "The dog is brown.",
+        "turkish": "Köpek kahverengi."
       }
     ]
   },
@@ -831,11 +969,13 @@
     "id": "a1-oranž",
     "estonian": "oranž",
     "english": "orange",
+    "turkish": "turuncu",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Apelsin on oranž.",
-        "english": "The orange is orange."
+        "english": "The orange is orange.",
+        "turkish": "Portakal turuncu."
       }
     ]
   },
@@ -843,11 +983,13 @@
     "id": "a1-esmaspäev",
     "estonian": "esmaspäev",
     "english": "Monday",
+    "turkish": "pazartesi",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Esmaspäev on nädala esimene päev.",
-        "english": "Monday is the first day of the week."
+        "english": "Monday is the first day of the week.",
+        "turkish": "Pazartesi haftanın ilk günü."
       }
     ]
   },
@@ -855,11 +997,13 @@
     "id": "a1-teisipäev",
     "estonian": "teisipäev",
     "english": "Tuesday",
+    "turkish": "salı",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Teisipäeval on mul koosolek.",
-        "english": "I have a meeting on Tuesday."
+        "english": "I have a meeting on Tuesday.",
+        "turkish": "Salı günü toplantım var."
       }
     ]
   },
@@ -867,11 +1011,13 @@
     "id": "a1-kolmapäev",
     "estonian": "kolmapäev",
     "english": "Wednesday",
+    "turkish": "çarşamba",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Kolmapäeval ma õpin eesti keelt.",
-        "english": "On Wednesday I study Estonian."
+        "english": "On Wednesday I study Estonian.",
+        "turkish": "Çarşamba günü Estonca çalışıyorum."
       }
     ]
   },
@@ -879,11 +1025,13 @@
     "id": "a1-neljapäev",
     "estonian": "neljapäev",
     "english": "Thursday",
+    "turkish": "perşembe",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Neljapäeval läheme kinno.",
-        "english": "On Thursday we go to the cinema."
+        "english": "On Thursday we go to the cinema.",
+        "turkish": "Perşembe günü sinemaya gidiyoruz."
       }
     ]
   },
@@ -891,11 +1039,13 @@
     "id": "a1-reede",
     "estonian": "reede",
     "english": "Friday",
+    "turkish": "cuma",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Reede on minu lemmikpäev.",
-        "english": "Friday is my favorite day."
+        "english": "Friday is my favorite day.",
+        "turkish": "Cuma benim en sevdiğim gün."
       }
     ]
   },
@@ -903,11 +1053,13 @@
     "id": "a1-laupäev",
     "estonian": "laupäev",
     "english": "Saturday",
+    "turkish": "cumartesi",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Laupäeval ma puhkan.",
-        "english": "On Saturday I rest."
+        "english": "On Saturday I rest.",
+        "turkish": "Cumartesi günü dinleniyorum."
       }
     ]
   },
@@ -915,11 +1067,13 @@
     "id": "a1-pühapäev",
     "estonian": "pühapäev",
     "english": "Sunday",
+    "turkish": "pazar",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Pühapäeval me sööme koos.",
-        "english": "On Sunday we eat together."
+        "english": "On Sunday we eat together.",
+        "turkish": "Pazar günü birlikte yemek yiyoruz."
       }
     ]
   },
@@ -927,11 +1081,13 @@
     "id": "a1-vend",
     "estonian": "vend",
     "english": "brother",
+    "turkish": "erkek kardeş",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Minu vend on noorem kui mina.",
-        "english": "My brother is younger than me."
+        "english": "My brother is younger than me.",
+        "turkish": "Erkek kardeşim benden küçük."
       }
     ]
   },
@@ -939,11 +1095,13 @@
     "id": "a1-õde",
     "estonian": "õde",
     "english": "sister",
+    "turkish": "kız kardeş",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Minu õde elab Tartus.",
-        "english": "My sister lives in Tartu."
+        "english": "My sister lives in Tartu.",
+        "turkish": "Kız kardeşim Tartu'da yaşıyor."
       }
     ]
   },
@@ -951,11 +1109,13 @@
     "id": "a1-vanaema",
     "estonian": "vanaema",
     "english": "grandmother",
+    "turkish": "büyükanne",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Vanaema teeb väga head kooki.",
-        "english": "Grandmother makes very good cake."
+        "english": "Grandmother makes very good cake.",
+        "turkish": "Büyükannem çok güzel kek yapar."
       }
     ]
   },
@@ -963,11 +1123,13 @@
     "id": "a1-vanaisa",
     "estonian": "vanaisa",
     "english": "grandfather",
+    "turkish": "büyükbaba",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Vanaisa elab maal.",
-        "english": "Grandfather lives in the countryside."
+        "english": "Grandfather lives in the countryside.",
+        "turkish": "Büyükbabam köyde yaşıyor."
       }
     ]
   },
@@ -975,11 +1137,13 @@
     "id": "a1-poeg",
     "estonian": "poeg",
     "english": "son",
+    "turkish": "oğul",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Minu poeg käib koolis.",
-        "english": "My son goes to school."
+        "english": "My son goes to school.",
+        "turkish": "Oğlum okula gidiyor."
       }
     ]
   },
@@ -987,11 +1151,13 @@
     "id": "a1-tütar",
     "estonian": "tütar",
     "english": "daughter",
+    "turkish": "kız",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Minu tütar on viie aastane.",
-        "english": "My daughter is five years old."
+        "english": "My daughter is five years old.",
+        "turkish": "Kızım beş yaşında."
       }
     ]
   },
@@ -999,11 +1165,13 @@
     "id": "a1-mees",
     "estonian": "mees",
     "english": "man / husband",
+    "turkish": "adam / koca",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See mees on minu naaber.",
-        "english": "This man is my neighbor."
+        "english": "This man is my neighbor.",
+        "turkish": "Bu adam benim komşum."
       }
     ]
   },
@@ -1011,11 +1179,13 @@
     "id": "a1-naine",
     "estonian": "naine",
     "english": "woman / wife",
+    "turkish": "kadın / eş",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See naine on õpetaja.",
-        "english": "This woman is a teacher."
+        "english": "This woman is a teacher.",
+        "turkish": "Bu kadın öğretmen."
       }
     ]
   },
@@ -1023,11 +1193,13 @@
     "id": "a1-supp",
     "estonian": "supp",
     "english": "soup",
+    "turkish": "çorba",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Supp on kuum.",
-        "english": "The soup is hot."
+        "english": "The soup is hot.",
+        "turkish": "Çorba sıcak."
       }
     ]
   },
@@ -1035,11 +1207,13 @@
     "id": "a1-liha",
     "estonian": "liha",
     "english": "meat",
+    "turkish": "et",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma ei söö liha.",
-        "english": "I don't eat meat."
+        "english": "I don't eat meat.",
+        "turkish": "Et yemiyorum."
       }
     ]
   },
@@ -1047,11 +1221,13 @@
     "id": "a1-kala",
     "estonian": "kala",
     "english": "fish",
+    "turkish": "balık",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Eestlased söövad palju kala.",
-        "english": "Estonians eat a lot of fish."
+        "english": "Estonians eat a lot of fish.",
+        "turkish": "Estonyalılar çok balık yer."
       }
     ]
   },
@@ -1059,11 +1235,13 @@
     "id": "a1-puuvili",
     "estonian": "puuvili",
     "english": "fruit",
+    "turkish": "meyve",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma söön iga päev puuvilju.",
-        "english": "I eat fruit every day."
+        "english": "I eat fruit every day.",
+        "turkish": "Her gün meyve yiyorum."
       }
     ]
   },
@@ -1071,11 +1249,13 @@
     "id": "a1-õun",
     "estonian": "õun",
     "english": "apple",
+    "turkish": "elma",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See õun on magus.",
-        "english": "This apple is sweet."
+        "english": "This apple is sweet.",
+        "turkish": "Bu elma tatlı."
       }
     ]
   },
@@ -1083,11 +1263,13 @@
     "id": "a1-kartul",
     "estonian": "kartul",
     "english": "potato",
+    "turkish": "patates",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Kartul on Eesti põhitoit.",
-        "english": "Potato is a staple food in Estonia."
+        "english": "Potato is a staple food in Estonia.",
+        "turkish": "Patates Estonya'nın temel gıdasıdır."
       }
     ]
   },
@@ -1095,11 +1277,13 @@
     "id": "a1-juust",
     "estonian": "juust",
     "english": "cheese",
+    "turkish": "peynir",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma panen leivale juustu.",
-        "english": "I put cheese on the bread."
+        "english": "I put cheese on the bread.",
+        "turkish": "Ekmeğin üstüne peynir koyuyorum."
       }
     ]
   },
@@ -1107,11 +1291,13 @@
     "id": "a1-muna",
     "estonian": "muna",
     "english": "egg",
+    "turkish": "yumurta",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Hommikul ma söön muna.",
-        "english": "In the morning I eat an egg."
+        "english": "In the morning I eat an egg.",
+        "turkish": "Sabahları yumurta yerim."
       }
     ]
   },
@@ -1119,11 +1305,13 @@
     "id": "a1-suhkur",
     "estonian": "suhkur",
     "english": "sugar",
+    "turkish": "şeker",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Kas sa tahad suhkrut kohvi sisse?",
-        "english": "Do you want sugar in your coffee?"
+        "english": "Do you want sugar in your coffee?",
+        "turkish": "Kahvene şeker ister misin?"
       }
     ]
   },
@@ -1131,11 +1319,13 @@
     "id": "a1-sool",
     "estonian": "sool",
     "english": "salt",
+    "turkish": "tuz",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Palun anna mulle soola.",
-        "english": "Please pass me the salt."
+        "english": "Please pass me the salt.",
+        "turkish": "Lütfen tuzu uzatır mısın?"
       }
     ]
   },
@@ -1143,11 +1333,13 @@
     "id": "a1-või",
     "estonian": "või",
     "english": "butter / or",
+    "turkish": "tereyağı / veya",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma panen leivale võid.",
-        "english": "I put butter on the bread."
+        "english": "I put butter on the bread.",
+        "turkish": "Ekmeğe tereyağı sürüyorum."
       }
     ]
   },
@@ -1155,11 +1347,13 @@
     "id": "a1-pea",
     "estonian": "pea",
     "english": "head",
+    "turkish": "baş / kafa",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mul on pea valus.",
-        "english": "My head hurts."
+        "english": "My head hurts.",
+        "turkish": "Başım ağrıyor."
       }
     ]
   },
@@ -1167,11 +1361,13 @@
     "id": "a1-käsi",
     "estonian": "käsi",
     "english": "hand / arm",
+    "turkish": "el / kol",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Pese käed ära!",
-        "english": "Wash your hands!"
+        "english": "Wash your hands!",
+        "turkish": "Ellerini yıka!"
       }
     ]
   },
@@ -1179,11 +1375,13 @@
     "id": "a1-jalg",
     "estonian": "jalg",
     "english": "foot / leg",
+    "turkish": "ayak / bacak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mu jalg on valus.",
-        "english": "My leg hurts."
+        "english": "My leg hurts.",
+        "turkish": "Bacağım ağrıyor."
       }
     ]
   },
@@ -1191,11 +1389,13 @@
     "id": "a1-silm",
     "estonian": "silm",
     "english": "eye",
+    "turkish": "göz",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Tal on sinised silmad.",
-        "english": "He/she has blue eyes."
+        "english": "He/she has blue eyes.",
+        "turkish": "Mavi gözleri var."
       }
     ]
   },
@@ -1203,11 +1403,13 @@
     "id": "a1-kõrv",
     "estonian": "kõrv",
     "english": "ear",
+    "turkish": "kulak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma kuulen kõrvaga.",
-        "english": "I hear with my ear."
+        "english": "I hear with my ear.",
+        "turkish": "Kulağımla duyarım."
       }
     ]
   },
@@ -1215,11 +1417,13 @@
     "id": "a1-nina",
     "estonian": "nina",
     "english": "nose",
+    "turkish": "burun",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Nina on näo keskel.",
-        "english": "The nose is in the middle of the face."
+        "english": "The nose is in the middle of the face.",
+        "turkish": "Burun yüzün ortasında."
       }
     ]
   },
@@ -1227,11 +1431,13 @@
     "id": "a1-suu",
     "estonian": "suu",
     "english": "mouth",
+    "turkish": "ağız",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Tee suu lahti!",
-        "english": "Open your mouth!"
+        "english": "Open your mouth!",
+        "turkish": "Ağzını aç!"
       }
     ]
   },
@@ -1239,11 +1445,13 @@
     "id": "a1-hammas",
     "estonian": "hammas",
     "english": "tooth",
+    "turkish": "diş",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mul on hammas valus.",
-        "english": "My tooth hurts."
+        "english": "My tooth hurts.",
+        "turkish": "Dişim ağrıyor."
       }
     ]
   },
@@ -1251,11 +1459,13 @@
     "id": "a1-süda",
     "estonian": "süda",
     "english": "heart",
+    "turkish": "kalp",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Süda lööb kiiresti.",
-        "english": "The heart beats fast."
+        "english": "The heart beats fast.",
+        "turkish": "Kalp hızlı atıyor."
       }
     ]
   },
@@ -1263,11 +1473,13 @@
     "id": "a1-olema",
     "estonian": "olema",
     "english": "to be",
+    "turkish": "olmak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma olen eestlane.",
-        "english": "I am Estonian."
+        "english": "I am Estonian.",
+        "turkish": "Ben Estonyalıyım."
       }
     ]
   },
@@ -1275,11 +1487,13 @@
     "id": "a1-tegema",
     "estonian": "tegema",
     "english": "to do / to make",
+    "turkish": "yapmak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mida sa teed?",
-        "english": "What are you doing?"
+        "english": "What are you doing?",
+        "turkish": "Ne yapıyorsun?"
       }
     ]
   },
@@ -1287,11 +1501,13 @@
     "id": "a1-minema",
     "estonian": "minema",
     "english": "to go",
+    "turkish": "gitmek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma lähen poodi.",
-        "english": "I am going to the store."
+        "english": "I am going to the store.",
+        "turkish": "Markete gidiyorum."
       }
     ]
   },
@@ -1299,11 +1515,13 @@
     "id": "a1-tulema",
     "estonian": "tulema",
     "english": "to come",
+    "turkish": "gelmek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Tule siia!",
-        "english": "Come here!"
+        "english": "Come here!",
+        "turkish": "Buraya gel!"
       }
     ]
   },
@@ -1311,11 +1529,13 @@
     "id": "a1-sööma",
     "estonian": "sööma",
     "english": "to eat",
+    "turkish": "yemek yemek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma söön lõunat.",
-        "english": "I am eating lunch."
+        "english": "I am eating lunch.",
+        "turkish": "Öğle yemeği yiyorum."
       }
     ]
   },
@@ -1323,11 +1543,13 @@
     "id": "a1-jooma",
     "estonian": "jooma",
     "english": "to drink",
+    "turkish": "içmek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma joon vett.",
-        "english": "I drink water."
+        "english": "I drink water.",
+        "turkish": "Su içiyorum."
       }
     ]
   },
@@ -1335,11 +1557,13 @@
     "id": "a1-rääkima",
     "estonian": "rääkima",
     "english": "to speak / to talk",
+    "turkish": "konuşmak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma räägin eesti keelt.",
-        "english": "I speak Estonian."
+        "english": "I speak Estonian.",
+        "turkish": "Estonca konuşuyorum."
       }
     ]
   },
@@ -1347,11 +1571,13 @@
     "id": "a1-lugema",
     "estonian": "lugema",
     "english": "to read",
+    "turkish": "okumak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma loen raamatut.",
-        "english": "I am reading a book."
+        "english": "I am reading a book.",
+        "turkish": "Kitap okuyorum."
       }
     ]
   },
@@ -1359,11 +1585,13 @@
     "id": "a1-kirjutama",
     "estonian": "kirjutama",
     "english": "to write",
+    "turkish": "yazmak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma kirjutan kirja.",
-        "english": "I am writing a letter."
+        "english": "I am writing a letter.",
+        "turkish": "Mektup yazıyorum."
       }
     ]
   },
@@ -1371,11 +1599,13 @@
     "id": "a1-õppima",
     "estonian": "õppima",
     "english": "to learn / to study",
+    "turkish": "öğrenmek / çalışmak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma õpin eesti keelt.",
-        "english": "I am learning Estonian."
+        "english": "I am learning Estonian.",
+        "turkish": "Estonca öğreniyorum."
       }
     ]
   },
@@ -1383,11 +1613,13 @@
     "id": "a1-töötama",
     "estonian": "töötama",
     "english": "to work",
+    "turkish": "çalışmak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma töötan haiglas.",
-        "english": "I work in a hospital."
+        "english": "I work in a hospital.",
+        "turkish": "Hastanede çalışıyorum."
       }
     ]
   },
@@ -1395,11 +1627,13 @@
     "id": "a1-magama",
     "estonian": "magama",
     "english": "to sleep",
+    "turkish": "uyumak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma magan kaheksa tundi.",
-        "english": "I sleep eight hours."
+        "english": "I sleep eight hours.",
+        "turkish": "Sekiz saat uyuyorum."
       }
     ]
   },
@@ -1407,11 +1641,13 @@
     "id": "a1-elama",
     "estonian": "elama",
     "english": "to live",
+    "turkish": "yaşamak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma elan Tallinnas.",
-        "english": "I live in Tallinn."
+        "english": "I live in Tallinn.",
+        "turkish": "Tallinn'de yaşıyorum."
       }
     ]
   },
@@ -1419,11 +1655,13 @@
     "id": "a1-tahtma",
     "estonian": "tahtma",
     "english": "to want",
+    "turkish": "istemek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma tahan jäätist.",
-        "english": "I want ice cream."
+        "english": "I want ice cream.",
+        "turkish": "Dondurma istiyorum."
       }
     ]
   },
@@ -1431,11 +1669,13 @@
     "id": "a1-saama",
     "estonian": "saama",
     "english": "to get / can",
+    "turkish": "almak / yapabilmek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma saan aru.",
-        "english": "I understand."
+        "english": "I understand.",
+        "turkish": "Anlıyorum."
       }
     ]
   },
@@ -1443,11 +1683,13 @@
     "id": "a1-teadma",
     "estonian": "teadma",
     "english": "to know",
+    "turkish": "bilmek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma ei tea.",
-        "english": "I don't know."
+        "english": "I don't know.",
+        "turkish": "Bilmiyorum."
       }
     ]
   },
@@ -1455,11 +1697,13 @@
     "id": "a1-nägema",
     "estonian": "nägema",
     "english": "to see",
+    "turkish": "görmek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma näen merd.",
-        "english": "I see the sea."
+        "english": "I see the sea.",
+        "turkish": "Denizi görüyorum."
       }
     ]
   },
@@ -1467,11 +1711,13 @@
     "id": "a1-kuulma",
     "estonian": "kuulma",
     "english": "to hear",
+    "turkish": "duymak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma kuulen muusikat.",
-        "english": "I hear music."
+        "english": "I hear music.",
+        "turkish": "Müzik duyuyorum."
       }
     ]
   },
@@ -1479,11 +1725,13 @@
     "id": "a1-ostma",
     "estonian": "ostma",
     "english": "to buy",
+    "turkish": "satın almak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma ostan leiba.",
-        "english": "I am buying bread."
+        "english": "I am buying bread.",
+        "turkish": "Ekmek alıyorum."
       }
     ]
   },
@@ -1491,11 +1739,13 @@
     "id": "a1-andma",
     "estonian": "andma",
     "english": "to give",
+    "turkish": "vermek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Anna mulle see raamat.",
-        "english": "Give me that book."
+        "english": "Give me that book.",
+        "turkish": "Şu kitabı bana ver."
       }
     ]
   },
@@ -1503,11 +1753,13 @@
     "id": "a1-mängima",
     "estonian": "mängima",
     "english": "to play",
+    "turkish": "oynamak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Lapsed mängivad õues.",
-        "english": "The children play outside."
+        "english": "The children play outside.",
+        "turkish": "Çocuklar dışarıda oynuyor."
       }
     ]
   },
@@ -1515,11 +1767,13 @@
     "id": "a1-ilus",
     "estonian": "ilus",
     "english": "beautiful",
+    "turkish": "güzel",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See lill on ilus.",
-        "english": "This flower is beautiful."
+        "english": "This flower is beautiful.",
+        "turkish": "Bu çiçek güzel."
       }
     ]
   },
@@ -1527,11 +1781,13 @@
     "id": "a1-kuum",
     "estonian": "kuum",
     "english": "hot",
+    "turkish": "sıcak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Kohv on kuum.",
-        "english": "The coffee is hot."
+        "english": "The coffee is hot.",
+        "turkish": "Kahve sıcak."
       }
     ]
   },
@@ -1539,11 +1795,13 @@
     "id": "a1-külm",
     "estonian": "külm",
     "english": "cold",
+    "turkish": "soğuk",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Talvel on külm.",
-        "english": "It is cold in winter."
+        "english": "It is cold in winter.",
+        "turkish": "Kışın soğuk olur."
       }
     ]
   },
@@ -1551,11 +1809,13 @@
     "id": "a1-soe",
     "estonian": "soe",
     "english": "warm",
+    "turkish": "ılık",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Täna on soe ilm.",
-        "english": "Today the weather is warm."
+        "english": "Today the weather is warm.",
+        "turkish": "Bugün hava ılık."
       }
     ]
   },
@@ -1563,11 +1823,13 @@
     "id": "a1-kallis",
     "estonian": "kallis",
     "english": "expensive / dear",
+    "turkish": "pahalı / sevgili",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See on liiga kallis.",
-        "english": "This is too expensive."
+        "english": "This is too expensive.",
+        "turkish": "Bu çok pahalı."
       }
     ]
   },
@@ -1575,11 +1837,13 @@
     "id": "a1-odav",
     "estonian": "odav",
     "english": "cheap",
+    "turkish": "ucuz",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See pood on odav.",
-        "english": "This shop is cheap."
+        "english": "This shop is cheap.",
+        "turkish": "Bu dükkan ucuz."
       }
     ]
   },
@@ -1587,11 +1851,13 @@
     "id": "a1-noor",
     "estonian": "noor",
     "english": "young",
+    "turkish": "genç",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ta on veel noor.",
-        "english": "He/she is still young."
+        "english": "He/she is still young.",
+        "turkish": "O hâlâ genç."
       }
     ]
   },
@@ -1599,11 +1865,13 @@
     "id": "a1-kiire",
     "estonian": "kiire",
     "english": "fast / busy",
+    "turkish": "hızlı / meşgul",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mul on kiire.",
-        "english": "I am in a hurry."
+        "english": "I am in a hurry.",
+        "turkish": "Acelem var."
       }
     ]
   },
@@ -1611,11 +1879,13 @@
     "id": "a1-aeglane",
     "estonian": "aeglane",
     "english": "slow",
+    "turkish": "yavaş",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Palun räägi aeglasemalt.",
-        "english": "Please speak more slowly."
+        "english": "Please speak more slowly.",
+        "turkish": "Lütfen daha yavaş konuş."
       }
     ]
   },
@@ -1623,11 +1893,13 @@
     "id": "a1-pikk",
     "estonian": "pikk",
     "english": "tall / long",
+    "turkish": "uzun",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ta on väga pikk.",
-        "english": "He/she is very tall."
+        "english": "He/she is very tall.",
+        "turkish": "O çok uzun boylu."
       }
     ]
   },
@@ -1635,11 +1907,13 @@
     "id": "a1-lühike",
     "estonian": "lühike",
     "english": "short",
+    "turkish": "kısa",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See tee on lühike.",
-        "english": "This road is short."
+        "english": "This road is short.",
+        "turkish": "Bu yol kısa."
       }
     ]
   },
@@ -1647,11 +1921,13 @@
     "id": "a1-kerge",
     "estonian": "kerge",
     "english": "light / easy",
+    "turkish": "hafif / kolay",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See ülesanne on kerge.",
-        "english": "This task is easy."
+        "english": "This task is easy.",
+        "turkish": "Bu görev kolay."
       }
     ]
   },
@@ -1659,11 +1935,13 @@
     "id": "a1-raske",
     "estonian": "raske",
     "english": "heavy / difficult",
+    "turkish": "ağır / zor",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See kott on raske.",
-        "english": "This bag is heavy."
+        "english": "This bag is heavy.",
+        "turkish": "Bu çanta ağır."
       }
     ]
   },
@@ -1671,11 +1949,13 @@
     "id": "a1-pood",
     "estonian": "pood",
     "english": "shop / store",
+    "turkish": "dükkan / market",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma lähen poodi.",
-        "english": "I am going to the store."
+        "english": "I am going to the store.",
+        "turkish": "Markete gidiyorum."
       }
     ]
   },
@@ -1683,11 +1963,13 @@
     "id": "a1-restoran",
     "estonian": "restoran",
     "english": "restaurant",
+    "turkish": "restoran",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Me sööme restoranis.",
-        "english": "We eat at a restaurant."
+        "english": "We eat at a restaurant.",
+        "turkish": "Restoranda yemek yiyoruz."
       }
     ]
   },
@@ -1695,11 +1977,13 @@
     "id": "a1-haigla",
     "estonian": "haigla",
     "english": "hospital",
+    "turkish": "hastane",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Arst töötab haiglas.",
-        "english": "The doctor works in a hospital."
+        "english": "The doctor works in a hospital.",
+        "turkish": "Doktor hastanede çalışıyor."
       }
     ]
   },
@@ -1707,11 +1991,13 @@
     "id": "a1-apteek",
     "estonian": "apteek",
     "english": "pharmacy",
+    "turkish": "eczane",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma ostan rohtu apteegist.",
-        "english": "I buy medicine from the pharmacy."
+        "english": "I buy medicine from the pharmacy.",
+        "turkish": "Eczaneden ilaç alıyorum."
       }
     ]
   },
@@ -1719,11 +2005,13 @@
     "id": "a1-raamatukogu",
     "estonian": "raamatukogu",
     "english": "library",
+    "turkish": "kütüphane",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma loen raamatukogus.",
-        "english": "I read in the library."
+        "english": "I read in the library.",
+        "turkish": "Kütüphanede okuyorum."
       }
     ]
   },
@@ -1731,11 +2019,13 @@
     "id": "a1-linn",
     "estonian": "linn",
     "english": "city",
+    "turkish": "şehir",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Tallinn on Eesti pealinn.",
-        "english": "Tallinn is the capital of Estonia."
+        "english": "Tallinn is the capital of Estonia.",
+        "turkish": "Tallinn, Estonya'nın başkentidir."
       }
     ]
   },
@@ -1743,11 +2033,13 @@
     "id": "a1-tänav",
     "estonian": "tänav",
     "english": "street",
+    "turkish": "sokak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mis tänaval sa elad?",
-        "english": "What street do you live on?"
+        "english": "What street do you live on?",
+        "turkish": "Hangi sokakta oturuyorsun?"
       }
     ]
   },
@@ -1755,11 +2047,13 @@
     "id": "a1-buss",
     "estonian": "buss",
     "english": "bus",
+    "turkish": "otobüs",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma sõidan bussiga tööle.",
-        "english": "I take the bus to work."
+        "english": "I take the bus to work.",
+        "turkish": "İşe otobüsle gidiyorum."
       }
     ]
   },
@@ -1767,11 +2061,13 @@
     "id": "a1-rong",
     "estonian": "rong",
     "english": "train",
+    "turkish": "tren",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Rong läheb Tartusse.",
-        "english": "The train goes to Tartu."
+        "english": "The train goes to Tartu.",
+        "turkish": "Tren Tartu'ya gidiyor."
       }
     ]
   },
@@ -1779,11 +2075,13 @@
     "id": "a1-lennuk",
     "estonian": "lennuk",
     "english": "airplane",
+    "turkish": "uçak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Lennuk lendab kõrgel.",
-        "english": "The airplane flies high."
+        "english": "The airplane flies high.",
+        "turkish": "Uçak yüksekte uçuyor."
       }
     ]
   },
@@ -1791,11 +2089,13 @@
     "id": "a1-tund",
     "estonian": "tund",
     "english": "hour / lesson",
+    "turkish": "saat / ders",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Tund kestab 45 minutit.",
-        "english": "The lesson lasts 45 minutes."
+        "english": "The lesson lasts 45 minutes.",
+        "turkish": "Ders 45 dakika sürüyor."
       }
     ]
   },
@@ -1803,11 +2103,13 @@
     "id": "a1-minut",
     "estonian": "minut",
     "english": "minute",
+    "turkish": "dakika",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Oota üks minut.",
-        "english": "Wait one minute."
+        "english": "Wait one minute.",
+        "turkish": "Bir dakika bekle."
       }
     ]
   },
@@ -1815,11 +2117,13 @@
     "id": "a1-nädal",
     "estonian": "nädal",
     "english": "week",
+    "turkish": "hafta",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Üks nädal on seitse päeva.",
-        "english": "One week is seven days."
+        "english": "One week is seven days.",
+        "turkish": "Bir hafta yedi gündür."
       }
     ]
   },
@@ -1827,11 +2131,13 @@
     "id": "a1-kuu",
     "estonian": "kuu",
     "english": "month / moon",
+    "turkish": "ay",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Üks kuu on umbes 30 päeva.",
-        "english": "One month is about 30 days."
+        "english": "One month is about 30 days.",
+        "turkish": "Bir ay yaklaşık 30 gündür."
       }
     ]
   },
@@ -1839,11 +2145,13 @@
     "id": "a1-aasta",
     "estonian": "aasta",
     "english": "year",
+    "turkish": "yıl",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Üks aasta on 12 kuud.",
-        "english": "One year is 12 months."
+        "english": "One year is 12 months.",
+        "turkish": "Bir yıl 12 aydır."
       }
     ]
   },
@@ -1851,11 +2159,13 @@
     "id": "a1-kell",
     "estonian": "kell",
     "english": "clock / time",
+    "turkish": "saat",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mis kell on?",
-        "english": "What time is it?"
+        "english": "What time is it?",
+        "turkish": "Saat kaç?"
       }
     ]
   },
@@ -1863,11 +2173,13 @@
     "id": "a1-mina",
     "estonian": "mina",
     "english": "I (emphatic)",
+    "turkish": "ben (vurgulu)",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mina olen Eestist.",
-        "english": "I am from Estonia."
+        "english": "I am from Estonia.",
+        "turkish": "Ben Estonya'danım."
       }
     ]
   },
@@ -1875,11 +2187,13 @@
     "id": "a1-sina",
     "estonian": "sina",
     "english": "you (emphatic)",
+    "turkish": "sen (vurgulu)",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Sina oled minu sõber.",
-        "english": "You are my friend."
+        "english": "You are my friend.",
+        "turkish": "Sen benim arkadaşımsın."
       }
     ]
   },
@@ -1887,11 +2201,13 @@
     "id": "a1-see",
     "estonian": "see",
     "english": "this / that",
+    "turkish": "bu / şu",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See on minu raamat.",
-        "english": "This is my book."
+        "english": "This is my book.",
+        "turkish": "Bu benim kitabım."
       }
     ]
   },
@@ -1899,11 +2215,13 @@
     "id": "a1-keel",
     "estonian": "keel",
     "english": "language / tongue",
+    "turkish": "dil",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Eesti keel on ilus.",
-        "english": "The Estonian language is beautiful."
+        "english": "The Estonian language is beautiful.",
+        "turkish": "Estonca güzel bir dil."
       }
     ]
   },
@@ -1911,11 +2229,13 @@
     "id": "a1-sõna",
     "estonian": "sõna",
     "english": "word",
+    "turkish": "kelime",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma õpin uusi sõnu.",
-        "english": "I am learning new words."
+        "english": "I am learning new words.",
+        "turkish": "Yeni kelimeler öğreniyorum."
       }
     ]
   },
@@ -1923,11 +2243,13 @@
     "id": "a1-küsimus",
     "estonian": "küsimus",
     "english": "question",
+    "turkish": "soru",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mul on üks küsimus.",
-        "english": "I have one question."
+        "english": "I have one question.",
+        "turkish": "Bir sorum var."
       }
     ]
   },
@@ -1935,11 +2257,13 @@
     "id": "a1-vastus",
     "estonian": "vastus",
     "english": "answer",
+    "turkish": "cevap",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma ei tea vastust.",
-        "english": "I don't know the answer."
+        "english": "I don't know the answer.",
+        "turkish": "Cevabı bilmiyorum."
       }
     ]
   },
@@ -1947,11 +2271,13 @@
     "id": "a1-arst",
     "estonian": "arst",
     "english": "doctor",
+    "turkish": "doktor",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma lähen arsti juurde.",
-        "english": "I am going to the doctor."
+        "english": "I am going to the doctor.",
+        "turkish": "Doktora gidiyorum."
       }
     ]
   },
@@ -1959,11 +2285,13 @@
     "id": "a1-õpetaja",
     "estonian": "õpetaja",
     "english": "teacher",
+    "turkish": "öğretmen",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Minu õpetaja on väga hea.",
-        "english": "My teacher is very good."
+        "english": "My teacher is very good.",
+        "turkish": "Öğretmenim çok iyi."
       }
     ]
   },
@@ -1971,11 +2299,13 @@
     "id": "a1-õpilane",
     "estonian": "õpilane",
     "english": "student",
+    "turkish": "öğrenci",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ma olen õpilane.",
-        "english": "I am a student."
+        "english": "I am a student.",
+        "turkish": "Ben öğrenciyim."
       }
     ]
   },
@@ -1983,11 +2313,13 @@
     "id": "a1-riik",
     "estonian": "riik",
     "english": "country / state",
+    "turkish": "ülke / devlet",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Eesti on väike riik.",
-        "english": "Estonia is a small country."
+        "english": "Estonia is a small country.",
+        "turkish": "Estonya küçük bir ülke."
       }
     ]
   },
@@ -1995,11 +2327,13 @@
     "id": "a1-meri",
     "estonian": "meri",
     "english": "sea",
+    "turkish": "deniz",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Meri on sinine.",
-        "english": "The sea is blue."
+        "english": "The sea is blue.",
+        "turkish": "Deniz mavi."
       }
     ]
   },
@@ -2007,11 +2341,13 @@
     "id": "a1-mets",
     "estonian": "mets",
     "english": "forest",
+    "turkish": "orman",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Eestis on palju metsa.",
-        "english": "There is a lot of forest in Estonia."
+        "english": "There is a lot of forest in Estonia.",
+        "turkish": "Estonya'da çok fazla orman var."
       }
     ]
   },
@@ -2019,11 +2355,13 @@
     "id": "a1-tuba",
     "estonian": "tuba",
     "english": "room",
+    "turkish": "oda",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See tuba on suur.",
-        "english": "This room is big."
+        "english": "This room is big.",
+        "turkish": "Bu oda büyük."
       }
     ]
   },
@@ -2031,11 +2369,13 @@
     "id": "a1-uks",
     "estonian": "uks",
     "english": "door",
+    "turkish": "kapı",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Palun sulge uks.",
-        "english": "Please close the door."
+        "english": "Please close the door.",
+        "turkish": "Lütfen kapıyı kapat."
       }
     ]
   },
@@ -2043,11 +2383,13 @@
     "id": "a1-aken",
     "estonian": "aken",
     "english": "window",
+    "turkish": "pencere",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Tee aken lahti!",
-        "english": "Open the window!"
+        "english": "Open the window!",
+        "turkish": "Pencereyi aç!"
       }
     ]
   },
@@ -2055,11 +2397,13 @@
     "id": "a1-laud",
     "estonian": "laud",
     "english": "table",
+    "turkish": "masa",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Raamat on laual.",
-        "english": "The book is on the table."
+        "english": "The book is on the table.",
+        "turkish": "Kitap masanın üstünde."
       }
     ]
   },
@@ -2067,11 +2411,13 @@
     "id": "a1-tool",
     "estonian": "tool",
     "english": "chair",
+    "turkish": "sandalye",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Istu toolile.",
-        "english": "Sit on the chair."
+        "english": "Sit on the chair.",
+        "turkish": "Sandalyeye otur."
       }
     ]
   },
@@ -2079,11 +2425,13 @@
     "id": "a1-telefon",
     "estonian": "telefon",
     "english": "phone",
+    "turkish": "telefon",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Minu telefon heliseb.",
-        "english": "My phone is ringing."
+        "english": "My phone is ringing.",
+        "turkish": "Telefonum çalıyor."
       }
     ]
   },
@@ -2091,11 +2439,13 @@
     "id": "a1-raha",
     "estonian": "raha",
     "english": "money",
+    "turkish": "para",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mul ei ole raha.",
-        "english": "I don't have money."
+        "english": "I don't have money.",
+        "turkish": "Param yok."
       }
     ]
   },
@@ -2103,11 +2453,13 @@
     "id": "a1-aeg",
     "estonian": "aeg",
     "english": "time",
+    "turkish": "zaman",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mul ei ole aega.",
-        "english": "I don't have time."
+        "english": "I don't have time.",
+        "turkish": "Zamanım yok."
       }
     ]
   },
@@ -2115,11 +2467,13 @@
     "id": "a1-koht",
     "estonian": "koht",
     "english": "place / spot",
+    "turkish": "yer",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See on ilus koht.",
-        "english": "This is a beautiful place."
+        "english": "This is a beautiful place.",
+        "turkish": "Burası güzel bir yer."
       }
     ]
   },
@@ -2127,11 +2481,13 @@
     "id": "a1-inimene",
     "estonian": "inimene",
     "english": "person / human",
+    "turkish": "insan",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ta on hea inimene.",
-        "english": "He/she is a good person."
+        "english": "He/she is a good person.",
+        "turkish": "O iyi bir insan."
       }
     ]
   },
@@ -2139,11 +2495,13 @@
     "id": "a1-poiss",
     "estonian": "poiss",
     "english": "boy",
+    "turkish": "oğlan",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Poiss jookseb kiiresti.",
-        "english": "The boy runs fast."
+        "english": "The boy runs fast.",
+        "turkish": "Oğlan hızlı koşuyor."
       }
     ]
   },
@@ -2151,11 +2509,13 @@
     "id": "a1-tüdruk",
     "estonian": "tüdruk",
     "english": "girl",
+    "turkish": "kız",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Tüdruk loeb raamatut.",
-        "english": "The girl reads a book."
+        "english": "The girl reads a book.",
+        "turkish": "Kız kitap okuyor."
       }
     ]
   },
@@ -2163,11 +2523,13 @@
     "id": "a1-talv",
     "estonian": "talv",
     "english": "winter",
+    "turkish": "kış",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Eesti talv on pikk.",
-        "english": "Estonian winter is long."
+        "english": "Estonian winter is long.",
+        "turkish": "Estonya kışı uzundur."
       }
     ]
   },
@@ -2175,11 +2537,13 @@
     "id": "a1-suvi",
     "estonian": "suvi",
     "english": "summer",
+    "turkish": "yaz",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Suvel on soe.",
-        "english": "It is warm in summer."
+        "english": "It is warm in summer.",
+        "turkish": "Yazın hava ılık olur."
       }
     ]
   },
@@ -2187,11 +2551,13 @@
     "id": "a1-kevad",
     "estonian": "kevad",
     "english": "spring",
+    "turkish": "ilkbahar",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Kevadel hakkavad lilled õitsema.",
-        "english": "In spring the flowers start blooming."
+        "english": "In spring the flowers start blooming.",
+        "turkish": "İlkbaharda çiçekler açmaya başlar."
       }
     ]
   },
@@ -2199,11 +2565,13 @@
     "id": "a1-sügis",
     "estonian": "sügis",
     "english": "autumn",
+    "turkish": "sonbahar",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Sügisel langevad lehed.",
-        "english": "In autumn the leaves fall."
+        "english": "In autumn the leaves fall.",
+        "turkish": "Sonbaharda yapraklar dökülür."
       }
     ]
   },
@@ -2211,19 +2579,23 @@
     "id": "a1-ütlema",
     "estonian": "ütlema",
     "english": "say",
+    "turkish": "söylemek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ütle oma nimi!",
-        "english": "Ütle oma nimi!"
+        "english": "Ütle oma nimi!",
+        "turkish": "Adını söyle!"
       },
       {
         "estonian": "Oleks ta siis ühegi lohutava sõna öelnud.",
-        "english": "Oleks ta siis ühegi lohutava sõna öelnud."
+        "english": "Oleks ta siis ühegi lohutava sõna öelnud.",
+        "turkish": "Keşke tek bir teselli edici söz söyleseydi."
       },
       {
         "estonian": "Hästi öeldud!",
-        "english": "Hästi öeldud!"
+        "english": "Hästi öeldud!",
+        "turkish": "İyi söyledin!"
       }
     ]
   },
@@ -2231,19 +2603,23 @@
     "id": "a1-võtma",
     "estonian": "võtma",
     "english": "take",
+    "turkish": "almak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Võta kott ja lähme!",
-        "english": "Võta kott ja lähme!"
+        "english": "Võta kott ja lähme!",
+        "turkish": "Çantayı al ve gidelim!"
       },
       {
         "estonian": "Vares võttis leivatüki noka vahele.",
-        "english": "Vares võttis leivatüki noka vahele."
+        "english": "Vares võttis leivatüki noka vahele.",
+        "turkish": "Karga ekmek parçasını gagasına aldı."
       },
       {
         "estonian": "Võtsin laua pealt võtmed.",
-        "english": "Võtsin laua pealt võtmed."
+        "english": "Võtsin laua pealt võtmed.",
+        "turkish": "Masanın üstünden anahtarları aldım."
       }
     ]
   },
@@ -2251,19 +2627,23 @@
     "id": "a1-pidama",
     "estonian": "pidama",
     "english": "need",
+    "turkish": "gerekmek / zorunda olmak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Kõik peavad kohal olema.",
-        "english": "Kõik peavad kohal olema."
+        "english": "Kõik peavad kohal olema.",
+        "turkish": "Herkes orada olmak zorunda."
       },
       {
         "estonian": "Ta pidi vaikides ülekohut taluma.",
-        "english": "Ta pidi vaikides ülekohut taluma."
+        "english": "Ta pidi vaikides ülekohut taluma.",
+        "turkish": "Sessizce haksızlığa katlanmak zorunda kaldı."
       },
       {
         "estonian": "Lapsed peavad vanemate sõna kuulama.",
-        "english": "Lapsed peavad vanemate sõna kuulama."
+        "english": "Lapsed peavad vanemate sõna kuulama.",
+        "turkish": "Çocuklar anne babalarının sözünü dinlemek zorunda."
       }
     ]
   },
@@ -2271,19 +2651,23 @@
     "id": "a1-panema",
     "estonian": "panema",
     "english": "put",
+    "turkish": "koymak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Pane piim külmkappi.",
-        "english": "Pane piim külmkappi."
+        "english": "Pane piim külmkappi.",
+        "turkish": "Sütü buzdolabına koy."
       },
       {
         "estonian": "Maria paneb näputöö käest ja läheb ust avama.",
-        "english": "Maria paneb näputöö käest ja läheb ust avama."
+        "english": "Maria paneb näputöö käest ja läheb ust avama.",
+        "turkish": "Maria el işini bırakıp kapıyı açmaya gidiyor."
       },
       {
         "estonian": "Pane raamat lauale.",
-        "english": "Pane raamat lauale."
+        "english": "Pane raamat lauale.",
+        "turkish": "Kitabı masaya koy."
       }
     ]
   },
@@ -2291,19 +2675,23 @@
     "id": "a1-hakkama",
     "estonian": "hakkama",
     "english": "start",
+    "turkish": "başlamak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Kõik hakkasid naerma.",
-        "english": "Kõik hakkasid naerma."
+        "english": "Kõik hakkasid naerma.",
+        "turkish": "Herkes gülmeye başladı."
       },
       {
         "estonian": "Päevad hakkavad pikenema.",
-        "english": "Päevad hakkavad pikenema."
+        "english": "Päevad hakkavad pikenema.",
+        "turkish": "Günler uzamaya başlıyor."
       },
       {
         "estonian": "Hakkame siis tööle.",
-        "english": "Hakkame siis tööle."
+        "english": "Hakkame siis tööle.",
+        "turkish": "Haydi o zaman işe başlayalım."
       }
     ]
   },
@@ -2311,19 +2699,23 @@
     "id": "a1-viima",
     "estonian": "viima",
     "english": "take",
+    "turkish": "götürmek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Isa viis hommikul lapsed kooli.",
-        "english": "Isa viis hommikul lapsed kooli."
+        "english": "Isa viis hommikul lapsed kooli.",
+        "turkish": "Baba sabah çocukları okula götürdü."
       },
       {
         "estonian": "Ära unusta naisele sünnipäevaks lilli viia.",
-        "english": "Ära unusta naisele sünnipäevaks lilli viia."
+        "english": "Ära unusta naisele sünnipäevaks lilli viia.",
+        "turkish": "Eşine doğum günü için çiçek götürmeyi unutma."
       },
       {
         "estonian": "Limusiin viib presidendi otse lennujaama.",
-        "english": "Limusiin viib presidendi otse lennujaama."
+        "english": "Limusiin viib presidendi otse lennujaama.",
+        "turkish": "Limuzin cumhurbaşkanını doğrudan havalimanına götürüyor."
       }
     ]
   },
@@ -2331,19 +2723,23 @@
     "id": "a1-tooma",
     "estonian": "tooma",
     "english": "bring",
+    "turkish": "getirmek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Kohv toodi lauda sekundiga.",
-        "english": "Kohv toodi lauda sekundiga."
+        "english": "Kohv toodi lauda sekundiga.",
+        "turkish": "Kahve bir saniyede masaya getirildi."
       },
       {
         "estonian": "Jõuluvana tõi kõigile kingitusi.",
-        "english": "Jõuluvana tõi kõigile kingitusi."
+        "english": "Jõuluvana tõi kõigile kingitusi.",
+        "turkish": "Noel Baba herkese hediye getirdi."
       },
       {
         "estonian": "Paat tõi merehädalised meie saarele.",
-        "english": "Paat tõi merehädalised meie saarele."
+        "english": "Paat tõi merehädalised meie saarele.",
+        "turkish": "Tekne deniz kazasına uğrayanları adamıza getirdi."
       }
     ]
   },
@@ -2351,19 +2747,23 @@
     "id": "a1-leidma",
     "estonian": "leidma",
     "english": "find",
+    "turkish": "bulmak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Viige linnupoeg tagasi sinna, kust te ta leidsite.",
-        "english": "Viige linnupoeg tagasi sinna, kust te ta leidsite."
+        "english": "Viige linnupoeg tagasi sinna, kust te ta leidsite.",
+        "turkish": "Kuş yavrusunu bulduğunuz yere geri götürün."
       },
       {
         "estonian": "On vähe lootust teda elusana leida.",
-        "english": "On vähe lootust teda elusana leida."
+        "english": "On vähe lootust teda elusana leida.",
+        "turkish": "Onu sağ bulma umudu çok az."
       },
       {
         "estonian": "Ma ei leia oma rahakotti.",
-        "english": "Ma ei leia oma rahakotti."
+        "english": "Ma ei leia oma rahakotti.",
+        "turkish": "Cüzdanımı bulamıyorum."
       }
     ]
   },
@@ -2371,19 +2771,23 @@
     "id": "a1-mõtlema",
     "estonian": "mõtlema",
     "english": "think",
+    "turkish": "düşünmek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Pean asjad enda jaoks selgeks mõtlema.",
-        "english": "Pean asjad enda jaoks selgeks mõtlema."
+        "english": "Pean asjad enda jaoks selgeks mõtlema.",
+        "turkish": "İşleri kafamda netleştirmem gerekiyor."
       },
       {
         "estonian": "Ära kohe vasta, mõtle enne natuke.",
-        "english": "Ära kohe vasta, mõtle enne natuke."
+        "english": "Ära kohe vasta, mõtle enne natuke.",
+        "turkish": "Hemen cevap verme, önce biraz düşün."
       },
       {
         "estonian": "Inimesed ei mõtle, mida nad ütlevad.",
-        "english": "Inimesed ei mõtle, mida nad ütlevad."
+        "english": "Inimesed ei mõtle, mida nad ütlevad.",
+        "turkish": "İnsanlar ne söylediklerini düşünmüyor."
       }
     ]
   },
@@ -2391,19 +2795,23 @@
     "id": "a1-vaatama",
     "estonian": "vaatama",
     "english": "watch",
+    "turkish": "bakmak / izlemek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ära otse päikesesse vaata!",
-        "english": "Ära otse päikesesse vaata!"
+        "english": "Ära otse päikesesse vaata!",
+        "turkish": "Güneşe doğrudan bakma!"
       },
       {
         "estonian": "Ootaja vaatas närviliselt kella.",
-        "english": "Ootaja vaatas närviliselt kella."
+        "english": "Ootaja vaatas närviliselt kella.",
+        "turkish": "Bekleyen kişi gergin bir şekilde saate baktı."
       },
       {
         "estonian": "Vaata mõlemale poole, enne kui üle tee lähed.",
-        "english": "Vaata mõlemale poole, enne kui üle tee lähed."
+        "english": "Vaata mõlemale poole, enne kui üle tee lähed.",
+        "turkish": "Karşıya geçmeden önce iki tarafa da bak."
       }
     ]
   },
@@ -2411,19 +2819,23 @@
     "id": "a1-elu",
     "estonian": "elu",
     "english": "life",
+    "turkish": "hayat",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ta elu on väljaspool hädaohtu.",
-        "english": "Ta elu on väljaspool hädaohtu."
+        "english": "Ta elu on väljaspool hädaohtu.",
+        "turkish": "Hayatı tehlike dışında."
       },
       {
         "estonian": "Arstid võitlesid haige elu eest.",
-        "english": "Arstid võitlesid haige elu eest."
+        "english": "Arstid võitlesid haige elu eest.",
+        "turkish": "Doktorlar hastanın hayatı için mücadele etti."
       },
       {
         "estonian": "Kas siin kiputi kellegi elu kallale?",
-        "english": "Kas siin kiputi kellegi elu kallale?"
+        "english": "Kas siin kiputi kellegi elu kallale?",
+        "turkish": "Burada birinin hayatına kast mı edildi?"
       }
     ]
   },
@@ -2431,19 +2843,23 @@
     "id": "a1-maa",
     "estonian": "maa",
     "english": "land",
+    "turkish": "toprak / kara",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Pikk merereis ei ole sellega veel lõppenud, kui maa paistma hakkab.",
-        "english": "Pikk merereis ei ole sellega veel lõppenud, kui maa paistma hakkab."
+        "english": "Pikk merereis ei ole sellega veel lõppenud, kui maa paistma hakkab.",
+        "turkish": "Uzun deniz yolculuğu, kara göründüğünde henüz bitmemiş olur."
       },
       {
         "estonian": "Pääsukesed lendasid madalalt maa kohal.",
-        "english": "Pääsukesed lendasid madalalt maa kohal."
+        "english": "Pääsukesed lendasid madalalt maa kohal.",
+        "turkish": "Kırlangıçlar yerin üstünde alçaktan uçtu."
       },
       {
         "estonian": "Laev lähenes maale.",
-        "english": "Laev lähenes maale."
+        "english": "Laev lähenes maale.",
+        "turkish": "Gemi karaya yaklaştı."
       }
     ]
   },
@@ -2451,19 +2867,23 @@
     "id": "a1-asi",
     "estonian": "asi",
     "english": "thing",
+    "turkish": "şey / eşya",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Terve tuba oli igasuguseid asju täis.",
-        "english": "Terve tuba oli igasuguseid asju täis."
+        "english": "Terve tuba oli igasuguseid asju täis.",
+        "turkish": "Bütün oda her türlü eşyayla doluydu."
       },
       {
         "estonian": "Naine pakkis oma asjad kokku ja läks minema.",
-        "english": "Naine pakkis oma asjad kokku ja läks minema."
+        "english": "Naine pakkis oma asjad kokku ja läks minema.",
+        "turkish": "Kadın eşyalarını topladı ve gitti."
       },
       {
         "estonian": "Küll ta armastab ilusaid asju.",
-        "english": "Küll ta armastab ilusaid asju."
+        "english": "Küll ta armastab ilusaid asju.",
+        "turkish": "O güzel şeyleri ne kadar çok seviyor."
       }
     ]
   },
@@ -2471,19 +2891,23 @@
     "id": "a1-kord",
     "estonian": "kord",
     "english": "time",
+    "turkish": "kez / defa",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "See oli ka ainus kord, kui reisil arstiabi vaja läks.",
-        "english": "See oli ka ainus kord, kui reisil arstiabi vaja läks."
+        "english": "See oli ka ainus kord, kui reisil arstiabi vaja läks.",
+        "turkish": "Bu, yolculukta tıbbi yardım gereken tek seferdi."
       },
       {
         "estonian": "Iga kord lõpeb see halvasti.",
-        "english": "Iga kord lõpeb see halvasti."
+        "english": "Iga kord lõpeb see halvasti.",
+        "turkish": "Her seferinde kötü bitiyor."
       },
       {
         "estonian": "Sel korral tuli ta üksi.",
-        "english": "Sel korral tuli ta üksi."
+        "english": "Sel korral tuli ta üksi.",
+        "turkish": "Bu sefer tek başına geldi."
       }
     ]
   },
@@ -2491,19 +2915,23 @@
     "id": "a1-osa",
     "estonian": "osa",
     "english": "part",
+    "turkish": "parça / bölüm",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Rõdu on hoone osa.",
-        "english": "Rõdu on hoone osa."
+        "english": "Rõdu on hoone osa.",
+        "turkish": "Balkon binanın bir parçasıdır."
       },
       {
         "estonian": "Eri suuruse ja kujuga aju osad.",
-        "english": "Eri suuruse ja kujuga aju osad."
+        "english": "Eri suuruse ja kujuga aju osad.",
+        "turkish": "Farklı büyüklük ve şekillerde beyin bölümleri."
       },
       {
         "estonian": "Alustame õhtu piduliku osaga.",
-        "english": "Alustame õhtu piduliku osaga."
+        "english": "Alustame õhtu piduliku osaga.",
+        "turkish": "Gecenin şenlik bölümüyle başlayalım."
       }
     ]
   },
@@ -2511,19 +2939,23 @@
     "id": "a1-pool",
     "estonian": "pool",
     "english": "half",
+    "turkish": "yarım",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Pool miljonit.",
-        "english": "Pool miljonit."
+        "english": "Pool miljonit.",
+        "turkish": "Yarım milyon."
       },
       {
         "estonian": "Ostsin pool kilo õunu.",
-        "english": "Ostsin pool kilo õunu."
+        "english": "Ostsin pool kilo õunu.",
+        "turkish": "Yarım kilo elma aldım."
       },
       {
         "estonian": "Koosolek kestis pool tundi (= 30 minutit).",
-        "english": "Koosolek kestis pool tundi (= 30 minutit)."
+        "english": "Koosolek kestis pool tundi (= 30 minutit).",
+        "turkish": "Toplantı yarım saat sürdü (= 30 dakika)."
       }
     ]
   },
@@ -2531,19 +2963,23 @@
     "id": "a1-loom",
     "estonian": "loom",
     "english": "animal",
+    "turkish": "hayvan",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Maailmas elab palju huvitavaid linde, loomi ja putukaid.",
-        "english": "Maailmas elab palju huvitavaid linde, loomi ja putukaid."
+        "english": "Maailmas elab palju huvitavaid linde, loomi ja putukaid.",
+        "turkish": "Dünyada birçok ilginç kuş, hayvan ve böcek yaşar."
       },
       {
         "estonian": "Elevandid on ühed vaadatumad loomad loomaaedades.",
-        "english": "Elevandid on ühed vaadatumad loomad loomaaedades."
+        "english": "Elevandid on ühed vaadatumad loomad loomaaedades.",
+        "turkish": "Filler hayvanat bahçelerinde en çok izlenen hayvanlardan biridir."
       },
       {
         "estonian": "Jänes, rebane ja karu on loomad.",
-        "english": "Jänes, rebane ja karu on loomad."
+        "english": "Jänes, rebane ja karu on loomad.",
+        "turkish": "Tavşan, tilki ve ayı hayvanlardır."
       }
     ]
   },
@@ -2551,19 +2987,23 @@
     "id": "a1-puu",
     "estonian": "puu",
     "english": "tree",
+    "turkish": "ağaç",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ahvid elavad puu otsas.",
-        "english": "Ahvid elavad puu otsas."
+        "english": "Ahvid elavad puu otsas.",
+        "turkish": "Maymunlar ağaçların üstünde yaşar."
       },
       {
         "estonian": "Metsas on kohti, kus puud ei kasva.",
-        "english": "Metsas on kohti, kus puud ei kasva."
+        "english": "Metsas on kohti, kus puud ei kasva.",
+        "turkish": "Ormanda ağaçların yetişmediği yerler var."
       },
       {
         "estonian": "Päike hakkab puude taha vajuma.",
-        "english": "Päike hakkab puude taha vajuma."
+        "english": "Päike hakkab puude taha vajuma.",
+        "turkish": "Güneş ağaçların arkasına batmaya başlıyor."
       }
     ]
   },
@@ -2571,19 +3011,23 @@
     "id": "a1-lill",
     "estonian": "lill",
     "english": "flower",
+    "turkish": "çiçek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Aeda on istutatud õunapuid ja põõsaid, lilledest rääkimata.",
-        "english": "Aeda on istutatud õunapuid ja põõsaid, lilledest rääkimata."
+        "english": "Aeda on istutatud õunapuid ja põõsaid, lilledest rääkimata.",
+        "turkish": "Bahçeye elma ağaçları ve çalılar dikilmiş, çiçeklerden bahsetmiyorum bile."
       },
       {
         "estonian": "Aias õitsevad kaunid lilled.",
-        "english": "Aias õitsevad kaunid lilled."
+        "english": "Aias õitsevad kaunid lilled.",
+        "turkish": "Bahçede güzel çiçekler açıyor."
       },
       {
         "estonian": "Pane lilled vaasi!",
-        "english": "Pane lilled vaasi!"
+        "english": "Pane lilled vaasi!",
+        "turkish": "Çiçekleri vazoya koy!"
       }
     ]
   },
@@ -2591,19 +3035,23 @@
     "id": "a1-jõgi",
     "estonian": "jõgi",
     "english": "river",
+    "turkish": "nehir",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Sügaval oru põhjas lookleb jõgi.",
-        "english": "Sügaval oru põhjas lookleb jõgi."
+        "english": "Sügaval oru põhjas lookleb jõgi.",
+        "turkish": "Derin vadinin dibinde bir nehir kıvrılarak akıyor."
       },
       {
         "estonian": "Laevatatav jõgi.",
-        "english": "Laevatatav jõgi."
+        "english": "Laevatatav jõgi.",
+        "turkish": "Gemi ulaşımına uygun nehir."
       },
       {
         "estonian": "Amazonas on üks maailma pikimaid jõgesid.",
-        "english": "Amazonas on üks maailma pikimaid jõgesid."
+        "english": "Amazonas on üks maailma pikimaid jõgesid.",
+        "turkish": "Amazon, dünyanın en uzun nehirlerinden biridir."
       }
     ]
   },
@@ -2611,19 +3059,23 @@
     "id": "a1-mägi",
     "estonian": "mägi",
     "english": "mountain",
+    "turkish": "dağ",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Otepää ümbruse mäed.",
-        "english": "Otepää ümbruse mäed."
+        "english": "Otepää ümbruse mäed.",
+        "turkish": "Otepää çevresindeki dağlar."
       },
       {
         "estonian": "Mäe otsast avanesid imelised vaated.",
-        "english": "Mäe otsast avanesid imelised vaated."
+        "english": "Mäe otsast avanesid imelised vaated.",
+        "turkish": "Dağın tepesinden muhteşem manzaralar açılıyordu."
       },
       {
         "estonian": "Fuji on jaapanlastele püha mägi.",
-        "english": "Fuji on jaapanlastele püha mägi."
+        "english": "Fuji on jaapanlastele püha mägi.",
+        "turkish": "Fuji, Japonlar için kutsal bir dağdır."
       }
     ]
   },
@@ -2631,19 +3083,23 @@
     "id": "a1-järv",
     "estonian": "järv",
     "english": "lake",
+    "turkish": "göl",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Käisime järves ujumas.",
-        "english": "Käisime järves ujumas."
+        "english": "Käisime järves ujumas.",
+        "turkish": "Gölde yüzmeye gittik."
       },
       {
         "estonian": "Kalamehed sõitsid paadiga järvele.",
-        "english": "Kalamehed sõitsid paadiga järvele."
+        "english": "Kalamehed sõitsid paadiga järvele.",
+        "turkish": "Balıkçılar tekneyle göle çıktı."
       },
       {
         "estonian": "Maja ehitati järve kaldale.",
-        "english": "Maja ehitati järve kaldale."
+        "english": "Maja ehitati järve kaldale.",
+        "turkish": "Ev göl kıyısına inşa edildi."
       }
     ]
   },
@@ -2651,19 +3107,23 @@
     "id": "a1-tuul",
     "estonian": "tuul",
     "english": "wind",
+    "turkish": "rüzgar",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Väljas tõusis tugev tuul.",
-        "english": "Väljas tõusis tugev tuul."
+        "english": "Väljas tõusis tugev tuul.",
+        "turkish": "Dışarıda şiddetli bir rüzgar çıktı."
       },
       {
         "estonian": "Tuul puhub tormi ajal kuni 30 meetrit sekundis.",
-        "english": "Tuul puhub tormi ajal kuni 30 meetrit sekundis."
+        "english": "Tuul puhub tormi ajal kuni 30 meetrit sekundis.",
+        "turkish": "Fırtınada rüzgar saniyede 30 metreye kadar esiyor."
       },
       {
         "estonian": "Kael on kange, tuul on vist läbi tõmmanud.",
-        "english": "Kael on kange, tuul on vist läbi tõmmanud."
+        "english": "Kael on kange, tuul on vist läbi tõmmanud.",
+        "turkish": "Boynum tutulmuş, galiba rüzgar çarpmış."
       }
     ]
   },
@@ -2671,19 +3131,23 @@
     "id": "a1-taevas",
     "estonian": "taevas",
     "english": "sky",
+    "turkish": "gökyüzü",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Vanasti oli rohi rohelisem ja taevas sinisem.",
-        "english": "Vanasti oli rohi rohelisem ja taevas sinisem."
+        "english": "Vanasti oli rohi rohelisem ja taevas sinisem.",
+        "turkish": "Eskiden çimenler daha yeşil, gökyüzü daha maviydi."
       },
       {
         "estonian": "Taevas on pilves.",
-        "english": "Taevas on pilves."
+        "english": "Taevas on pilves.",
+        "turkish": "Gökyüzü bulutlu."
       },
       {
         "estonian": "Taevasse ilmus vikerkaar.",
-        "english": "Taevasse ilmus vikerkaar."
+        "english": "Taevasse ilmus vikerkaar.",
+        "turkish": "Gökyüzünde gökkuşağı belirdi."
       }
     ]
   },
@@ -2691,15 +3155,18 @@
     "id": "a1-täht",
     "estonian": "täht",
     "english": "star",
+    "turkish": "yıldız",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Taevas näeb tuhandeid langevaid tähti.",
-        "english": "Taevas näeb tuhandeid langevaid tähti."
+        "english": "Taevas näeb tuhandeid langevaid tähti.",
+        "turkish": "Gökyüzünde binlerce kayan yıldız görülüyor."
       },
       {
         "estonian": "Tähed säravad taevas.",
-        "english": "Tähed säravad taevas."
+        "english": "Tähed säravad taevas.",
+        "turkish": "Yıldızlar gökyüzünde parlıyor."
       }
     ]
   },
@@ -2707,19 +3174,23 @@
     "id": "a1-laev",
     "estonian": "laev",
     "english": "ship",
+    "turkish": "gemi",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Laev sõidab Eesti lipu all.",
-        "english": "Laev sõidab Eesti lipu all."
+        "english": "Laev sõidab Eesti lipu all.",
+        "turkish": "Gemi Estonya bayrağı altında yol alıyor."
       },
       {
         "estonian": "Merearheoloogid otsivad Läänemerest uppunud laevu.",
-        "english": "Merearheoloogid otsivad Läänemerest uppunud laevu."
+        "english": "Merearheoloogid otsivad Läänemerest uppunud laevu.",
+        "turkish": "Deniz arkeologları Baltık Denizi'nde batık gemiler arıyor."
       },
       {
         "estonian": "Lõbusõidulaev.",
-        "english": "Lõbusõidulaev."
+        "english": "Lõbusõidulaev.",
+        "turkish": "Gezi gemisi."
       }
     ]
   },
@@ -2727,19 +3198,23 @@
     "id": "a1-sild",
     "estonian": "sild",
     "english": "bridge",
+    "turkish": "köprü",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Pirita jõe sild.",
-        "english": "Pirita jõe sild."
+        "english": "Pirita jõe sild.",
+        "turkish": "Pirita nehir köprüsü."
       },
       {
         "estonian": "Elava liiklusega tänavale tehti jalakäijate sild.",
-        "english": "Elava liiklusega tänavale tehti jalakäijate sild."
+        "english": "Elava liiklusega tänavale tehti jalakäijate sild.",
+        "turkish": "Yoğun trafikli caddeye yaya köprüsü yapıldı."
       },
       {
         "estonian": "Raudsild.",
-        "english": "Raudsild."
+        "english": "Raudsild.",
+        "turkish": "Demir köprü."
       }
     ]
   },
@@ -2747,19 +3222,23 @@
     "id": "a1-tugev",
     "estonian": "tugev",
     "english": "strong",
+    "turkish": "güçlü",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Vanaisa oli tugev nagu karu.",
-        "english": "Vanaisa oli tugev nagu karu."
+        "english": "Vanaisa oli tugev nagu karu.",
+        "turkish": "Büyükbabam ayı gibi güçlüydü."
       },
       {
         "estonian": "Kehalt tugev mees.",
-        "english": "Kehalt tugev mees."
+        "english": "Kehalt tugev mees.",
+        "turkish": "Bedenen güçlü bir adam."
       },
       {
         "estonian": "Minu isa on väga tugev mees.",
-        "english": "Minu isa on väga tugev mees."
+        "english": "Minu isa on väga tugev mees.",
+        "turkish": "Babam çok güçlü bir adam."
       }
     ]
   },
@@ -2767,19 +3246,23 @@
     "id": "a1-nõrk",
     "estonian": "nõrk",
     "english": "weak",
+    "turkish": "zayıf",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ründaja otsib nõrku vastaseid.",
-        "english": "Ründaja otsib nõrku vastaseid."
+        "english": "Ründaja otsib nõrku vastaseid.",
+        "turkish": "Saldırgan zayıf rakipler arıyor."
       },
       {
         "estonian": "Nõrk iseloom.",
-        "english": "Nõrk iseloom."
+        "english": "Nõrk iseloom.",
+        "turkish": "Zayıf karakter."
       },
       {
         "estonian": "Nõrk käepigistus.",
-        "english": "Nõrk käepigistus."
+        "english": "Nõrk käepigistus.",
+        "turkish": "Zayıf el sıkışma."
       }
     ]
   },
@@ -2787,19 +3270,23 @@
     "id": "a1-puhas",
     "estonian": "puhas",
     "english": "clean",
+    "turkish": "temiz",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Peske käed puhtaks.",
-        "english": "Peske käed puhtaks."
+        "english": "Peske käed puhtaks.",
+        "turkish": "Ellerinizi temiz yıkayın."
       },
       {
         "estonian": "Panin voodisse puhtad linad.",
-        "english": "Panin voodisse puhtad linad."
+        "english": "Panin voodisse puhtad linad.",
+        "turkish": "Yatağa temiz çarşaflar serdim."
       },
       {
         "estonian": "Puhas õhk, puhas vesi ja vaikus on väärtused omaette.",
-        "english": "Puhas õhk, puhas vesi ja vaikus on väärtused omaette."
+        "english": "Puhas õhk, puhas vesi ja vaikus on väärtused omaette.",
+        "turkish": "Temiz hava, temiz su ve sessizlik başlı başına birer değerdir."
       }
     ]
   },
@@ -2807,19 +3294,23 @@
     "id": "a1-oluline",
     "estonian": "oluline",
     "english": "important",
+    "turkish": "önemli",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Metsadel on oluline osa süsinikuringes.",
-        "english": "Metsadel on oluline osa süsinikuringes."
+        "english": "Metsadel on oluline osa süsinikuringes.",
+        "turkish": "Ormanların karbon döngüsünde önemli bir rolü var."
       },
       {
         "estonian": "Teiste arvamus on talle väga oluline.",
-        "english": "Teiste arvamus on talle väga oluline."
+        "english": "Teiste arvamus on talle väga oluline.",
+        "turkish": "Başkalarının görüşü onun için çok önemli."
       },
       {
         "estonian": "Üks oluline erinevus siiski oli.",
-        "english": "Üks oluline erinevus siiski oli."
+        "english": "Üks oluline erinevus siiski oli.",
+        "turkish": "Yine de önemli bir fark vardı."
       }
     ]
   },
@@ -2827,19 +3318,23 @@
     "id": "a1-vajalik",
     "estonian": "vajalik",
     "english": "necessary",
+    "turkish": "gerekli",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Liha on inimese jaoks vajalike toitainete ning energia allikas.",
-        "english": "Liha on inimese jaoks vajalike toitainete ning energia allikas."
+        "english": "Liha on inimese jaoks vajalike toitainete ning energia allikas.",
+        "turkish": "Et, insan için gerekli besin maddeleri ve enerji kaynağıdır."
       },
       {
         "estonian": "Samba rajamiseks vajalik summa on 5000 eurot.",
-        "english": "Samba rajamiseks vajalik summa on 5000 eurot."
+        "english": "Samba rajamiseks vajalik summa on 5000 eurot.",
+        "turkish": "Anıtın inşası için gerekli miktar 5000 avrodur."
       },
       {
         "estonian": "Ülivajalik.",
-        "english": "Ülivajalik."
+        "english": "Ülivajalik.",
+        "turkish": "Son derece gerekli."
       }
     ]
   },
@@ -2847,19 +3342,23 @@
     "id": "a1-võimalik",
     "estonian": "võimalik",
     "english": "possible",
+    "turkish": "mümkün",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Seda oleks võimalik arvutada.",
-        "english": "Seda oleks võimalik arvutada."
+        "english": "Seda oleks võimalik arvutada.",
+        "turkish": "Bunu hesaplamak mümkün olabilir."
       },
       {
         "estonian": "Seaduse järgi on see võimalik.",
-        "english": "Seaduse järgi on see võimalik."
+        "english": "Seaduse järgi on see võimalik.",
+        "turkish": "Yasaya göre bu mümkün."
       },
       {
         "estonian": "Asjad lahenesid parimal võimalikul moel.",
-        "english": "Asjad lahenesid parimal võimalikul moel."
+        "english": "Asjad lahenesid parimal võimalikul moel.",
+        "turkish": "İşler mümkün olan en iyi şekilde çözüldü."
       }
     ]
   },
@@ -2867,19 +3366,23 @@
     "id": "a1-huvitav",
     "estonian": "huvitav",
     "english": "interesting",
+    "turkish": "ilginç",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Äärmiselt huvitav nähtus.",
-        "english": "Äärmiselt huvitav nähtus."
+        "english": "Äärmiselt huvitav nähtus.",
+        "turkish": "Son derece ilginç bir olay."
       },
       {
         "estonian": "Kuulsime huvitavaid fakte perekonna ajaloost.",
-        "english": "Kuulsime huvitavaid fakte perekonna ajaloost."
+        "english": "Kuulsime huvitavaid fakte perekonna ajaloost.",
+        "turkish": "Aile tarihinden ilginç bilgiler duyduk."
       },
       {
         "estonian": "Telekas polnud midagi huvitavat.",
-        "english": "Telekas polnud midagi huvitavat."
+        "english": "Telekas polnud midagi huvitavat.",
+        "turkish": "Televizyonda ilginç bir şey yoktu."
       }
     ]
   },
@@ -2887,19 +3390,23 @@
     "id": "a1-tervis",
     "estonian": "tervis",
     "english": "health",
+    "turkish": "sağlık",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ta on hea vaimse tervise juures.",
-        "english": "Ta on hea vaimse tervise juures."
+        "english": "Ta on hea vaimse tervise juures.",
+        "turkish": "Ruh sağlığı yerinde."
       },
       {
         "estonian": "Nõrga tervisega tüdrukud.",
-        "english": "Nõrga tervisega tüdrukud."
+        "english": "Nõrga tervisega tüdrukud.",
+        "turkish": "Sağlığı zayıf kızlar."
       },
       {
         "estonian": "Tulen, kui tervis lubab.",
-        "english": "Tulen, kui tervis lubab."
+        "english": "Tulen, kui tervis lubab.",
+        "turkish": "Sağlığım el verirse gelirim."
       }
     ]
   },
@@ -2907,19 +3414,23 @@
     "id": "a1-kultuur",
     "estonian": "kultuur",
     "english": "culture",
+    "turkish": "kültür",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Kasvab majandus, õitseb kultuur.",
-        "english": "Kasvab majandus, õitseb kultuur."
+        "english": "Kasvab majandus, õitseb kultuur.",
+        "turkish": "Ekonomi büyüyor, kültür gelişiyor."
       },
       {
         "estonian": "Iidse kultuuriga maa.",
-        "english": "Iidse kultuuriga maa."
+        "english": "Iidse kultuuriga maa.",
+        "turkish": "Kadim kültüre sahip bir ülke."
       },
       {
         "estonian": "Tänapäeva kultuur.",
-        "english": "Tänapäeva kultuur."
+        "english": "Tänapäeva kultuur.",
+        "turkish": "Günümüz kültürü."
       }
     ]
   },
@@ -2927,19 +3438,23 @@
     "id": "a1-loodus",
     "estonian": "loodus",
     "english": "nature",
+    "turkish": "doğa",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Veetsin päeva vabas looduses.",
-        "english": "Veetsin päeva vabas looduses."
+        "english": "Veetsin päeva vabas looduses.",
+        "turkish": "Günü doğada geçirdim."
       },
       {
         "estonian": "Plastpudel võib loodust reostada aastakümneid.",
-        "english": "Plastpudel võib loodust reostada aastakümneid."
+        "english": "Plastpudel võib loodust reostada aastakümneid.",
+        "turkish": "Plastik şişe doğayı on yıllarca kirletebilir."
       },
       {
         "estonian": "Inimkond on osa loodusest.",
-        "english": "Inimkond on osa loodusest."
+        "english": "Inimkond on osa loodusest.",
+        "turkish": "İnsanlık doğanın bir parçasıdır."
       }
     ]
   },
@@ -2947,15 +3462,18 @@
     "id": "a1-muusika",
     "estonian": "muusika",
     "english": "music",
+    "turkish": "müzik",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Muusikale pühendatud elu.",
-        "english": "Muusikale pühendatud elu."
+        "english": "Muusikale pühendatud elu.",
+        "turkish": "Müziğe adanmış bir hayat."
       },
       {
         "estonian": "Peol mängis vali muusika.",
-        "english": "Peol mängis vali muusika."
+        "english": "Peol mängis vali muusika.",
+        "turkish": "Partide yüksek sesli müzik çalıyordu."
       }
     ]
   },
@@ -2963,19 +3481,23 @@
     "id": "a1-plaan",
     "estonian": "plaan",
     "english": "plan",
+    "turkish": "plan",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Mul on täna plaan teha lambalihahautist.",
-        "english": "Mul on täna plaan teha lambalihahautist."
+        "english": "Mul on täna plaan teha lambalihahautist.",
+        "turkish": "Bugün kuzu yahnisi yapma planım var."
       },
       {
         "estonian": "Suvel on plaanis sõpradega mööda Eestit ringi sõita.",
-        "english": "Suvel on plaanis sõpradega mööda Eestit ringi sõita."
+        "english": "Suvel on plaanis sõpradega mööda Eestit ringi sõita.",
+        "turkish": "Yazın arkadaşlarla Estonya'yı gezme planımız var."
       },
       {
         "estonian": "Ülemusel olid uue töötajaga oma plaanid.",
-        "english": "Ülemusel olid uue töötajaga oma plaanid."
+        "english": "Ülemusel olid uue töötajaga oma plaanid.",
+        "turkish": "Patronun yeni çalışanla ilgili kendi planları vardı."
       }
     ]
   },
@@ -2983,19 +3505,23 @@
     "id": "a1-uskuma",
     "estonian": "uskuma",
     "english": "believe",
+    "turkish": "inanmak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ta usub Jumalasse.",
-        "english": "Ta usub Jumalasse."
+        "english": "Ta usub Jumalasse.",
+        "turkish": "O Tanrı'ya inanıyor."
       },
       {
         "estonian": "Ma ei usu jumalaid, ma ei usu saatust, vaid ennast.",
-        "english": "Ma ei usu jumalaid, ma ei usu saatust, vaid ennast."
+        "english": "Ma ei usu jumalaid, ma ei usu saatust, vaid ennast.",
+        "turkish": "Tanrılara inanmam, kadere inanmam, sadece kendime inanırım."
       },
       {
         "estonian": "Kas sa usud jumalasse/jumalat?",
-        "english": "Kas sa usud jumalasse/jumalat?"
+        "english": "Kas sa usud jumalasse/jumalat?",
+        "turkish": "Sen Tanrı'ya inanıyor musun?"
       }
     ]
   },
@@ -3003,19 +3529,23 @@
     "id": "a1-unustama",
     "estonian": "unustama",
     "english": "forget",
+    "turkish": "unutmak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Hommikuks olin unenäo unustanud.",
-        "english": "Hommikuks olin unenäo unustanud."
+        "english": "Hommikuks olin unenäo unustanud.",
+        "turkish": "Sabaha kadar rüyayı unutmuştum."
       },
       {
         "estonian": "Kas unustasid parooli?",
-        "english": "Kas unustasid parooli?"
+        "english": "Kas unustasid parooli?",
+        "turkish": "Şifreni mi unuttun?"
       },
       {
         "estonian": "Lubadused unustati kiiresti.",
-        "english": "Lubadused unustati kiiresti."
+        "english": "Lubadused unustati kiiresti.",
+        "turkish": "Sözler çabucak unutuldu."
       }
     ]
   },
@@ -3023,19 +3553,23 @@
     "id": "a1-ootama",
     "estonian": "ootama",
     "english": "wait",
+    "turkish": "beklemek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Peatuses ootas bussi kaks inimest.",
-        "english": "Peatuses ootas bussi kaks inimest."
+        "english": "Peatuses ootas bussi kaks inimest.",
+        "turkish": "Durakta iki kişi otobüs bekliyordu."
       },
       {
         "estonian": "Takso ootab maja ees.",
-        "english": "Takso ootab maja ees."
+        "english": "Takso ootab maja ees.",
+        "turkish": "Taksi evin önünde bekliyor."
       },
       {
         "estonian": "Ema on juba kümme aastat oma kadunud poega koju oodanud.",
-        "english": "Ema on juba kümme aastat oma kadunud poega koju oodanud."
+        "english": "Ema on juba kümme aastat oma kadunud poega koju oodanud.",
+        "turkish": "Anne on yıldır kayıp oğlunu eve bekliyor."
       }
     ]
   },
@@ -3043,19 +3577,23 @@
     "id": "a1-otsima",
     "estonian": "otsima",
     "english": "look",
+    "turkish": "aramak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Aita mul prille otsida!",
-        "english": "Aita mul prille otsida!"
+        "english": "Aita mul prille otsida!",
+        "turkish": "Gözlüklerimi aramamda bana yardım et!"
       },
       {
         "estonian": "Politsei otsib kadunud marjulist.",
-        "english": "Politsei otsib kadunud marjulist."
+        "english": "Politsei otsib kadunud marjulist.",
+        "turkish": "Polis kayıp mantar toplayıcısını arıyor."
       },
       {
         "estonian": "Esimene koht, kust infot otsitakse, on internet.",
-        "english": "Esimene koht, kust infot otsitakse, on internet."
+        "english": "Esimene koht, kust infot otsitakse, on internet.",
+        "turkish": "Bilgi aranan ilk yer internettir."
       }
     ]
   },
@@ -3063,19 +3601,23 @@
     "id": "a1-alustama",
     "estonian": "alustama",
     "english": "begin",
+    "turkish": "başlamak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Kui alustasin kunstnikuelu, maalisin peamiselt kõrbemaastikke.",
-        "english": "Kui alustasin kunstnikuelu, maalisin peamiselt kõrbemaastikke."
+        "english": "Kui alustasin kunstnikuelu, maalisin peamiselt kõrbemaastikke.",
+        "turkish": "Sanatçı hayatıma başladığımda çoğunlukla çöl manzaraları çizerdim."
       },
       {
         "estonian": "Homme alustan dieeti.",
-        "english": "Homme alustan dieeti."
+        "english": "Homme alustan dieeti.",
+        "turkish": "Yarın diyete başlıyorum."
       },
       {
         "estonian": "Meeskond alustas treeningutega aprillis.",
-        "english": "Meeskond alustas treeningutega aprillis."
+        "english": "Meeskond alustas treeningutega aprillis.",
+        "turkish": "Takım antrenmanlara nisanda başladı."
       }
     ]
   },
@@ -3083,19 +3625,23 @@
     "id": "a1-lõpetama",
     "estonian": "lõpetama",
     "english": "finish",
+    "turkish": "bitirmek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ta lõpetas ülikooli 2010. aastal.",
-        "english": "Ta lõpetas ülikooli 2010. aastal."
+        "english": "Ta lõpetas ülikooli 2010. aastal.",
+        "turkish": "2010 yılında üniversiteyi bitirdi."
       },
       {
         "estonian": "Lõpetan parasjagu koristamist.",
-        "english": "Lõpetan parasjagu koristamist."
+        "english": "Lõpetan parasjagu koristamist.",
+        "turkish": "Tam şu an temizliği bitiriyorum."
       },
       {
-        "estonian": "Kontserdi lõpetas „Salve Regina”.",
-        "english": "Kontserdi lõpetas „Salve Regina”."
+        "estonian": "Kontserdi l\u00f5petas \u201eSalve Regina\u201d.",
+        "english": "Kontserdi l\u00f5petas \u201eSalve Regina\u201d.",
+        "turkish": "Konseri 'Salve Regina' bitirdi."
       }
     ]
   },
@@ -3103,15 +3649,18 @@
     "id": "a1-kasvama",
     "estonian": "kasvama",
     "english": "grow",
+    "turkish": "büyümek",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Lapsed kasvavad kiiresti.",
-        "english": "Lapsed kasvavad kiiresti."
+        "english": "Lapsed kasvavad kiiresti.",
+        "turkish": "Çocuklar hızlı büyür."
       },
       {
         "estonian": "Sul on juuksed pikaks kasvanud.",
-        "english": "Sul on juuksed pikaks kasvanud."
+        "english": "Sul on juuksed pikaks kasvanud.",
+        "turkish": "Saçların uzamış."
       }
     ]
   },
@@ -3119,19 +3668,23 @@
     "id": "a1-number",
     "estonian": "number",
     "english": "number",
+    "turkish": "numara",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Tähtedest ja numbritest koosnev salasõna.",
-        "english": "Tähtedest ja numbritest koosnev salasõna."
+        "english": "Tähtedest ja numbritest koosnev salasõna.",
+        "turkish": "Harflerden ve rakamlardan oluşan şifre."
       },
       {
         "estonian": "Summa numbritega.",
-        "english": "Summa numbritega."
+        "english": "Summa numbritega.",
+        "turkish": "Rakamlarla toplam."
       },
       {
         "estonian": "Numbrid ühest kümneni.",
-        "english": "Numbrid ühest kümneni."
+        "english": "Numbrid ühest kümneni.",
+        "turkish": "Birden ona kadar rakamlar."
       }
     ]
   },
@@ -3139,19 +3692,23 @@
     "id": "a1-arv",
     "estonian": "arv",
     "english": "number",
+    "turkish": "sayı",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Arvud ühest kümneni.",
-        "english": "Arvud ühest kümneni."
+        "english": "Arvud ühest kümneni.",
+        "turkish": "Birden ona kadar sayılar."
       },
       {
         "estonian": "Kolmekohalised arvud.",
-        "english": "Kolmekohalised arvud."
+        "english": "Kolmekohalised arvud.",
+        "turkish": "Üç basamaklı sayılar."
       },
       {
         "estonian": "Seitse on maagiline arv.",
-        "english": "Seitse on maagiline arv."
+        "english": "Seitse on maagiline arv.",
+        "turkish": "Yedi sihirli bir sayıdır."
       }
     ]
   },
@@ -3159,19 +3716,23 @@
     "id": "a1-politsei",
     "estonian": "politsei",
     "english": "police",
+    "turkish": "polis",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ta töötab politseis.",
-        "english": "Ta töötab politseis."
+        "english": "Ta töötab politseis.",
+        "turkish": "O poliste çalışıyor."
       },
       {
         "estonian": "Lärmi peale kutsuti kohale politsei.",
-        "english": "Lärmi peale kutsuti kohale politsei."
+        "english": "Lärmi peale kutsuti kohale politsei.",
+        "turkish": "Gürültü üzerine polis çağrıldı."
       },
       {
         "estonian": "Naine viis leitud rahakoti politseisse.",
-        "english": "Naine viis leitud rahakoti politseisse."
+        "english": "Naine viis leitud rahakoti politseisse.",
+        "turkish": "Kadın bulduğu cüzdanı polise götürdü."
       }
     ]
   },
@@ -3179,19 +3740,23 @@
     "id": "a1-arvuti",
     "estonian": "arvuti",
     "english": "computer",
+    "turkish": "bilgisayar",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Istusin arvuti taga terve päeva.",
-        "english": "Istusin arvuti taga terve päeva."
+        "english": "Istusin arvuti taga terve päeva.",
+        "turkish": "Bütün gün bilgisayar başında oturdum."
       },
       {
         "estonian": "Andmetele saab ligi nutitelefoni või arvutit kasutades.",
-        "english": "Andmetele saab ligi nutitelefoni või arvutit kasutades."
+        "english": "Andmetele saab ligi nutitelefoni või arvutit kasutades.",
+        "turkish": "Verilere akıllı telefon veya bilgisayar kullanarak erişilebilir."
       },
       {
         "estonian": "Lülitan arvuti sisse.",
-        "english": "Lülitan arvuti sisse."
+        "english": "Lülitan arvuti sisse.",
+        "turkish": "Bilgisayarı açıyorum."
       }
     ]
   },
@@ -3199,19 +3764,23 @@
     "id": "a1-internet",
     "estonian": "internet",
     "english": "internet",
+    "turkish": "internet",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Juhtmevaba internet.",
-        "english": "Juhtmevaba internet."
+        "english": "Juhtmevaba internet.",
+        "turkish": "Kablosuz internet."
       },
       {
         "estonian": "Mobiilne internet.",
-        "english": "Mobiilne internet."
+        "english": "Mobiilne internet.",
+        "turkish": "Mobil internet."
       },
       {
         "estonian": "Kasutan internetti iga päev.",
-        "english": "Kasutan internetti iga päev."
+        "english": "Kasutan internetti iga päev.",
+        "turkish": "Her gün internet kullanıyorum."
       }
     ]
   },
@@ -3219,19 +3788,23 @@
     "id": "a1-köök",
     "estonian": "köök",
     "english": "kitchen",
+    "turkish": "mutfak",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Ema tegi köögis süüa.",
-        "english": "Ema tegi köögis süüa."
+        "english": "Ema tegi köögis süüa.",
+        "turkish": "Anne mutfakta yemek yaptı."
       },
       {
         "estonian": "Ema teeb köögis süüa.",
-        "english": "Ema teeb köögis süüa."
+        "english": "Ema teeb köögis süüa.",
+        "turkish": "Anne mutfakta yemek yapıyor."
       },
       {
         "estonian": "Korteris on köök, elutuba, magamistuba ja vannituba.",
-        "english": "Korteris on köök, elutuba, magamistuba ja vannituba."
+        "english": "Korteris on köök, elutuba, magamistuba ja vannituba.",
+        "turkish": "Dairede mutfak, oturma odası, yatak odası ve banyo var."
       }
     ]
   },
@@ -3239,19 +3812,23 @@
     "id": "a1-korrus",
     "estonian": "korrus",
     "english": "storey",
+    "turkish": "kat",
     "cefrLevel": "A1",
     "sentences": [
       {
         "estonian": "Renoveerimise käigus ehitati hoonele üks korrus juurde.",
-        "english": "Renoveerimise käigus ehitati hoonele üks korrus juurde."
+        "english": "Renoveerimise käigus ehitati hoonele üks korrus juurde.",
+        "turkish": "Tadilat sırasında binaya bir kat daha eklendi."
       },
       {
         "estonian": "Majakorrus.",
-        "english": "Majakorrus."
+        "english": "Majakorrus.",
+        "turkish": "Bina katı."
       },
       {
         "estonian": "Ma elan viiendal korrusel.",
-        "english": "Ma elan viiendal korrusel."
+        "english": "Ma elan viiendal korrusel.",
+        "turkish": "Beşinci katta oturuyorum."
       }
     ]
   }

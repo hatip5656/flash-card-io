@@ -126,6 +126,38 @@ export async function initDb(connectionString: string): Promise<pg.Pool> {
   // Index for streak calculation
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_activity_log_chat_date ON activity_log (chat_id, activity_date DESC)`);
 
+  // Saved words (bookmarks for mobile app)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS saved_words (
+      chat_id BIGINT NOT NULL,
+      word_id TEXT NOT NULL,
+      saved_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (chat_id, word_id)
+    )
+  `);
+
+  // Story read tracking (grammar stories for mobile app)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS story_reads (
+      chat_id BIGINT NOT NULL,
+      story_id TEXT NOT NULL,
+      read_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (chat_id, story_id)
+    )
+  `);
+
+  // Word comments
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS word_comments (
+      id SERIAL PRIMARY KEY,
+      chat_id BIGINT NOT NULL,
+      word_id TEXT NOT NULL,
+      comment TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_word_comments_word ON word_comments (word_id, created_at DESC)`);
+
   console.error(`[db] Connected to PostgreSQL database "${dbName}"`);
   return pool;
 }
@@ -407,6 +439,8 @@ export interface UserPreferences {
   grammarCards: boolean;
   dailySummary: boolean;
   weeklyReport: boolean;
+  nativeLanguage: "turkish" | "english";
+  theme: "dark" | "light" | "system";
 }
 
 const DEFAULT_PREFERENCES: UserPreferences = {
@@ -416,6 +450,8 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   grammarCards: true,
   dailySummary: true,
   weeklyReport: true,
+  nativeLanguage: "turkish",
+  theme: "system",
 };
 
 export async function getPreferences(chatId: number): Promise<UserPreferences> {
@@ -429,6 +465,17 @@ export async function updatePreference(chatId: number, key: string, value: any):
     `UPDATE subscribers SET preferences = preferences || $1::jsonb WHERE chat_id = $2`,
     [JSON.stringify({ [key]: value }), chatId],
   );
+}
+
+// Mobile users get IDs starting at 2_000_000_000 (above Telegram chat ID range)
+const MOBILE_ID_BASE = 2_000_000_000;
+
+export async function getNextMobileUserId(): Promise<number> {
+  const res = await pool.query(
+    `SELECT COALESCE(MAX(chat_id), $1 - 1) + 1 AS next_id FROM subscribers WHERE chat_id >= $1`,
+    [MOBILE_ID_BASE],
+  );
+  return Number(res.rows[0].next_id);
 }
 
 export async function addSubscriber(chatId: number, channel = "telegram", username?: string, firstName?: string): Promise<void> {
@@ -584,6 +631,101 @@ export async function getSentWordValues(chatId: number): Promise<Set<string>> {
     [chatId],
   );
   return new Set(res.rows.map((r) => r.word_value));
+}
+
+// --- Saved words (mobile bookmarks) ---
+
+export async function saveWord(chatId: number, wordId: string): Promise<void> {
+  await pool.query(
+    "INSERT INTO saved_words (chat_id, word_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+    [chatId, wordId],
+  );
+}
+
+export async function unsaveWord(chatId: number, wordId: string): Promise<void> {
+  await pool.query(
+    "DELETE FROM saved_words WHERE chat_id = $1 AND word_id = $2",
+    [chatId, wordId],
+  );
+}
+
+export async function getSavedWordIds(chatId: number): Promise<string[]> {
+  const res = await pool.query(
+    "SELECT word_id FROM saved_words WHERE chat_id = $1 ORDER BY saved_at DESC",
+    [chatId],
+  );
+  return res.rows.map((r) => r.word_id);
+}
+
+// --- Story reads (grammar stories) ---
+
+export async function markStoryRead(chatId: number, storyId: string): Promise<void> {
+  await pool.query(
+    "INSERT INTO story_reads (chat_id, story_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+    [chatId, storyId],
+  );
+}
+
+export async function getReadStoryIds(chatId: number): Promise<Set<string>> {
+  const res = await pool.query(
+    "SELECT story_id FROM story_reads WHERE chat_id = $1",
+    [chatId],
+  );
+  return new Set(res.rows.map((r) => r.story_id));
+}
+
+// --- Word comments ---
+
+export interface WordComment {
+  id: number;
+  chatId: number;
+  firstName: string | null;
+  comment: string;
+  createdAt: string;
+}
+
+export async function addComment(chatId: number, wordId: string, comment: string): Promise<WordComment> {
+  const res = await pool.query(
+    `INSERT INTO word_comments (chat_id, word_id, comment) VALUES ($1, $2, $3)
+     RETURNING id, chat_id, comment, created_at`,
+    [chatId, wordId, comment],
+  );
+  const row = res.rows[0];
+  const user = await pool.query("SELECT first_name FROM subscribers WHERE chat_id = $1", [chatId]);
+  return {
+    id: row.id,
+    chatId: Number(row.chat_id),
+    firstName: user.rows[0]?.first_name ?? null,
+    comment: row.comment,
+    createdAt: row.created_at,
+  };
+}
+
+export async function getComments(wordId: string, limit = 20): Promise<WordComment[]> {
+  const res = await pool.query(
+    `SELECT wc.id, wc.chat_id, wc.comment, wc.created_at, s.first_name
+     FROM word_comments wc
+     LEFT JOIN subscribers s ON s.chat_id = wc.chat_id
+     WHERE wc.word_id = $1
+     ORDER BY wc.created_at DESC
+     LIMIT $2`,
+    [wordId, limit],
+  );
+  return res.rows.map((r) => ({
+    id: r.id,
+    chatId: Number(r.chat_id),
+    firstName: r.first_name,
+    comment: r.comment,
+    createdAt: r.created_at,
+  }));
+}
+
+export async function getCommentCount(wordId: string): Promise<number> {
+  const res = await pool.query(
+    "SELECT COUNT(*) as cnt FROM word_comments WHERE word_id = $1",
+    [wordId],
+  );
+  return Number(res.rows[0].cnt);
 }
 
 export async function getStats(chatId: number): Promise<{ sent: number; level: CefrLevel; schedule: string }> {

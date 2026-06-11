@@ -3,6 +3,7 @@ export type CefrLevel = "A1" | "A2" | "B1" | "B2";
 export interface AppConfig {
   telegramBotToken: string;
   unsplashAccessKey: string;
+  pexelsApiKey: string | null;
   ekilexApiKey: string | null;
   databaseUrl: string;
   cronSchedule: string;
@@ -42,6 +43,7 @@ export function loadConfig(): AppConfig {
   return {
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN ?? "",
     unsplashAccessKey: process.env.UNSPLASH_ACCESS_KEY,
+    pexelsApiKey: process.env.PEXELS_API_KEY ?? null,
     ekilexApiKey: process.env.EKILEX_API_KEY ?? null,
     databaseUrl: process.env.DATABASE_URL,
     cronSchedule: process.env.CRON_SCHEDULE ?? "0 9 * * *",

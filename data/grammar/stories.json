@@ -1,0 +1,1655 @@
+[
+  {
+    "id": "story-a1-personal-pronouns",
+    "cefrLevel": "A1",
+    "topic": "Zamirler",
+    "icon": "👤",
+    "slides": [
+      {
+        "title": "Estonca Kişisel Zamirler",
+        "body": "Estoncada, tıpkı Türkçe gibi 6 kişi zamiri vardır.\nHer birinin uzun (resmi/yazılı) ve kısa (günlük konuşma) formu bulunur.\n\nHepsini öğrenelim!"
+      },
+      {
+        "title": "Tekil Zamirler",
+        "body": "Tekil zamirler ve kısa formları:\n\nmina (ma) - ben\nsina (sa) - sen\ntema (ta) - o\n\nNot: Estoncada cinsiyet ayrımı yoktur. \"tema\" hem erkek, hem kadın, hem de nesne için kullanılır.",
+        "examples": [
+          {
+            "estonian": "Ma olen tudeng.",
+            "english": "I am a student.",
+            "turkish": "Ben öğrenciyim."
+          },
+          {
+            "estonian": "Sa oled ilus.",
+            "english": "You are beautiful.",
+            "turkish": "Sen güzelsin."
+          },
+          {
+            "estonian": "Ta on arst.",
+            "english": "He/She is a doctor.",
+            "turkish": "O bir doktor."
+          }
+        ]
+      },
+      {
+        "title": "Çoğul Zamirler",
+        "body": "Çoğul zamirler ve kısa formları:\n\nmeie (me) - biz\nteie (te) - siz (çoğul veya resmi)\nnemad (nad) - onlar\n\n\"Teie\" ayrıca yabancılara veya büyüklere hitap ederken resmi \"siz\" olarak da kullanılır.",
+        "examples": [
+          {
+            "estonian": "Me oleme siin.",
+            "english": "We are here.",
+            "turkish": "Biz buradayız."
+          },
+          {
+            "estonian": "Te olete head.",
+            "english": "You are good.",
+            "turkish": "Siz iyisiniz."
+          },
+          {
+            "estonian": "Nad on kodus.",
+            "english": "They are at home.",
+            "turkish": "Onlar evdeler."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Uzun formlar: mina, sina, tema, meie, teie, nemad\nKısa formlar: ma, sa, ta, me, te, nad\n\nKısa formlar günlük konuşmada kullanılır.\nEstoncada dilbilgisel cinsiyet yoktur - ta hem erkek, hem kadın, hem de nesne anlamına gelir.",
+        "highlight": "Günlük konuşmada kısa formları (ma, sa, ta, me, te, nad) kullanın. Uzun formlar vurgu veya resmi yazı içindir."
+      }
+    ]
+  },
+  {
+    "id": "story-a1-olema-present",
+    "cefrLevel": "A1",
+    "topic": "Olmak",
+    "icon": "🔵",
+    "slides": [
+      {
+        "title": "\"olema\" Fiili (olmak)",
+        "body": "\"Olema\" Estoncadaki en önemli fiildir.\nTürkçedeki \"-dır/-dir\" ve \"olmak\" gibi çalışır.\n\nŞimdi geniş zamandaki çekimini öğrenelim."
+      },
+      {
+        "title": "Geniş Zaman Çekimi",
+        "body": "\"olema\" fiilinin her kişi için değişimi:\n\nma olen - ben ...-ım/im\nsa oled - sen ...-sın/sin\nta on - o ...-dır/dir\nme oleme - biz ...-ız/iz\nte olete - siz ...-sınız/siniz\nnad on - onlar ...-dırlar/dirler\n\nDikkat: ta ve nad aynı formu \"on\" paylaşır.",
+        "examples": [
+          {
+            "estonian": "Ma olen eestlane.",
+            "english": "I am Estonian.",
+            "turkish": "Ben Estonyalıyım."
+          },
+          {
+            "estonian": "Sa oled mu sõber.",
+            "english": "You are my friend.",
+            "turkish": "Sen benim arkadaşımsın."
+          },
+          {
+            "estonian": "Ta on õpetaja.",
+            "english": "He/She is a teacher.",
+            "turkish": "O bir öğretmen."
+          }
+        ]
+      },
+      {
+        "title": "Olumsuz Form",
+        "body": "Olumsuz form çok basittir: TÜM kişiler için \"ei ole\" kullanılır.\nFormu değiştirmeye gerek yoktur - hep aynı kalır.\n\nma ei ole - ben değilim\nsa ei ole - sen değilsin\nta ei ole - o değildir\nme ei ole - biz değiliz\nte ei ole - siz değilsiniz\nnad ei ole - onlar değildir",
+        "examples": [
+          {
+            "estonian": "Ta ei ole kodus.",
+            "english": "He/She is not at home.",
+            "turkish": "O evde değil."
+          },
+          {
+            "estonian": "Me ei ole valmis.",
+            "english": "We are not ready.",
+            "turkish": "Biz hazır değiliz."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Olumlu: olen, oled, on, oleme, olete, on\nOlumsuz: ei ole (tüm kişiler için aynı)\n\nBu, Estoncada öğrenmeniz gereken ilk fiildir.",
+        "highlight": "olema fiilinin olumsuz hali her zaman \"ei ole\"dir. Kişiye göre çekim gerekmez!"
+      }
+    ]
+  },
+  {
+    "id": "story-a1-basic-word-order",
+    "cefrLevel": "A1",
+    "topic": "Söz Dizimi",
+    "icon": "📝",
+    "slides": [
+      {
+        "title": "Estoncada Temel Sözcük Dizilişi",
+        "body": "Estonca genellikle ÖFN kalıbını izler:\nÖzne - Fiil - Nesne\n\nBu düzen İngilizce ile aynıdır. Türkçedeki Özne-Nesne-Fiil düzeninden farklıdır.\nCümlelerin nasıl kurulduğunu görelim."
+      },
+      {
+        "title": "Düz Cümle Sözcük Dizilişi (ÖFN)",
+        "body": "Normal cümlelerde önce özne, sonra fiil, sonra nesne gelir.\n\nBu, çoğu basit cümle için standart kalıptır.",
+        "examples": [
+          {
+            "estonian": "Ma söön leiba.",
+            "english": "I eat bread.",
+            "turkish": "Ben ekmek yerim."
+          },
+          {
+            "estonian": "Ta loeb raamatut.",
+            "english": "He reads a book.",
+            "turkish": "O bir kitap okuyor."
+          },
+          {
+            "estonian": "Me joome kohvi.",
+            "english": "We drink coffee.",
+            "turkish": "Biz kahve içiyoruz."
+          }
+        ]
+      },
+      {
+        "title": "\"Kas\" ile Soru Sormak",
+        "body": "Evet/hayır sorusu oluşturmak için cümlenin başına \"Kas\" eklenir.\n\"Kas\" soru edatıdır - bir sorunun geldiğini belirtir.\n\n\"Kas\"tan sonra sözcük dizilişi düz cümledeki gibi kalır.",
+        "examples": [
+          {
+            "estonian": "Kas sa räägid eesti keelt?",
+            "english": "Do you speak Estonian?",
+            "turkish": "Estonca konuşuyor musun?"
+          },
+          {
+            "estonian": "Kas ta on kodus?",
+            "english": "Is he/she at home?",
+            "turkish": "O evde mi?"
+          },
+          {
+            "estonian": "Kas te olete valmis?",
+            "english": "Are you ready?",
+            "turkish": "Hazır mısınız?"
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Düz cümleler: Özne + Fiil + Nesne (Ma söön leiba.)\nSorular: Kas + Özne + Fiil + Nesne? (Kas sa söön leiba?)\n\nEstonca sözcük dizilişi esnektir, ancak ÖFN başlangıç seviyesi için güvenli tercihtir.",
+        "highlight": "Düz cümleler için ÖFN kullanın ve evet/hayır soruları için başa \"Kas\" ekleyin."
+      }
+    ]
+  },
+  {
+    "id": "story-a1-nominative-case",
+    "cefrLevel": "A1",
+    "topic": "Yalın Hal",
+    "icon": "📗",
+    "slides": [
+      {
+        "title": "Yalın Hal (nimetav)",
+        "body": "Yalın hal, bir sözcüğün temel formudur.\nSözlükte bulacağınız form budur.\n\nEn basit haldir - hiçbir ek eklenmez.\nNe zaman kullanıldığını görelim."
+      },
+      {
+        "title": "Yalın Hal Ne Zaman Kullanılır",
+        "body": "Yalın hal şu durumlarda kullanılır:\n\n1. Cümlenin öznesi (eylemi yapan kim/ne)\n2. \"olema\" (olmak) fiilinden sonra\n3. Herhangi bir ismin sözlük/temel formu",
+        "examples": [
+          {
+            "estonian": "Koer on suur.",
+            "english": "The dog is big.",
+            "turkish": "Köpek büyük."
+          },
+          {
+            "estonian": "See on raamat.",
+            "english": "This is a book.",
+            "turkish": "Bu bir kitap."
+          },
+          {
+            "estonian": "Laps magab.",
+            "english": "The child is sleeping.",
+            "turkish": "Çocuk uyuyor."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Yalın hal = sözlük/temel form.\nHiçbir ek eklenmez.\n\nÖzneler ve \"olema\" (olmak) fiilinden sonra kullanılır.\n\nÖrnekler: koer (köpek), raamat (kitap), maja (ev), laps (çocuk)",
+        "highlight": "Yalın hal, ek almamış sözlük formudur. Cümlenin öznesi ve olema fiilinden sonra kullanılır."
+      }
+    ]
+  },
+  {
+    "id": "story-a1-genitive-case",
+    "cefrLevel": "A1",
+    "topic": "Tamlayan",
+    "icon": "🔑",
+    "slides": [
+      {
+        "title": "Tamlayan Hali (omastav)",
+        "body": "Tamlayan hali iyelik (sahiplik) bildirir (Türkçedeki \"-nın/-nin\" gibi).\nAma Estoncada bundan çok daha önemlidir.\n\nTamlayan formu diğer hallerin çoğunu oluşturmak için KÖKÜ sağlar.\nBu yüzden ezberlenecek en önemli haldir."
+      },
+      {
+        "title": "Nasıl Çalışır",
+        "body": "Tamlayan hali sözcük sonunu değiştirerek oluşturulur.\nNe yazık ki değişiklikler her zaman tahmin edilemez - öğrenmeniz gerekir.\n\nkoer -> koera (köpeğin)\nraamat -> raamatu (kitabın)\nmaja -> maja (evin - aynı kalıyor!)\nlaps -> lapse (çocuğun)",
+        "examples": [
+          {
+            "estonian": "See on koera nimi.",
+            "english": "This is the dog's name.",
+            "turkish": "Bu köpeğin adı."
+          },
+          {
+            "estonian": "Raamatu hind on kõrge.",
+            "english": "The book's price is high.",
+            "turkish": "Kitabın fiyatı yüksek."
+          },
+          {
+            "estonian": "Maja uks on avatud.",
+            "english": "The house's door is open.",
+            "turkish": "Evin kapısı açık."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Tamlayan hali iyelik bildirir VE diğer haller için temel oluşturur.\n\nHer yeni ismin tamlayan formunu öğrenmelisiniz.\nSözlükler şöyle listeler: yalın -> tamlayan -> kısmi.\n\nÖrnekler: koer/koera, raamat/raamatu, maja/maja, laps/lapse",
+        "highlight": "Yeni isimlerin tamlayan formunu her zaman öğrenin. Bu, neredeyse tüm diğer Estonca hallerin temel yapı taşıdır."
+      }
+    ]
+  },
+  {
+    "id": "story-a1-partitive-case",
+    "cefrLevel": "A1",
+    "topic": "Kısmi Hal",
+    "icon": "🧩",
+    "slides": [
+      {
+        "title": "Kısmi Hal (osastav)",
+        "body": "Kısmi hal, Estoncadaki en çok kullanılan hallerden biridir.\n\"Bir şeyin bir kısmını\" veya tamamlanmamış/devam eden bir eylemi ifade eder.\n\nSürekli karşılaşacaksınız, o yüzden temellerini öğrenelim."
+      },
+      {
+        "title": "Kısmi Hal Ne Zaman Kullanılır",
+        "body": "Kısmi hal şu durumlarda kullanılır:\n\n1. Kısmi veya sayılmamış nesneler (biraz süt, biraz ekmek)\n2. 2 ve üzeri sayılardan sonra (kaks koera = iki köpek)\n3. Olumsuz cümlelerde (Bende kitap yok)\n4. Devam eden veya tamamlanmamış eylemler",
+        "examples": [
+          {
+            "estonian": "Ma joon piima.",
+            "english": "I drink milk.",
+            "turkish": "Ben süt içiyorum."
+          },
+          {
+            "estonian": "Kaks koera.",
+            "english": "Two dogs.",
+            "turkish": "İki köpek."
+          },
+          {
+            "estonian": "Mul ei ole raamatut.",
+            "english": "I don't have a book.",
+            "turkish": "Bende kitap yok."
+          }
+        ]
+      },
+      {
+        "title": "Yaygın Kısmi Hal Formları",
+        "body": "Bazı yaygın sözcüklerin kısmi hal formları:\n\nkoer -> koera\nraamat -> raamatut\npiim -> piima\nmaja -> maja\nleib -> leiba\nvesi -> vett",
+        "examples": [
+          {
+            "estonian": "Ma söön leiba.",
+            "english": "I eat bread.",
+            "turkish": "Ben ekmek yerim."
+          },
+          {
+            "estonian": "Kolm maja.",
+            "english": "Three houses.",
+            "turkish": "Üç ev."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Kısmi hal; kısmi nesneler, sayılardan (2+) sonra ve olumsuz cümlelerde kullanılır.\n\nHer ismin üç temel formunu öğrenin:\nyalın -> tamlayan -> kısmi\nkoer -> koera -> koera\nraamat -> raamatu -> raamatut",
+        "highlight": "Kısmi hal = kısmi/sayılmamış nesneler, 2+ sayılardan sonra ve olumsuz cümleler. Ezberlenecek üçüncü en önemli formdur."
+      }
+    ]
+  },
+  {
+    "id": "story-a1-question-words",
+    "cefrLevel": "A1",
+    "topic": "Sorular",
+    "icon": "❓",
+    "slides": [
+      {
+        "title": "Estonca Soru Sözcükleri",
+        "body": "Soru sormak iletişim için gereklidir.\nEstoncada ilk günden ihtiyaç duyacağınız soru sözcükleri vardır.\n\nEn önemli 9 tanesini öğrenelim."
+      },
+      {
+        "title": "Kim, Ne, Nerede",
+        "body": "Temel soru sözcükleri:\n\nkes? - kim?\nmis? - ne?\nkus? - nerede? (konum)\nkuhu? - nereye? (yön)\nkust? - nereden? (kaynak)\n\nNot: Estonca \"nerede\" (konum), \"nereye\" (yön) ve \"nereden\" (kaynak) ayrımını yapar.",
+        "examples": [
+          {
+            "estonian": "Kes sa oled?",
+            "english": "Who are you?",
+            "turkish": "Sen kimsin?"
+          },
+          {
+            "estonian": "Mis see on?",
+            "english": "What is this?",
+            "turkish": "Bu ne?"
+          },
+          {
+            "estonian": "Kus sa elad?",
+            "english": "Where do you live?",
+            "turkish": "Nerede yaşıyorsun?"
+          }
+        ]
+      },
+      {
+        "title": "Ne Zaman, Nasıl, Neden, Ne Kadar",
+        "body": "Diğer temel soru sözcükleri:\n\nmillal? - ne zaman?\nkuidas? - nasıl?\nmiks? - neden?\nkui palju? - ne kadar/kaç tane?",
+        "examples": [
+          {
+            "estonian": "Millal sa tuled?",
+            "english": "When are you coming?",
+            "turkish": "Ne zaman geliyorsun?"
+          },
+          {
+            "estonian": "Kuidas läheb?",
+            "english": "How is it going?",
+            "turkish": "Nasıl gidiyor?"
+          },
+          {
+            "estonian": "Miks sa nutad?",
+            "english": "Why are you crying?",
+            "turkish": "Neden ağlıyorsun?"
+          },
+          {
+            "estonian": "Kui palju see maksab?",
+            "english": "How much does this cost?",
+            "turkish": "Bu ne kadar?"
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "9 temel soru sözcüğü:\nkes (kim), mis (ne), kus (nerede),\nkuhu (nereye), kust (nereden),\nmillal (ne zaman), kuidas (nasıl), miks (neden),\nkui palju (ne kadar/kaç tane)\n\nEstoncada konum, yön ve kaynak için ÜÇ ayrı \"nerede\" sözcüğü vardır.",
+        "highlight": "Üç \"nerede\" sözcüğünü hatırlayın: kus (nerede), kuhu (nereye), kust (nereden). Bu konum/yön/kaynak kalıbı tüm Estonca hallerde geçerlidir."
+      }
+    ]
+  },
+  {
+    "id": "story-a1-numbers",
+    "cefrLevel": "A1",
+    "topic": "Sayılar",
+    "icon": "🔢",
+    "slides": [
+      {
+        "title": "Estoncada 1-10 Sayıları",
+        "body": "Sayılar her dilde öğrenilecek ilk şeyler arasındadır.\nEstonca 1-10 arası sayılar ezberlenmelidir.\n\nAyrıca sayılardan sonra isimlerin nasıl davrandığına dair önemli bir dilbilgisi kuralı vardır."
+      },
+      {
+        "title": "1'den 10'a Kadar Sayılar",
+        "body": "1 - üks\n2 - kaks\n3 - kolm\n4 - neli\n5 - viis\n6 - kuus\n7 - seitse\n8 - kaheksa\n9 - üheksa\n10 - kümme",
+        "examples": [
+          {
+            "estonian": "Mul on üks koer.",
+            "english": "I have one dog.",
+            "turkish": "Benim bir köpeğim var."
+          },
+          {
+            "estonian": "Siin on viis inimest.",
+            "english": "There are five people here.",
+            "turkish": "Burada beş kişi var."
+          }
+        ]
+      },
+      {
+        "title": "Sayılar ve Kısmi Hal Kuralı",
+        "body": "Önemli kural: 2 ve üzeri sayılardan sonra isim TEKİL KISMİ HAL formunu alır.\n\n\"üks\" (bir) den sonra isim yalın halde kalır.\n\nüks koer - bir köpek (yalın hal)\nkaks koera - iki köpek (kısmi hal)\nkolm raamatut - üç kitap (kısmi hal)\nviis last - beş çocuk (kısmi hal)",
+        "examples": [
+          {
+            "estonian": "Kolm raamatut.",
+            "english": "Three books.",
+            "turkish": "Üç kitap."
+          },
+          {
+            "estonian": "Neli kassi.",
+            "english": "Four cats.",
+            "turkish": "Dört kedi."
+          },
+          {
+            "estonian": "Kümme aastat.",
+            "english": "Ten years.",
+            "turkish": "On yıl."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "1: üks, 2: kaks, 3: kolm, 4: neli, 5: viis\n6: kuus, 7: seitse, 8: kaheksa, 9: üheksa, 10: kümme\n\n2 ve üzeri sayılardan sonra isimler tekil kısmi hal alır.",
+        "highlight": "2 ve üzeri sayılardan sonra her zaman tekil kısmi hal kullanın: kaks koera (iki köpek), kaks koerad değil."
+      }
+    ]
+  },
+  {
+    "id": "story-a1-negation",
+    "cefrLevel": "A1",
+    "topic": "Olumsuzluk",
+    "icon": "🚫",
+    "slides": [
+      {
+        "title": "Estoncada Olumsuzluk",
+        "body": "Estoncada olumsuz cümle kurmak şaşırtıcı derecede basittir.\nFiilin önüne \"ei\" (değil) sözcüğü koyulur.\n\nTemel kural: \"ei\"den sonra fiil kişi ekini KAYBEDER."
+      },
+      {
+        "title": "Olumsuzluk Nasıl Çalışır",
+        "body": "Formül: özne + ei + fiil KÖKÜ (kişi eki yok)\n\nOlumlu: ma söön (yerim) -> Olumsuz: ma ei söö\nOlumlu: sa räägid (konuşursun) -> Olumsuz: sa ei räägi\nOlumlu: ta loeb (okur) -> Olumsuz: ta ei loe\n\nFiil kökü olumsuzda TÜM kişiler için aynıdır.",
+        "examples": [
+          {
+            "estonian": "Ma ei söö liha.",
+            "english": "I don't eat meat.",
+            "turkish": "Ben et yemem."
+          },
+          {
+            "estonian": "Ta ei räägi eesti keelt.",
+            "english": "He doesn't speak Estonian.",
+            "turkish": "O Estonca konuşmuyor."
+          },
+          {
+            "estonian": "Me ei tea.",
+            "english": "We don't know.",
+            "turkish": "Biz bilmiyoruz."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Olumsuzluk = ei + fiil kökü (kişi eki olmadan)\n\nma söön -> ma ei söö\nsa räägid -> sa ei räägi\nta loeb -> ta ei loe\nme sööme -> me ei söö\nte sööte -> te ei söö\nnad söövad -> nad ei söö\n\n\"ei\"den sonraki fiil formu herkes için aynıdır.",
+        "highlight": "\"ei\"den sonra fiil kişi ekini düşürür ve yalın köküne döner. Kök tüm kişiler için aynı kalır."
+      }
+    ]
+  },
+  {
+    "id": "story-a2-past-simple",
+    "cefrLevel": "A2",
+    "topic": "Geçmiş",
+    "icon": "⏪",
+    "slides": [
+      {
+        "title": "Basit Geçmiş Zaman (lihtminevik)",
+        "body": "Basit geçmiş zaman, geçmişte tamamlanmış eylemleri anlatır.\nFiil köküne ekler eklenerek oluşturulur.\n\nEn yaygın belirteçler -s ve -si'dir."
+      },
+      {
+        "title": "Çekim Kalıbı",
+        "body": "\"sööma\" (yemek) fiilini örnek alalım:\n\nma sõin - yedim\nsa sõid - yedin\nta sõi - yedi\nme sõime - yedik\nte sõite - yediniz\nnad sõid - yediler\n\nÜnlü değişimleri fiilin derece değişimi kalıbının bir parçasıdır.",
+        "examples": [
+          {
+            "estonian": "Ma sõin eile suppi.",
+            "english": "I ate soup yesterday.",
+            "turkish": "Dün çorba yedim."
+          },
+          {
+            "estonian": "Ta kirjutas kirja.",
+            "english": "He/She wrote a letter.",
+            "turkish": "O bir mektup yazdı."
+          },
+          {
+            "estonian": "Me kõisime Tallinnas.",
+            "english": "We walked in Tallinn.",
+            "turkish": "Tallinn'de yürüyüş yaptık."
+          }
+        ]
+      },
+      {
+        "title": "Olumsuz Geçmiş Zaman",
+        "body": "Olumsuz geçmiş zaman: ei + nud-formu (tüm kişiler için)\n\nma ei söönud - yemedim\nsa ei söönud - yemedin\nta ei söönud - yemedi\n\n-nud formu, tıpkı geniş zaman olumsuzluğu gibi, tüm kişiler için aynıdır.",
+        "examples": [
+          {
+            "estonian": "Ta ei söönud midagi.",
+            "english": "He didn't eat anything.",
+            "turkish": "O hiçbir şey yemedi."
+          },
+          {
+            "estonian": "Me ei näinud teda.",
+            "english": "We didn't see him.",
+            "turkish": "Biz onu görmedik."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Basit geçmiş: fiil köküne -s/-si ve kişi ekleri eklenir.\nOlumsuz geçmiş: ei + -nud formu (tüm kişiler için aynı).\n\nOlumlu: ma sõin, sa sõid, ta sõi\nOlumsuz: ma/sa/ta ei söönud",
+        "highlight": "Olumlu geçmiş zamanda kişi ekleri (-in, -id, -i, -ime, -ite, -id) kullanılır. Olumsuz geçmiş zamanda tüm kişiler için \"ei\" + -nud ortacı kullanılır."
+      }
+    ]
+  },
+  {
+    "id": "story-a2-present-perfect",
+    "cefrLevel": "A2",
+    "topic": "Bitmiş",
+    "icon": "✅",
+    "slides": [
+      {
+        "title": "Yakın Geçmiş Zaman (täisminevik)",
+        "body": "Yakın geçmiş zaman, şimdiki zamanla bağlantılı geçmiş eylemleri anlatır.\nolema (geniş zaman) + -nud ortacı ile oluşturulur.\n\nİngilizce karşılığı: \"I have eaten\", \"She has seen\"."
+      },
+      {
+        "title": "Nasıl Oluşturulur",
+        "body": "Formül: olen/oled/on + fiil-nud\n\nma olen söönud - yemişim / yemiş bulunuyorum\nsa oled söönud - yemişsin\nta on söönud - yemiş\nme oleme söönud - yemişiz\nte olete söönud - yemişsiniz\nnad on söönud - yemişler",
+        "examples": [
+          {
+            "estonian": "Ma olen Tallinnas elanud viis aastat.",
+            "english": "I have lived in Tallinn for five years.",
+            "turkish": "Beş yıldır Tallinn'de yaşıyorum."
+          },
+          {
+            "estonian": "Kas sa oled seda filmi näinud?",
+            "english": "Have you seen this movie?",
+            "turkish": "Bu filmi gördün mü?"
+          }
+        ]
+      },
+      {
+        "title": "Olumsuz Yakın Geçmiş",
+        "body": "Olumsuz: ei ole + -nud (tüm kişiler için aynı)\n\nma ei ole söönud - yememişim\nsa ei ole söönud - yememişsin\nta ei ole söönud - yememiş",
+        "examples": [
+          {
+            "estonian": "Ma ei ole seal kunagi käinud.",
+            "english": "I have never been there.",
+            "turkish": "Orada hiç bulunmadım."
+          },
+          {
+            "estonian": "Ta ei ole veel vastanud.",
+            "english": "He/She has not answered yet.",
+            "turkish": "O henüz cevap vermedi."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Yakın geçmiş = olema (çekimli) + -nud ortacı\nOlumsuz = ei ole + -nud\n\nŞimdiki zamanla bağlantılı geçmiş olaylar için kullanılır.",
+        "highlight": "Yakın geçmiş = olen/oled/on + -nud. Deneyimler ve şimdiki zamanla ilgili eylemler için kullanılır."
+      }
+    ]
+  },
+  {
+    "id": "story-a2-illative-case",
+    "cefrLevel": "A2",
+    "topic": "İçe Hal",
+    "icon": "📥",
+    "slides": [
+      {
+        "title": "İçe Yönelme Hali - İÇİNE Hareket",
+        "body": "İçe yönelme hali, bir şeyin İÇİNE veya bir yere DOĞRU hareketi ifade eder.\n\"kuhu?\" (nereye?) sorusuna cevap verir.\n\nEstoncada iki formu vardır: kısa içe yönelme ve uzun içe yönelme (-sse)."
+      },
+      {
+        "title": "Kısa İçe Yönelme (en yaygın)",
+        "body": "Kısa içe yönelme günlük konuşmada daha sık kullanılır.\nSözcük kökünde değişiklikler içerir:\n\nmaja -> majja (evin içine)\nlinn -> linna (şehre)\nkool -> kooli (okula)\npood -> poodi (dükkana)",
+        "examples": [
+          {
+            "estonian": "Ma lähen linna.",
+            "english": "I'm going to the city.",
+            "turkish": "Şehre gidiyorum."
+          },
+          {
+            "estonian": "Lapsed lähevad kooli.",
+            "english": "Children go to school.",
+            "turkish": "Çocuklar okula gidiyor."
+          },
+          {
+            "estonian": "Tule majja!",
+            "english": "Come into the house!",
+            "turkish": "Eve gel!"
+          }
+        ]
+      },
+      {
+        "title": "Uzun İçe Yönelme (-sse)",
+        "body": "Uzun içe yönelme, tamlayan formuna -sse eklenerek yapılır.\nUzun sözcüklerde veya kısa formun belirsiz olduğu durumlarda kullanılır:\n\nraamatukogu -> raamatukokku veya raamatukogusse\nhaigla -> haiglasse (hastaneye)\nülikool -> ülikooli (üniversiteye)",
+        "examples": [
+          {
+            "estonian": "Ma lähen haiglasse.",
+            "english": "I'm going to the hospital.",
+            "turkish": "Hastaneye gidiyorum."
+          },
+          {
+            "estonian": "Ta astus autosse.",
+            "english": "He/She got into the car.",
+            "turkish": "O arabaya bindi."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "İçe yönelme = bir şeyin İÇİNE hareket.\nCevaplar: kuhu? (nereye?)\n\nKısa içe yönelme: majja, linna, kooli (daha yaygın)\nUzun içe yönelme: tamlayan formuna -sse eklenir (haiglasse, autosse)",
+        "highlight": "İçe yönelme hali \"kuhu?\" (nereye?) sorusuna cevap verir. Kısa formlar (linna, kooli) konuşmada daha yaygındır; uzun formlar (-sse) uzun sözcükler için kullanılır."
+      }
+    ]
+  },
+  {
+    "id": "story-a2-inessive-elative",
+    "cefrLevel": "A2",
+    "topic": "İçinde/Dışa",
+    "icon": "📦",
+    "slides": [
+      {
+        "title": "İçinde Kalma ve İçinden Çıkma Halleri",
+        "body": "Bu iki hal, içe yönelme ile birlikte \"iç yer\" üçlüsünü tamamlar.\n\nİçinde kalma (-s) = İÇİNDE olma (kus? - nerede?)\nİçinden çıkma (-st) = İÇİNDEN çıkma (kust? - nereden?)\n\nBirlikte: İÇİNE (içe yönelme) -> İÇİNDE (içinde kalma) -> İÇİNDEN (içinden çıkma)"
+      },
+      {
+        "title": "İçinde Kalma Hali (-s) - İÇİNDE",
+        "body": "\"İçinde\" veya \"dahilinde\" demek için tamlayan formuna -s eklenir.\n\nlinn -> linnas (şehirde)\nkool -> koolis (okulda)\nmaja -> majas (evde)\nTallinn -> Tallinnas (Tallinn'de)",
+        "examples": [
+          {
+            "estonian": "Ma elan Tallinnas.",
+            "english": "I live in Tallinn.",
+            "turkish": "Tallinn'de yaşıyorum."
+          },
+          {
+            "estonian": "Lapsed on koolis.",
+            "english": "The children are in school.",
+            "turkish": "Çocuklar okulda."
+          },
+          {
+            "estonian": "Mis on karbis?",
+            "english": "What is in the box?",
+            "turkish": "Kutuda ne var?"
+          }
+        ]
+      },
+      {
+        "title": "İçinden Çıkma Hali (-st) - İÇİNDEN",
+        "body": "\"İçinden\" veya \"-den/-dan\" demek için tamlayan formuna -st eklenir.\n\nlinn -> linnast (şehirden)\nkool -> koolist (okuldan)\nmaja -> majast (evden)",
+        "examples": [
+          {
+            "estonian": "Ta tuleb koolist.",
+            "english": "He comes from school.",
+            "turkish": "O okuldan geliyor."
+          },
+          {
+            "estonian": "Ma tulin linnast.",
+            "english": "I came from the city.",
+            "turkish": "Şehirden geldim."
+          },
+          {
+            "estonian": "Võta see majast välja.",
+            "english": "Take it out of the house.",
+            "turkish": "Onu evden çıkar."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "İç yer halleri (tamlayan formuna eklenir):\nİçe yönelme = İÇİNE (kuhu?) -> linna\nİçinde kalma -s = İÇİNDE (kus?) -> linnas\nİçinden çıkma -st = İÇİNDEN (kust?) -> linnast\n\nBunları bir hareket üçlüsü olarak düşünün: içine -> içinde -> içinden.",
+        "highlight": "İçinde kalma (-s) = içinde, İçinden çıkma (-st) = içinden/-den. Her ikisi de tamlayan formuna eklenir. İçe yönelme ile birlikte iç yer hali üçlüsünü oluştururlar."
+      }
+    ]
+  },
+  {
+    "id": "story-a2-allative-adessive-ablative",
+    "cefrLevel": "A2",
+    "topic": "Yüzeyler",
+    "icon": "🔲",
+    "slides": [
+      {
+        "title": "Yüzey Halleri (Dış Yer Halleri)",
+        "body": "Estoncada yüzeyler için üç \"dış\" yer hali vardır:\n\nÜstüne yönelme (-le) = BİR yüzeyin ÜZERİNE (kuhu?)\nÜstünde kalma (-l) = BİR yüzeyin ÜZERİNDE (kus?)\nÜstünden ayrılma (-lt) = BİR yüzeyDEN (kust?)\n\nBunlar iç hallerin aynısıdır ama açık/düz yüzeyler içindir."
+      },
+      {
+        "title": "Üstüne Yönelme (-le) - ÜZERİNE",
+        "body": "Bir yüzeyin ÜZERİNE hareketi ifade etmek için tamlayan formuna -le eklenir.\n\nlaud -> lauale (masanın üzerine)\npõld -> põlvule (tarlanın üzerine)\ntänav -> tänavale (caddenin üzerine)",
+        "examples": [
+          {
+            "estonian": "Pane raamat lauale.",
+            "english": "Put the book on the table.",
+            "turkish": "Kitabı masaya koy."
+          },
+          {
+            "estonian": "Lapsed jooksevad väljakule.",
+            "english": "Children run onto the field.",
+            "turkish": "Çocuklar sahaya koşuyor."
+          }
+        ]
+      },
+      {
+        "title": "Üstünde Kalma (-l) - ÜZERİNDE / Üstünden Ayrılma (-lt) - ÜZERİNDEN",
+        "body": "Üstünde kalma (-l) = bir yüzeyin ÜZERİNDE olma:\nlaud -> laual (masanın üzerinde)\n\nÜstünden ayrılma (-lt) = bir yüzeyDEN ayrılma:\nlaud -> laualt (masanın üzerinden)",
+        "examples": [
+          {
+            "estonian": "Raamat on laual.",
+            "english": "The book is on the table.",
+            "turkish": "Kitap masada."
+          },
+          {
+            "estonian": "Võta raamat laualt.",
+            "english": "Take the book off the table.",
+            "turkish": "Kitabı masadan al."
+          },
+          {
+            "estonian": "Mul on raha.",
+            "english": "I have money. (lit: On me is money)",
+            "turkish": "Bende para var."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Dış yer halleri (tamlayan formuna eklenir):\nÜstüne yönelme -le = ÜZERİNE (kuhu?) -> lauale\nÜstünde kalma -l = ÜZERİNDE (kus?) -> laual\nÜstünden ayrılma -lt = ÜZERİNDEN (kust?) -> laualt\n\nNot: Üstünde kalma hali iyelik için de kullanılır (mul on = bende var).",
+        "highlight": "Yüzey halleri: -le (üzerine), -l (üzerinde), -lt (üzerinden). Üstünde kalma hali (-l) ayrıca sahiplik ifade eder: mul on = bende var."
+      }
+    ]
+  },
+  {
+    "id": "story-a2-postpositions",
+    "cefrLevel": "A2",
+    "topic": "Sontakılar",
+    "icon": "📍",
+    "slides": [
+      {
+        "title": "Estoncada Sontakılar",
+        "body": "Türkçede edatlar isimden SONRA gelir: \"evin önünde\".\nEstoncada da sontakılar isimden SONRA gelir: \"maja ees\".\n\nSontakıdan önceki isim genellikle tamlayan halindedir.",
+        "examples": []
+      },
+      {
+        "title": "Yaygın Sontakılar",
+        "body": "Konum sözcükleri (tamlayan hali ile kullanılır):\n\nees - önünde\ntaga - arkasında\nkõrval - yanında\nsees - içinde\npeal - üstünde\nall - altında\njuures - yakınında\nvahel - arasında",
+        "examples": [
+          {
+            "estonian": "Auto on maja ees.",
+            "english": "The car is in front of the house.",
+            "turkish": "Araba evin önünde."
+          },
+          {
+            "estonian": "Kass istub laua all.",
+            "english": "The cat sits under the table.",
+            "turkish": "Kedi masanın altında oturuyor."
+          },
+          {
+            "estonian": "Pood on kooli kõrval.",
+            "english": "The shop is next to the school.",
+            "turkish": "Dükkan okulun yanında."
+          }
+        ]
+      },
+      {
+        "title": "Yön Bildiren Sontakılar",
+        "body": "Bazı sontakılar yön belirtmek için form değiştirir:\n\nees (önünde) -> ette (önüne) -> eest (önünden)\ntaga (arkasında) -> taha (arkasına) -> tagant (arkasından)\nall (altında) -> alla (altına) -> alt (altından)\n\nBu, kus/kuhu/kust kalıbını yansıtır.",
+        "examples": [
+          {
+            "estonian": "Ta seisis maja ees.",
+            "english": "He stood in front of the house.",
+            "turkish": "O evin önünde durdu."
+          },
+          {
+            "estonian": "Ta läks maja taha.",
+            "english": "He went behind the house.",
+            "turkish": "O evin arkasına gitti."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Estonca, öntakılar değil sontakılar (isimden sonra gelen) kullanır.\nİsim tamlayan halini alır.\n\nmaja ees = evin önünde\nlaua all = masanın altında\nkooli kõrval = okulun yanında",
+        "highlight": "Sontakılar tamlayan halindeki isimden SONRA gelir: maja ees (evin önünde). Bu yapı Türkçedeki sontakılara benzer."
+      }
+    ]
+  },
+  {
+    "id": "story-a2-ma-da-infinitive",
+    "cefrLevel": "A2",
+    "topic": "Mastarlar",
+    "icon": "🔀",
+    "slides": [
+      {
+        "title": "İki Mastar Formu: -ma ve -da",
+        "body": "Estoncada her fiilin iki mastar formu vardır:\n\nma-mastarı: sööma (yemek)\nda-mastarı: süüa (yemek)\n\nFarklı bağlamlarda kullanılırlar. Her birinin ne zaman kullanıldığını öğrenelim."
+      },
+      {
+        "title": "ma-mastarı: Amaç ve Hareket",
+        "body": "Hareket fiillerinden sonra veya amaç ifade ederken (bir şey yapmaya gitmek) ma-mastarı kullanılır.\n\nŞöyle düşünün: \"Bir şey yapmaya gidiyorum\"",
+        "examples": [
+          {
+            "estonian": "Ma lähen sööma.",
+            "english": "I'm going to eat.",
+            "turkish": "Yemek yemeye gidiyorum."
+          },
+          {
+            "estonian": "Ta tuli õppima.",
+            "english": "He came to study.",
+            "turkish": "O okumaya geldi."
+          },
+          {
+            "estonian": "Me lähme jalutama.",
+            "english": "We're going for a walk.",
+            "turkish": "Yürüyüşe gidiyoruz."
+          }
+        ]
+      },
+      {
+        "title": "da-mastarı: Kip Fiilleri",
+        "body": "Kip fiillerinden sonra da-mastarı kullanılır:\ntahtma (istemek), saama (yapabilmek), pidama (zorunda olmak), oskama (bilmek/becermek).\n\nŞöyle düşünün: \"Bir şey istiyorum/yapabilirim/yapmalıyım\"",
+        "examples": [
+          {
+            "estonian": "Ma tahan süüa.",
+            "english": "I want to eat.",
+            "turkish": "Yemek yemek istiyorum."
+          },
+          {
+            "estonian": "Sa pead õppida.",
+            "english": "You have to study.",
+            "turkish": "Çalışmak zorundasın."
+          },
+          {
+            "estonian": "Kas sa oskad ujuda?",
+            "english": "Can you swim?",
+            "turkish": "Yüzme biliyor musun?"
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "ma-mastarı -> hareket fiillerinden sonra (lähen sööma)\nda-mastarı -> kip fiillerinden sonra (tahan süüa)\n\nKural:\nBir yere gidip yapacaksan? -> ma\nİstemek/yapabilmek/zorunda olmak? -> da",
+        "highlight": "Hareket fiilleri ma-mastarı kullanır (lähen sööma). Kip fiilleri da-mastarı kullanır (tahan süüa). Tereddütte: gitmek = -ma, istemek = -da."
+      }
+    ]
+  },
+  {
+    "id": "story-a2-comparatives",
+    "cefrLevel": "A2",
+    "topic": "Karşılaştır",
+    "icon": "⚖️",
+    "slides": [
+      {
+        "title": "Karşılaştırma ve Üstünlük Dereceleri",
+        "body": "Estoncada karşılaştırma düzenli bir kalıp izler:\n\nKarşılaştırma (daha büyük): tamlayan kökü + -m\nÜstünlük (en büyük): kõige + karşılaştırma formu\n\nNasıl çalıştığını görelim."
+      },
+      {
+        "title": "Karşılaştırma Derecesi Oluşturma",
+        "body": "Sıfatın tamlayan formunu alıp -m ekleyin:\n\nsuur (büyük) -> suurem (daha büyük)\nilus (güzel) -> ilusam (daha güzel)\nvana (yaşlı) -> vanem (daha yaşlı)\nnoor (genç) -> noorem (daha genç)\n\nKarşılaştırma için \"kui\" (den/dan) kullanılır.",
+        "examples": [
+          {
+            "estonian": "Tallinn on suurem kui Tartu.",
+            "english": "Tallinn is bigger than Tartu.",
+            "turkish": "Tallinn, Tartu'dan daha büyük."
+          },
+          {
+            "estonian": "Ta on vanem kui mina.",
+            "english": "He is older than me.",
+            "turkish": "O benden daha yaşlı."
+          }
+        ]
+      },
+      {
+        "title": "Üstünlük Derecesi Oluşturma",
+        "body": "Karşılaştırma formunun önüne \"kõige\" ekleyin:\n\nsuurem -> kõige suurem (en büyük)\nilusam -> kõige ilusam (en güzel)\nvanem -> kõige vanem (en yaşlı)",
+        "examples": [
+          {
+            "estonian": "See on kõige ilusam linn.",
+            "english": "This is the most beautiful city.",
+            "turkish": "Bu en güzel şehir."
+          },
+          {
+            "estonian": "Ta on kõige targem õpilane.",
+            "english": "He is the smartest student.",
+            "turkish": "O en akıllı öğrenci."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Karşılaştırma: tamlayan + -m (suurem = daha büyük)\nÜstünlük: kõige + karşılaştırma (kõige suurem = en büyük)\nKarşılaştırma sözcüğü: kui (-den/-dan)\n\nsuur -> suurem -> kõige suurem",
+        "highlight": "Karşılaştırma = tamlayan + -m, Üstünlük = kõige + karşılaştırma. \"kui\" sözcüğü \"-den/-dan\" anlamında kullanılır: suurem kui = -den daha büyük."
+      }
+    ]
+  },
+  {
+    "id": "story-a2-numbers-11-100",
+    "cefrLevel": "A2",
+    "topic": "Sayılar+",
+    "icon": "💯",
+    "slides": [
+      {
+        "title": "11-100 Arası Sayılar ve Sıra Sayıları",
+        "body": "Şimdi 1-10'un ötesine geçelim.\nEstonca sayı oluşturma mantıklıdır ve net kalıplar izler.\n\nAyrıca sıra sayılarını da (birinci, ikinci, üçüncü...) öğreneceğiz."
+      },
+      {
+        "title": "Onlu Sayılar (11-19)",
+        "body": "Onlu sayılar temel sayıya \"-teist\" eklenerek oluşturulur:\n\n11 - üksteist\n12 - kaksteist\n13 - kolmteist\n14 - neliteist\n15 - viisteist\n16 - kuusteist\n17 - seitseteist\n18 - kaheksateist\n19 - üheksateist\n\nKalıp: [sayı] + teist",
+        "examples": [
+          {
+            "estonian": "Mul on kaksteist õuna.",
+            "english": "I have twelve apples.",
+            "turkish": "Benim on iki elmam var."
+          },
+          {
+            "estonian": "Ta on viisteist aastane.",
+            "english": "He/She is fifteen years old.",
+            "turkish": "O on beş yaşında."
+          }
+        ]
+      },
+      {
+        "title": "Onlar Basamağı (20-100)",
+        "body": "Onlar basamağı \"-kümmend\" ile oluşturulur:\n\n20 - kakskümmend\n30 - kolmkümmend\n40 - nelikümmend\n50 - viiskümmend\n60 - kuuskümmend\n70 - seitsekümmend\n80 - kaheksakümmend\n90 - üheksakümmend\n100 - sada\n\nBirleşimler: kakskümmend üks (21), kolmkümmend viis (35)",
+        "examples": [
+          {
+            "estonian": "Ma elan kolmandal korrusel.",
+            "english": "I live on the third floor.",
+            "turkish": "Üçüncü katta yaşıyorum."
+          },
+          {
+            "estonian": "Siin on kakskümmend viis inimest.",
+            "english": "There are 25 people here.",
+            "turkish": "Burada yirmi beş kişi var."
+          }
+        ]
+      },
+      {
+        "title": "Sıra Sayıları",
+        "body": "Sıra sayıları (birinci, ikinci...) -s eki ile oluşturulur:\n\n1. - esimene (düzensiz)\n2. - teine (düzensiz)\n3. - kolmas\n4. - neljas\n5. - viies\n6. - kuues\n7. - seitsmes\n8. - kaheksas\n9. - üheksas\n10. - kümnes",
+        "examples": [
+          {
+            "estonian": "See on esimene kord.",
+            "english": "This is the first time.",
+            "turkish": "Bu ilk seferdir."
+          },
+          {
+            "estonian": "Teine uks vasakul.",
+            "english": "Second door on the left.",
+            "turkish": "Solda ikinci kapı."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Onlu sayılar: sayı + teist (kaksteist = 12)\nOnlar basamağı: sayı + kümmend (kakskümmend = 20)\n100 = sada\n\nSıra sayıları: çoğunlukla -s eki, ama esimene (1.) ve teine (2.) düzensizdir.",
+        "highlight": "Onlu sayılar = [sayı]teist, Onlar basamağı = [sayı]kümmend, 100 = sada. Unutmayın: esimene (1.) ve teine (2.) düzensiz sıra sayılarıdır."
+      }
+    ]
+  },
+  {
+    "id": "story-b1-conditional",
+    "cefrLevel": "B1",
+    "topic": "Koşul",
+    "icon": "💭",
+    "slides": [
+      {
+        "title": "Dilek-Şart Kipi (tingiv kõneviis)",
+        "body": "Dilek-şart kipi varsayımsal durumları ve kibar istekleri ifade eder - Türkçedeki \"-sA/-rdı\" gibi.\n-ks eki ile oluşturulur.\n\nGünlük konuşma için en yararlı kiplerden biridir."
+      },
+      {
+        "title": "Dilek-Şart Kipini Oluşturma",
+        "body": "Fiil köküne -ks, ardından kişi ekleri eklenir:\n\nma sööksin - yerdim / yesem\nsa sööksid - yerdin / yesen\nta sööks - yerdi / yese\nme söökime - yerdik / yesek\nte söösite - yerdiniz / yeseniz\nnad sööksid - yerlerdi / yeseler\n\nOlumsuz: ei sööks (tüm kişiler için aynı)",
+        "examples": [
+          {
+            "estonian": "Ma tahaksin kohvi.",
+            "english": "I would like coffee.",
+            "turkish": "Kahve isterdim."
+          },
+          {
+            "estonian": "Kas sa tuleksid minuga?",
+            "english": "Would you come with me?",
+            "turkish": "Benimle gelir misin?"
+          }
+        ]
+      },
+      {
+        "title": "Dilek-Şart Kipi Ne Zaman Kullanılır",
+        "body": "Dilek-şart kipi şu durumlarda kullanılır:\n\n1. Kibar istekler (tahaksin = isterdim)\n2. Varsayımsal durumlar (eğer olsaydım...)\n3. Dilekler ve hayaller\n4. İfadeleri yumuşatma",
+        "examples": [
+          {
+            "estonian": "Ma sööksin praegu magada.",
+            "english": "I would like to sleep now.",
+            "turkish": "Şimdi uyumak isterdim."
+          },
+          {
+            "estonian": "See oleks tore.",
+            "english": "That would be nice.",
+            "turkish": "Bu güzel olurdu."
+          },
+          {
+            "estonian": "Kui ma oleksin rikas, reisiksin palju.",
+            "english": "If I were rich, I would travel a lot.",
+            "turkish": "Zengin olsam, çok seyahat ederdim."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Dilek-şart = fiil kökü + -ks + kişi ekleri\nOlumsuz = ei + fiil-ks\n\nKibar istekler için en çok kullanılan formlar: tahaksin (isterdim), saaksin (yapabilir miyim).",
+        "highlight": "-ks eki dilek-şart kipini oluşturur. Günlük hayatta kibar istekler için \"tahaksin\" (isterdim) ve \"saaksin\" (yapabilir miyim) kullanın."
+      }
+    ]
+  },
+  {
+    "id": "story-b1-passive",
+    "cefrLevel": "B1",
+    "topic": "Edilgen",
+    "icon": "🔄",
+    "slides": [
+      {
+        "title": "Edilgen Çatı (umbisikuline tegumood)",
+        "body": "Estoncada edilgen çatı kişisizdir - özne yoktur.\nEylemi vurgular, yapanı değil.\n\nGeniş zaman edilgen: -takse/-dakse\nGeçmiş zaman edilgen: -ti/-di"
+      },
+      {
+        "title": "Geniş Zaman Edilgen",
+        "body": "Fiil köküne -takse veya -dakse eklenerek oluşturulur.\nÖzne gerekmez - eylemin kendisi odak noktasıdır.\n\nrääkima -> räägitakse (konuşulur)\navama -> avatakse (açılır)\nmüüma -> müüakse (satılır)",
+        "examples": [
+          {
+            "estonian": "Siin räägitakse eesti keelt.",
+            "english": "Estonian is spoken here.",
+            "turkish": "Burada Estonca konuşulur."
+          },
+          {
+            "estonian": "Ukse avatakse kell 9.",
+            "english": "The door is opened at 9.",
+            "turkish": "Kapı saat 9'da açılır."
+          }
+        ]
+      },
+      {
+        "title": "Geçmiş Zaman Edilgen",
+        "body": "Fiil köküne -ti veya -di eklenerek oluşturulur.\n\nehitama -> ehitati (inşa edildi)\navama -> avati (açıldı)\nkirjutama -> kirjutati (yazıldı)",
+        "examples": [
+          {
+            "estonian": "Maja ehitati 1990. aastal.",
+            "english": "The house was built in 1990.",
+            "turkish": "Ev 1990 yılında inşa edildi."
+          },
+          {
+            "estonian": "See raamat kirjutati eesti keeles.",
+            "english": "This book was written in Estonian.",
+            "turkish": "Bu kitap Estonca yazıldı."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Geniş zaman edilgen: -takse/-dakse (räägitakse = konuşulur)\nGeçmiş zaman edilgen: -ti/-di (ehitati = inşa edildi)\n\nÖzne gerekmez. Odak eylem üzerindedir.",
+        "highlight": "Edilgen çatı kişisizdir: -takse (geniş zaman), -ti (geçmiş zaman). Özne gerekmez. Tabelâlarda çok yaygın: \"Siin räägitakse eesti keelt\" (Burada Estonca konuşulur)."
+      }
+    ]
+  },
+  {
+    "id": "story-b1-translative-case",
+    "cefrLevel": "B1",
+    "topic": "Oluş Hali",
+    "icon": "🦋",
+    "slides": [
+      {
+        "title": "Dönüşüm Hali (-ks) - Olma/Dönüşme",
+        "body": "Dönüşüm hali değişim veya dönüşümü ifade eder.\n\"kelleks?\" (kime?) veya \"milleks?\" (neye?) sorularına cevap verir.\n\nTamlayan formuna -ks eklenerek oluşturulur."
+      },
+      {
+        "title": "Dönüşüm Hali Nasıl Kullanılır",
+        "body": "Yaygın kalıplar:\n\nBir meslek sahibi olmak: õpetaja -> õpetajaks\nBir duruma geçmek: haige -> haigeks\nBir şeye dönüşmek: suur -> suureks\n\nŞu fiillerle kullanılır: saama (olmak/dönüşmek), jääma (kalmak/olmak), kasvama (büyümek), õppima (olmak için okumak).",
+        "examples": [
+          {
+            "estonian": "Ta õpib arstiks.",
+            "english": "He's studying to become a doctor.",
+            "turkish": "O doktor olmak için okuyor."
+          },
+          {
+            "estonian": "Ma jäin haigeks.",
+            "english": "I got sick.",
+            "turkish": "Hastalandım."
+          },
+          {
+            "estonian": "Laps kasvab suureks.",
+            "english": "The child is growing up.",
+            "turkish": "Çocuk büyüyor."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Dönüşüm hali = tamlayan + -ks\nDönüşüm, değişim veya olma ifade eder.\n\nõpetaja -> õpetajaks (öğretmen olmak)\nhaige -> haigeks (hasta olmak)\n\nCevaplar: kelleks? milleks? (neye/kime?)",
+        "highlight": "Dönüşüm hali -ks = bir şeye dönüşme. saama, jääma, kasvama, õppima ile kullanılır: \"Ta saab õpetajaks\" (O öğretmen olur)."
+      }
+    ]
+  },
+  {
+    "id": "story-b1-terminative-essive-abessive",
+    "cefrLevel": "B1",
+    "topic": "3 Hal",
+    "icon": "🏷️",
+    "slides": [
+      {
+        "title": "Daha Az Yaygın Üç Hal",
+        "body": "Estoncada daha az sıklıkla kullanılan ama yine de önemli üç hal vardır:\n\nSınır hali (-ni) = -e kadar\nGörev hali (-na) = olarak\nYoksunluk hali (-ta) = -sız/-siz\n\nÜçü de tamlayan formuna eklenir."
+      },
+      {
+        "title": "Sınır Hali (-ni) - -e Kadar",
+        "body": "Zaman veya mekanda bir sınırı ifade eder.\nTamlayan formuna eklenir.\n\nõhtu -> õhtuni (akşama kadar)\nmets -> metsani (ormana kadar)\nlõppu -> lõpuni (sonuna kadar)",
+        "examples": [
+          {
+            "estonian": "Ma jooksen metsani.",
+            "english": "I run up to the forest.",
+            "turkish": "Ormana kadar koşuyorum."
+          },
+          {
+            "estonian": "Õhtuni on aega.",
+            "english": "There's time until evening.",
+            "turkish": "Akşama kadar zaman var."
+          }
+        ]
+      },
+      {
+        "title": "Görev Hali (-na) ve Yoksunluk Hali (-ta)",
+        "body": "Görev hali (-na) = bir görev/rol olarak:\nõpetaja -> õpetajana (öğretmen olarak)\n\nYoksunluk hali (-ta) = -sız/-siz, olmadan:\nraha -> rahata (parasız)\nprobleem -> probleemita (sorunsuz)",
+        "examples": [
+          {
+            "estonian": "Ta töötab õpetajana.",
+            "english": "He works as a teacher.",
+            "turkish": "O öğretmen olarak çalışıyor."
+          },
+          {
+            "estonian": "Ma tulin rahata.",
+            "english": "I came without money.",
+            "turkish": "Parasız geldim."
+          },
+          {
+            "estonian": "Probleemita!",
+            "english": "No problem!",
+            "turkish": "Sorun yok!"
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Sınır hali -ni = -e kadar (õhtuni)\nGörev hali -na = olarak (õpetajana)\nYoksunluk hali -ta = -sız/-siz (rahata)\n\nÜçü de tamlayan formuna eklenir.",
+        "highlight": "Üç yararlı hal: -ni (-e kadar), -na (olarak), -ta (-sız/-siz). Hepsi tamlayan formuna eklenir. En yaygınları: õpetajana (öğretmen olarak), rahata (parasız)."
+      }
+    ]
+  },
+  {
+    "id": "story-b1-relative-clauses",
+    "cefrLevel": "B1",
+    "topic": "İlgi Cml",
+    "icon": "🔗",
+    "slides": [
+      {
+        "title": "İlgi Cümleleri",
+        "body": "İlgi cümleleri bir isim hakkında ek bilgi verir.\nEstonca şu ilgi sözcüklerini kullanır:\n\nkes - kim (kişiler için)\nmis - hangi/ki (nesneler için)\nkus - nerede (yerler için)"
+      },
+      {
+        "title": "\"kes\" ve \"mis\" Kullanımı",
+        "body": "\"kes\" kişiler için kullanılır ve bir isim gibi çekilir.\n\"mis\" nesneler için kullanılır ve o da çekilir.\n\nmis -> mida (kısmi), mille (tamlayan), milles (içinde kalma)...\n\nİlgi sözcüğü, cümle içindeki görevine uygun halde olmalıdır.",
+        "examples": [
+          {
+            "estonian": "Mees, kes seal istub, on mu isa.",
+            "english": "The man who sits there is my father.",
+            "turkish": "Orada oturan adam benim babam."
+          },
+          {
+            "estonian": "Raamat, mida ma loen, on huvitav.",
+            "english": "The book that I'm reading is interesting.",
+            "turkish": "Okuduğum kitap ilginç."
+          },
+          {
+            "estonian": "Linn, kus ma elan, on ilus.",
+            "english": "The city where I live is beautiful.",
+            "turkish": "Yaşadığım şehir güzel."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "İlgi zamirleri:\nkes = kim (kişiler)\nmis/mida/mille = hangi/ki (nesneler)\nkus = nerede (yerler)\n\nKendilerinden önceki ismi tanımlayan bir cümle başlatırlar.\nNot: \"mis\" dilbilgisel görevine göre form değiştirir.",
+        "highlight": "Kişiler için kes, nesneler için mis, yerler için kus kullanın. mis sözcüğünün çekildiğini unutmayın: mida (kısmi), mille (tamlayan) vb."
+      }
+    ]
+  },
+  {
+    "id": "story-b1-verb-rection",
+    "cefrLevel": "B1",
+    "topic": "Fiil Hali",
+    "icon": "🎯",
+    "slides": [
+      {
+        "title": "Fiil Yönetimi - Hangi Hal Kullanılmalı?",
+        "body": "Estoncadaki en zor özelliklerden biri: bazı fiiller nesneleri için her zaman belirli bir hal gerektirir.\n\nKısmi, tamlayan ve yalın hal nesnesi arasındaki seçim fiil türüne ve eylemin tamamlanma durumuna bağlıdır."
+      },
+      {
+        "title": "Kısmi Hal Gerektiren Fiiller",
+        "body": "Bazı fiiller tamamlanma durumundan bağımsız olarak HER ZAMAN kısmi hal nesnesi alır:\n\narmastama (sevmek) -> her zaman kısmi hal\nootama (beklemek) -> her zaman kısmi hal\nkartma (korkmak) -> her zaman kısmi hal\naitama (yardım etmek) -> her zaman kısmi hal",
+        "examples": [
+          {
+            "estonian": "Ma armastan sind.",
+            "english": "I love you.",
+            "turkish": "Seni seviyorum."
+          },
+          {
+            "estonian": "Ma ootan bussi.",
+            "english": "I'm waiting for the bus.",
+            "turkish": "Otobüs bekliyorum."
+          },
+          {
+            "estonian": "Ta aitab mind.",
+            "english": "He helps me.",
+            "turkish": "O bana yardım ediyor."
+          }
+        ]
+      },
+      {
+        "title": "Tamlayan Hali ve Kısmi Hal Nesnesi Karşılaştırması",
+        "body": "Diğer fiillerde hal seçimi anlam farkı yaratır:\n\nTamlayan nesnesi = tamamlanmış eylem (bitirdim)\nKısmi hal nesnesi = devam eden/kısmi eylem (yapıyordum)\n\nBu ayrım Estonca dilbilgisinin temelidir.",
+        "examples": [
+          {
+            "estonian": "Ma lugesin raamatu läbi.",
+            "english": "I read the book (finished it).",
+            "turkish": "Kitabı okudum (bitirdim)."
+          },
+          {
+            "estonian": "Ma lugesin raamatut.",
+            "english": "I was reading the book.",
+            "turkish": "Kitabı okuyordum."
+          },
+          {
+            "estonian": "Ma sõin suppi.",
+            "english": "I was eating soup. (partitive = ongoing)",
+            "turkish": "Çorba içiyordum."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Bazı fiiller her zaman kısmi hal gerektirir (armastama, ootama, kartma).\nDiğer fiillerde:\n- Tamlayan nesnesi = tamamlanmış eylem\n- Kısmi hal nesnesi = devam eden/kısmi eylem\n\nBu, Estonca dilbilgisinin en zor kısımlarından biridir.",
+        "highlight": "Tamlayan nesnesi = tamamlanmış eylem (lugesin raamatu läbi). Kısmi hal nesnesi = devam eden/kısmi eylem (lugesin raamatut). Bazı fiiller her zaman kısmi hal alır."
+      }
+    ]
+  },
+  {
+    "id": "story-b1-reported-speech",
+    "cefrLevel": "B1",
+    "topic": "Aktarım",
+    "icon": "💬",
+    "slides": [
+      {
+        "title": "Aktarılan Konuşma (kaudne kõneviis)",
+        "body": "Estoncada aktarılan konuşma için özel bir kip vardır: nakil kipi.\n-vat eki kullanılır.\n\nBu ek, başka birinin söylediğini aktardığınızı, doğruluğunu teyit etmeden, belirtir."
+      },
+      {
+        "title": "Nakil Kipini Oluşturma",
+        "body": "Fiil köküne -vat eklenir:\n\nolema -> olevat (olduğu söyleniyor)\nminema -> minevat (gittiği söyleniyor)\ntulema -> tulevat (geldiği söyleniyor)\n\nGeçmiş formu: olevat + -nud ortacı",
+        "examples": [
+          {
+            "estonian": "Ta olevat haige.",
+            "english": "He is said to be sick.",
+            "turkish": "Hasta olduğu söyleniyor."
+          },
+          {
+            "estonian": "Ilm minevat külmaks.",
+            "english": "The weather is said to be getting cold.",
+            "turkish": "Havanın soğuduğu söyleniyor."
+          },
+          {
+            "estonian": "Ta olevat tulnud Eestist.",
+            "english": "He is said to have come from Estonia.",
+            "turkish": "Estonya'dan geldiği söyleniyor."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Nakil kipi: fiil kökü + -vat\nGeçmiş nakil: olevat + -nud\n\nBaşkalarının söylediğini, doğruluğunu teyit etmeden aktarmak için kullanılır.\nBu kip Estonca ve Finceye özgüdür.",
+        "highlight": "-vat eki aktarılan/duyulan bilgiyi belirtir. \"Ta olevat haige\" = Hasta OLDUĞU SÖYLENİYOR. Bilginin asıl kaynağı siz değilseniz bu kipi kullanın."
+      }
+    ]
+  },
+  {
+    "id": "story-b2-comitative-case",
+    "cefrLevel": "B2",
+    "topic": "Birlikte",
+    "icon": "🤝",
+    "slides": [
+      {
+        "title": "Birliktelik Hali (-ga) - İle/Birlikte",
+        "body": "Birliktelik hali \"-ile\" veya \"birlikte\" anlamını ifade eder.\nEstoncadaki 14. ve son haldir.\n\nTamlayan formuna -ga eklenerek oluşturulur."
+      },
+      {
+        "title": "Nasıl Oluşturulur ve Kullanılır",
+        "body": "Formül: tamlayan formu + -ga\n\nauto -> autoga (arabayla)\nsõber -> sõbraga (bir arkadaşla)\nsina -> sinuga (seninle)\nbuss -> bussiga (otobüsle)\n\nEşlik ve ulaşım aracı için kullanılır.",
+        "examples": [
+          {
+            "estonian": "Ma tulen autoga.",
+            "english": "I'll come by car.",
+            "turkish": "Arabayla geleceğim."
+          },
+          {
+            "estonian": "Ta elab koos sõbraga.",
+            "english": "He lives with a friend.",
+            "turkish": "O bir arkadaşıyla yaşıyor."
+          },
+          {
+            "estonian": "Mis sinuga juhtus?",
+            "english": "What happened to you?",
+            "turkish": "Sana ne oldu?"
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Birliktelik hali = tamlayan + -ga\nAnlamı: ile, vasıtasıyla, birlikte\n\nautoga (arabayla), sõbraga (bir arkadaşla), sinuga (seninle)\n\nBu, Estoncadaki 14. ve son haldir!",
+        "highlight": "Birliktelik hali -ga = ile/vasıtasıyla. Tamlayan formuna eklenir. autoga (arabayla), sinuga (seninle). Estoncadaki 14. ve son haldir."
+      }
+    ]
+  },
+  {
+    "id": "story-b2-nud-tud-participles",
+    "cefrLevel": "B2",
+    "topic": "Ortaçlar",
+    "icon": "📖",
+    "slides": [
+      {
+        "title": "Sıfat Olarak Kullanılan Ortaçlar",
+        "body": "Estoncada sıfat olarak çalışan dört ortaç formu vardır:\n\n-nud = etken geçmiş (bir şeyi yapan)\n-tud = edilgen geçmiş (yapılmış olan)\n-v = etken geniş zaman (yapmakta olan)\n-tav = edilgen geniş zaman (yapılmakta olan)"
+      },
+      {
+        "title": "-nud ve -tud (Geçmiş Zaman Ortaçları)",
+        "body": "-nud (etken, geçmiş): bir şeyi YAPAN\nväsinud (yorgun = yorulan kişi)\nõpinud (eğitimli = okumuş kişi)\n\n-tud (edilgen, geçmiş): YAPILMIŞ olan\nsuletud (kapalı = kapatılmış olan)\ntehtud (yapılmış = üretilmiş olan)",
+        "examples": [
+          {
+            "estonian": "Väsinud mees istus pingile.",
+            "english": "The tired man sat on the bench.",
+            "turkish": "Yorgun adam banka oturdu."
+          },
+          {
+            "estonian": "Suletud uks.",
+            "english": "A closed door.",
+            "turkish": "Kapalı bir kapı."
+          },
+          {
+            "estonian": "Hästi tehtud!",
+            "english": "Well done!",
+            "turkish": "Aferin!"
+          }
+        ]
+      },
+      {
+        "title": "-v ve -tav (Geniş Zaman Ortaçları)",
+        "body": "-v (etken, geniş zaman): YAPMAKTA olan\nmagav (uyuyan = uyumakta olan)\nnaerev (gülen = gülmekte olan)\n\n-tav (edilgen, geniş zaman): YAPILMAKTA olan / yapılabilir\nloetav (okunabilir = okunabilen)\nsoovitav (tavsiye edilen = önerilen)",
+        "examples": [
+          {
+            "estonian": "Magav laps.",
+            "english": "A sleeping child.",
+            "turkish": "Uyuyan çocuk."
+          },
+          {
+            "estonian": "Loetav raamat.",
+            "english": "A readable book.",
+            "turkish": "Okunabilir bir kitap."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Dört ortaç:\n-nud = etken geçmiş (väsinud = yorgun)\n-tud = edilgen geçmiş (suletud = kapalı)\n-v = etken geniş zaman (magav = uyuyan)\n-tav = edilgen geniş zaman (loetav = okunabilir)\n\nİsimlerin önünde sıfat olarak işlev görürler.",
+        "highlight": "Dört ortaç türü: -nud (yapan), -tud (yapılmış), -v (yapmakta olan), -tav (yapılmakta olan). Hepsi isimlerin önünde sıfat olarak kullanılır."
+      }
+    ]
+  },
+  {
+    "id": "story-b2-imperative",
+    "cefrLevel": "B2",
+    "topic": "Emirler",
+    "icon": "📢",
+    "slides": [
+      {
+        "title": "Emir Kipi - Emirler",
+        "body": "Emir kipi, emir ve istekler için kullanılır.\nEstoncada farklı formlar vardır:\n\n- Tekil (sa) emirler\n- Çoğul/resmi (te) emirler\n- Olumsuz emirler\n- \"Hadi yapalım\" önerileri"
+      },
+      {
+        "title": "Tekil ve Çoğul Emirler",
+        "body": "Tekil (sa): sadece fiil kökü\nÇoğul/resmi (te): kök + -ge/-ke\n\nTekil form en basit olanıdır - sadece yalın kök.\nÇoğul forma -ge (ünlülerden sonra) veya -ke (ünsüzlerden sonra) eklenir.",
+        "examples": [
+          {
+            "estonian": "Tule siia!",
+            "english": "Come here! (singular)",
+            "turkish": "Buraya gel!"
+          },
+          {
+            "estonian": "Istu maha!",
+            "english": "Sit down! (singular)",
+            "turkish": "Otur!"
+          },
+          {
+            "estonian": "Tulge siia!",
+            "english": "Come here! (plural/formal)",
+            "turkish": "Buraya gelin!"
+          },
+          {
+            "estonian": "Istuge maha!",
+            "english": "Sit down! (plural/formal)",
+            "turkish": "Oturun!"
+          }
+        ]
+      },
+      {
+        "title": "Olumsuz Emirler ve Hadi Yapalım",
+        "body": "Olumsuz tekil: ära + fiil kökü\nOlumsuz çoğul: ärge + fiil kökü\n\n\"Hadi yapalım\" formu: kök + -gem/-kem\n\nära/ärge olumsuz emir edatlarıdır.",
+        "examples": [
+          {
+            "estonian": "Ära mine!",
+            "english": "Don't go!",
+            "turkish": "Gitme!"
+          },
+          {
+            "estonian": "Ärge unustage!",
+            "english": "Don't forget! (plural)",
+            "turkish": "Unutmayın!"
+          },
+          {
+            "estonian": "Lähme!",
+            "english": "Let's go!",
+            "turkish": "Hadi gidelim!"
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Tekil emir: yalın fiil kökü (tule!)\nÇoğul/resmi: kök + -ge/-ke (tulge!)\nOlumsuz: ära/ärge + kök (ära mine! / ärge minge!)\nHadi yapalım: kök + -gem/-kem (lähme!)",
+        "highlight": "Emirler: tekil = kök (tule!), çoğul = kök + -ge (tulge!), olumsuz = ära/ärge + kök (ära mine!), hadi = kök + -gem (lähme!)."
+      }
+    ]
+  },
+  {
+    "id": "story-b2-word-formation",
+    "cefrLevel": "B2",
+    "topic": "Sözcük Yap",
+    "icon": "🧱",
+    "slides": [
+      {
+        "title": "Estoncada Sözcük Türetme",
+        "body": "Estonca, birleştirme ve ekler yoluyla yeni sözcükler türetir.\nBu kalıpları anlamak, tanımadığınız sözcükleri çözmenize yardımcı olur.\n\nEn yaygın sözcük oluşturma yöntemlerini inceleyelim."
+      },
+      {
+        "title": "Bileşik Sözcükler",
+        "body": "Estonca bileşik sözcükleri sever - iki veya daha fazla sözcük birleştirilir.\nİlk sözcük genellikle tamlayan halindedir.\n\nraamat + kogu -> raamatukogu (kütüphane)\nlinn + hall -> linnahall (belediye binası)\nkool + maja -> koolimaja (okul binası)\nauto + juht -> autojuht (şoför)\n\nUzun sözcükleri parçalarına ayırarak anlayın.",
+        "examples": [
+          {
+            "estonian": "Ma lähen raamatukokku.",
+            "english": "I'm going to the library.",
+            "turkish": "Kütüphaneye gidiyorum."
+          },
+          {
+            "estonian": "Autojuht peatus.",
+            "english": "The driver stopped.",
+            "turkish": "Şoför durdu."
+          }
+        ]
+      },
+      {
+        "title": "Yaygın Ekler",
+        "body": "Sözcük türetmek için yararlı ekler:\n\n-ja = yapan kişi: õpetama -> õpetaja (öğretmen)\n-mine = eylem ismi: õppima -> õppimine (çalışma)\n-lik = sıfat: sõber -> sõbralik (cana yakın)\n-tu = -sız/-siz: süü -> süütu (masum)\n-kas = nitelik: jõud -> jõukas (varlıklı)\n-lane = -li (bir yerden olan): Eesti -> eestlane (Estonyalı)",
+        "examples": [
+          {
+            "estonian": "Õpetaja on sõbralik.",
+            "english": "The teacher is friendly.",
+            "turkish": "Öğretmen cana yakın."
+          },
+          {
+            "estonian": "Õppimine on oluline.",
+            "english": "Studying is important.",
+            "turkish": "Çalışmak önemli."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Bileşik sözcükler: sözcükleri birleştirin (tamlayan + isim)\nTemel ekler: -ja (yapan), -mine (eylem), -lik (sıfat), -tu (-sız), -kas (nitelik), -lane (-li/bir yerden olan)\n\nUzun bir Estonca sözcük gördüğünüzde, parçalarına ayırın.",
+        "highlight": "Uzun bileşik sözcükleri parçalarına ayırın: raamatukogu = raamatu (kitabın) + kogu (koleksiyon) = kütüphane. Ekleri öğrenin: -ja (yapan), -mine (eylem), -lik (sıfat)."
+      }
+    ]
+  },
+  {
+    "id": "story-b2-clause-connectors",
+    "cefrLevel": "B2",
+    "topic": "Bağlaçlar",
+    "icon": "🔗",
+    "slides": [
+      {
+        "title": "Cümle Bağlaçları",
+        "body": "Karmaşık cümleler kurmak için bağlaçlara ihtiyaç vardır.\nEstoncada sıralama bağlaçları (eşit cümleleri birleştirir) ve alt sıralama bağlaçları (bağımlı cümleler ekler) bulunur."
+      },
+      {
+        "title": "Sıralama Bağlaçları",
+        "body": "İki eşit, bağımsız cümleyi birleştirirler:\n\nja - ve\naga / kuid - ama\nvõi - veya\nning - ve (daha resmi, edebi)\n\nCümleleri aynı düzeyde bağlarlar.",
+        "examples": [
+          {
+            "estonian": "Ma õpin ja töötan.",
+            "english": "I study and work.",
+            "turkish": "Okuyorum ve çalışıyorum."
+          },
+          {
+            "estonian": "Ta on vaikne, aga tark.",
+            "english": "He is quiet but smart.",
+            "turkish": "O sessiz ama akıllı."
+          },
+          {
+            "estonian": "Kas sa tuled või jääd?",
+            "english": "Are you coming or staying?",
+            "turkish": "Geliyor musun yoksa kalıyor musun?"
+          }
+        ]
+      },
+      {
+        "title": "Alt Sıralama Bağlaçları",
+        "body": "Bağımlı cümleler başlatırlar:\n\net - ki/-dığını\nsest / kuna - çünkü\nkui - -dığında / eğer\nkuigi - rağmen/-masına rağmen\nselleks et - için/amacıyla\nkuni - -e kadar/iken",
+        "examples": [
+          {
+            "estonian": "Ma õpin, sest tahan eksamit sooritada.",
+            "english": "I study because I want to pass the exam.",
+            "turkish": "Çalışıyorum çünkü sınavı geçmek istiyorum."
+          },
+          {
+            "estonian": "Kuigi sajab, me lähme välja.",
+            "english": "Although it rains, we'll go out.",
+            "turkish": "Yağmur yağmasına rağmen dışarı çıkacağız."
+          },
+          {
+            "estonian": "Ma tean, et sa tuled.",
+            "english": "I know that you will come.",
+            "turkish": "Geleceğini biliyorum."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Sıralama: ja (ve), aga/kuid (ama), või (veya)\nAlt sıralama: et (ki), sest/kuna (çünkü), kui (-dığında/eğer), kuigi (rağmen), selleks et (için)\n\nBu bağlaçlar karmaşık cümleler kurmak için gereklidir.",
+        "highlight": "Şu bağlaçları öğrenin: ja (ve), aga (ama), sest (çünkü), et (ki), kui (-dığında/eğer), kuigi (rağmen). Bunlar karmaşık Estonca cümlelerin yapıştırıcısıdır."
+      }
+    ]
+  },
+  {
+    "id": "story-b2-pluperfect",
+    "cefrLevel": "B2",
+    "topic": "Uzak Geçm",
+    "icon": "⏮️",
+    "slides": [
+      {
+        "title": "Uzak Geçmiş Zaman (enneminevik)",
+        "body": "Uzak geçmiş zaman, başka bir geçmiş eylemden ÖNCE tamamlanmış bir eylemi anlatır.\nTürkçe karşılığı: \"-mıştı/-mişti\".\n\nFormül: olin/olid/oli + -nud ortacı"
+      },
+      {
+        "title": "Uzak Geçmiş Zamanın Oluşturulması",
+        "body": "olema fiilinin GEÇMİŞ ZAMAN formu + -nud ortacı kullanılır:\n\nma olin söönud - yemiştim\nsa olid söönud - yemiştin\nta oli söönud - yemişti\nme olime söönud - yemiştik\nte olite söönud - yemiştiniz\nnad olid söönud - yemişlerdi\n\nYakın geçmiş ile karşılaştırma: ma OLEN söönud (yemişim)\nUzak geçmiş: ma OLIN söönud (yemiştim)",
+        "examples": [
+          {
+            "estonian": "Kui ma tulin, ta oli juba lahkunud.",
+            "english": "When I arrived, he had already left.",
+            "turkish": "Ben geldiğimde, o çoktan gitmişti."
+          },
+          {
+            "estonian": "Me olime söönud, enne kui nad tulid.",
+            "english": "We had eaten before they came.",
+            "turkish": "Onlar gelmeden önce yemek yemiştik."
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Uzak geçmiş = olema geçmiş zaman (olin/olid/oli) + -nud ortacı\n\nBaşka bir geçmiş olaydan ÖNCE tamamlanmış eylemler için kullanılır.\n\nYakın geçmiş: olen söönud (yemişim)\nUzak geçmiş: olin söönud (yemiştim)",
+        "highlight": "Uzak geçmiş = olin + -nud. \"Daha önceki geçmişi\" anlatır - başka bir geçmiş olaydan önce olan bir şey. Temel fark: olen söönud (yemişim) ve olin söönud (yemiştim)."
+      }
+    ]
+  },
+  {
+    "id": "story-b2-object-rules",
+    "cefrLevel": "B2",
+    "topic": "Nesneler",
+    "icon": "📐",
+    "slides": [
+      {
+        "title": "Estonca Nesne Hali Kuralları",
+        "body": "Üçlü nesne ayrımı (yalın / tamlayan / kısmi) Estonca dilbilgisinin ayırt edici özelliğidir.\n\nDoğru hal; eylemin tamamlanma durumuna, cümle türüne ve fiil türüne bağlıdır.\nTüm kuralları öğrenelim."
+      },
+      {
+        "title": "Yalın Hal Nesnesi",
+        "body": "Yalın hal (temel form) nesnesini şu durumlarda kullanın:\n\n1. Emir cümleleri: Ava uks! (Kapıyı aç!)\n2. Kişisiz/edilgen cümleler: Uks avatakse. (Kapı açılır.)\n\nYalın hal, bu özel yapılarda tam ve bütün bir nesneyi ifade eder.",
+        "examples": [
+          {
+            "estonian": "Ava uks!",
+            "english": "Open the door!",
+            "turkish": "Kapıyı aç!"
+          },
+          {
+            "estonian": "Kirjuta kiri!",
+            "english": "Write the letter!",
+            "turkish": "Mektubu yaz!"
+          }
+        ]
+      },
+      {
+        "title": "Tamlayan Hali Nesnesi",
+        "body": "Olumlu bir cümlede TAMAMLANMIŞ tekil bir eylem için tamlayan hali nesnesi kullanılır.\nEylem bitmiştir, nesne tamamen etkilenmiştir.\n\nBu şunu ifade eder: \"Tamamen yaptım, bitti.\"",
+        "examples": [
+          {
+            "estonian": "Ma avasin ukse.",
+            "english": "I opened the door. (completed)",
+            "turkish": "Kapıyı açtım. (tamamlandı)"
+          },
+          {
+            "estonian": "Ta luges raamatu läbi.",
+            "english": "He read the whole book.",
+            "turkish": "Kitabın tamamını okudu."
+          }
+        ]
+      },
+      {
+        "title": "Kısmi Hal Nesnesi",
+        "body": "Kısmi hal nesnesini şu durumlarda kullanın:\n\n1. Devam eden veya tamamlanmamış eylemler\n2. Olumsuz cümleler (her zaman kısmi hal)\n3. Kısmi miktarlar\n4. Kısmi hal gerektiren fiillerden sonra (armastama, ootama...)",
+        "examples": [
+          {
+            "estonian": "Ma avan ust.",
+            "english": "I'm opening the door. (ongoing)",
+            "turkish": "Kapıyı açıyorum. (devam ediyor)"
+          },
+          {
+            "estonian": "Ma ei avanud ust.",
+            "english": "I didn't open the door. (negative)",
+            "turkish": "Kapıyı açmadım. (olumsuz)"
+          },
+          {
+            "estonian": "Ma joon vett.",
+            "english": "I drink water. (partial)",
+            "turkish": "Su içiyorum. (kısmi)"
+          }
+        ]
+      },
+      {
+        "title": "Özet",
+        "body": "Yalın hal nesnesi: emirler ve edilgen (Ava uks!)\nTamlayan nesnesi: tamamlanmış eylem (Avasin ukse.)\nKısmi hal nesnesi: devam eden, olumsuz, kısmi (Avan ust.)\n\nOlumsuz cümleler HER ZAMAN kısmi hal kullanır.\nBu üçlü sistem Estonca dilbilgisinin çekirdeğidir.",
+        "highlight": "Yalın = emirler/edilgen, Tamlayan = tamamlanmış eylem, Kısmi = devam eden/olumsuz/kısmi. Tereddütte kısmi hal güvenli tercihtir - en yaygın nesne halidir."
+      }
+    ]
+  }
+]

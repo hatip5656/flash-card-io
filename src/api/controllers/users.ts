@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { addSubscriber, removeSubscriber, getStats, getSubscriberLevel, setSubscriberLevel, getSubscriberSchedule, setSubscriberSchedule, getPreferences, updatePreference, updateNextDelivery, scheduleNextGrammar, SCHEDULE_OFF } from "../../db/progress.js";
+import { addSubscriber, removeSubscriber, getStats, getSubscriberLevel, setSubscriberLevel, getSubscriberSchedule, setSubscriberSchedule, getPreferences, updatePreference, updateNextDelivery, scheduleNextGrammar, SCHEDULE_OFF, getNextMobileUserId } from "../../db/progress.js";
 import { invalidateQueue } from "../../services/prebuild.js";
 import { getWordsForLevel } from "../../flashcard/word-bank.js";
 import { SCHEDULE_PRESETS } from "../../bot/commands.js";
@@ -21,6 +21,20 @@ export async function register(req: Request, res: Response): Promise<void> {
 
   const stats = await getStats(chatId);
   res.status(201).json({ userId: chatId, ...stats });
+}
+
+export async function autoRegister(req: Request, res: Response): Promise<void> {
+  const { firstName, channel } = req.body;
+  const nextId = await getNextMobileUserId();
+  await addSubscriber(nextId, channel ?? "mobile", undefined, firstName);
+
+  const timezone = req.app.get("cronTimezone") as string;
+  const schedule = await getSubscriberSchedule(nextId);
+  await updateNextDelivery(nextId, schedule, timezone);
+  await scheduleNextGrammar(nextId, timezone);
+
+  const stats = await getStats(nextId);
+  res.status(201).json({ userId: nextId, ...stats });
 }
 
 export async function getUser(req: Request, res: Response): Promise<void> {
@@ -73,7 +87,7 @@ export async function getUserPreferences(req: Request, res: Response): Promise<v
   res.json(prefs);
 }
 
-const VALID_PREF_KEYS = new Set(["audio", "voiceName", "wordForms", "grammarCards", "dailySummary", "weeklyReport"]);
+const VALID_PREF_KEYS = new Set(["audio", "voiceName", "wordForms", "grammarCards", "dailySummary", "weeklyReport", "nativeLanguage", "theme"]);
 
 export async function setPreference(req: Request, res: Response): Promise<void> {
   const chatId = req.userId!;
@@ -86,7 +100,17 @@ export async function setPreference(req: Request, res: Response): Promise<void> 
     res.status(400).json({ error: "voiceName must be a string" });
     return;
   }
-  if (key !== "voiceName" && typeof value !== "boolean") {
+  if (key === "nativeLanguage") {
+    if (!["turkish", "english"].includes(value)) {
+      res.status(400).json({ error: "nativeLanguage must be 'turkish' or 'english'" });
+      return;
+    }
+  } else if (key === "theme") {
+    if (!["dark", "light", "system"].includes(value)) {
+      res.status(400).json({ error: "theme must be 'dark', 'light', or 'system'" });
+      return;
+    }
+  } else if (key !== "voiceName" && typeof value !== "boolean") {
     res.status(400).json({ error: `${key} must be a boolean` });
     return;
   }

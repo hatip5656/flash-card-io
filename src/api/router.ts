@@ -6,6 +6,11 @@ import * as flashcards from "./controllers/flashcards.js";
 import * as quiz from "./controllers/quiz.js";
 import * as stats from "./controllers/stats.js";
 import * as content from "./controllers/content.js";
+import * as feed from "./controllers/feed.js";
+import * as saved from "./controllers/saved.js";
+import * as stories from "./controllers/stories.js";
+import * as comments from "./controllers/comments.js";
+import * as audio from "./controllers/audio.js";
 
 export function createApiRouter(): Router {
   const router = Router();
@@ -19,6 +24,7 @@ export function createApiRouter(): Router {
 
   // --- User registration ---
   router.post("/users", h(users.register));
+  router.post("/users/auto", h(users.autoRegister));
 
   // --- Authenticated routes ---
   router.use(authenticate);
@@ -49,6 +55,26 @@ export function createApiRouter(): Router {
   router.get("/quiz/history", h(quiz.getHistory));
   router.get("/quiz/stats", h(quiz.getStats));
   router.get("/quiz/missed", h(quiz.getMissedWords));
+
+  // Feed (mobile app)
+  router.get("/feed", h(feed.getFeed));
+  router.post("/feed/seen/:wordId", h(feed.markSeen));
+
+  // Saved words (mobile bookmarks)
+  router.get("/saved", h(saved.getSavedWords));
+  router.post("/saved/:wordId", h(saved.addSavedWord));
+  router.delete("/saved/:wordId", h(saved.removeSavedWord));
+
+  // Grammar stories (mobile app)
+  router.get("/stories", h(stories.getStories));
+  router.post("/stories/:storyId/read", h(stories.markStoryAsRead));
+
+  // Comments
+  router.get("/comments/:wordId", h(comments.getWordComments));
+  router.post("/comments/:wordId", h(comments.postComment));
+
+  // Audio pronunciation
+  router.get("/audio/:word", h(audio.getWordAudio));
 
   return router;
 }
