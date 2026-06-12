@@ -12,6 +12,7 @@ import * as stories from "./controllers/stories.js";
 import * as comments from "./controllers/comments.js";
 import * as audio from "./controllers/audio.js";
 import * as mobileQuiz from "./controllers/mobile-quiz.js";
+import * as grammarPractice from "./controllers/grammar-practice.js";
 
 export function createApiRouter(): Router {
   const router = Router();
@@ -61,6 +62,9 @@ export function createApiRouter(): Router {
   // Quiz (Mobile — all questions at once)
   router.get("/mobile/quiz/generate", h(mobileQuiz.generateQuiz));
   router.post("/mobile/quiz/submit", h(mobileQuiz.submitQuiz));
+
+  // Grammar practice (Mobile)
+  router.get("/mobile/grammar/practice", h(grammarPractice.generatePractice));
 
   // Feed (mobile app)
   router.get("/feed", h(feed.getFeed));
