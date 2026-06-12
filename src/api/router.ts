@@ -14,6 +14,7 @@ import * as audio from "./controllers/audio.js";
 import * as mobileQuiz from "./controllers/mobile-quiz.js";
 import * as grammarPractice from "./controllers/grammar-practice.js";
 import * as wordCrush from "./controllers/word-crush.js";
+import * as adminWords from "./controllers/admin-words.js";
 
 export function createApiRouter(): Router {
   const router = Router();
@@ -69,6 +70,14 @@ export function createApiRouter(): Router {
 
   // Word Crush game (Mobile)
   router.get("/mobile/word-crush", h(wordCrush.getWordCrushData));
+
+  // Admin: word catalog management
+  router.post("/admin/words", h(adminWords.addWord));
+  router.post("/admin/words/from-ekilex", h(adminWords.addFromEkilex));
+  router.get("/admin/words/untranslated", h(adminWords.getUntranslated));
+  router.get("/admin/words/stats", h(adminWords.getWordStats));
+  router.patch("/admin/words/:id/translate", h(adminWords.translateWord));
+  router.post("/admin/words/bulk-translate", h(adminWords.bulkTranslate));
 
   // Feed (mobile app)
   router.get("/feed", h(feed.getFeed));

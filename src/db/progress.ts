@@ -18,6 +18,10 @@ export interface Subscriber {
 
 let pool: pg.Pool;
 
+export function getPool(): pg.Pool {
+  return pool;
+}
+
 export async function initDb(connectionString: string): Promise<pg.Pool> {
   // Connect to default 'postgres' DB first to create our DB if needed
   const parsed = new URL(connectionString);
