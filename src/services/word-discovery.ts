@@ -71,7 +71,12 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
   for (const r of existing.rows) known.add(r.estonian);
   for (const r of candidatesDb.rows) known.add(r.estonian);
 
+  console.error(`[discovery] Starting... (${known.size} words already known)`);
+
   let totalAdded = 0;
+  let totalSearches = 0;
+  let totalDetails = 0;
+  let totalSkipped = 0;
   const targetPerLevel: Record<string, number> = {};
   for (const l of LEVELS) targetPerLevel[l] = 0;
 
@@ -81,11 +86,16 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
     if (LEVELS.every(l => targetPerLevel[l] >= WORDS_PER_LEVEL)) break;
 
     const prefix = randomPrefix();
+    totalSearches++;
     const data = await apiRequest<{ totalCount: number; words: EkilexSearchWord[] }>(
       `/word/search/${encodeURIComponent(prefix)}`,
       apiKey,
     );
-    if (!data?.words?.length) continue;
+    if (!data?.words?.length) {
+      console.error(`[discovery] Prefix "${prefix}": no results`);
+      continue;
+    }
+    console.error(`[discovery] Prefix "${prefix}": ${data.words.length} words`);
 
     // Shuffle results and check first batch
     const estWords = data.words
@@ -99,6 +109,7 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
       const est = w.wordValue.toLowerCase();
       if (known.has(est)) continue;
 
+      totalDetails++;
       const details = await apiRequest<EkilexWordDetails>(
         `/word/details/${w.wordId}`,
         apiKey,
@@ -173,10 +184,8 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
     }
   }
 
-  if (totalAdded > 0) {
-    const summary = LEVELS.map(l => `${l}:${targetPerLevel[l]}`).join(", ");
-    console.error(`[discovery] Added ${totalAdded} candidates (${summary})`);
-  }
+  const summary = LEVELS.map(l => `${l}:${targetPerLevel[l]}`).join(", ");
+  console.error(`[discovery] Done: ${totalAdded} added, ${totalSearches} searches, ${totalDetails} detail lookups (${summary})`);
 
   return totalAdded;
 }
