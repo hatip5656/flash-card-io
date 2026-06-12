@@ -11,6 +11,7 @@ import * as saved from "./controllers/saved.js";
 import * as stories from "./controllers/stories.js";
 import * as comments from "./controllers/comments.js";
 import * as audio from "./controllers/audio.js";
+import * as mobileQuiz from "./controllers/mobile-quiz.js";
 
 export function createApiRouter(): Router {
   const router = Router();
@@ -50,12 +51,16 @@ export function createApiRouter(): Router {
   router.get("/review/due", h(flashcards.getDueWords));
   router.post("/review/recall", h(flashcards.submitRecall));
 
-  // Quiz
+  // Quiz (Telegram bot — session-based)
   router.post("/quiz/start", h(quiz.startQuiz));
   router.post("/quiz/answer", h(quiz.submitAnswer));
   router.get("/quiz/history", h(quiz.getHistory));
   router.get("/quiz/stats", h(quiz.getStats));
   router.get("/quiz/missed", h(quiz.getMissedWords));
+
+  // Quiz (Mobile — all questions at once)
+  router.get("/mobile/quiz/generate", h(mobileQuiz.generateQuiz));
+  router.post("/mobile/quiz/submit", h(mobileQuiz.submitQuiz));
 
   // Feed (mobile app)
   router.get("/feed", h(feed.getFeed));

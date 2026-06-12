@@ -69,7 +69,9 @@ export async function startQuiz(req: Request, res: Response): Promise<void> {
   const nativeTrans = (w: typeof enriched[0]) =>
     useTurkish && w.turkish ? w.turkish : w.english;
 
-  const missed = await getMostMissedWords(chatId, 10);
+  const count = Math.min(Math.max(Number(req.query.count) || 5, 5), 50);
+
+  const missed = await getMostMissedWords(chatId, Math.min(count, 20));
   const missedSet = new Set(missed.map((m) => m.estonian));
 
   // Prioritize missed words, then least-quizzed
@@ -77,7 +79,7 @@ export async function startQuiz(req: Request, res: Response): Promise<void> {
     ...enriched.filter((w) => missedSet.has(w.estonian)),
     ...enriched.filter((w) => !missedSet.has(w.estonian)),
   ];
-  const selected = prioritized.slice(0, 5);
+  const selected = prioritized.slice(0, count);
 
   const typeLabel = useTurkish ? "tr" : "eng";
 
