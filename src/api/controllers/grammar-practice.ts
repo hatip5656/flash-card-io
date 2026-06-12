@@ -167,5 +167,9 @@ export async function generatePractice(req: Request, res: Response): Promise<voi
     });
   }
 
-  res.json({ totalQuestions: questions.length, questions, storyId: storyId ?? null });
+  // Shuffle all questions and cap at 15 for a focused session
+  const shuffled = shuffle(questions);
+  const capped = shuffled.slice(0, 15).map((q, i) => ({ ...q, index: i }));
+
+  res.json({ totalQuestions: capped.length, questions: capped, storyId: storyId ?? null });
 }
