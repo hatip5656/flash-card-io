@@ -50,14 +50,14 @@ async function apiRequest<T>(path: string, apiKey: string): Promise<T | null> {
   }
 }
 
-/** Generate a random 3-letter Estonian prefix */
+/** Generate a random 3-letter Estonian prefix with wildcard for Ekilex search */
 function randomPrefix(): string {
-  const len = 2 + Math.floor(Math.random() * 2); // 2 or 3 chars
+  const len = 3; // 3-letter prefix keeps results manageable (<500)
   let prefix = "";
   for (let i = 0; i < len; i++) {
     prefix += ESTONIAN_CHARS[Math.floor(Math.random() * ESTONIAN_CHARS.length)];
   }
-  return prefix;
+  return prefix + "*"; // Ekilex requires * for prefix matching
 }
 
 /**
