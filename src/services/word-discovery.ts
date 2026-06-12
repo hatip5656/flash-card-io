@@ -6,23 +6,8 @@ const API_BASE = "https://ekilex.ee/api";
 const LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2"];
 const WORDS_PER_LEVEL = 10;
 
-// Common Estonian words to search — each search returns nearby words too
-const SEARCH_SEEDS = [
-  "koer", "kass", "maja", "auto", "raamat", "laps", "vesi", "tee", "söök", "töö",
-  "aeg", "päev", "öö", "kool", "linn", "mets", "meri", "järv", "tuba", "uks",
-  "aken", "tool", "laud", "voodi", "lamp", "pilt", "sõna", "keel", "raha", "pood",
-  "arst", "haige", "tervis", "süda", "silm", "käsi", "jalg", "pea", "nina", "suu",
-  "ilus", "suur", "väike", "vana", "noor", "hea", "halb", "kiire", "aeglane", "kallis",
-  "odav", "kuum", "külm", "märg", "kuiv", "kerge", "raske", "pikk", "lühike", "lai",
-  "tegema", "minema", "tulema", "olema", "saama", "andma", "võtma", "panema", "nägema", "kuulma",
-  "lugema", "kirjutama", "rääkima", "ütlema", "mõtlema", "teadma", "oskama", "tahtma", "pidama", "hakkama",
-  "sööma", "jooma", "magama", "istuma", "seisma", "kõndima", "jooksma", "ujuma", "laulma", "tantsima",
-  "õppima", "õpetama", "töötama", "elama", "armastama", "meeldima", "kartma", "naerma", "nutma", "ootama",
-  "otsima", "leidma", "ostma", "müüma", "maksma", "aitama", "küsima", "vastama", "alustama", "lõpetama",
-  "pere", "ema", "isa", "vend", "õde", "sõber", "naaber", "õpetaja", "õpilane", "juht",
-  "ilm", "päike", "pilv", "vihm", "lumi", "tuul", "suvi", "talv", "kevad", "sügis",
-  "hommik", "lõuna", "õhtu", "nädal", "kuu", "aasta", "tund", "minut", "sekund", "homme",
-];
+// Estonian alphabet for generating random prefixes
+const ESTONIAN_CHARS = "abdefghijklmnoprsšzžtuvõäöü";
 
 interface EkilexSearchWord {
   wordId: number;
@@ -52,18 +37,32 @@ async function apiRequest<T>(path: string, apiKey: string): Promise<T | null> {
   try {
     const res = await fetch(`${API_BASE}${path}`, {
       headers: { "ekilex-api-key": apiKey },
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal.timeout(60_000),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.error(`[discovery] Ekilex ${res.status} for ${path}`);
+      return null;
+    }
     return (await res.json()) as T;
-  } catch {
+  } catch (err) {
+    console.error(`[discovery] Request failed for ${path}:`, errMsg(err));
     return null;
   }
 }
 
+/** Generate a random 3-letter Estonian prefix */
+function randomPrefix(): string {
+  const len = 2 + Math.floor(Math.random() * 2); // 2 or 3 chars
+  let prefix = "";
+  for (let i = 0; i < len; i++) {
+    prefix += ESTONIAN_CHARS[Math.floor(Math.random() * ESTONIAN_CHARS.length)];
+  }
+  return prefix;
+}
+
 /**
  * Discover new words from Ekilex and save to candidate_words table.
- * Uses specific word searches instead of wildcards to avoid massive responses.
+ * Uses random 2-3 letter prefixes to search broadly across the dictionary.
  */
 export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise<number> {
   const existing = await pool.query("SELECT estonian FROM words");
@@ -76,26 +75,29 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
   const targetPerLevel: Record<string, number> = {};
   for (const l of LEVELS) targetPerLevel[l] = 0;
 
-  // Pick random seed words to search
-  const shuffled = [...SEARCH_SEEDS].sort(() => Math.random() - 0.5);
-  const seeds = shuffled.slice(0, 20); // search 20 seeds per run
+  const maxSearches = 30;
 
-  for (const seed of seeds) {
-    // Stop if we have enough for all levels
+  for (let search = 0; search < maxSearches; search++) {
     if (LEVELS.every(l => targetPerLevel[l] >= WORDS_PER_LEVEL)) break;
 
-    const data = await apiRequest<{ words: EkilexSearchWord[] }>(
-      `/word/search/${encodeURIComponent(seed)}`,
+    const prefix = randomPrefix();
+    const data = await apiRequest<{ totalCount: number; words: EkilexSearchWord[] }>(
+      `/word/search/${encodeURIComponent(prefix)}`,
       apiKey,
     );
-    if (!data?.words) continue;
+    if (!data?.words?.length) continue;
 
-    // Check first few Estonian words from results
-    const estWords = data.words.filter(w => w.lang === "est").slice(0, 5);
+    // Shuffle results and check first batch
+    const estWords = data.words
+      .filter(w => w.lang === "est" && w.wordValue.length >= 3 && !w.wordValue.includes(" "))
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 8);
 
     for (const w of estWords) {
+      if (LEVELS.every(l => targetPerLevel[l] >= WORDS_PER_LEVEL)) break;
+
       const est = w.wordValue.toLowerCase();
-      if (known.has(est) || est.includes(" ") || est.length < 3) continue;
+      if (known.has(est)) continue;
 
       const details = await apiRequest<EkilexWordDetails>(
         `/word/details/${w.wordId}`,
@@ -108,7 +110,7 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
         if (!level || !LEVELS.includes(level)) continue;
         if (targetPerLevel[level] >= WORDS_PER_LEVEL) continue;
 
-        // Extract English translation
+        // Extract English
         let english: string | null = null;
         for (const group of lexeme.synonymLangGroups ?? []) {
           if (group.lang === "eng") {
@@ -123,7 +125,7 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
         }
         if (!english) continue;
 
-        // Extract usage sentences
+        // Extract usages
         const usages: Array<{ estonian: string; english: string }> = [];
         for (const u of lexeme.usages ?? []) {
           const estSent = (u.value ?? u.valuePrese ?? "").replace(/<[^>]*>/g, "");
@@ -166,7 +168,7 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
           // duplicate, skip
         }
 
-        break; // one lexeme per word is enough
+        break;
       }
     }
   }
