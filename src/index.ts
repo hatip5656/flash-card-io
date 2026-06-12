@@ -429,6 +429,20 @@ async function main(): Promise<void> {
   // Also warm queues 30 seconds after startup (once initial load settles)
   setTimeout(() => warmAllQueues().catch(() => {}), 30_000);
 
+  // Word discovery: find new words from Ekilex every 10 minutes
+  if (config.ekilexApiKey) {
+    const { discoverCandidates } = await import("./services/word-discovery.js");
+    const discoveryJob = new Cron("*/10 * * * *", { timezone: config.cronTimezone }, async () => {
+      try {
+        const added = await discoverCandidates(pool, config.ekilexApiKey!);
+        if (added > 0) console.error(`[discovery] Found ${added} new candidate words`);
+      } catch (err) {
+        console.error(`[discovery] Error:`, errMsg(err));
+      }
+    });
+    console.error("[main] Word discovery: every 10 minutes");
+  }
+
   // Log cache stats on startup (async, non-blocking)
   getCacheStats().then((stats) => {
     const entries = Object.entries(stats);

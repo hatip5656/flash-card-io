@@ -15,6 +15,7 @@ import * as mobileQuiz from "./controllers/mobile-quiz.js";
 import * as grammarPractice from "./controllers/grammar-practice.js";
 import * as wordCrush from "./controllers/word-crush.js";
 import * as adminWords from "./controllers/admin-words.js";
+import * as candidates from "./controllers/candidates.js";
 
 export function createApiRouter(): Router {
   const router = Router();
@@ -80,6 +81,14 @@ export function createApiRouter(): Router {
   router.get("/admin/words/:id", h(adminWords.getWordDetail));
   router.patch("/admin/words/:id/translate", h(adminWords.translateWord));
   router.post("/admin/words/bulk-translate", h(adminWords.bulkTranslate));
+
+  // Candidate words (discovery pipeline)
+  router.get("/admin/candidates", h(candidates.listCandidates));
+  router.get("/admin/candidates/stats", h(candidates.candidateStats));
+  router.patch("/admin/candidates/:id", h(candidates.translateCandidate));
+  router.post("/admin/candidates/:id/approve", h(candidates.approveCandidate));
+  router.post("/admin/candidates/approve-all", h(candidates.approveAll));
+  router.delete("/admin/candidates/:id", h(candidates.rejectCandidate));
 
   // Feed (mobile app)
   router.get("/feed", h(feed.getFeed));
