@@ -6,8 +6,29 @@ const API_BASE = "https://ekilex.ee/api";
 const LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2"];
 const WORDS_PER_LEVEL = 10;
 
-// Estonian alphabet for generating random prefixes
-const ESTONIAN_CHARS = "abdefghijklmnoprsšzžtuvõäöü";
+// Realistic Estonian 2-letter prefix starts (consonant+vowel, vowel+consonant patterns)
+const ESTONIAN_PREFIXES = [
+  "aa", "ab", "ae", "ah", "ai", "aj", "ak", "al", "am", "an", "ap", "ar", "as", "at", "au", "av",
+  "ea", "eb", "ed", "ee", "eh", "ei", "ek", "el", "em", "en", "ep", "er", "es", "et", "ev",
+  "ha", "he", "hi", "ho", "hu", "hä", "hü",
+  "il", "im", "in", "is", "it",
+  "ja", "je", "jo", "ju", "jä", "jõ", "jü",
+  "ka", "ke", "ki", "ko", "ku", "kä", "kõ", "kö", "kü",
+  "la", "le", "li", "lo", "lu", "lä", "lõ", "lö", "lü",
+  "ma", "me", "mi", "mo", "mu", "mä", "mõ", "mö", "mü",
+  "na", "ne", "ni", "no", "nu", "nä", "nõ", "nö", "nü",
+  "oa", "od", "oh", "oi", "ok", "ol", "om", "on", "op", "or", "os", "ot", "ou",
+  "pa", "pe", "pi", "po", "pu", "pä", "pö", "pü",
+  "ra", "re", "ri", "ro", "ru", "rä", "rõ", "rü",
+  "sa", "se", "si", "so", "su", "sä", "sõ", "sö", "sü",
+  "ta", "te", "ti", "to", "tu", "tä", "tõ", "tö", "tü",
+  "ua", "ud", "ue", "ui", "uk", "ul", "um", "un", "up", "ur", "us", "ut", "uu",
+  "va", "ve", "vi", "vo", "vu", "vä", "võ", "vö",
+  "õh", "õi", "õl", "õm", "õn", "õp", "õu",
+  "äi", "äk", "är", "ät",
+  "öi", "öö",
+  "üh", "ük", "ül", "üm", "ür", "üt", "üü",
+];
 
 interface EkilexSearchWord {
   wordId: number;
@@ -50,14 +71,10 @@ async function apiRequest<T>(path: string, apiKey: string): Promise<T | null> {
   }
 }
 
-/** Generate a random 3-letter Estonian prefix with wildcard for Ekilex search */
+/** Pick a random realistic Estonian prefix with wildcard */
 function randomPrefix(): string {
-  const len = 3; // 3-letter prefix keeps results manageable (<500)
-  let prefix = "";
-  for (let i = 0; i < len; i++) {
-    prefix += ESTONIAN_CHARS[Math.floor(Math.random() * ESTONIAN_CHARS.length)];
-  }
-  return prefix + "*"; // Ekilex requires * for prefix matching
+  const base = ESTONIAN_PREFIXES[Math.floor(Math.random() * ESTONIAN_PREFIXES.length)];
+  return base + "*";
 }
 
 /**
