@@ -54,21 +54,28 @@ interface EkilexWordDetails {
   lexemes: EkilexLexeme[];
 }
 
-async function apiRequest<T>(path: string, apiKey: string): Promise<T | null> {
-  try {
-    const res = await fetch(`${API_BASE}${path}`, {
-      headers: { "ekilex-api-key": apiKey },
-      signal: AbortSignal.timeout(60_000),
-    });
-    if (!res.ok) {
-      console.error(`[discovery] Ekilex ${res.status} for ${path}`);
+async function apiRequest<T>(path: string, apiKey: string, retries = 2): Promise<T | null> {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(`${API_BASE}${path}`, {
+        headers: { "ekilex-api-key": apiKey },
+        signal: AbortSignal.timeout(90_000),
+      });
+      if (!res.ok) {
+        console.error(`[discovery] Ekilex ${res.status} for ${path}`);
+        return null;
+      }
+      return (await res.json()) as T;
+    } catch (err) {
+      if (attempt < retries) {
+        await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
+        continue;
+      }
+      console.error(`[discovery] Failed ${path} after ${retries + 1} attempts: ${errMsg(err)}`);
       return null;
     }
-    return (await res.json()) as T;
-  } catch (err) {
-    console.error(`[discovery] Request failed for ${path}:`, errMsg(err));
-    return null;
   }
+  return null;
 }
 
 /** Pick a random realistic Estonian prefix with wildcard */
