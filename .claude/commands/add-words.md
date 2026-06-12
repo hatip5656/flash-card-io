@@ -1,67 +1,87 @@
 # Add Words to Wordagram DB
 
-Add new Estonian words to the database. Uses the Ekilex API to discover words with CEFR levels, English translations, and example sentences.
+Review candidate words discovered by the background Ekilex job, add Turkish translations, and approve them into the main words table.
 
 ## Instructions
 
-The user will specify what words to add. Interpret their request and use the appropriate API:
+The backend discovers new Estonian words from Ekilex every 10 minutes and saves them to `candidate_words` table with status `pending`. Your job is to:
+1. Check what candidates are available
+2. Add Turkish translations (word + sentences)
+3. Approve them into the main `words` table
 
 ### API Base: https://wordagram.hatip.dev/api
 ### Auth Header: X-User-Id: 8607749953
 
-### Available Endpoints:
+### Step 1: Check pipeline status
+```
+GET /api/admin/candidates/stats
+```
 
-1. **Discover by search term** — finds a specific word in Ekilex:
-   ```
-   POST /api/admin/words/from-ekilex
-   Body: {"search": "koer"}
-   ```
+### Step 2: Get pending candidates (with sentences)
+```
+GET /api/admin/candidates?status=pending&level=A1&limit=20
+```
+Response includes each word's Estonian, English, CEFR level, and example sentences.
 
-2. **Discover random words by level** — pulls N new words at a given CEFR level:
-   ```
-   POST /api/admin/words/from-ekilex
-   Body: {"level": "A1", "count": 10}
-   ```
+### Step 3: Translate a candidate (word + sentences)
+```
+PATCH /api/admin/candidates/{id}
+Body: {
+  "turkish": "köpek",
+  "sentences": [
+    {"estonian": "Koer jookseb.", "turkish": "Köpek koşuyor."}
+  ]
+}
+```
 
-3. **Add manually** — when Ekilex doesn't have the word:
-   ```
-   POST /api/admin/words
-   Body: {"estonian": "koer", "english": "dog", "turkish": "köpek", "cefrLevel": "A1", "sentences": [{"estonian": "Koer jookseb.", "english": "The dog runs.", "turkish": "Köpek koşuyor."}]}
-   ```
+For each candidate:
+- Translate the word itself to Turkish
+- Translate ALL its example sentences to Turkish
+- Use natural, everyday Turkish — not overly formal
+- This changes the candidate status from `pending` to `translated`
 
-4. **Check current stats**:
-   ```
-   GET /api/admin/words/stats
-   ```
+### Step 4: Approve translated candidates into words table
+Approve one:
+```
+POST /api/admin/candidates/{id}/approve
+```
+Approve ALL translated at once:
+```
+POST /api/admin/candidates/approve-all
+```
 
-5. **Get words needing Turkish translation**:
-   ```
-   GET /api/admin/words/untranslated-full?level=A1&limit=10
-   ```
+### Step 5: Reject bad candidates (wrong level, duplicate meaning, etc.)
+```
+DELETE /api/admin/candidates/{id}
+```
 
-6. **Add Turkish translations** (word + sentences):
-   ```
-   PATCH /api/admin/words/{id}/translate
-   Body: {"turkish": "köpek", "sentences": [{"estonian": "Koer jookseb.", "turkish": "Köpek koşuyor."}]}
-   ```
-
-7. **Bulk translate**:
-   ```
-   POST /api/admin/words/bulk-translate
-   Body: {"translations": [{"id": "a1-koer", "turkish": "köpek", "sentences": [{"estonian": "...", "turkish": "..."}]}]}
-   ```
+### Step 6: Verify final stats
+```
+GET /api/admin/words/stats
+```
 
 ### Workflow:
+1. First check candidate stats to see how many are pending
+2. Fetch pending candidates for the requested level (or all levels)
+3. For EACH candidate, translate the word AND all its sentences to Turkish using PATCH
+4. After translating a batch, call approve-all to move them to the words table
+5. Report: how many translated, how many approved, how many rejected, new word totals
 
-1. First check stats to see current word counts per level
-2. Use from-ekilex to discover new words (they come with Estonian + English + sentences)
-3. After adding, fetch untranslated words and add Turkish translations
-4. Report what was added and what still needs Turkish
+### Processing approach:
+- Fetch candidates in batches (limit=10 or limit=20)
+- Translate each one with a PATCH call — include Turkish for the word AND every sentence
+- After each batch of translations, call approve-all once
+- Then fetch the next batch
+- Continue until all requested candidates are processed or user's limit is reached
 
 ### Rules:
-- Always check stats first to understand current state
-- Duplicate words are rejected by the API (unique constraint on estonian column)
-- When adding Turkish translations, translate BOTH the word AND its example sentences
-- Report results clearly: how many added, how many skipped (duplicates), how many need Turkish
+- Always check candidate stats first
+- Translate BOTH the word AND its example sentences to Turkish
+- Use natural everyday Turkish translations
+- Reject words that are too obscure, have no clear Turkish equivalent, or are duplicates in meaning of existing words
+- If a candidate has no sentences, still translate and approve the word
+- After approving, verify with /admin/words/stats to confirm new totals
+- When user says "add N words for level X" — translate and approve N pending candidates for that level
+- When user says "translate all" — process all pending candidates across all levels
 
 $ARGUMENTS
