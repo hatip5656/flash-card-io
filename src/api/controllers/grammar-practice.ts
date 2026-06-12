@@ -37,26 +37,33 @@ export async function generatePractice(req: Request, res: Response): Promise<voi
   const allStories = getAllStories();
 
   // Collect examples from relevant stories
-  let targetStories = storyId
+  const levelStories = allStories.filter((s) => s.cefrLevel === level);
+  const targetStories = storyId
     ? allStories.filter((s) => s.id === storyId)
-    : allStories.filter((s) => s.cefrLevel === level);
+    : levelStories;
 
   if (targetStories.length === 0) {
     res.status(404).json({ error: "No stories found" });
     return;
   }
 
-  // Gather all examples with their story context
+  // Gather all examples at this level (used as distractor pool)
+  const allLevelExamples: Example[] = [];
+  for (const story of levelStories) {
+    for (const slide of story.slides) {
+      if (slide.examples) allLevelExamples.push(...slide.examples);
+    }
+  }
+
+  // Gather target story examples (primary questions)
   const pool: Array<{ example: Example; topic: string; allExamples: Example[] }> = [];
   for (const story of targetStories) {
     const storyExamples: Example[] = [];
     for (const slide of story.slides) {
-      if (slide.examples) {
-        storyExamples.push(...slide.examples);
-      }
+      if (slide.examples) storyExamples.push(...slide.examples);
     }
     for (const ex of storyExamples) {
-      pool.push({ example: ex, topic: story.topic, allExamples: storyExamples });
+      pool.push({ example: ex, topic: story.topic, allExamples: allLevelExamples });
     }
   }
 
@@ -65,10 +72,20 @@ export async function generatePractice(req: Request, res: Response): Promise<voi
     return;
   }
 
+  // Multiply pool by using each example with different question types to reach count
+  const expandedPool: typeof pool = [];
+  const types: Array<"fill-blank" | "translate" | "choose-form"> = ["fill-blank", "translate", "choose-form"];
+  for (let t = 0; expandedPool.length < count && t < types.length; t++) {
+    for (const item of pool) {
+      expandedPool.push(item);
+      if (expandedPool.length >= count) break;
+    }
+  }
+
   const nativeTrans = (ex: Example) =>
     useTurkish && ex.turkish ? ex.turkish : ex.english;
 
-  const shuffled = shuffle([...pool]);
+  const shuffled = shuffle([...expandedPool]);
   const selected = shuffled.slice(0, count);
 
   const questions: PracticeQuestion[] = selected.map((item, i) => {
