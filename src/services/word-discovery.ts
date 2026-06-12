@@ -6,7 +6,7 @@ const API_BASE = "https://ekilex.ee/api";
 const LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2"];
 const WORDS_PER_LEVEL = 10;
 
-// Realistic Estonian 2-letter prefix starts (consonant+vowel, vowel+consonant patterns)
+// Realistic Estonian 2-letter prefix starts
 const ESTONIAN_PREFIXES = [
   "aa", "ab", "ae", "ah", "ai", "aj", "ak", "al", "am", "an", "ap", "ar", "as", "at", "au", "av",
   "ea", "eb", "ed", "ee", "eh", "ei", "ek", "el", "em", "en", "ep", "er", "es", "et", "ev",
@@ -54,6 +54,11 @@ interface EkilexWordDetails {
   lexemes: EkilexLexeme[];
 }
 
+// In-memory caches — persist across cron runs, cleared on pod restart
+const searchCache = new Map<string, EkilexSearchWord[]>();
+const detailsCache = new Map<number, EkilexWordDetails | null>();
+const searchedPrefixes = new Set<string>();
+
 async function apiRequest<T>(path: string, apiKey: string, retries = 2): Promise<T | null> {
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
@@ -78,15 +83,30 @@ async function apiRequest<T>(path: string, apiKey: string, retries = 2): Promise
   return null;
 }
 
-/** Pick a random realistic Estonian prefix with wildcard */
-function randomPrefix(): string {
-  const base = ESTONIAN_PREFIXES[Math.floor(Math.random() * ESTONIAN_PREFIXES.length)];
-  return base + "*";
+async function searchPrefix(prefix: string, apiKey: string): Promise<EkilexSearchWord[]> {
+  if (searchCache.has(prefix)) return searchCache.get(prefix)!;
+
+  const data = await apiRequest<{ totalCount: number; words: EkilexSearchWord[] }>(
+    `/word/search/${encodeURIComponent(prefix)}`,
+    apiKey,
+  );
+
+  const words = data?.words?.filter(w => w.lang === "est") ?? [];
+  searchCache.set(prefix, words);
+  return words;
+}
+
+async function getWordDetails(wordId: number, apiKey: string): Promise<EkilexWordDetails | null> {
+  if (detailsCache.has(wordId)) return detailsCache.get(wordId)!;
+
+  const details = await apiRequest<EkilexWordDetails>(`/word/details/${wordId}`, apiKey);
+  detailsCache.set(wordId, details);
+  return details;
 }
 
 /**
  * Discover new words from Ekilex and save to candidate_words table.
- * Uses random 2-3 letter prefixes to search broadly across the dictionary.
+ * Uses in-memory cache for Ekilex responses — never calls the same prefix or word twice.
  */
 export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise<number> {
   const existing = await pool.query("SELECT estonian FROM words");
@@ -95,49 +115,47 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
   for (const r of existing.rows) known.add(r.estonian);
   for (const r of candidatesDb.rows) known.add(r.estonian);
 
-  console.error(`[discovery] Starting... (${known.size} words already known)`);
+  console.error(`[discovery] Starting... (${known.size} known, ${searchedPrefixes.size}/${ESTONIAN_PREFIXES.length} prefixes cached)`);
 
   let totalAdded = 0;
   let totalSearches = 0;
   let totalDetails = 0;
-  let totalSkipped = 0;
   const targetPerLevel: Record<string, number> = {};
   for (const l of LEVELS) targetPerLevel[l] = 0;
 
+  // Pick unsearched prefixes first, then random from all
+  const unsearched = ESTONIAN_PREFIXES.filter(p => !searchedPrefixes.has(p));
+  const shuffled = unsearched.length > 0
+    ? unsearched.sort(() => Math.random() - 0.5)
+    : [...ESTONIAN_PREFIXES].sort(() => Math.random() - 0.5);
+
   const maxSearches = 30;
 
-  for (let search = 0; search < maxSearches; search++) {
+  for (const prefix of shuffled.slice(0, maxSearches)) {
     if (LEVELS.every(l => targetPerLevel[l] >= WORDS_PER_LEVEL)) break;
 
-    const prefix = randomPrefix();
+    const fullPrefix = prefix + "*";
     totalSearches++;
-    const data = await apiRequest<{ totalCount: number; words: EkilexSearchWord[] }>(
-      `/word/search/${encodeURIComponent(prefix)}`,
-      apiKey,
-    );
-    if (!data?.words?.length) {
-      console.error(`[discovery] Prefix "${prefix}": no results`);
-      continue;
-    }
-    console.error(`[discovery] Prefix "${prefix}": ${data.words.length} words`);
+    const words = await searchPrefix(fullPrefix, apiKey);
+    searchedPrefixes.add(prefix);
 
-    // Shuffle results and check first batch
-    const estWords = data.words
-      .filter(w => w.lang === "est" && w.wordValue.length >= 3 && !w.wordValue.includes(" "))
+    if (!words.length) continue;
+    console.error(`[discovery] Prefix "${fullPrefix}": ${words.length} words`);
+
+    // Shuffle and check candidates
+    const candidates = words
+      .filter(w => w.wordValue.length >= 3 && !w.wordValue.includes(" "))
       .sort(() => Math.random() - 0.5)
       .slice(0, 8);
 
-    for (const w of estWords) {
+    for (const w of candidates) {
       if (LEVELS.every(l => targetPerLevel[l] >= WORDS_PER_LEVEL)) break;
 
       const est = w.wordValue.toLowerCase();
       if (known.has(est)) continue;
 
       totalDetails++;
-      const details = await apiRequest<EkilexWordDetails>(
-        `/word/details/${w.wordId}`,
-        apiKey,
-      );
+      const details = await getWordDetails(w.wordId, apiKey);
       if (!details) continue;
 
       for (const lexeme of details.lexemes) {
@@ -150,10 +168,7 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
         for (const group of lexeme.synonymLangGroups ?? []) {
           if (group.lang === "eng") {
             for (const syn of group.synonyms ?? []) {
-              if (syn.words?.[0]) {
-                english = syn.words[0].wordValue;
-                break;
-              }
+              if (syn.words?.[0]) { english = syn.words[0].wordValue; break; }
             }
           }
           if (english) break;
@@ -167,10 +182,7 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
           if (!estSent) continue;
           let engSent = "";
           for (const t of u.translations ?? []) {
-            if (t.lang === "eng") {
-              engSent = (t.value ?? "").replace(/<[^>]*>/g, "");
-              break;
-            }
+            if (t.lang === "eng") { engSent = (t.value ?? "").replace(/<[^>]*>/g, ""); break; }
           }
           if (estSent && engSent) usages.push({ estonian: estSent, english: engSent });
         }
@@ -209,7 +221,8 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
   }
 
   const summary = LEVELS.map(l => `${l}:${targetPerLevel[l]}`).join(", ");
-  console.error(`[discovery] Done: ${totalAdded} added, ${totalSearches} searches, ${totalDetails} detail lookups (${summary})`);
+  console.error(`[discovery] Done: ${totalAdded} added, ${totalSearches} searches, ${totalDetails} details (${summary})`);
+  console.error(`[discovery] Cache: ${searchCache.size} prefix searches, ${detailsCache.size} word details`);
 
   return totalAdded;
 }
