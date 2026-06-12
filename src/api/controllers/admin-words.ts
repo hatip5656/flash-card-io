@@ -108,7 +108,8 @@ export async function addFromEkilex(req: Request, res: Response): Promise<void> 
   } else if (level && VALID_LEVELS.includes(level)) {
     // Discover random words for a level
     const target = Math.min(Number(count) || 10, 50);
-    const existingWords = await pool.query("SELECT estonian FROM words WHERE cefr_level = $1", [level]);
+    // Check ALL words, not just current level — prevent cross-level duplicates
+    const existingWords = await pool.query("SELECT estonian FROM words");
     const existingSet = new Set(existingWords.rows.map((r: any) => r.estonian));
 
     for (let attempt = 0; attempt < target * 3 && added.length < target; attempt++) {
