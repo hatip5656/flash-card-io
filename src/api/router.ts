@@ -75,7 +75,9 @@ export function createApiRouter(): Router {
   router.post("/admin/words", h(adminWords.addWord));
   router.post("/admin/words/from-ekilex", h(adminWords.addFromEkilex));
   router.get("/admin/words/untranslated", h(adminWords.getUntranslated));
+  router.get("/admin/words/untranslated-full", h(adminWords.getUntranslatedFull));
   router.get("/admin/words/stats", h(adminWords.getWordStats));
+  router.get("/admin/words/:id", h(adminWords.getWordDetail));
   router.patch("/admin/words/:id/translate", h(adminWords.translateWord));
   router.post("/admin/words/bulk-translate", h(adminWords.bulkTranslate));
 

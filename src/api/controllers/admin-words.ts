@@ -182,11 +182,12 @@ export async function getUntranslated(req: Request, res: Response): Promise<void
 
 /**
  * PATCH /api/admin/words/:id/translate
- * Add/update translation. Body: { turkish: string }
+ * Add/update translation for word AND its sentences.
+ * Body: { turkish: string, sentences?: [{estonian: string, turkish: string}] }
  */
 export async function translateWord(req: Request, res: Response): Promise<void> {
   const { id } = req.params;
-  const { turkish } = req.body;
+  const { turkish, sentences } = req.body;
 
   if (!turkish) {
     res.status(400).json({ error: "turkish translation required" });
@@ -194,6 +195,8 @@ export async function translateWord(req: Request, res: Response): Promise<void> 
   }
 
   const pool = getPool();
+
+  // Update word translation
   const result = await pool.query(
     "UPDATE words SET turkish = $1 WHERE id = $2 RETURNING id, estonian, english, turkish, cefr_level",
     [turkish, id],
@@ -204,12 +207,26 @@ export async function translateWord(req: Request, res: Response): Promise<void> 
     return;
   }
 
-  res.json(result.rows[0]);
+  // Update sentence translations if provided
+  let sentencesUpdated = 0;
+  if (sentences && Array.isArray(sentences)) {
+    for (const s of sentences) {
+      if (!s.estonian || !s.turkish) continue;
+      const r = await pool.query(
+        "UPDATE word_sentences SET turkish = $1 WHERE word_id = $2 AND estonian = $3",
+        [s.turkish, id, s.estonian],
+      );
+      if (r.rowCount && r.rowCount > 0) sentencesUpdated++;
+    }
+  }
+
+  res.json({ ...result.rows[0], sentencesUpdated });
 }
 
 /**
  * POST /api/admin/words/bulk-translate
- * Bulk add translations. Body: { translations: [{id, turkish}] }
+ * Bulk translate words AND their sentences.
+ * Body: { translations: [{id, turkish, sentences?: [{estonian, turkish}]}] }
  */
 export async function bulkTranslate(req: Request, res: Response): Promise<void> {
   const { translations } = req.body;
@@ -219,20 +236,93 @@ export async function bulkTranslate(req: Request, res: Response): Promise<void> 
   }
 
   const pool = getPool();
-  let updated = 0;
+  let wordsUpdated = 0;
+  let sentencesUpdated = 0;
 
   for (const t of translations) {
     if (!t.id || !t.turkish) continue;
-    const result = await pool.query("UPDATE words SET turkish = $1 WHERE id = $2", [t.turkish, t.id]);
-    if (result.rowCount && result.rowCount > 0) updated++;
+    const r = await pool.query("UPDATE words SET turkish = $1 WHERE id = $2", [t.turkish, t.id]);
+    if (r.rowCount && r.rowCount > 0) wordsUpdated++;
+
+    // Update sentence translations
+    if (t.sentences && Array.isArray(t.sentences)) {
+      for (const s of t.sentences) {
+        if (!s.estonian || !s.turkish) continue;
+        const sr = await pool.query(
+          "UPDATE word_sentences SET turkish = $1 WHERE word_id = $2 AND estonian = $3",
+          [s.turkish, t.id, s.estonian],
+        );
+        if (sr.rowCount && sr.rowCount > 0) sentencesUpdated++;
+      }
+    }
   }
 
-  // Reload word bank
-  if (updated > 0) {
+  if (wordsUpdated > 0) {
     await loadWordBankFromDb(pool);
   }
 
-  res.json({ updated, total: translations.length });
+  res.json({ wordsUpdated, sentencesUpdated, total: translations.length });
+}
+
+/**
+ * GET /api/admin/words/:id
+ * Get full word details including sentences (for translation workflow)
+ */
+export async function getWordDetail(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+  const pool = getPool();
+
+  const word = await pool.query(
+    "SELECT id, estonian, english, turkish, cefr_level FROM words WHERE id = $1",
+    [id],
+  );
+  if (word.rowCount === 0) {
+    res.status(404).json({ error: "Word not found" });
+    return;
+  }
+
+  const sentences = await pool.query(
+    "SELECT estonian, english, turkish, sort_order FROM word_sentences WHERE word_id = $1 ORDER BY sort_order",
+    [id],
+  );
+
+  res.json({ ...word.rows[0], sentences: sentences.rows });
+}
+
+/**
+ * GET /api/admin/words/untranslated-full?level=A1&limit=10
+ * Get words with their sentences that need Turkish translation
+ */
+export async function getUntranslatedFull(req: Request, res: Response): Promise<void> {
+  const limit = Math.min(Number(req.query.limit) || 10, 50);
+  const level = req.query.level as string | undefined;
+
+  const pool = getPool();
+
+  let query = "SELECT id, estonian, english, cefr_level FROM words WHERE turkish IS NULL";
+  const params: any[] = [];
+
+  if (level && VALID_LEVELS.includes(level)) {
+    params.push(level);
+    query += ` AND cefr_level = $${params.length}`;
+  }
+
+  params.push(limit);
+  query += ` ORDER BY cefr_level, estonian LIMIT $${params.length}`;
+
+  const words = await pool.query(query, params);
+
+  // Fetch sentences for each word
+  const result = [];
+  for (const w of words.rows) {
+    const sentences = await pool.query(
+      "SELECT estonian, english, turkish, sort_order FROM word_sentences WHERE word_id = $1 ORDER BY sort_order",
+      [w.id],
+    );
+    result.push({ ...w, sentences: sentences.rows });
+  }
+
+  res.json({ count: result.length, words: result });
 }
 
 /**
