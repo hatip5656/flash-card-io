@@ -13,6 +13,7 @@ import * as comments from "./controllers/comments.js";
 import * as audio from "./controllers/audio.js";
 import * as mobileQuiz from "./controllers/mobile-quiz.js";
 import * as grammarPractice from "./controllers/grammar-practice.js";
+import * as wordCrush from "./controllers/word-crush.js";
 
 export function createApiRouter(): Router {
   const router = Router();
@@ -65,6 +66,9 @@ export function createApiRouter(): Router {
 
   // Grammar practice (Mobile)
   router.get("/mobile/grammar/practice", h(grammarPractice.generatePractice));
+
+  // Word Crush game (Mobile)
+  router.get("/mobile/word-crush", h(wordCrush.getWordCrushData));
 
   // Feed (mobile app)
   router.get("/feed", h(feed.getFeed));
