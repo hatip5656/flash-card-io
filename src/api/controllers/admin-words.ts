@@ -94,7 +94,7 @@ export async function addFromEkilex(req: Request, res: Response): Promise<void> 
       // Add usage sentences
       for (let i = 0; i < w.usages.length; i++) {
         const u = w.usages[i];
-        if (u.estonian && u.english) {
+        if (u.estonian) {
           await pool.query(
             `INSERT INTO word_sentences (word_id, estonian, english, sort_order)
              VALUES ($1, $2, $3, $4)`,
@@ -128,7 +128,7 @@ export async function addFromEkilex(req: Request, res: Response): Promise<void> 
 
         for (let i = 0; i < w.usages.length; i++) {
           const u = w.usages[i];
-          if (u.estonian && u.english) {
+          if (u.estonian) {
             await pool.query(
               `INSERT INTO word_sentences (word_id, estonian, english, sort_order)
                VALUES ($1, $2, $3, $4)`,

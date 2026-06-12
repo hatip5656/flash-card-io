@@ -175,16 +175,16 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
         }
         if (!english) continue;
 
-        // Extract usages
+        // Extract usages — keep sentences even without English translation
         const usages: Array<{ estonian: string; english: string }> = [];
         for (const u of lexeme.usages ?? []) {
-          const estSent = (u.value ?? u.valuePrese ?? "").replace(/<[^>]*>/g, "");
-          if (!estSent) continue;
+          const estSent = (u.value ?? u.valuePrese ?? "").replace(/<[^>]*>/g, "").trim();
+          if (!estSent || estSent.length > 200) continue;
           let engSent = "";
           for (const t of u.translations ?? []) {
-            if (t.lang === "eng") { engSent = (t.value ?? "").replace(/<[^>]*>/g, ""); break; }
+            if (t.lang === "eng") { engSent = (t.value ?? "").replace(/<[^>]*>/g, "").trim(); break; }
           }
-          if (estSent && engSent) usages.push({ estonian: estSent, english: engSent });
+          usages.push({ estonian: estSent, english: engSent });
         }
 
         const pos = lexeme.pos?.[0]?.value ?? null;
