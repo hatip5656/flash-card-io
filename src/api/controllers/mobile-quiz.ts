@@ -60,11 +60,10 @@ export async function generateQuiz(req: Request, res: Response): Promise<void> {
   const missed = await getMostMissedWords(chatId, Math.min(count, 20));
   const missedSet = new Set(missed.map((m) => m.estonian));
 
-  const prioritized = [
-    ...enriched.filter((w) => missedSet.has(w.estonian)),
-    ...enriched.filter((w) => !missedSet.has(w.estonian)),
-  ];
-  const selected = prioritized.slice(0, count);
+  // Missed words first, then shuffle the rest so it's different every time
+  const missedWords = enriched.filter((w) => missedSet.has(w.estonian));
+  const otherWords = shuffle(enriched.filter((w) => !missedSet.has(w.estonian)));
+  const selected = [...missedWords, ...otherWords].slice(0, count);
 
   const typeLabel = useTurkish ? "tr" : "eng";
 
