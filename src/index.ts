@@ -431,18 +431,9 @@ async function main(): Promise<void> {
 
   // Word discovery: find new words from Ekilex every 10 minutes
   if (config.ekilexApiKey) {
-    const { discoverCandidates } = await import("./services/word-discovery.js");
-    const runDiscovery = async () => {
-      console.error("[discovery] Cron triggered");
-      try {
-        const added = await discoverCandidates(pool, config.ekilexApiKey!);
-        console.error(`[discovery] Completed: ${added} new candidates`);
-      } catch (err) {
-        console.error(`[discovery] Error:`, errMsg(err));
-      }
-    };
-    new Cron("*/10 * * * *", { timezone: config.cronTimezone }, runDiscovery);
-    console.error("[main] Word discovery: every 10 minutes");
+    // Word discovery disabled — we already have 687 pending candidates
+    // Re-enable when ready: import discoverCandidates and set up cron
+    console.error("[main] Word discovery: disabled (687 candidates pending)");
   }
 
   // Log cache stats on startup (async, non-blocking)
