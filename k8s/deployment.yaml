@@ -76,7 +76,7 @@ spec:
             - name: TTS_SPEAKER
               value: "mari"
             - name: FEATURE_DEEPFILTER
-              value: "true"
+              value: "false"
             - name: FEATURE_API
               value: "true"
             - name: NODE_OPTIONS
@@ -111,7 +111,7 @@ spec:
               memory: 1Gi
             limits:
               cpu: 1500m
-              memory: 1536Mi
+              memory: 2Gi
       volumes:
         - name: cache
           persistentVolumeClaim:
