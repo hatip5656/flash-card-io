@@ -80,38 +80,38 @@ spec:
             - name: FEATURE_API
               value: "true"
             - name: NODE_OPTIONS
-              value: "--max-old-space-size=512"
+              value: "--max-old-space-size=1024"
           startupProbe:
             httpGet:
               path: /healthz
               port: health
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            failureThreshold: 6
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 12
           livenessProbe:
             httpGet:
               path: /healthz
               port: health
             periodSeconds: 30
-            timeoutSeconds: 5
-            failureThreshold: 3
+            timeoutSeconds: 10
+            failureThreshold: 5
           readinessProbe:
             httpGet:
               path: /readyz
               port: health
             periodSeconds: 10
-            timeoutSeconds: 5
+            timeoutSeconds: 10
             failureThreshold: 3
           volumeMounts:
             - name: cache
               mountPath: /app/cache
           resources:
             requests:
-              cpu: 200m
-              memory: 512Mi
+              cpu: 250m
+              memory: 1Gi
             limits:
-              cpu: 1000m
-              memory: 768Mi
+              cpu: 1500m
+              memory: 1536Mi
       volumes:
         - name: cache
           persistentVolumeClaim:
