@@ -59,28 +59,17 @@ const searchCache = new Map<string, EkilexSearchWord[]>();
 const detailsCache = new Map<number, EkilexWordDetails | null>();
 const searchedPrefixes = new Set<string>();
 
-async function apiRequest<T>(path: string, apiKey: string, retries = 2): Promise<T | null> {
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      const res = await fetch(`${API_BASE}${path}`, {
-        headers: { "ekilex-api-key": apiKey },
-        signal: AbortSignal.timeout(90_000),
-      });
-      if (!res.ok) {
-        console.error(`[discovery] Ekilex ${res.status} for ${path}`);
-        return null;
-      }
-      return (await res.json()) as T;
-    } catch (err) {
-      if (attempt < retries) {
-        await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
-        continue;
-      }
-      console.error(`[discovery] Failed ${path} after ${retries + 1} attempts: ${errMsg(err)}`);
-      return null;
-    }
+async function apiRequest<T>(path: string, apiKey: string): Promise<T | null> {
+  try {
+    const res = await fetch(`${API_BASE}${path}`, {
+      headers: { "ekilex-api-key": apiKey },
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch {
+    return null;
   }
-  return null;
 }
 
 async function searchPrefix(prefix: string, apiKey: string): Promise<EkilexSearchWord[]> {
@@ -129,7 +118,7 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
     ? unsearched.sort(() => Math.random() - 0.5)
     : [...ESTONIAN_PREFIXES].sort(() => Math.random() - 0.5);
 
-  const maxSearches = 30;
+  const maxSearches = 10; // keep it light to avoid OOM
 
   for (const prefix of shuffled.slice(0, maxSearches)) {
     if (LEVELS.every(l => targetPerLevel[l] >= WORDS_PER_LEVEL)) break;
@@ -146,7 +135,7 @@ export async function discoverCandidates(pool: pg.Pool, apiKey: string): Promise
     const candidates = words
       .filter(w => w.wordValue.length >= 3 && !w.wordValue.includes(" "))
       .sort(() => Math.random() - 0.5)
-      .slice(0, 8);
+      .slice(0, 4);
 
     for (const w of candidates) {
       if (LEVELS.every(l => targetPerLevel[l] >= WORDS_PER_LEVEL)) break;
