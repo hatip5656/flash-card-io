@@ -94,6 +94,8 @@ export function createApiRouter(): Router {
   // Feed (mobile app)
   router.get("/feed", h(feed.getFeed));
   router.post("/feed/seen/:wordId", h(feed.markSeen));
+  router.post("/feed/mastered/:wordId", h(feed.markMastered));
+  router.delete("/feed/mastered/:wordId", h(feed.unmarkMastered));
 
   // Saved words (mobile bookmarks)
   router.get("/saved", h(saved.getSavedWords));

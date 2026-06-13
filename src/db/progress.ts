@@ -243,8 +243,8 @@ export async function getWordsDueForReview(chatId: number, limit = 10): Promise<
 export async function getSeenWordsByRecency(chatId: number, limit = 10, offset = 0): Promise<Array<{ wordId: string; wordValue: string; english: string }>> {
   const res = await pool.query(
     `SELECT word_id, word_value, english FROM sent_words
-     WHERE chat_id = $1 AND word_value IS NOT NULL
-     ORDER BY sent_at DESC
+     WHERE chat_id = $1 AND word_value IS NOT NULL AND mastered = FALSE
+     ORDER BY last_fed_at ASC NULLS FIRST, sent_at DESC
      LIMIT $2 OFFSET $3`,
     [chatId, limit, offset],
   );
@@ -530,7 +530,9 @@ export async function getRandomLearnedWord(chatId: number): Promise<{ wordId: st
 
 export async function getLearnedWordsForQuiz(chatId: number): Promise<Array<{ estonian: string; english: string; quizCount: number }>> {
   const res = await pool.query(
-    "SELECT word_value, english, quiz_count FROM sent_words WHERE chat_id = $1 AND word_value IS NOT NULL AND english IS NOT NULL ORDER BY quiz_count ASC",
+    `SELECT word_value, english, quiz_count FROM sent_words
+     WHERE chat_id = $1 AND word_value IS NOT NULL AND english IS NOT NULL AND mastered = FALSE
+     ORDER BY last_quizzed_at ASC NULLS FIRST, quiz_count ASC`,
     [chatId],
   );
   return res.rows.map((r) => ({ estonian: r.word_value, english: r.english, quizCount: Number(r.quiz_count) }));
@@ -539,8 +541,38 @@ export async function getLearnedWordsForQuiz(chatId: number): Promise<Array<{ es
 export async function incrementQuizCount(chatId: number, wordValues: string[]): Promise<void> {
   if (wordValues.length === 0) return;
   await pool.query(
-    "UPDATE sent_words SET quiz_count = quiz_count + 1 WHERE chat_id = $1 AND word_value = ANY($2)",
+    "UPDATE sent_words SET quiz_count = quiz_count + 1, last_quizzed_at = NOW() WHERE chat_id = $1 AND word_value = ANY($2)",
     [chatId, wordValues],
+  );
+}
+
+export async function trackFeedShown(chatId: number, wordIds: string[]): Promise<void> {
+  if (wordIds.length === 0) return;
+  await pool.query(
+    "UPDATE sent_words SET feed_count = feed_count + 1, last_fed_at = NOW() WHERE chat_id = $1 AND word_id = ANY($2)",
+    [chatId, wordIds],
+  );
+}
+
+export async function trackCrushFound(chatId: number, wordValues: string[]): Promise<void> {
+  if (wordValues.length === 0) return;
+  await pool.query(
+    "UPDATE sent_words SET crush_count = crush_count + 1, last_crushed_at = NOW() WHERE chat_id = $1 AND word_value = ANY($2)",
+    [chatId, wordValues],
+  );
+}
+
+export async function markWordMastered(chatId: number, wordId: string): Promise<void> {
+  await pool.query(
+    "UPDATE sent_words SET mastered = TRUE, mastered_at = NOW() WHERE chat_id = $1 AND word_id = $2",
+    [chatId, wordId],
+  );
+}
+
+export async function unmarkWordMastered(chatId: number, wordId: string): Promise<void> {
+  await pool.query(
+    "UPDATE sent_words SET mastered = FALSE, mastered_at = NULL WHERE chat_id = $1 AND word_id = $2",
+    [chatId, wordId],
   );
 }
 

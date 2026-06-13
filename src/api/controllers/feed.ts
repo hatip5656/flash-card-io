@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { getSubscriberLevel, getSentWordIds, getSeenWordsByRecency, getSavedWordIds, markWordSent, logWordActivity, getPool } from "../../db/progress.js";
+import { getSubscriberLevel, getSentWordIds, getSeenWordsByRecency, getSavedWordIds, markWordSent, logWordActivity, trackFeedShown, markWordMastered, unmarkWordMastered, getPool } from "../../db/progress.js";
 import { getUnsent, getWordById } from "../../flashcard/word-bank.js";
 import { searchPhoto, triggerDownload } from "../../services/unsplash.js";
 import { searchPexelsPhoto } from "../../services/pexels.js";
@@ -149,6 +149,12 @@ export async function getFeed(req: Request, res: Response): Promise<void> {
     }),
   );
 
+  // Track which seen words were shown in this feed page (fire and forget)
+  const shownWordIds = items.filter(i => !i.isNew).map(i => i.word.id);
+  if (shownWordIds.length > 0) {
+    trackFeedShown(chatId, shownWordIds).catch(() => {});
+  }
+
   const hasMore = items.length === limit;
   const nextCursor = hasMore ? `${nextMode}:${nextOffset}` : null;
 
@@ -162,6 +168,20 @@ export async function markSeen(req: Request, res: Response): Promise<void> {
   await markWordSent(chatId, wordId, estonian ?? null, english ?? null);
   await logWordActivity(chatId);
   res.json({ seen: true, wordId });
+}
+
+export async function markMastered(req: Request, res: Response): Promise<void> {
+  const chatId = req.userId!;
+  const wordId = req.params.wordId as string;
+  await markWordMastered(chatId, wordId);
+  res.json({ mastered: true, wordId });
+}
+
+export async function unmarkMastered(req: Request, res: Response): Promise<void> {
+  const chatId = req.userId!;
+  const wordId = req.params.wordId as string;
+  await unmarkWordMastered(chatId, wordId);
+  res.json({ mastered: false, wordId });
 }
 
 function parseCursor(cursor: string): ["new" | "review", number] {
