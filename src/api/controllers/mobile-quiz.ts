@@ -57,13 +57,15 @@ export async function generateQuiz(req: Request, res: Response): Promise<void> {
   const nativeTrans = (w: typeof enriched[0]) =>
     useTurkish && w.turkish ? w.turkish : w.english;
 
-  const missed = await getMostMissedWords(chatId, Math.min(count, 20));
+  const missed = await getMostMissedWords(chatId, 10);
   const missedSet = new Set(missed.map((m) => m.estonian));
 
-  // Missed words first, then shuffle the rest so it's different every time
-  const missedWords = enriched.filter((w) => missedSet.has(w.estonian));
-  const otherWords = shuffle(enriched.filter((w) => !missedSet.has(w.estonian)));
-  const selected = [...missedWords, ...otherWords].slice(0, count);
+  // Max 30% missed words, rest are shuffled from least-quizzed pool
+  const maxMissed = Math.ceil(count * 0.3);
+  const missedWords = shuffle(enriched.filter((w) => missedSet.has(w.estonian))).slice(0, maxMissed);
+  const missedIds = new Set(missedWords.map((w) => w.estonian));
+  const otherWords = shuffle(enriched.filter((w) => !missedIds.has(w.estonian)));
+  const selected = shuffle([...missedWords, ...otherWords.slice(0, count - missedWords.length)]);
 
   const typeLabel = useTurkish ? "tr" : "eng";
 
