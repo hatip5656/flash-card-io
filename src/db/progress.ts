@@ -222,6 +222,17 @@ export async function getWordsDueForReview(chatId: number, limit = 10): Promise<
   return res.rows.map((r) => ({ wordId: r.word_id, wordValue: r.word_value, english: r.english }));
 }
 
+export async function getSeenWordsByRecency(chatId: number, limit = 10, offset = 0): Promise<Array<{ wordId: string; wordValue: string; english: string }>> {
+  const res = await pool.query(
+    `SELECT word_id, word_value, english FROM sent_words
+     WHERE chat_id = $1 AND word_value IS NOT NULL
+     ORDER BY sent_at DESC
+     LIMIT $2 OFFSET $3`,
+    [chatId, limit, offset],
+  );
+  return res.rows.map((r) => ({ wordId: r.word_id, wordValue: r.word_value, english: r.english }));
+}
+
 export async function updateSm2(chatId: number, wordValue: string, quality: number): Promise<void> {
   // quality: 0-5 (0-2 = fail, 3 = hard, 4 = good, 5 = easy)
   const res = await pool.query(

@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { getSubscriberLevel, getSentWordIds, getWordsDueForReview, getSavedWordIds, markWordSent, logWordActivity } from "../../db/progress.js";
+import { getSubscriberLevel, getSentWordIds, getSeenWordsByRecency, getSavedWordIds, markWordSent, logWordActivity } from "../../db/progress.js";
 import { getUnsent, getWordById } from "../../flashcard/word-bank.js";
 import { searchPhoto, triggerDownload } from "../../services/unsplash.js";
 import { searchPexelsPhoto } from "../../services/pexels.js";
@@ -82,21 +82,20 @@ export async function getFeed(req: Request, res: Response): Promise<void> {
       nextMode = "review";
       nextOffset = 0;
       const reviewNeeded = limit - rawItems.length;
-      const reviewWords = await getWordsDueForReview(chatId, reviewNeeded);
-      for (const rw of reviewWords) {
-        const fullWord = getWordById(rw.wordId);
+      const seenWords = await getSeenWordsByRecency(chatId, reviewNeeded, 0);
+      for (const sw of seenWords) {
+        const fullWord = getWordById(sw.wordId);
         if (fullWord) rawItems.push({ word: fullWord, isNew: false });
       }
-      nextOffset = reviewWords.length;
+      nextOffset = seenWords.length;
     }
   } else {
-    const reviewWords = await getWordsDueForReview(chatId, limit + cursorOffset);
-    const slice = reviewWords.slice(cursorOffset, cursorOffset + limit);
-    for (const rw of slice) {
-      const fullWord = getWordById(rw.wordId);
+    const seenWords = await getSeenWordsByRecency(chatId, limit, cursorOffset);
+    for (const sw of seenWords) {
+      const fullWord = getWordById(sw.wordId);
       if (fullWord) rawItems.push({ word: fullWord, isNew: false });
     }
-    nextOffset = cursorOffset + slice.length;
+    nextOffset = cursorOffset + seenWords.length;
   }
 
   // Fetch images in parallel
