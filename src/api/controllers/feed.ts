@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { getSubscriberLevel, getSentWordIds, getSeenWordsByRecency, getSavedWordIds, markWordSent, logWordActivity } from "../../db/progress.js";
+import { getSubscriberLevel, getSentWordIds, getSeenWordsByRecency, getSavedWordIds, markWordSent, logWordActivity, getPool } from "../../db/progress.js";
 import { getUnsent, getWordById } from "../../flashcard/word-bank.js";
 import { searchPhoto, triggerDownload } from "../../services/unsplash.js";
 import { searchPexelsPhoto } from "../../services/pexels.js";
@@ -98,11 +98,35 @@ export async function getFeed(req: Request, res: Response): Promise<void> {
     nextOffset = cursorOffset + seenWords.length;
   }
 
-  // Fetch images in parallel
+  // Check DB-cached images first, fetch missing ones in parallel
+  const pool = getPool();
+  const wordIds = rawItems.map(r => r.word.id);
+  const cachedImages = await pool.query(
+    `SELECT id, image_url, image_photographer FROM words WHERE id = ANY($1)`,
+    [wordIds],
+  );
+  const imageCache = new Map<string, { url: string; photographer: string }>();
+  for (const row of cachedImages.rows) {
+    if (row.image_url) imageCache.set(row.id, { url: row.image_url, photographer: row.image_photographer ?? "" });
+  }
+
   const items: FeedItem[] = await Promise.all(
     rawItems.map(async ({ word, isNew }) => {
-      const query = word.imageQuery ?? word.english;
-      const img = await fetchImage(query, unsplashKey, pexelsKey);
+      let img = imageCache.get(word.id) ?? null;
+
+      // If no cached image, fetch and save to DB in background
+      if (!img) {
+        const query = word.imageQuery ?? word.english;
+        const fetched = await fetchImage(query, unsplashKey, pexelsKey);
+        if (fetched) {
+          img = fetched;
+          // Save to DB for next time (fire and forget)
+          pool.query(
+            "UPDATE words SET image_url = $1, image_photographer = $2 WHERE id = $3",
+            [fetched.url, fetched.photographer, word.id],
+          ).catch(() => {});
+        }
+      }
 
       return {
         word: {
