@@ -162,10 +162,10 @@ spec:
           resources:
             requests:
               cpu: 500m
-              memory: 1Gi
+              memory: 2Gi
             limits:
               cpu: 1500m
-              memory: 2Gi
+              memory: 3Gi
           # Lenient probe — worker CPU is fully used during inference,
           # so python3 probe startup can easily exceed tight timeouts
           livenessProbe:
