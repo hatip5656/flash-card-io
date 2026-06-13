@@ -114,18 +114,17 @@ export async function getFeed(req: Request, res: Response): Promise<void> {
     rawItems.map(async ({ word, isNew }) => {
       let img = imageCache.get(word.id) ?? null;
 
-      // If no cached image, fetch and save to DB in background
+      // If no cached image, fetch in background — don't block the response
       if (!img) {
         const query = word.imageQuery ?? word.english;
-        const fetched = await fetchImage(query, unsplashKey, pexelsKey);
-        if (fetched) {
-          img = fetched;
-          // Save to DB for next time (fire and forget)
-          pool.query(
-            "UPDATE words SET image_url = $1, image_photographer = $2 WHERE id = $3",
-            [fetched.url, fetched.photographer, word.id],
-          ).catch(() => {});
-        }
+        fetchImage(query, unsplashKey, pexelsKey).then(fetched => {
+          if (fetched) {
+            pool.query(
+              "UPDATE words SET image_url = $1, image_photographer = $2 WHERE id = $3",
+              [fetched.url, fetched.photographer, word.id],
+            ).catch(() => {});
+          }
+        }).catch(() => {});
       }
 
       return {
