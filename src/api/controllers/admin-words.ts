@@ -31,22 +31,35 @@ export async function addWord(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  await pool.query(
-    `INSERT INTO words (id, estonian, english, turkish, cefr_level)
-     VALUES ($1, $2, $3, $4, $5)`,
-    [id, estonian.toLowerCase(), english.toLowerCase(), turkish ?? null, cefrLevel],
-  );
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query(
+      `INSERT INTO words (id, estonian, english, turkish, cefr_level)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [id, estonian.toLowerCase(), english.toLowerCase(), turkish ?? null, cefrLevel],
+    );
 
-  // Add sentences if provided
-  if (sentences && Array.isArray(sentences)) {
-    for (let i = 0; i < sentences.length; i++) {
-      const s = sentences[i];
-      await pool.query(
-        `INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order)
-         VALUES ($1, $2, $3, $4, $5)`,
-        [id, s.estonian, s.english, s.turkish ?? null, i],
+    // Batch-insert sentences if provided
+    if (sentences && Array.isArray(sentences) && sentences.length > 0) {
+      const values: any[] = [];
+      const placeholders: string[] = [];
+      sentences.forEach((s: any, i: number) => {
+        const o = i * 5;
+        placeholders.push(`($${o + 1}, $${o + 2}, $${o + 3}, $${o + 4}, $${o + 5})`);
+        values.push(id, s.estonian, s.english, s.turkish ?? null, i);
+      });
+      await client.query(
+        `INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VALUES ${placeholders.join(", ")}`,
+        values,
       );
     }
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
   }
 
   // Reload word bank
@@ -312,16 +325,21 @@ export async function getUntranslatedFull(req: Request, res: Response): Promise<
   query += ` ORDER BY cefr_level, estonian LIMIT $${params.length}`;
 
   const words = await pool.query(query, params);
+  const wordIds = words.rows.map((w: any) => w.id);
 
-  // Fetch sentences for each word
-  const result = [];
-  for (const w of words.rows) {
-    const sentences = await pool.query(
-      "SELECT estonian, english, turkish, sort_order FROM word_sentences WHERE word_id = $1 ORDER BY sort_order",
-      [w.id],
-    );
-    result.push({ ...w, sentences: sentences.rows });
+  // Batch-fetch all sentences in one query
+  const allSents = wordIds.length > 0
+    ? await pool.query(
+        "SELECT word_id, estonian, english, turkish, sort_order FROM word_sentences WHERE word_id = ANY($1) ORDER BY word_id, sort_order",
+        [wordIds],
+      )
+    : { rows: [] };
+  const sentMap = new Map<string, any[]>();
+  for (const s of allSents.rows) {
+    if (!sentMap.has(s.word_id)) sentMap.set(s.word_id, []);
+    sentMap.get(s.word_id)!.push({ estonian: s.estonian, english: s.english, turkish: s.turkish, sort_order: s.sort_order });
   }
+  const result = words.rows.map((w: any) => ({ ...w, sentences: sentMap.get(w.id) ?? [] }));
 
   res.json({ count: result.length, words: result });
 }

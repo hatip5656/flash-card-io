@@ -12,6 +12,7 @@ export interface AppConfig {
   featureTelegram: boolean;
   featureWhatsapp: boolean;
   featureDeepfilter: boolean;
+  webhookUrl: string | null;
 }
 
 export const VALID_LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2"];
@@ -52,5 +53,6 @@ export function loadConfig(): AppConfig {
     featureTelegram,
     featureWhatsapp,
     featureDeepfilter,
+    webhookUrl: process.env.WEBHOOK_URL ?? null,
   };
 }

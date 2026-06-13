@@ -4,6 +4,24 @@ import { shuffle, errMsg } from "../utils.js";
 
 const API_BASE = "https://ekilex.ee/api";
 const MAX_DETAIL_LOOKUPS = 10;
+const MAX_REQUESTS_PER_MINUTE = 30;
+
+// Token bucket rate limiter for Ekilex API
+let ekilexTokens = MAX_REQUESTS_PER_MINUTE;
+let ekilexLastRefill = Date.now();
+
+function tryConsumeEkilex(): boolean {
+  const now = Date.now();
+  const elapsed = now - ekilexLastRefill;
+  const refill = Math.floor(elapsed / (60_000 / MAX_REQUESTS_PER_MINUTE));
+  if (refill > 0) {
+    ekilexTokens = Math.min(MAX_REQUESTS_PER_MINUTE, ekilexTokens + refill);
+    ekilexLastRefill = now;
+  }
+  if (ekilexTokens <= 0) return false;
+  ekilexTokens--;
+  return true;
+}
 
 // --- Ekilex API response types ---
 
@@ -70,9 +88,14 @@ export interface WordFormResult {
 // --- Internal helpers ---
 
 async function apiRequest<T>(path: string, apiKey: string): Promise<T | null> {
+  if (!tryConsumeEkilex()) {
+    console.error(`[ekilex] Rate limited, skipping ${path}`);
+    return null;
+  }
   try {
     const res = await fetch(`${API_BASE}${path}`, {
       headers: { "ekilex-api-key": apiKey },
+      signal: AbortSignal.timeout(10_000),
     });
     if (!res.ok) {
       console.error(`[ekilex] API error ${res.status} for ${path}`);

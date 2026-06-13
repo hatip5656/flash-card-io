@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { getLearnedWordsForQuiz, getMostMissedWords, incrementQuizCount, saveQuizResult, logQuizActivity, getQuizHistory, getQuizStats, getPreferences } from "../../db/progress.js";
+import { getLearnedWordsForQuiz, getMostMissedWords, incrementQuizCount, saveQuizResult, logQuizActivity, getQuizHistory, getQuizStats, getPreferences, getQuizSession, upsertQuizSession, pushQuizAnswer, deleteQuizSession } from "../../db/progress.js";
 import { getAllWords } from "../../flashcard/word-bank.js";
 import { shuffle } from "../../utils.js";
 import type { QuizAnswer } from "../../db/progress.js";
@@ -12,24 +12,7 @@ interface QuizQuestion {
   correctIndex: number;
 }
 
-interface QuizSession {
-  questions: QuizQuestion[];
-  answers: { chosen: number; correct: boolean }[];
-  words: Array<{ estonian: string; english: string }>;
-  createdAt: number;
-}
-
-const sessions = new Map<number, QuizSession>();
-const SESSION_TTL = 10 * 60 * 1000; // 10 min
-
-function cleanStaleSessions(): void {
-  const now = Date.now();
-  for (const [id, session] of sessions) {
-    if (now - session.createdAt > SESSION_TTL) sessions.delete(id);
-  }
-}
-
-// Lazily built and cached lookup: estonian → turkish
+// Lazily built and cached lookup: estonian -> turkish
 let turkishLookupCache: Map<string, string> | null = null;
 
 function getTurkishLookup(): Map<string, string> {
@@ -42,9 +25,13 @@ function getTurkishLookup(): Map<string, string> {
   return turkishLookupCache;
 }
 
+/** Call after words are added/modified to invalidate the cache. */
+export function invalidateTurkishCache(): void {
+  turkishLookupCache = null;
+}
+
 export async function startQuiz(req: Request, res: Response): Promise<void> {
   const chatId = req.userId!;
-  cleanStaleSessions();
 
   const prefs = await getPreferences(chatId);
   const useTurkish = prefs.nativeLanguage === "turkish";
@@ -53,7 +40,7 @@ export async function startQuiz(req: Request, res: Response): Promise<void> {
   const allWords = await getLearnedWordsForQuiz(chatId);
   if (allWords.length < 4) {
     const msg = useTurkish
-      ? "Quiz başlatmak için en az 4 kelime öğrenmelisin. Öğrenmeye devam et!"
+      ? "Quiz baslatmak icin en az 4 kelime ogrenmelisin. Ogrenmeye devam et!"
       : "Need at least 4 learned words to start a quiz. Keep learning!";
     res.status(400).json({ error: msg });
     return;
@@ -102,13 +89,10 @@ export async function startQuiz(req: Request, res: Response): Promise<void> {
     };
   });
 
-  const session: QuizSession = {
-    questions,
-    answers: [],
-    words: selected.map((w) => ({ estonian: w.estonian, english: w.english })),
-    createdAt: Date.now(),
-  };
-  sessions.set(chatId, session);
+  const words = selected.map((w) => ({ estonian: w.estonian, english: w.english }));
+
+  // Store session in DB
+  await upsertQuizSession(chatId, questions, words);
 
   res.json({
     totalQuestions: questions.length,
@@ -123,43 +107,48 @@ export async function startQuiz(req: Request, res: Response): Promise<void> {
 
 export async function submitAnswer(req: Request, res: Response): Promise<void> {
   const chatId = req.userId!;
-  const session = sessions.get(chatId);
+  const session = await getQuizSession(chatId);
   if (!session) {
     res.status(404).json({ error: "No active quiz session. Start one with POST /api/quiz/start" });
     return;
   }
 
-  const qIndex = session.answers.length;
-  if (qIndex >= session.questions.length) {
+  const questions = session.questions as QuizQuestion[];
+  const answers = session.answers as Array<{ chosen: number; correct: boolean }>;
+  const qIndex = answers.length;
+  if (qIndex >= questions.length) {
     res.status(400).json({ error: "Quiz already complete" });
     return;
   }
 
-  const question = session.questions[qIndex];
+  const question = questions[qIndex];
   const { chosenIndex } = req.body;
   if (chosenIndex === undefined || !Number.isInteger(chosenIndex) || chosenIndex < 0 || chosenIndex >= question.options.length) {
     res.status(400).json({ error: `chosenIndex must be an integer between 0 and ${question.options.length - 1}` });
     return;
   }
   const correct = chosenIndex === question.correctIndex;
-  session.answers.push({ chosen: chosenIndex, correct });
+  const newAnswer = { chosen: chosenIndex, correct };
+  await pushQuizAnswer(chatId, newAnswer);
 
-  const isComplete = session.answers.length >= session.questions.length;
+  const allAnswers = [...answers, newAnswer];
+  const isComplete = allAnswers.length >= questions.length;
 
   if (isComplete) {
-    const score = session.answers.filter((a) => a.correct).length;
-    const total = session.questions.length;
-    const quizAnswers: QuizAnswer[] = session.questions.map((q, i) => ({
-      estonian: session.words[i].estonian,
+    const score = allAnswers.filter((a) => a.correct).length;
+    const total = questions.length;
+    const words = session.words as Array<{ estonian: string; english: string }>;
+    const quizAnswers: QuizAnswer[] = questions.map((q, i) => ({
+      estonian: words[i].estonian,
       correctAnswer: q.options[q.correctIndex],
-      userAnswer: q.options[session.answers[i].chosen] ?? "",
-      isCorrect: session.answers[i].correct,
+      userAnswer: q.options[allAnswers[i].chosen] ?? "",
+      isCorrect: allAnswers[i].correct,
     }));
 
     await saveQuizResult(chatId, score, total, quizAnswers);
     await logQuizActivity(chatId);
-    await incrementQuizCount(chatId, session.words.map((w) => w.estonian));
-    sessions.delete(chatId);
+    await incrementQuizCount(chatId, words.map((w) => w.estonian));
+    await deleteQuizSession(chatId);
 
     res.json({
       correct,
@@ -174,7 +163,7 @@ export async function submitAnswer(req: Request, res: Response): Promise<void> {
     return;
   }
 
-  const next = session.questions[qIndex + 1];
+  const next = questions[qIndex + 1];
   res.json({
     correct,
     correctAnswer: question.options[question.correctIndex],

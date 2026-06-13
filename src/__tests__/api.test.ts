@@ -5,6 +5,9 @@ import { createApiRouter } from "../api/router.js";
 import { errorHandler } from "../api/middleware/errors.js";
 
 // --- Mock database layer ---
+// Shared session state for quiz tests
+let mockQuizSession: any = null;
+
 vi.mock("../db/progress.js", () => ({
   SCHEDULE_OFF: "off",
   DEFAULT_SCHEDULE: "0 9 * * *",
@@ -18,6 +21,7 @@ vi.mock("../db/progress.js", () => ({
   getPreferences: vi.fn().mockResolvedValue({
     audio: true, voiceName: "mari", wordForms: true,
     grammarCards: true, dailySummary: true, weeklyReport: true,
+    nativeLanguage: "english",
   }),
   updatePreference: vi.fn(),
   updateNextDelivery: vi.fn(),
@@ -46,6 +50,21 @@ vi.mock("../db/progress.js", () => ({
   logQuizActivity: vi.fn(),
   getStreak: vi.fn().mockResolvedValue(3),
   getTodayActivity: vi.fn().mockResolvedValue({ wordsLearned: 2, quizzesTaken: 1 }),
+  // DB-backed quiz sessions
+  getQuizSession: vi.fn().mockImplementation(() => {
+    if (!mockQuizSession) return null;
+    // Return a deep copy to match real DB behavior (fresh read each time)
+    return JSON.parse(JSON.stringify(mockQuizSession));
+  }),
+  upsertQuizSession: vi.fn().mockImplementation((_chatId: number, questions: any[], words: any[]) => {
+    mockQuizSession = { questions, answers: [], words, createdAt: new Date() };
+  }),
+  pushQuizAnswer: vi.fn().mockImplementation((_chatId: number, answer: any) => {
+    if (mockQuizSession) mockQuizSession.answers.push(answer);
+  }),
+  deleteQuizSession: vi.fn().mockImplementation(() => { mockQuizSession = null; }),
+  cleanExpiredQuizSessions: vi.fn().mockResolvedValue(0),
+  getNextMobileUserId: vi.fn().mockResolvedValue(2000000001),
 }));
 
 vi.mock("../services/prebuild.js", () => ({
@@ -93,6 +112,10 @@ describe("API", () => {
 
   beforeAll(() => {
     app = createTestApp();
+  });
+
+  beforeEach(() => {
+    mockQuizSession = null;
   });
 
   // --- Public endpoints ---

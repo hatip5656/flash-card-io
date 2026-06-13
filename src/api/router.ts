@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "./middleware/auth.js";
 import { asyncHandler as h } from "./middleware/async.js";
+import { flashcardLimiter, quizLimiter, adminLimiter } from "./middleware/rate-limit.js";
 import * as users from "./controllers/users.js";
 import * as flashcards from "./controllers/flashcards.js";
 import * as quiz from "./controllers/quiz.js";
@@ -46,8 +47,8 @@ export function createApiRouter(): Router {
   // Stats
   router.get("/users/me/stats", h(stats.getUserStats));
 
-  // Flashcards
-  router.get("/flashcards/next", h(flashcards.getNextFlashcard));
+  // Flashcards (rate-limited — builds are expensive)
+  router.get("/flashcards/next", flashcardLimiter, h(flashcards.getNextFlashcard));
   router.get("/flashcards/grammar", h(flashcards.getGrammarCard));
   router.get("/flashcards/audio/latest", h(flashcards.getAudio));
 
@@ -56,15 +57,15 @@ export function createApiRouter(): Router {
   router.post("/review/recall", h(flashcards.submitRecall));
 
   // Quiz (Telegram bot — session-based)
-  router.post("/quiz/start", h(quiz.startQuiz));
-  router.post("/quiz/answer", h(quiz.submitAnswer));
+  router.post("/quiz/start", quizLimiter, h(quiz.startQuiz));
+  router.post("/quiz/answer", quizLimiter, h(quiz.submitAnswer));
   router.get("/quiz/history", h(quiz.getHistory));
   router.get("/quiz/stats", h(quiz.getStats));
   router.get("/quiz/missed", h(quiz.getMissedWords));
 
   // Quiz (Mobile — all questions at once)
-  router.get("/mobile/quiz/generate", h(mobileQuiz.generateQuiz));
-  router.post("/mobile/quiz/submit", h(mobileQuiz.submitQuiz));
+  router.get("/mobile/quiz/generate", quizLimiter, h(mobileQuiz.generateQuiz));
+  router.post("/mobile/quiz/submit", quizLimiter, h(mobileQuiz.submitQuiz));
 
   // Grammar practice (Mobile)
   router.get("/mobile/grammar/practice", h(grammarPractice.generatePractice));
@@ -72,9 +73,9 @@ export function createApiRouter(): Router {
   // Word Crush game (Mobile)
   router.get("/mobile/word-crush", h(wordCrush.getWordCrushData));
 
-  // Admin: word catalog management
-  router.post("/admin/words", h(adminWords.addWord));
-  router.post("/admin/words/from-ekilex", h(adminWords.addFromEkilex));
+  // Admin: word catalog management (rate-limited)
+  router.post("/admin/words", adminLimiter, h(adminWords.addWord));
+  router.post("/admin/words/from-ekilex", adminLimiter, h(adminWords.addFromEkilex));
   router.get("/admin/words/untranslated", h(adminWords.getUntranslated));
   router.get("/admin/words/untranslated-full", h(adminWords.getUntranslatedFull));
   router.get("/admin/words/stats", h(adminWords.getWordStats));

@@ -79,18 +79,35 @@ export async function saveQuizResult(
   total: number,
   answers: QuizAnswer[],
 ): Promise<void> {
-  const percentage = Math.round((score / total) * 100);
-  const res = await pool.query(
-    "INSERT INTO quiz_results (chat_id, score, total, percentage) VALUES ($1, $2, $3, $4) RETURNING id",
-    [chatId, score, total, percentage],
-  );
-  const quizId = res.rows[0].id;
-
-  for (const a of answers) {
-    await pool.query(
-      "INSERT INTO quiz_answers (quiz_id, estonian, correct_answer, user_answer, is_correct) VALUES ($1, $2, $3, $4, $5)",
-      [quizId, a.estonian, a.correctAnswer, a.userAnswer, a.isCorrect],
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const percentage = Math.round((score / total) * 100);
+    const res = await client.query(
+      "INSERT INTO quiz_results (chat_id, score, total, percentage) VALUES ($1, $2, $3, $4) RETURNING id",
+      [chatId, score, total, percentage],
     );
+    const quizId = res.rows[0].id;
+
+    if (answers.length > 0) {
+      const values: any[] = [];
+      const placeholders: string[] = [];
+      answers.forEach((a, i) => {
+        const offset = i * 5;
+        placeholders.push(`($${offset + 1}, $${offset + 2}, $${offset + 3}, $${offset + 4}, $${offset + 5})`);
+        values.push(quizId, a.estonian, a.correctAnswer, a.userAnswer, a.isCorrect);
+      });
+      await client.query(
+        `INSERT INTO quiz_answers (quiz_id, estonian, correct_answer, user_answer, is_correct) VALUES ${placeholders.join(", ")}`,
+        values,
+      );
+    }
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
   }
 }
 
@@ -112,12 +129,10 @@ export async function getQuizHistory(chatId: number, limit = 5): Promise<QuizRes
   const res = await pool.query(
     `SELECT qr.id, qr.score, qr.total, qr.percentage, qr.completed_at,
             qa.estonian, qa.correct_answer, qa.user_answer, qa.is_correct
-     FROM quiz_results qr
+     FROM (SELECT * FROM quiz_results WHERE chat_id = $1 ORDER BY completed_at DESC LIMIT $2) qr
      LEFT JOIN quiz_answers qa ON qa.quiz_id = qr.id
-     WHERE qr.chat_id = $1
-     ORDER BY qr.completed_at DESC, qr.id DESC, qa.id ASC
-     LIMIT $2`,
-    [chatId, limit * 20],
+     ORDER BY qr.completed_at DESC, qr.id DESC, qa.id ASC`,
+    [chatId, limit],
   );
 
   const quizMap = new Map<number, QuizResult>();
@@ -149,30 +164,24 @@ export async function getQuizHistory(chatId: number, limit = 5): Promise<QuizRes
 
 export async function getQuizStats(chatId: number): Promise<{ totalQuizzes: number; avgPercentage: number; recentTrend: number | null }> {
   const res = await pool.query(
-    "SELECT COUNT(*) as count, COALESCE(AVG(percentage), 0) as avg_pct FROM quiz_results WHERE chat_id = $1",
+    `SELECT
+       COUNT(*) AS total,
+       COALESCE(AVG(percentage), 0) AS avg_pct,
+       AVG(CASE WHEN rn <= 5 THEN percentage END) AS recent_avg,
+       AVG(CASE WHEN rn > 5 AND rn <= 10 THEN percentage END) AS older_avg
+     FROM (
+       SELECT percentage, ROW_NUMBER() OVER (ORDER BY completed_at DESC) AS rn
+       FROM quiz_results WHERE chat_id = $1
+     ) sub`,
     [chatId],
   );
-  const totalQuizzes = Number(res.rows[0].count);
-  const avgPercentage = Math.round(Number(res.rows[0].avg_pct));
-
-  // Recent trend: compare last 5 quizzes avg vs previous 5
+  const row = res.rows[0];
+  const totalQuizzes = Number(row.total);
+  const avgPercentage = Math.round(Number(row.avg_pct));
   let recentTrend: number | null = null;
-  if (totalQuizzes >= 4) {
-    const recent = await pool.query(
-      "SELECT percentage FROM quiz_results WHERE chat_id = $1 ORDER BY completed_at DESC LIMIT 5",
-      [chatId],
-    );
-    const older = await pool.query(
-      "SELECT percentage FROM quiz_results WHERE chat_id = $1 ORDER BY completed_at DESC LIMIT 5 OFFSET 5",
-      [chatId],
-    );
-    if (older.rows.length > 0) {
-      const recentAvg = recent.rows.reduce((s: number, r: any) => s + Number(r.percentage), 0) / recent.rows.length;
-      const olderAvg = older.rows.reduce((s: number, r: any) => s + Number(r.percentage), 0) / older.rows.length;
-      recentTrend = Math.round(recentAvg - olderAvg);
-    }
+  if (totalQuizzes >= 4 && row.older_avg !== null) {
+    recentTrend = Math.round(Number(row.recent_avg) - Number(row.older_avg));
   }
-
   return { totalQuizzes, avgPercentage, recentTrend };
 }
 
@@ -195,18 +204,27 @@ export async function backfillEnglish(wordLookup: (wordId: string) => string | n
   const res = await pool.query(
     "SELECT chat_id, word_id, word_value FROM sent_words WHERE english IS NULL AND word_value IS NOT NULL",
   );
-  let updated = 0;
+  // Collect updates and batch them
+  const updates: Array<{ english: string; chatId: string; wordId: string }> = [];
   for (const row of res.rows) {
     const english = wordLookup(row.word_id);
     if (english) {
-      await pool.query(
-        "UPDATE sent_words SET english = $1 WHERE chat_id = $2 AND word_id = $3",
-        [english, row.chat_id, row.word_id],
-      );
-      updated++;
+      updates.push({ english, chatId: row.chat_id, wordId: row.word_id });
     }
   }
-  return updated;
+  if (updates.length === 0) return 0;
+
+  // Batch update using unnest
+  const englishArr = updates.map((u) => u.english);
+  const chatIdArr = updates.map((u) => u.chatId);
+  const wordIdArr = updates.map((u) => u.wordId);
+  await pool.query(
+    `UPDATE sent_words SET english = data.english
+     FROM unnest($1::text[], $2::bigint[], $3::text[]) AS data(english, chat_id, word_id)
+     WHERE sent_words.chat_id = data.chat_id AND sent_words.word_id = data.word_id`,
+    [englishArr, chatIdArr, wordIdArr],
+  );
+  return updates.length;
 }
 
 // SM-2 Spaced Repetition Algorithm
@@ -632,6 +650,50 @@ export async function getCommentCount(wordId: string): Promise<number> {
     [wordId],
   );
   return Number(res.rows[0].cnt);
+}
+
+// --- Quiz sessions (DB-backed for horizontal scaling) ---
+
+export interface DbQuizSession {
+  questions: any[];
+  answers: any[];
+  words: any[];
+  createdAt: Date;
+}
+
+export async function getQuizSession(chatId: number): Promise<DbQuizSession | null> {
+  const res = await pool.query(
+    "SELECT questions, answers, words, created_at FROM quiz_sessions WHERE chat_id = $1 AND created_at > NOW() - INTERVAL '10 minutes'",
+    [chatId],
+  );
+  if (res.rows.length === 0) return null;
+  const r = res.rows[0];
+  return { questions: r.questions, answers: r.answers, words: r.words, createdAt: r.created_at };
+}
+
+export async function upsertQuizSession(chatId: number, questions: any[], words: any[]): Promise<void> {
+  await pool.query(
+    `INSERT INTO quiz_sessions (chat_id, questions, answers, words, created_at)
+     VALUES ($1, $2, '[]', $3, NOW())
+     ON CONFLICT (chat_id) DO UPDATE SET questions = $2, answers = '[]', words = $3, created_at = NOW()`,
+    [chatId, JSON.stringify(questions), JSON.stringify(words)],
+  );
+}
+
+export async function pushQuizAnswer(chatId: number, answer: any): Promise<void> {
+  await pool.query(
+    "UPDATE quiz_sessions SET answers = answers || $1::jsonb WHERE chat_id = $2",
+    [JSON.stringify([answer]), chatId],
+  );
+}
+
+export async function deleteQuizSession(chatId: number): Promise<void> {
+  await pool.query("DELETE FROM quiz_sessions WHERE chat_id = $1", [chatId]);
+}
+
+export async function cleanExpiredQuizSessions(): Promise<number> {
+  const res = await pool.query("DELETE FROM quiz_sessions WHERE created_at < NOW() - INTERVAL '10 minutes'");
+  return res.rowCount ?? 0;
 }
 
 export async function getStats(chatId: number): Promise<{ sent: number; level: CefrLevel; schedule: string }> {

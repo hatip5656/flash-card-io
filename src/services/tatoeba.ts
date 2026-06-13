@@ -20,6 +20,7 @@ export async function searchSentences(
 
     const res = await fetch(`https://tatoeba.org/en/api_v0/search?${params}`, {
       headers: { "User-Agent": "flash-card-io/1.0" },
+      signal: AbortSignal.timeout(5_000),
     });
 
     if (!res.ok) {

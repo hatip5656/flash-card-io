@@ -1,6 +1,7 @@
 import express from "express";
 import { createApiRouter } from "./router.js";
 import { errorHandler } from "./middleware/errors.js";
+import { globalLimiter } from "./middleware/rate-limit.js";
 
 export function createApiApp(cronTimezone: string, unsplashAccessKey?: string, pexelsApiKey?: string): express.Express {
   const app = express();
@@ -9,8 +10,8 @@ export function createApiApp(cronTimezone: string, unsplashAccessKey?: string, p
   if (unsplashAccessKey) app.set("unsplashAccessKey", unsplashAccessKey);
   if (pexelsApiKey) app.set("pexelsApiKey", pexelsApiKey);
 
-  // Parse JSON bodies
-  app.use(express.json());
+  // Parse JSON bodies with size limit
+  app.use(express.json({ limit: "16kb" }));
 
   // CORS for mobile/web clients
   app.use((_req, res, next) => {
@@ -23,6 +24,9 @@ export function createApiApp(cronTimezone: string, unsplashAccessKey?: string, p
     }
     next();
   });
+
+  // Global rate limit
+  app.use("/api", globalLimiter);
 
   // Mount API routes
   app.use("/api", createApiRouter());

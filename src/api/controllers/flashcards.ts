@@ -4,17 +4,28 @@ import { popPrebuilt } from "../../services/prebuild.js";
 import type { Flashcard } from "../../flashcard/types.js";
 import { getRandomLesson } from "../../flashcard/grammar-bank.js";
 
-/** TTL audio cache — stores last audio per user for 5 minutes. */
+/** TTL audio cache — stores last audio per user for 5 minutes. Bounded to 500 entries. */
 const audioCache = new Map<number, { buffer: Buffer; expires: number }>();
 const AUDIO_TTL = 5 * 60 * 1000;
+const MAX_AUDIO_CACHE = 500;
 
 function storeAudio(chatId: number, buffer: Buffer): void {
   audioCache.set(chatId, { buffer, expires: Date.now() + AUDIO_TTL });
-  // Evict expired entries periodically
-  if (audioCache.size > 100) {
+  // Evict expired or oldest entries to stay bounded
+  if (audioCache.size > MAX_AUDIO_CACHE) {
     const now = Date.now();
     for (const [id, entry] of audioCache) {
       if (entry.expires < now) audioCache.delete(id);
+    }
+    // If still over limit, delete oldest entries
+    if (audioCache.size > MAX_AUDIO_CACHE) {
+      const excess = audioCache.size - MAX_AUDIO_CACHE;
+      let removed = 0;
+      for (const [id] of audioCache) {
+        if (removed >= excess) break;
+        audioCache.delete(id);
+        removed++;
+      }
     }
   }
 }

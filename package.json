@@ -25,6 +25,7 @@
   "dependencies": {
     "croner": "^9.0.0",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
     "grammy": "^1.41.1",
     "node-pg-migrate": "^8.0.4",
     "pg": "^8.20.0"

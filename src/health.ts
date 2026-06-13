@@ -7,7 +7,15 @@ export function setReady(value: boolean): void {
   ready = value;
 }
 
+export function getApiApp(): Express | undefined {
+  return currentApp;
+}
+
+let currentApp: Express | undefined;
+
 export function startHealthServer(port = 8080, apiApp?: Express): void {
+  currentApp = apiApp;
+
   if (apiApp) {
     // Mount health endpoints on the Express app
     apiApp.get("/healthz", (_req, res) => { res.send("ok"); });

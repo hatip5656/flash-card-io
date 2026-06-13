@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 import { loadConfig, type CefrLevel } from "./config.js";
-import { startHealthServer, setReady } from "./health.js";
+import { startHealthServer, setReady, getApiApp } from "./health.js";
+import { webhookCallback } from "grammy";
 import { initDb, closeDb, getActiveSubscribers, getSentWordIds, getSentWordValues, markWordSent, getSubscriberLevel, backfillEnglish, getSentGrammarIds, markGrammarSent, logWordActivity, getStreak, getTodayActivity, getStats, getQuizStats, getPreferences, initNextDeliveryForAll, initNextGrammarForAll } from "./db/progress.js";
 import { loadWordBank, getUnsent, getWordById } from "./flashcard/word-bank.js";
 import { loadGrammarBank, getRandomLesson } from "./flashcard/grammar-bank.js";
@@ -282,12 +283,17 @@ async function refillQueue(chatId: number): Promise<void> {
 
 /**
  * Warm pre-build queues for all active subscribers during idle time.
+ * Process in batches of 5 for concurrency without overwhelming resources.
  */
 async function warmAllQueues(): Promise<void> {
   try {
     const subs = await getActiveSubscribers();
-    for (const sub of subs) {
-      await refillQueue(sub.chatId);
+    const BATCH = 5;
+    for (let i = 0; i < subs.length; i += BATCH) {
+      const batch = subs.slice(i, i + BATCH);
+      await Promise.all(batch.map((sub) => refillQueue(sub.chatId).catch((err) => {
+        console.error(`[prebuild] Warm-up error for ${sub.chatId}:`, errMsg(err));
+      })));
     }
   } catch (err) {
     console.error("[prebuild] Warm-up error:", errMsg(err));
@@ -332,9 +338,25 @@ async function main(): Promise<void> {
     bot.catch((err) => {
       console.error("[bot] Unhandled error:", errMsg(err.error));
     });
-    bot.start({
-      onStart: () => console.error("[main] Telegram bot polling started"),
-    });
+
+    if (config.webhookUrl) {
+      // Webhook mode — mount handler on Express and register with Telegram
+      const app = getApiApp();
+      if (app) {
+        const secretPath = `/telegram-webhook-${config.telegramBotToken.split(":")[0]}`;
+        app.use(secretPath, webhookCallback(bot, "express"));
+        await bot.api.setWebhook(`${config.webhookUrl}${secretPath}`);
+        console.error(`[main] Telegram webhook set: ${config.webhookUrl}${secretPath}`);
+      } else {
+        console.error("[main] Webhook mode requires API server — falling back to polling");
+        bot.start({ onStart: () => console.error("[main] Telegram bot polling started") });
+      }
+    } else {
+      // Polling mode (development / single-pod)
+      bot.start({
+        onStart: () => console.error("[main] Telegram bot polling started"),
+      });
+    }
   }
 
   // Wire API build function (for live flashcard builds when pre-built queue is empty)
@@ -462,7 +484,12 @@ async function main(): Promise<void> {
     cacheEvictionJob.stop();
     prebuildWarmupJob.stop();
     dailySummaryJob.stop();
-    if (bot) bot.stop();
+    if (bot) {
+      if (config.webhookUrl) {
+        await bot.api.deleteWebhook().catch(() => {});
+      }
+      bot.stop();
+    }
     await closeDb();
     process.exit(0);
   };

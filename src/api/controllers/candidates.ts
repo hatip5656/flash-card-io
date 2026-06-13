@@ -23,16 +23,21 @@ export async function listCandidates(req: Request, res: Response): Promise<void>
   query += ` ORDER BY discovered_at DESC LIMIT $${params.length}`;
 
   const words = await pool.query(query, params);
+  const wordIds = words.rows.map((w: any) => w.id);
 
-  // Fetch sentences
-  const result = [];
-  for (const w of words.rows) {
-    const sents = await pool.query(
-      "SELECT estonian, english, turkish, sort_order FROM candidate_sentences WHERE candidate_id = $1 ORDER BY sort_order",
-      [w.id],
-    );
-    result.push({ ...w, sentences: sents.rows });
+  // Batch-fetch all sentences in one query
+  const sents = wordIds.length > 0
+    ? await pool.query(
+        "SELECT candidate_id, estonian, english, turkish, sort_order FROM candidate_sentences WHERE candidate_id = ANY($1) ORDER BY candidate_id, sort_order",
+        [wordIds],
+      )
+    : { rows: [] };
+  const sentMap = new Map<number, any[]>();
+  for (const s of sents.rows) {
+    if (!sentMap.has(s.candidate_id)) sentMap.set(s.candidate_id, []);
+    sentMap.get(s.candidate_id)!.push({ estonian: s.estonian, english: s.english, turkish: s.turkish, sort_order: s.sort_order });
   }
+  const result = words.rows.map((w: any) => ({ ...w, sentences: sentMap.get(w.id) ?? [] }));
 
   // Stats
   const stats = await pool.query(`
@@ -116,28 +121,43 @@ export async function approveCandidate(req: Request, res: Response): Promise<voi
     return;
   }
 
-  // Insert into words
-  await pool.query(
-    `INSERT INTO words (id, estonian, english, turkish, cefr_level)
-     VALUES ($1, $2, $3, $4, $5)`,
-    [wordId, w.estonian, w.english, w.turkish, w.cefr_level],
-  );
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
 
-  // Move sentences
-  const sents = await pool.query(
-    "SELECT estonian, english, turkish, sort_order FROM candidate_sentences WHERE candidate_id = $1 ORDER BY sort_order",
-    [id],
-  );
-  for (const s of sents.rows) {
-    await pool.query(
-      `INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order)
+    await client.query(
+      `INSERT INTO words (id, estonian, english, turkish, cefr_level)
        VALUES ($1, $2, $3, $4, $5)`,
-      [wordId, s.estonian, s.english, s.turkish, s.sort_order],
+      [wordId, w.estonian, w.english, w.turkish, w.cefr_level],
     );
-  }
 
-  // Mark as approved
-  await pool.query("UPDATE candidate_words SET status = 'approved' WHERE id = $1", [id]);
+    // Batch-insert sentences
+    const sents = await client.query(
+      "SELECT estonian, english, turkish, sort_order FROM candidate_sentences WHERE candidate_id = $1 ORDER BY sort_order",
+      [id],
+    );
+    if (sents.rows.length > 0) {
+      const values: any[] = [];
+      const placeholders: string[] = [];
+      sents.rows.forEach((s: any, i: number) => {
+        const o = i * 5;
+        placeholders.push(`($${o + 1}, $${o + 2}, $${o + 3}, $${o + 4}, $${o + 5})`);
+        values.push(wordId, s.estonian, s.english, s.turkish, s.sort_order);
+      });
+      await client.query(
+        `INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VALUES ${placeholders.join(", ")}`,
+        values,
+      );
+    }
+
+    await client.query("UPDATE candidate_words SET status = 'approved' WHERE id = $1", [id]);
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 
   // Reload word bank
   await loadWordBankFromDb(pool);
@@ -164,36 +184,69 @@ export async function approveAll(req: Request, res: Response): Promise<void> {
   let approved = 0;
   let skipped = 0;
 
-  for (const w of candidates.rows) {
-    const wordId = `${w.cefr_level.toLowerCase()}-${w.estonian.replace(/\s+/g, "-")}`;
+  // Pre-fetch existing words to avoid N+1 duplicate checks
+  const existingWords = await pool.query("SELECT estonian FROM words");
+  const existingSet = new Set(existingWords.rows.map((r: any) => r.estonian));
 
-    const dup = await pool.query("SELECT id FROM words WHERE estonian = $1", [w.estonian]);
-    if (dup.rowCount && dup.rowCount > 0) {
-      await pool.query("UPDATE candidate_words SET status = 'rejected' WHERE id = $1", [w.id]);
-      skipped++;
-      continue;
-    }
+  // Pre-fetch all candidate sentences in one query
+  const candidateIds = candidates.rows.map((w: any) => w.id);
+  const allSents = candidateIds.length > 0
+    ? await pool.query(
+        "SELECT candidate_id, estonian, english, turkish, sort_order FROM candidate_sentences WHERE candidate_id = ANY($1) ORDER BY candidate_id, sort_order",
+        [candidateIds],
+      )
+    : { rows: [] };
+  const sentMap = new Map<number, any[]>();
+  for (const s of allSents.rows) {
+    if (!sentMap.has(s.candidate_id)) sentMap.set(s.candidate_id, []);
+    sentMap.get(s.candidate_id)!.push(s);
+  }
 
-    await pool.query(
-      `INSERT INTO words (id, estonian, english, turkish, cefr_level)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [wordId, w.estonian, w.english, w.turkish, w.cefr_level],
-    );
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
 
-    const sents = await pool.query(
-      "SELECT estonian, english, turkish, sort_order FROM candidate_sentences WHERE candidate_id = $1",
-      [w.id],
-    );
-    for (const s of sents.rows) {
-      await pool.query(
-        `INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order)
+    for (const w of candidates.rows) {
+      const wordId = `${w.cefr_level.toLowerCase()}-${w.estonian.replace(/\s+/g, "-")}`;
+
+      if (existingSet.has(w.estonian)) {
+        await client.query("UPDATE candidate_words SET status = 'rejected' WHERE id = $1", [w.id]);
+        skipped++;
+        continue;
+      }
+
+      await client.query(
+        `INSERT INTO words (id, estonian, english, turkish, cefr_level)
          VALUES ($1, $2, $3, $4, $5)`,
-        [wordId, s.estonian, s.english, s.turkish, s.sort_order],
+        [wordId, w.estonian, w.english, w.turkish, w.cefr_level],
       );
+      existingSet.add(w.estonian);
+
+      const sents = sentMap.get(w.id) ?? [];
+      if (sents.length > 0) {
+        const values: any[] = [];
+        const placeholders: string[] = [];
+        sents.forEach((s: any, i: number) => {
+          const o = i * 5;
+          placeholders.push(`($${o + 1}, $${o + 2}, $${o + 3}, $${o + 4}, $${o + 5})`);
+          values.push(wordId, s.estonian, s.english, s.turkish, s.sort_order);
+        });
+        await client.query(
+          `INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VALUES ${placeholders.join(", ")}`,
+          values,
+        );
+      }
+
+      await client.query("UPDATE candidate_words SET status = 'approved' WHERE id = $1", [w.id]);
+      approved++;
     }
 
-    await pool.query("UPDATE candidate_words SET status = 'approved' WHERE id = $1", [w.id]);
-    approved++;
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
   }
 
   if (approved > 0) {
