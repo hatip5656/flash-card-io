@@ -17,6 +17,7 @@ import * as grammarPractice from "./controllers/grammar-practice.js";
 import * as wordCrush from "./controllers/word-crush.js";
 import * as adminWords from "./controllers/admin-words.js";
 import * as candidates from "./controllers/candidates.js";
+import * as dialogs from "./controllers/dialogs.js";
 
 export function createApiRouter(): Router {
   const router = Router();
@@ -90,6 +91,10 @@ export function createApiRouter(): Router {
   router.post("/admin/candidates/:id/approve", h(candidates.approveCandidate));
   router.post("/admin/candidates/approve-all", h(candidates.approveAll));
   router.delete("/admin/candidates/:id", h(candidates.rejectCandidate));
+
+  // Dialogs (conversation practice)
+  router.get("/dialogs", h(dialogs.listDialogs));
+  router.get("/dialogs/:id", h(dialogs.getDialog));
 
   // Feed (mobile app)
   router.get("/feed", h(feed.getFeed));
