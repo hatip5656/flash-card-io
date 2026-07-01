@@ -1,5 +1,5 @@
 import {Request, Response} from 'express';
-import {getPool} from '../../db/progress';
+import {getPool} from '../../db/progress.js';
 
 export async function listStories(req: Request, res: Response) {
   const pool = getPool();
