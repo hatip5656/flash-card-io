@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/flashcard_io}
+    username: ${DB_USERNAME:}
+    password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: 20
+      idle-timeout: 30000
+      connection-timeout: 10000
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+  jackson:
+    default-property-inclusion: non_null
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+
+app:
+  unsplash-access-key: ${UNSPLASH_ACCESS_KEY:}
+  pexels-api-key: ${PEXELS_API_KEY:}
+  ekilex-api-key: ${EKILEX_API_KEY:}
+  tts-api-url: ${TTS_API_URL:http://tts-api:8000}
+  tts-speaker: ${TTS_SPEAKER:mari}
+  cron-timezone: ${CRON_TIMEZONE:Europe/Tallinn}
+  cron-schedule: ${CRON_SCHEDULE:0 9 * * *}
+  cefr-levels: ${CEFR_LEVELS:A1,A2}

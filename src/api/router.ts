@@ -18,6 +18,7 @@ import * as wordCrush from "./controllers/word-crush.js";
 import * as adminWords from "./controllers/admin-words.js";
 import * as candidates from "./controllers/candidates.js";
 import * as dialogs from "./controllers/dialogs.js";
+import * as adventure from "./controllers/adventure.js";
 
 export function createApiRouter(): Router {
   const router = Router();
@@ -95,6 +96,12 @@ export function createApiRouter(): Router {
   // Dialogs (conversation practice)
   router.get("/dialogs", h(dialogs.listDialogs));
   router.get("/dialogs/:id", h(dialogs.getDialog));
+
+  // Adventure stories
+  router.get("/adventure/stories", h(adventure.listStories));
+  router.get("/adventure/stories/:storyId", h(adventure.getStory));
+  router.post("/adventure/stories/:storyId/progress", h(adventure.saveProgress));
+  router.get("/adventure/stories/:storyId/progress", h(adventure.getProgress));
 
   // Feed (mobile app)
   router.get("/feed", h(feed.getFeed));
