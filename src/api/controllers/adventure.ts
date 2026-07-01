@@ -47,7 +47,8 @@ export async function getStory(req: Request, res: Response) {
   // Get story meta
   const storyResult = await pool.query(`SELECT * FROM adventure_stories WHERE id = $1`, [storyId]);
   if (storyResult.rows.length === 0) {
-    return res.status(404).json({error: 'Story not found'});
+    res.status(404).json({error: 'Story not found'});
+    return;
   }
   const story = storyResult.rows[0];
 
@@ -177,7 +178,8 @@ export async function getProgress(req: Request, res: Response) {
   );
 
   if (result.rows.length === 0) {
-    return res.json({progress: null});
+    res.json({progress: null});
+    return;
   }
 
   const p = result.rows[0];
