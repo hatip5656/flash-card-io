@@ -21,7 +21,11 @@ export async function listStories(req: Request, res: Response) {
       )
     : {rows: []};
 
-  const progressMap = new Map(progressResult.rows.map((r: any) => [r.story_id, r]));
+  const progressMap = new Map(progressResult.rows.map((r: any) => [r.story_id, {
+    currentNodeId: r.current_node_id,
+    wordsLearned: r.words_learned,
+    completed: r.completed,
+  }]));
 
   const stories = storiesResult.rows.map((s: any) => ({
     id: s.id,
