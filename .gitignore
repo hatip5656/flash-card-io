@@ -19,6 +19,14 @@ data/db/
 .playwright-mcp/
 .claude/
 
+# Java / Maven
+java/target/
+*.class
+*.jar
+*.war
+*.log
+java/.mvn/
+
 # OS
 .DS_Store
 Thumbs.db
