@@ -121,18 +121,17 @@ spec:
         app: tts-worker
     spec:
       initContainers:
-        # Download model files if not present
         - name: model-downloader
           image: alpine:3
           command:
             - sh
             - -c
             - |
-              if [ ! -f /models/multispeaker/model_weights.hdf5 ]; then
+              if [ ! -f /app/models/multispeaker/model_weights.hdf5 ]; then
                 echo "Downloading TTS model..."
                 apk add --no-cache wget unzip
                 wget -q https://github.com/TartuNLP/text-to-speech-worker/releases/download/v3.1.0/multispeaker.zip -O /tmp/model.zip
-                unzip -o /tmp/model.zip -d /models/
+                unzip -o /tmp/model.zip -d /app/models/
                 rm /tmp/model.zip
                 echo "Model downloaded successfully"
               else
@@ -140,7 +139,7 @@ spec:
               fi
           volumeMounts:
             - name: models
-              mountPath: /models
+              mountPath: /app/models
       containers:
         - name: tts-worker
           image: ghcr.io/tartunlp/text-to-speech-worker:latest
@@ -164,8 +163,8 @@ spec:
               cpu: 500m
               memory: 2Gi
             limits:
-              cpu: 1500m
-              memory: 3Gi
+              cpu: 2000m
+              memory: 4Gi
           # Lenient probe — worker CPU is fully used during inference,
           # so python3 probe startup can easily exceed tight timeouts
           livenessProbe:

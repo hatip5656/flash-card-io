@@ -49,26 +49,21 @@ public class FlashcardBuilderService {
     public Flashcard buildFlashcard(Word word, BuildOptions options) {
         SentenceService.Sentence sentence = sentenceService.resolveSentence(word);
         String query = word.getImageQuery() != null ? word.getImageQuery() : word.getEnglish();
-        ImageService.ImageResult photo = imageService.fetchImage(query);
 
-        List<GrammarBuilderService.SelectedForm> forms = List.of();
-        String ekilexKey = appProperties.getEkilexApiKey();
-        if (ekilexKey != null && !ekilexKey.isBlank() && options.wordFormsEnabled()) {
-            // Ekilex word forms - skipped in this build for simplicity
-            // Could be added with EkilexService.getWordFormsForValue
-        }
+        // Run image fetch and TTS in parallel
+        var imageFuture = java.util.concurrent.CompletableFuture.supplyAsync(() -> imageService.fetchImage(query));
+
+        boolean shouldTts = options.audioEnabled() && ttsService.isAvailable();
+        var audioFuture = shouldTts
+            ? java.util.concurrent.CompletableFuture.supplyAsync(() ->
+                ttsService.synthesizeSpeech(word.getEstonian(), sentence.estonian(), options.voiceName()))
+            : java.util.concurrent.CompletableFuture.completedFuture((byte[]) null);
+
+        ImageService.ImageResult photo = imageFuture.join();
+        byte[] audio = audioFuture.join();
 
         String caption = buildCaption(word.getEstonian(), word.getEnglish(), word.getCefrLevel(),
-            sentence, photo, forms, null, null, options.isReview());
-
-        byte[] audio = null;
-        if (options.audioEnabled()) {
-            try {
-                audio = ttsService.synthesizeSpeech(word.getEstonian(), sentence.estonian(), options.voiceName());
-            } catch (Exception e) {
-                log.warn("[builder] TTS failed for \"{}\": {}", word.getEstonian(), e.getMessage());
-            }
-        }
+            sentence, photo, List.of(), null, null, options.isReview());
 
         return new Flashcard(word, sentence,
             photo != null ? photo.url() : null,
@@ -78,7 +73,6 @@ public class FlashcardBuilderService {
 
     public Flashcard buildFlashcardFromEkilex(EkilexService.EkilexWord ekilexWord, BuildOptions options) {
         String query = ekilexWord.english() != null ? ekilexWord.english() : ekilexWord.wordValue();
-        ImageService.ImageResult photo = imageService.fetchImage(query);
 
         SentenceService.Sentence sentence;
         if (!ekilexWord.usages().isEmpty()) {
@@ -87,6 +81,18 @@ public class FlashcardBuilderService {
         } else {
             sentence = new SentenceService.Sentence(ekilexWord.wordValue(), ekilexWord.english() != null ? ekilexWord.english() : "");
         }
+
+        // Run image fetch and TTS in parallel
+        var imageFuture = java.util.concurrent.CompletableFuture.supplyAsync(() -> imageService.fetchImage(query));
+
+        boolean shouldTts = options.audioEnabled() && ttsService.isAvailable();
+        var audioFuture = shouldTts
+            ? java.util.concurrent.CompletableFuture.supplyAsync(() ->
+                ttsService.synthesizeSpeech(ekilexWord.wordValue(), sentence.estonian(), options.voiceName()))
+            : java.util.concurrent.CompletableFuture.completedFuture((byte[]) null);
+
+        ImageService.ImageResult photo = imageFuture.join();
+        byte[] audio = audioFuture.join();
 
         Word word = new Word();
         word.setId("ekilex-" + ekilexWord.wordId());
@@ -100,15 +106,6 @@ public class FlashcardBuilderService {
             ekilexWord.english() != null ? ekilexWord.english() : "",
             ekilexWord.cefrLevel() != null ? ekilexWord.cefrLevel() : "A1",
             sentence, photo, List.of(), ekilexWord.pos(), "Source: Ekilex/Sonaveeb", options.isReview());
-
-        byte[] audio = null;
-        if (options.audioEnabled()) {
-            try {
-                audio = ttsService.synthesizeSpeech(ekilexWord.wordValue(), sentence.estonian(), options.voiceName());
-            } catch (Exception e) {
-                log.warn("[builder] TTS failed for \"{}\": {}", ekilexWord.wordValue(), e.getMessage());
-            }
-        }
 
         return new Flashcard(word, sentence,
             photo != null ? photo.url() : null,

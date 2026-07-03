@@ -17,17 +17,25 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class TtsService {
 
     private static final Logger log = LoggerFactory.getLogger(TtsService.class);
     private static final String CACHE_VERSION = "v4";
+    private static final int TTS_TIMEOUT_SECONDS = 8;
+    private static final int CIRCUIT_BREAKER_THRESHOLD = 3;
+    private static final long CIRCUIT_BREAKER_COOLDOWN_MS = 5 * 60 * 1000;
 
     private final AppProperties appProperties;
     private final DiskCacheService diskCache;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
+
+    private final AtomicInteger consecutiveFailures = new AtomicInteger(0);
+    private final AtomicLong circuitOpenUntil = new AtomicLong(0);
 
     public TtsService(AppProperties appProperties, DiskCacheService diskCache,
                       HttpClient httpClient, ObjectMapper objectMapper) {
@@ -37,7 +45,18 @@ public class TtsService {
         this.objectMapper = objectMapper;
     }
 
+    public boolean isAvailable() {
+        return System.currentTimeMillis() >= circuitOpenUntil.get();
+    }
+
     public byte[] synthesizeSpeech(String word, String sentence, String voiceName) {
+        // Circuit breaker — skip TTS if it's been failing
+        if (!isAvailable()) {
+            log.debug("[tts] Circuit open, skipping TTS for \"{}\" (cooldown until {}ms from now)",
+                word, circuitOpenUntil.get() - System.currentTimeMillis());
+            return null;
+        }
+
         String voice = voiceName != null ? voiceName : appProperties.getTtsSpeaker();
         String text = sentence != null && !sentence.equals(word) ? word + ". ... " + sentence : word;
         String cacheKey = CACHE_VERSION + "\0" + text + "\0" + voice;
@@ -56,32 +75,44 @@ public class TtsService {
             return null;
         }
 
-        for (int attempt = 0; attempt < 2; attempt++) {
-            try {
-                HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(appProperties.getTtsApiUrl() + "/v2"))
-                    .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(body))
-                    .timeout(Duration.ofSeconds(25))
-                    .build();
-                HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
-                if (response.statusCode() != 200) {
-                    log.error("[tts] API error {} (attempt {}): {}", response.statusCode(), attempt + 1,
-                        new String(response.body()).substring(0, Math.min(200, response.body().length)));
-                    continue;
-                }
+        try {
+            long start = System.currentTimeMillis();
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(appProperties.getTtsApiUrl() + "/v2"))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .timeout(Duration.ofSeconds(TTS_TIMEOUT_SECONDS))
+                .build();
+            HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
-                byte[] wavBuffer = response.body();
-                byte[] audio = convertWavToOgg(wavBuffer);
-
-                diskCache.setCachedBuffer("tts", cacheKey, "ogg", audio);
-
-                return audio;
-            } catch (Exception e) {
-                log.error("[tts] Error synthesizing \"{}\" (attempt {}): {}", word, attempt + 1, e.getMessage());
+            if (response.statusCode() != 200) {
+                log.error("[tts] API error {} for \"{}\": {}", response.statusCode(), word,
+                    new String(response.body()).substring(0, Math.min(200, response.body().length)));
+                recordFailure();
+                return null;
             }
+
+            byte[] wavBuffer = response.body();
+            byte[] audio = convertWavToOgg(wavBuffer);
+
+            consecutiveFailures.set(0);
+            diskCache.setCachedBuffer("tts", cacheKey, "ogg", audio);
+            log.info("[tts] Synthesized \"{}\" in {}ms ({}bytes)", word, System.currentTimeMillis() - start, audio.length);
+
+            return audio;
+        } catch (Exception e) {
+            log.warn("[tts] Failed for \"{}\": {}", word, e.getMessage());
+            recordFailure();
+            return null;
         }
-        return null;
+    }
+
+    private void recordFailure() {
+        int failures = consecutiveFailures.incrementAndGet();
+        if (failures >= CIRCUIT_BREAKER_THRESHOLD) {
+            circuitOpenUntil.set(System.currentTimeMillis() + CIRCUIT_BREAKER_COOLDOWN_MS);
+            log.warn("[tts] Circuit breaker OPEN — {} consecutive failures, skipping TTS for 5 minutes", failures);
+        }
     }
 
     private byte[] convertWavToOgg(byte[] wavBuffer) {
@@ -114,7 +145,7 @@ public class TtsService {
                 "-y", oggFile.toString());
             pb.redirectErrorStream(true);
             Process process = pb.start();
-            process.getInputStream().readAllBytes(); // consume output
+            process.getInputStream().readAllBytes();
             int exitCode = process.waitFor();
             if (exitCode != 0) {
                 log.warn("[tts] ffmpeg exited with code {}, returning raw WAV", exitCode);
