@@ -1,8 +1,14 @@
-node_modules/
-dist/
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.log
+.mvn/
+
+# Env
 .env
 .env.*
-*.tsbuildinfo
 
 # IDE
 .idea/
@@ -13,21 +19,13 @@ dist/
 
 # Data
 data/db/
+cache/
 
 # MCP / Tools
 /.mcp.json
 .playwright-mcp/
 .claude/
 
-# Java / Maven
-java/target/
-*.class
-*.jar
-*.war
-*.log
-java/.mvn/
-
 # OS
 .DS_Store
 Thumbs.db
-/opencode.json

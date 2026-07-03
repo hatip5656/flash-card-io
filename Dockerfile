@@ -1,39 +1,29 @@
-FROM node:20-alpine AS builder
+FROM maven:3.9-eclipse-temurin-25-alpine AS builder
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
-COPY tsconfig.json ./
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
 COPY src/ ./src/
-RUN npm run build
+RUN mvn package -DskipTests -B
 
-FROM node:20-slim
+FROM eclipse-temurin:25-jre-alpine
 WORKDIR /app
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends tini ffmpeg python3 python3-pip \
-    && pip3 install --no-cache-dir --break-system-packages \
-       torch==2.1.0+cpu torchaudio==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu \
-    && pip3 install --no-cache-dir --break-system-packages deepfilternet==0.5.6 \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
-COPY --from=builder /app/dist/ ./dist/
-COPY data/ ./data/
-COPY migrations/ ./migrations/
 
-# Cache directory for TTS/Unsplash/Ekilex disk cache
+RUN apk add --no-cache ffmpeg tini \
+    && addgroup -S appuser && adduser -S appuser -G appuser -u 1000
+
+COPY --from=builder /app/target/flash-card-io-1.0.0.jar app.jar
+
+# Cache directory for TTS/Unsplash/Ekilex disk cache + prebuild queue
 RUN mkdir -p /app/cache && chown 1000:1000 /app/cache
 ENV CACHE_DIR=/app/cache
 
-# DeepFilterNet: pre-download model at build time + writable cache for runtime
-RUN mkdir -p /home/node/.cache && chown -R 1000:1000 /home/node
-ENV DF_MODEL_BASE_DIR=/home/node/.cache/DeepFilterNet
-RUN python3 -c "from df.enhance import init_df; init_df()" 2>/dev/null \
-    && chown -R 1000:1000 /home/node/.cache \
-    || echo "[dockerfile] DeepFilterNet model pre-download skipped"
-
-# Run as non-root (node user exists as uid 1000 in node images)
-USER node
+USER appuser
 
 EXPOSE 8080
-ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["node", "--max-old-space-size=1024", "dist/index.js"]
+
+ENTRYPOINT ["tini", "--"]
+CMD ["java", \
+  "-XX:+UseZGC", \
+  "-XX:MaxRAMPercentage=75.0", \
+  "-Djava.security.egd=file:/dev/./urandom", \
+  "-jar", "app.jar"]

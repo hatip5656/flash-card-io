@@ -1,13 +1,13 @@
-name: Build and Deploy Java Backend
+name: Build and Deploy
 
 on:
   push:
     branches: [main]
     paths:
-      - 'java/**'
-      - 'k8s/java-deployment.yaml'
-      - 'k8s/redis.yaml'
-      - 'k8s/kustomization.yaml'
+      - 'src/**'
+      - 'pom.xml'
+      - 'Dockerfile'
+      - 'k8s/**'
       - '.github/workflows/deploy-java.yml'
   workflow_dispatch:
 
@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   build:
-    name: Build Java Docker Image
+    name: Build Docker Image
     runs-on: ubuntu-latest
 
     outputs:
@@ -50,7 +50,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./java
+          context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -58,7 +58,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   deploy:
-    name: Deploy Java Backend to Server
+    name: Deploy to Server
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
@@ -106,7 +106,6 @@ jobs:
 
             kubectl apply -f namespace.yaml
 
-            # Create/update docker registry secret
             kubectl create secret docker-registry ghcr-secret \
               --namespace=flash-card-io \
               --docker-server=ghcr.io \
@@ -114,7 +113,6 @@ jobs:
               --docker-password=${GHCR_PAT} \
               --dry-run=client -o yaml | kubectl apply -f -
 
-            # Create/update app secrets (shared with Node backend)
             kubectl create secret generic flash-card-io-secrets \
               --namespace=flash-card-io \
               --from-literal=TELEGRAM_BOT_TOKEN="${TELEGRAM_BOT_TOKEN}" \
@@ -124,20 +122,13 @@ jobs:
               --from-literal=DATABASE_URL="${DATABASE_URL}" \
               --dry-run=client -o yaml | kubectl apply -f -
 
-            # Update image tag in java deployment
             sed -i "s|ghcr.io/hatip5656/flash-card-io-java:latest|ghcr.io/hatip5656/flash-card-io-java:${IMAGE_TAG:-latest}|g" java-deployment.yaml
 
-            # Deploy Redis
             kubectl apply -f redis.yaml
-
-            # Deploy Java backend
             kubectl apply -f cache-pvc.yaml
             kubectl apply -f java-deployment.yaml
 
-            # Restart to pick up latest image
             kubectl rollout restart deployment/flash-card-io-java -n flash-card-io
-
-            # Wait for rollout
             kubectl rollout status deployment/flash-card-io-java -n flash-card-io --timeout=180s
 
             echo "Deployment status:"
@@ -157,9 +148,7 @@ jobs:
 
       - name: Deployment summary
         run: |
-          echo "## Java Backend Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "## Deployment Complete" >> $GITHUB_STEP_SUMMARY
           echo "- **Image:** ghcr.io/${{ github.repository_owner }}/flash-card-io-java:${{ needs.build.outputs.image-tag }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Namespace:** flash-card-io" >> $GITHUB_STEP_SUMMARY
           echo "- **Service:** flash-card-io-java-api (NodePort 30148)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Telegram Bot:** disabled (API-only mode)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Redis:** deployed for caching" >> $GITHUB_STEP_SUMMARY
