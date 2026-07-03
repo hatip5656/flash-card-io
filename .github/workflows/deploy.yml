@@ -1,9 +1,10 @@
-name: Build and Deploy
+name: Build and Deploy (Node.js - DISABLED)
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
+  # push trigger disabled — Java backend is the primary now
+  # push:
+  #   branches: [main]
 
 permissions:
   contents: read
