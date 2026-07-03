@@ -1,6 +1,8 @@
 package io.flashcard.service;
 
 import io.flashcard.config.AppProperties;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -17,8 +19,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class TtsService {
@@ -26,16 +26,12 @@ public class TtsService {
     private static final Logger log = LoggerFactory.getLogger(TtsService.class);
     private static final String CACHE_VERSION = "v4";
     private static final int TTS_TIMEOUT_SECONDS = 8;
-    private static final int CIRCUIT_BREAKER_THRESHOLD = 3;
-    private static final long CIRCUIT_BREAKER_COOLDOWN_MS = 5 * 60 * 1000;
 
     private final AppProperties appProperties;
     private final DiskCacheService diskCache;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
-
-    private final AtomicInteger consecutiveFailures = new AtomicInteger(0);
-    private final AtomicLong circuitOpenUntil = new AtomicLong(0);
+    private final CircuitBreaker circuitBreaker;
 
     public TtsService(AppProperties appProperties, DiskCacheService diskCache,
                       HttpClient httpClient, ObjectMapper objectMapper) {
@@ -43,40 +39,61 @@ public class TtsService {
         this.diskCache = diskCache;
         this.httpClient = httpClient;
         this.objectMapper = objectMapper;
+        this.circuitBreaker = CircuitBreaker.of("tts", CircuitBreakerConfig.custom()
+            .failureRateThreshold(50)
+            .slowCallRateThreshold(80)
+            .slowCallDurationThreshold(Duration.ofSeconds(TTS_TIMEOUT_SECONDS))
+            .slidingWindowType(CircuitBreakerConfig.SlidingWindowType.COUNT_BASED)
+            .slidingWindowSize(5)
+            .minimumNumberOfCalls(3)
+            .waitDurationInOpenState(Duration.ofMinutes(5))
+            .permittedNumberOfCallsInHalfOpenState(1)
+            .automaticTransitionFromOpenToHalfOpenEnabled(true)
+            .build());
+
+        circuitBreaker.getEventPublisher()
+            .onStateTransition(event -> log.info("[tts] Circuit breaker: {}", event))
+            .onCallNotPermitted(event -> log.debug("[tts] Call blocked by circuit breaker"));
     }
 
     public boolean isAvailable() {
-        return System.currentTimeMillis() >= circuitOpenUntil.get();
+        return circuitBreaker.getState() != CircuitBreaker.State.OPEN;
     }
 
     public byte[] synthesizeSpeech(String word, String sentence, String voiceName) {
-        // Circuit breaker — skip TTS if it's been failing
-        if (!isAvailable()) {
-            log.debug("[tts] Circuit open, skipping TTS for \"{}\" (cooldown until {}ms from now)",
-                word, circuitOpenUntil.get() - System.currentTimeMillis());
-            return null;
-        }
-
         String voice = voiceName != null ? voiceName : appProperties.getTtsSpeaker();
         String text = sentence != null && !sentence.equals(word) ? word + ". ... " + sentence : word;
         String cacheKey = CACHE_VERSION + "\0" + text + "\0" + voice;
 
+        // Disk cache check — outside circuit breaker
         byte[] cached = diskCache.getCachedBuffer("tts", cacheKey, "ogg", DiskCacheService.TTS_TTL_MS);
         if (cached != null) {
             log.debug("[tts] Cache hit for \"{}\" ({})", word, voice);
             return cached;
         }
 
+        // Circuit breaker wraps the API call
+        try {
+            return circuitBreaker.executeSupplier(() -> callTtsApi(word, text, voice, cacheKey));
+        } catch (io.github.resilience4j.circuitbreaker.CallNotPermittedException e) {
+            log.debug("[tts] Circuit open, skipping \"{}\"", word);
+            return null;
+        } catch (Exception e) {
+            log.warn("[tts] Failed for \"{}\": {}", word, e.getMessage());
+            return null;
+        }
+    }
+
+    private byte[] callTtsApi(String word, String text, String voice, String cacheKey) {
         String body;
         try {
             body = objectMapper.writeValueAsString(Map.of("text", text, "speaker", voice, "speed", 0.85));
         } catch (Exception e) {
-            log.error("[tts] Failed to serialize request body: {}", e.getMessage());
-            return null;
+            throw new RuntimeException("Failed to serialize TTS request", e);
         }
 
+        long start = System.currentTimeMillis();
         try {
-            long start = System.currentTimeMillis();
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(appProperties.getTtsApiUrl() + "/v2"))
                 .header("Content-Type", "application/json")
@@ -86,32 +103,17 @@ public class TtsService {
             HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
 
             if (response.statusCode() != 200) {
-                log.error("[tts] API error {} for \"{}\": {}", response.statusCode(), word,
-                    new String(response.body()).substring(0, Math.min(200, response.body().length)));
-                recordFailure();
-                return null;
+                throw new RuntimeException("TTS API error " + response.statusCode());
             }
 
-            byte[] wavBuffer = response.body();
-            byte[] audio = convertWavToOgg(wavBuffer);
-
-            consecutiveFailures.set(0);
+            byte[] audio = convertWavToOgg(response.body());
             diskCache.setCachedBuffer("tts", cacheKey, "ogg", audio);
             log.info("[tts] Synthesized \"{}\" in {}ms ({}bytes)", word, System.currentTimeMillis() - start, audio.length);
-
             return audio;
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            log.warn("[tts] Failed for \"{}\": {}", word, e.getMessage());
-            recordFailure();
-            return null;
-        }
-    }
-
-    private void recordFailure() {
-        int failures = consecutiveFailures.incrementAndGet();
-        if (failures >= CIRCUIT_BREAKER_THRESHOLD) {
-            circuitOpenUntil.set(System.currentTimeMillis() + CIRCUIT_BREAKER_COOLDOWN_MS);
-            log.warn("[tts] Circuit breaker OPEN — {} consecutive failures, skipping TTS for 5 minutes", failures);
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

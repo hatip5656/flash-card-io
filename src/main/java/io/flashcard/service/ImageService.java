@@ -16,6 +16,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 
 @Service
 public class ImageService {
@@ -29,11 +32,27 @@ public class ImageService {
     private final HttpClient httpClient;
     private final TokenBucketRateLimiter unsplashLimiter = new TokenBucketRateLimiter(40, 3_600_000);
     private final AtomicLong unsplashRateLimitedUntil = new AtomicLong(0);
+    private final CircuitBreaker pexelsCb;
+    private final CircuitBreaker unsplashCb;
 
     public ImageService(AppProperties appProperties, ObjectMapper objectMapper, HttpClient httpClient) {
         this.appProperties = appProperties;
         this.objectMapper = objectMapper;
         this.httpClient = httpClient;
+
+        CircuitBreakerConfig cbConfig = CircuitBreakerConfig.custom()
+            .failureRateThreshold(50)
+            .slidingWindowSize(10)
+            .minimumNumberOfCalls(3)
+            .waitDurationInOpenState(Duration.ofMinutes(5))
+            .permittedNumberOfCallsInHalfOpenState(1)
+            .automaticTransitionFromOpenToHalfOpenEnabled(true)
+            .build();
+        this.pexelsCb = CircuitBreaker.of("pexels", cbConfig);
+        this.unsplashCb = CircuitBreaker.of("unsplash", cbConfig);
+
+        pexelsCb.getEventPublisher().onStateTransition(e -> log.info("[pexels] Circuit breaker: {}", e));
+        unsplashCb.getEventPublisher().onStateTransition(e -> log.info("[unsplash] Circuit breaker: {}", e));
     }
 
     public record ImageResult(String url, String photographer) {}
@@ -57,6 +76,18 @@ public class ImageService {
 
     private ImageResult searchPexels(String query, String apiKey) {
         try {
+            return pexelsCb.executeSupplier(() -> callPexels(query, apiKey));
+        } catch (CallNotPermittedException e) {
+            log.debug("[pexels] Circuit open, skipping");
+            return null;
+        } catch (Exception e) {
+            log.error("[pexels] Error searching for \"{}\": {}", query, e.getMessage());
+            return null;
+        }
+    }
+
+    private ImageResult callPexels(String query, String apiKey) {
+        try {
             String url = PEXELS_API + "/search?query=" + URLEncoder.encode(query, StandardCharsets.UTF_8)
                 + "&per_page=1&orientation=landscape";
             HttpRequest request = HttpRequest.newBuilder()
@@ -66,8 +97,7 @@ public class ImageService {
                 .GET().build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != 200) {
-                log.error("[pexels] API error: {}", response.statusCode());
-                return null;
+                throw new RuntimeException("Pexels API error " + response.statusCode());
             }
             JsonNode data = objectMapper.readTree(response.body());
             JsonNode photos = data.path("photos");
@@ -76,14 +106,24 @@ public class ImageService {
             return new ImageResult(
                 photo.path("src").path("landscape").asText(),
                 photo.path("photographer").asText(""));
-        } catch (Exception e) {
-            log.error("[pexels] Error searching for \"{}\": {}", query, e.getMessage());
-            return null;
-        }
+        } catch (RuntimeException e) { throw e; }
+        catch (Exception e) { throw new RuntimeException(e); }
     }
 
     private ImageResult searchUnsplash(String query, String accessKey) {
         if (!tryConsumeUnsplash()) return null;
+        try {
+            return unsplashCb.executeSupplier(() -> callUnsplash(query, accessKey));
+        } catch (CallNotPermittedException e) {
+            log.debug("[unsplash] Circuit open, skipping");
+            return null;
+        } catch (Exception e) {
+            log.error("[unsplash] Error searching for \"{}\": {}", query, e.getMessage());
+            return null;
+        }
+    }
+
+    private ImageResult callUnsplash(String query, String accessKey) {
         try {
             String url = UNSPLASH_API + "/search/photos?query=" + URLEncoder.encode(query, StandardCharsets.UTF_8)
                 + "&per_page=1&orientation=landscape";
@@ -96,12 +136,10 @@ public class ImageService {
 
             if (response.statusCode() == 403 || response.statusCode() == 429) {
                 unsplashRateLimitedUntil.set(System.currentTimeMillis() + 5 * 60_000);
-                log.warn("[unsplash] Rate limited ({}), backing off 5 min", response.statusCode());
-                return null;
+                throw new RuntimeException("Unsplash rate limited (" + response.statusCode() + ")");
             }
             if (response.statusCode() != 200) {
-                log.error("[unsplash] API error: {}", response.statusCode());
-                return null;
+                throw new RuntimeException("Unsplash API error " + response.statusCode());
             }
 
             JsonNode data = objectMapper.readTree(response.body());
@@ -109,7 +147,6 @@ public class ImageService {
             if (!results.isArray() || results.isEmpty()) return null;
             JsonNode photo = results.get(0);
 
-            // Trigger download (fire and forget)
             String downloadUrl = photo.path("links").path("download_location").asText(null);
             if (downloadUrl != null) {
                 triggerDownloadAsync(downloadUrl, accessKey);
@@ -118,10 +155,8 @@ public class ImageService {
             return new ImageResult(
                 photo.path("urls").path("regular").asText(),
                 photo.path("user").path("name").asText(""));
-        } catch (Exception e) {
-            log.error("[unsplash] Error searching for \"{}\": {}", query, e.getMessage());
-            return null;
-        }
+        } catch (RuntimeException e) { throw e; }
+        catch (Exception e) { throw new RuntimeException(e); }
     }
 
     private boolean tryConsumeUnsplash() {

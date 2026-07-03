@@ -17,6 +17,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 
 @Service
 public class EkilexService {
@@ -35,10 +38,21 @@ public class EkilexService {
     private final ObjectMapper objectMapper;
     private final HttpClient httpClient;
     private final TokenBucketRateLimiter rateLimiter = new TokenBucketRateLimiter(30, 60_000);
+    private final CircuitBreaker circuitBreaker;
 
     public EkilexService(AppProperties appProperties, ObjectMapper objectMapper, HttpClient httpClient) {
         this.objectMapper = objectMapper;
         this.httpClient = httpClient;
+        this.circuitBreaker = CircuitBreaker.of("ekilex", CircuitBreakerConfig.custom()
+            .failureRateThreshold(50)
+            .slidingWindowSize(10)
+            .minimumNumberOfCalls(3)
+            .waitDurationInOpenState(Duration.ofMinutes(3))
+            .permittedNumberOfCallsInHalfOpenState(1)
+            .automaticTransitionFromOpenToHalfOpenEnabled(true)
+            .build());
+        circuitBreaker.getEventPublisher()
+            .onStateTransition(event -> log.info("[ekilex] Circuit breaker: {}", event));
     }
 
     public record EkilexWord(int wordId, String wordValue, String cefrLevel, String english,
@@ -51,17 +65,24 @@ public class EkilexService {
             return null;
         }
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(API_BASE + path))
-                .header("ekilex-api-key", apiKey)
-                .timeout(Duration.ofSeconds(10))
-                .GET().build();
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                log.error("[ekilex] API error {} for {}", response.statusCode(), path);
-                return null;
-            }
-            return objectMapper.readTree(response.body());
+            return circuitBreaker.executeSupplier(() -> {
+                try {
+                    HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(API_BASE + path))
+                        .header("ekilex-api-key", apiKey)
+                        .timeout(Duration.ofSeconds(10))
+                        .GET().build();
+                    HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                    if (response.statusCode() != 200) {
+                        throw new RuntimeException("API error " + response.statusCode() + " for " + path);
+                    }
+                    return objectMapper.readTree(response.body());
+                } catch (RuntimeException e) { throw e; }
+                catch (Exception e) { throw new RuntimeException(e); }
+            });
+        } catch (CallNotPermittedException e) {
+            log.debug("[ekilex] Circuit open, skipping {}", path);
+            return null;
         } catch (Exception e) {
             log.error("[ekilex] Request failed for {}: {}", path, e.getMessage());
             return null;
