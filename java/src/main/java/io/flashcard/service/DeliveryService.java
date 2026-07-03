@@ -67,22 +67,26 @@ public class DeliveryService {
     }
 
     public void deliverFlashcard(long chatId) {
+        long startTime = System.currentTimeMillis();
         String level = subscriberRepo.getSubscriberLevel(chatId);
         UserPreferences prefs = subscriberRepo.getPreferences(chatId);
         var buildOpts = new FlashcardBuilderService.BuildOptions(prefs.isAudio(), prefs.getVoiceName(), prefs.isWordForms(), false);
 
         List<String> sentIds = sentWordRepo.getSentWordIds(chatId);
         List<Word> unsent = wordBankService.getUnsent(level, sentIds);
+        log.info("[delivery] chat={} level={} sentCount={} unsentCount={}", chatId, level, sentIds.size(), unsent.size());
 
         FlashcardBuilderService.Flashcard flashcard;
         String wordId, wordValue, english;
 
         if (!unsent.isEmpty()) {
             Word word = unsent.get(ThreadLocalRandom.current().nextInt(unsent.size()));
-            log.info("[delivery] Building flashcard for \"{}\" ({}) -> chat {}", word.getEstonian(), word.getCefrLevel(), chatId);
+            log.info("[delivery] Building flashcard for \"{}\" ({}) -> chat {} audio={} wordForms={}",
+                word.getEstonian(), word.getCefrLevel(), chatId, prefs.isAudio(), prefs.isWordForms());
 
             if (telegramChannel != null) telegramChannel.sendTyping(chatId);
 
+            long buildStart = System.currentTimeMillis();
             try {
                 buildSemaphore.acquire();
                 flashcard = flashcardBuilder.buildFlashcard(word, buildOpts);
@@ -92,15 +96,24 @@ public class DeliveryService {
             } finally {
                 buildSemaphore.release();
             }
+            log.info("[delivery] Flashcard built for \"{}\" in {}ms (image={} audio={}bytes)",
+                word.getEstonian(), System.currentTimeMillis() - buildStart,
+                flashcard.imageUrl() != null, flashcard.audio() != null ? flashcard.audio().length : 0);
+
             wordId = word.getId();
             wordValue = word.getEstonian();
             english = word.getEnglish();
         } else {
             String ekilexKey = appProperties.getEkilexApiKey();
             if (ekilexKey != null && !ekilexKey.isBlank()) {
+                log.info("[delivery] Local {} words exhausted for chat={}, querying Ekilex", level, chatId);
+                long ekilexStart = System.currentTimeMillis();
                 Set<String> sentValues = sentWordRepo.getSentWordValues(chatId);
                 var ekilexWord = ekilexService.getRandomWordForLevel(level, sentValues, ekilexKey);
+                log.info("[delivery] Ekilex lookup took {}ms result={}", System.currentTimeMillis() - ekilexStart,
+                    ekilexWord != null ? ekilexWord.wordValue() : "null");
                 if (ekilexWord != null) {
+                    long buildStart = System.currentTimeMillis();
                     try {
                         buildSemaphore.acquire();
                         flashcard = flashcardBuilder.buildFlashcardFromEkilex(ekilexWord, buildOpts);
@@ -110,11 +123,13 @@ public class DeliveryService {
                     } finally {
                         buildSemaphore.release();
                     }
+                    log.info("[delivery] Ekilex flashcard built for \"{}\" in {}ms",
+                        ekilexWord.wordValue(), System.currentTimeMillis() - buildStart);
                     wordId = "ekilex-" + ekilexWord.wordId();
                     wordValue = ekilexWord.wordValue();
                     english = flashcard.word().getEnglish();
                 } else {
-                    log.info("[delivery] No new {} words found for chat {}", level, chatId);
+                    log.info("[delivery] No new {} words found in Ekilex for chat {}", level, chatId);
                     return;
                 }
             } else {
@@ -123,10 +138,13 @@ public class DeliveryService {
             }
         }
 
+        long sendStart = System.currentTimeMillis();
         if (telegramChannel != null && telegramChannel.sendFlashcard(chatId, flashcard)) {
             sentWordRepo.markWordSent(chatId, wordId, wordValue, english);
             int totalWords = activityRepo.logWordActivity(chatId);
             Integer milestone = activityRepo.checkMilestone(totalWords);
+            log.info("[delivery] Total delivery for \"{}\" -> chat {} took {}ms (send={}ms)",
+                wordValue, chatId, System.currentTimeMillis() - startTime, System.currentTimeMillis() - sendStart);
             if (milestone != null && telegramChannel != null) {
                 telegramChannel.sendMessage(chatId,
                     "\uD83C\uDF89 <b>Milestone!</b> You've learned <b>" + milestone + "</b> words!");

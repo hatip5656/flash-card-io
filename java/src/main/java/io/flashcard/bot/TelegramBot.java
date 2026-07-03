@@ -87,12 +87,13 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
                     BotCommand.builder().command("schedule").description("Change schedule").build(),
                     BotCommand.builder().command("stop").description("Stop receiving flashcards").build()))
                 .build());
+            log.info("[bot] Bot commands registered");
 
             botApplication = new TelegramBotsLongPollingApplication();
             botApplication.registerBot(token, this);
             log.info("[bot] Telegram bot started (long polling)");
         } catch (Exception e) {
-            log.error("[bot] Failed to start: {}", e.getMessage());
+            log.error("[bot] Failed to start: {}", e.getMessage(), e);
         }
     }
 
@@ -110,90 +111,170 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
             if (update.hasMessage() && update.getMessage().hasText()) {
                 handleMessage(update.getMessage());
             } else if (update.hasCallbackQuery()) {
-                handleCallback(update.getCallbackQuery().getMessage().getChatId(),
-                    update.getCallbackQuery().getData(),
-                    update.getCallbackQuery().getId());
+                long chatId = update.getCallbackQuery().getMessage().getChatId();
+                String data = update.getCallbackQuery().getData();
+                log.info("[bot] Callback from chat={} data={}", chatId, data);
+                handleCallback(chatId, data, update.getCallbackQuery().getId());
+            } else {
+                log.debug("[bot] Ignoring update type: hasMessage={} hasCallback={} hasInline={}",
+                    update.hasMessage(), update.hasCallbackQuery(), update.hasInlineQuery());
             }
         } catch (Exception e) {
-            log.error("[bot] Error processing update: {}", e.getMessage());
+            log.error("[bot] Error processing update: {}", e.getMessage(), e);
         }
     }
 
     private void handleMessage(Message message) {
         long chatId = message.getChatId();
         String text = message.getText().trim();
+        String username = message.getFrom() != null ? message.getFrom().getUserName() : null;
 
-        if (!text.startsWith("/")) return;
+        if (!text.startsWith("/")) {
+            log.debug("[bot] Ignoring non-command text from chat={}: {}", chatId, text.substring(0, Math.min(50, text.length())));
+            return;
+        }
 
         String command = text.split("\\s+")[0].replace("@", " ").split(" ")[0].toLowerCase();
-        switch (command) {
-            case "/start" -> handleStart(chatId, message);
-            case "/next" -> Thread.ofVirtual().start(() -> deliveryService.deliverFlashcard(chatId));
-            case "/grammar" -> Thread.ofVirtual().start(() -> deliveryService.deliverGrammarCard(chatId));
-            case "/stats", "/settings" -> sendStats(chatId);
-            case "/level" -> sendLevelPicker(chatId);
-            case "/schedule" -> sendSchedulePicker(chatId);
-            case "/stop" -> { subscriberRepo.removeSubscriber(chatId); sendText(chatId, "Stopped. Send /start to resume."); }
-            case "/quiz" -> sendText(chatId, "Use the mobile app for quizzes, or tap the Quiz button in settings.");
+        log.info("[bot] Command from chat={} user={}: {}", chatId, username, command);
+
+        try {
+            switch (command) {
+                case "/start" -> handleStart(chatId, message);
+                case "/next" -> {
+                    log.info("[bot] /next requested by chat={}", chatId);
+                    Thread.ofVirtual().start(() -> {
+                        try {
+                            deliveryService.deliverFlashcard(chatId);
+                        } catch (Exception e) {
+                            log.error("[bot] /next delivery failed for chat={}: {}", chatId, e.getMessage(), e);
+                            sendText(chatId, "Failed to send flashcard. Try again later.");
+                        }
+                    });
+                }
+                case "/grammar" -> {
+                    log.info("[bot] /grammar requested by chat={}", chatId);
+                    Thread.ofVirtual().start(() -> {
+                        try {
+                            deliveryService.deliverGrammarCard(chatId);
+                        } catch (Exception e) {
+                            log.error("[bot] /grammar delivery failed for chat={}: {}", chatId, e.getMessage(), e);
+                            sendText(chatId, "Failed to send grammar card. Try again later.");
+                        }
+                    });
+                }
+                case "/stats", "/settings" -> sendStats(chatId);
+                case "/level" -> sendLevelPicker(chatId);
+                case "/schedule" -> sendSchedulePicker(chatId);
+                case "/stop" -> {
+                    log.info("[bot] /stop from chat={}", chatId);
+                    subscriberRepo.removeSubscriber(chatId);
+                    sendText(chatId, "Stopped. Send /start to resume.");
+                }
+                case "/quiz" -> sendText(chatId, "Use the mobile app for quizzes, or tap the Quiz button in settings.");
+                default -> log.debug("[bot] Unknown command from chat={}: {}", chatId, command);
+            }
+        } catch (Exception e) {
+            log.error("[bot] Error handling command {} from chat={}: {}", command, chatId, e.getMessage(), e);
+            sendText(chatId, "Something went wrong. Please try again.");
         }
     }
 
     private void handleStart(long chatId, Message message) {
         String username = message.getFrom() != null ? message.getFrom().getUserName() : null;
         String firstName = message.getFrom() != null ? message.getFrom().getFirstName() : null;
+        log.info("[bot] /start from chat={} user={} firstName={}", chatId, username, firstName);
         subscriberRepo.addSubscriber(chatId, "telegram", username, firstName);
         sendStats(chatId);
     }
 
     private void sendStats(long chatId) {
-        Map<String, Object> stats = activityRepo.getStats(chatId);
-        int sent = (int) stats.get("sent");
-        String level = (String) stats.get("level");
-        String schedule = (String) stats.get("schedule");
-        int streak = activityRepo.getStreak(chatId);
-        String streakEmoji = streakEmoji(streak);
-        String scheduleLabel = scheduleService.findLabelForCron(schedule);
-        int totalForLevel = wordBankService.getWordsForLevel(level).size();
-        int pct = totalForLevel > 0 ? Math.round((float) sent / totalForLevel * 100) : 0;
+        try {
+            Map<String, Object> stats = activityRepo.getStats(chatId);
+            int sent = (int) stats.get("sent");
+            String level = (String) stats.get("level");
+            String schedule = (String) stats.get("schedule");
+            int streak = activityRepo.getStreak(chatId);
+            String emoji = streakEmoji(streak);
+            String scheduleLabel = scheduleService.findLabelForCron(schedule);
+            int totalForLevel = wordBankService.getWordsForLevel(level).size();
+            int pct = totalForLevel > 0 ? Math.round((float) sent / totalForLevel * 100) : 0;
 
-        String text = "<b>\uD83C\uDDEA\uD83C\uDDEA Flash Card IO</b>\n\n"
-            + streakEmoji + " Streak: <b>" + streak + " day" + (streak != 1 ? "s" : "") + "</b>\n"
-            + "\uD83C\uDFF7\uFE0F Level: <b>" + level + "</b>\n"
-            + "\u23F0 Schedule: <b>" + TextUtils.escapeHtml(scheduleLabel) + "</b>\n"
-            + "\uD83D\uDCDA Words learned: <b>" + sent + "</b>\n"
-            + "\uD83D\uDCD6 Local " + level + " words: " + totalForLevel + "\n"
-            + "\u2705 Progress: " + pct + "%";
+            String text = "<b>\uD83C\uDDEA\uD83C\uDDEA Flash Card IO</b>\n\n"
+                + emoji + " Streak: <b>" + streak + " day" + (streak != 1 ? "s" : "") + "</b>\n"
+                + "\uD83C\uDFF7\uFE0F Level: <b>" + level + "</b>\n"
+                + "\u23F0 Schedule: <b>" + TextUtils.escapeHtml(scheduleLabel) + "</b>\n"
+                + "\uD83D\uDCDA Words learned: <b>" + sent + "</b>\n"
+                + "\uD83D\uDCD6 Local " + level + " words: " + totalForLevel + "\n"
+                + "\u2705 Progress: " + pct + "%";
 
-        sendHtmlWithKeyboard(chatId, text, mainMenuKeyboard());
+            sendHtmlWithKeyboard(chatId, text, mainMenuKeyboard());
+            log.debug("[bot] Stats sent to chat={} level={} words={} streak={}", chatId, level, sent, streak);
+        } catch (Exception e) {
+            log.error("[bot] Failed to build/send stats for chat={}: {}", chatId, e.getMessage(), e);
+            sendText(chatId, "Failed to load stats. Please try again.");
+        }
     }
 
     private void handleCallback(long chatId, String data, String callbackId) {
-        if (data.startsWith("action:")) {
-            String action = data.split(":")[1];
-            switch (action) {
-                case "next" -> Thread.ofVirtual().start(() -> deliveryService.deliverFlashcard(chatId));
-                case "grammar" -> Thread.ofVirtual().start(() -> deliveryService.deliverGrammarCard(chatId));
-                case "stats" -> sendStats(chatId);
+        try {
+            if (data.startsWith("action:")) {
+                String action = data.split(":")[1];
+                log.info("[bot] Action callback chat={} action={}", chatId, action);
+                switch (action) {
+                    case "next" -> Thread.ofVirtual().start(() -> {
+                        try {
+                            deliveryService.deliverFlashcard(chatId);
+                        } catch (Exception e) {
+                            log.error("[bot] Callback next failed for chat={}: {}", chatId, e.getMessage(), e);
+                        }
+                    });
+                    case "grammar" -> Thread.ofVirtual().start(() -> {
+                        try {
+                            deliveryService.deliverGrammarCard(chatId);
+                        } catch (Exception e) {
+                            log.error("[bot] Callback grammar failed for chat={}: {}", chatId, e.getMessage(), e);
+                        }
+                    });
+                    case "stats" -> sendStats(chatId);
+                    default -> log.warn("[bot] Unknown action callback: {} from chat={}", action, chatId);
+                }
+            } else if (data.startsWith("edit_level") || data.startsWith("edit_")) {
+                String field = data.replace("edit_", "");
+                log.info("[bot] Edit callback chat={} field={}", chatId, field);
+                switch (field) {
+                    case "level" -> sendLevelPicker(chatId);
+                    case "schedule" -> sendSchedulePicker(chatId);
+                    default -> log.warn("[bot] Unknown edit field: {} from chat={}", field, chatId);
+                }
+            } else if (data.startsWith("set:level:")) {
+                String level = data.split(":")[2];
+                log.info("[bot] Set level chat={} level={}", chatId, level);
+                subscriberRepo.setSubscriberLevel(chatId, level);
+                sendText(chatId, "Level set to " + level + ".");
+                sendStats(chatId);
+            } else if (data.startsWith("set:schedule:")) {
+                String key = data.split(":")[2];
+                var preset = scheduleService.getPreset(key);
+                if (preset != null) {
+                    log.info("[bot] Set schedule chat={} key={} cron={}", chatId, key, preset.cron());
+                    subscriberRepo.setSubscriberSchedule(chatId, preset.cron());
+                    sendText(chatId, "\u23F0 Schedule: " + preset.label());
+                } else {
+                    log.warn("[bot] Unknown schedule preset: {} from chat={}", key, chatId);
+                }
+            } else if (data.startsWith("recall:")) {
+                String[] parts = data.split(":", 3);
+                String action = parts[1];
+                String wordValue = parts.length > 2 ? parts[2] : "";
+                int quality = "got".equals(action) ? 4 : 1;
+                log.info("[bot] Recall chat={} word={} action={} quality={}", chatId, wordValue, action, quality);
+                sentWordRepo.updateSm2(chatId, wordValue, quality);
+                sendText(chatId, "got".equals(action) ? "\u2705 Nice! Moving on." : "\uD83D\uDD04 We'll show this again soon.");
+            } else {
+                log.warn("[bot] Unhandled callback data: {} from chat={}", data, chatId);
             }
-        } else if (data.startsWith("set:level:")) {
-            String level = data.split(":")[2];
-            subscriberRepo.setSubscriberLevel(chatId, level);
-            sendText(chatId, "Level set to " + level + ".");
-            sendStats(chatId);
-        } else if (data.startsWith("set:schedule:")) {
-            String key = data.split(":")[2];
-            var preset = scheduleService.getPreset(key);
-            if (preset != null) {
-                subscriberRepo.setSubscriberSchedule(chatId, preset.cron());
-                sendText(chatId, "\u23F0 Schedule: " + preset.label());
-            }
-        } else if (data.startsWith("recall:")) {
-            String[] parts = data.split(":", 3);
-            String action = parts[1];
-            String wordValue = parts.length > 2 ? parts[2] : "";
-            int quality = "got".equals(action) ? 4 : 1;
-            sentWordRepo.updateSm2(chatId, wordValue, quality);
-            sendText(chatId, "got".equals(action) ? "\u2705 Nice! Moving on." : "\uD83D\uDD04 We'll show this again soon.");
+        } catch (Exception e) {
+            log.error("[bot] Error handling callback data={} from chat={}: {}", data, chatId, e.getMessage(), e);
         }
     }
 
@@ -213,6 +294,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
 
     private void sendLevelPicker(long chatId) {
         String current = subscriberRepo.getSubscriberLevel(chatId);
+        log.debug("[bot] Sending level picker to chat={} current={}", chatId, current);
         InlineKeyboardMarkup kb = InlineKeyboardMarkup.builder()
             .keyboardRow(new InlineKeyboardRow(
                 List.of("A1", "A2", "B1", "B2").stream()
@@ -226,6 +308,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
 
     private void sendSchedulePicker(long chatId) {
         String currentCron = subscriberRepo.getSubscriberSchedule(chatId);
+        log.debug("[bot] Sending schedule picker to chat={} current={}", chatId, currentCron);
         List<InlineKeyboardRow> rows = new ArrayList<>();
         List<InlineKeyboardButton> row = new ArrayList<>();
         int i = 0;
@@ -242,23 +325,30 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
 
     @Override
     public boolean sendFlashcard(long chatId, FlashcardBuilderService.Flashcard flashcard) {
+        log.info("[telegram] Sending flashcard to chat={} word={} hasImage={} hasAudio={}",
+            chatId, flashcard.word().getEstonian(), flashcard.imageUrl() != null, flashcard.audio() != null);
         try {
             String caption = flashcard.caption();
+
             if (flashcard.imageUrl() != null && caption.length() <= 1024) {
+                log.debug("[telegram] Sending photo+caption to chat={} imageUrl={}", chatId, flashcard.imageUrl());
                 telegramClient.execute(SendPhoto.builder()
                     .chatId(chatId).photo(new InputFile(flashcard.imageUrl()))
                     .caption(caption).parseMode("HTML").build());
             } else if (flashcard.imageUrl() != null) {
+                log.debug("[telegram] Sending photo then text to chat={} (caption too long: {} chars)", chatId, caption.length());
                 telegramClient.execute(SendPhoto.builder()
                     .chatId(chatId).photo(new InputFile(flashcard.imageUrl())).build());
                 telegramClient.execute(SendMessage.builder()
                     .chatId(chatId).text(caption).parseMode("HTML").build());
             } else {
+                log.debug("[telegram] Sending text-only flashcard to chat={}", chatId);
                 telegramClient.execute(SendMessage.builder()
                     .chatId(chatId).text(caption).parseMode("HTML").build());
             }
 
             if (flashcard.audio() != null) {
+                log.debug("[telegram] Sending voice audio to chat={} size={}bytes", chatId, flashcard.audio().length);
                 telegramClient.execute(SendVoice.builder()
                     .chatId(chatId)
                     .voice(new InputFile(new ByteArrayInputStream(flashcard.audio()), "pronunciation.ogg"))
@@ -276,15 +366,19 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
                         .build())
                     .build());
             }
+
+            log.info("[telegram] Flashcard sent successfully to chat={} word={}", chatId, flashcard.word().getEstonian());
             return true;
         } catch (Exception e) {
-            log.error("[telegram] Failed to send to {}: {}", chatId, e.getMessage());
+            log.error("[telegram] Failed to send flashcard to chat={} word={}: {}", chatId,
+                flashcard.word().getEstonian(), e.getMessage(), e);
             return false;
         }
     }
 
     @Override
     public void sendMessage(long chatId, String html) {
+        log.debug("[telegram] Sending message to chat={} length={}", chatId, html.length());
         sendText(chatId, html);
     }
 
@@ -292,14 +386,17 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
     public void sendTyping(long chatId) {
         try {
             telegramClient.execute(SendChatAction.builder().chatId(chatId).action("typing").build());
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            log.debug("[telegram] Failed to send typing to chat={}: {}", chatId, e.getMessage());
+        }
     }
 
     private void sendText(long chatId, String html) {
         try {
             telegramClient.execute(SendMessage.builder().chatId(chatId).text(html).parseMode("HTML").build());
         } catch (Exception e) {
-            log.error("[telegram] Failed to send message to {}: {}", chatId, e.getMessage());
+            log.error("[telegram] Failed to send text to chat={}: {} | text preview: {}", chatId, e.getMessage(),
+                html.substring(0, Math.min(100, html.length())));
         }
     }
 
@@ -308,7 +405,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
             telegramClient.execute(SendMessage.builder()
                 .chatId(chatId).text(html).parseMode("HTML").replyMarkup(keyboard).build());
         } catch (Exception e) {
-            log.error("[telegram] Failed to send message to {}: {}", chatId, e.getMessage());
+            log.error("[telegram] Failed to send message with keyboard to chat={}: {} | text preview: {}", chatId,
+                e.getMessage(), html.substring(0, Math.min(100, html.length())));
         }
     }
 }

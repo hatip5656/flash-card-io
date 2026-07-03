@@ -33,7 +33,7 @@ spec:
               protocol: TCP
           env:
             - name: FEATURE_TELEGRAM
-              value: "false"
+              value: "true"
             - name: TELEGRAM_BOT_TOKEN
               valueFrom:
                 secretKeyRef:
