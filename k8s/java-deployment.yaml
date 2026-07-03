@@ -78,7 +78,7 @@ spec:
             - name: CACHE_DIR
               value: "/app/cache"
             - name: JAVA_OPTS
-              value: "-XX:+UseZGC -XX:MaxRAMPercentage=75.0"
+              value: "-XX:+UseZGC -XX:+UseCompactObjectHeaders -XX:MaxRAMPercentage=75.0"
           startupProbe:
             httpGet:
               path: /actuator/health/liveness
