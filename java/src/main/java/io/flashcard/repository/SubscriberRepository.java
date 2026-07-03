@@ -4,6 +4,9 @@ import io.flashcard.model.Subscriber;
 import io.flashcard.model.UserPreferences;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -28,6 +31,12 @@ public class SubscriberRepository {
         this.objectMapper = objectMapper;
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = "subscriber_level", key = "#chatId"),
+        @CacheEvict(value = "subscriber_schedule", key = "#chatId"),
+        @CacheEvict(value = "subscriber_prefs", key = "#chatId"),
+        @CacheEvict(value = "subscriber_name", key = "#chatId")
+    })
     public void addSubscriber(long chatId, String channel, String username, String firstName) {
         jdbc.update("""
             INSERT INTO subscribers (chat_id, channel, username, first_name)
@@ -51,26 +60,31 @@ public class SubscriberRepository {
             this::mapSubscriber);
     }
 
+    @Cacheable(value = "subscriber_level", key = "#chatId")
     public String getSubscriberLevel(long chatId) {
         List<String> levels = jdbc.queryForList(
             "SELECT cefr_level FROM subscribers WHERE chat_id = ?", String.class, chatId);
         return levels.isEmpty() ? "A1" : levels.get(0);
     }
 
+    @CacheEvict(value = "subscriber_level", key = "#chatId")
     public void setSubscriberLevel(long chatId, String level) {
         jdbc.update("UPDATE subscribers SET cefr_level = ? WHERE chat_id = ?", level, chatId);
     }
 
+    @Cacheable(value = "subscriber_schedule", key = "#chatId")
     public String getSubscriberSchedule(long chatId) {
         List<String> schedules = jdbc.queryForList(
             "SELECT schedule FROM subscribers WHERE chat_id = ?", String.class, chatId);
         return schedules.isEmpty() ? DEFAULT_SCHEDULE : schedules.get(0);
     }
 
+    @CacheEvict(value = "subscriber_schedule", key = "#chatId")
     public void setSubscriberSchedule(long chatId, String schedule) {
         jdbc.update("UPDATE subscribers SET schedule = ? WHERE chat_id = ?", schedule, chatId);
     }
 
+    @Cacheable(value = "subscriber_prefs", key = "#chatId")
     public UserPreferences getPreferences(long chatId) {
         List<String> rows = jdbc.queryForList(
             "SELECT preferences FROM subscribers WHERE chat_id = ?", String.class, chatId);
@@ -84,6 +98,7 @@ public class SubscriberRepository {
         }
     }
 
+    @CacheEvict(value = "subscriber_prefs", key = "#chatId")
     public void updatePreference(long chatId, String key, Object value) {
         try {
             String json = objectMapper.writeValueAsString(Map.of(key, value));
@@ -146,6 +161,7 @@ public class SubscriberRepository {
             Long.class);
     }
 
+    @Cacheable(value = "subscriber_name", key = "#chatId")
     public String getFirstName(long chatId) {
         List<String> names = jdbc.queryForList(
             "SELECT first_name FROM subscribers WHERE chat_id = ?", String.class, chatId);

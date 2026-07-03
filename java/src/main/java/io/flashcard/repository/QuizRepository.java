@@ -5,6 +5,9 @@ import io.flashcard.model.QuizResult;
 import io.flashcard.model.QuizSession;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +26,10 @@ public class QuizRepository {
     }
 
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "quiz_stats", key = "#chatId"),
+        @CacheEvict(value = "most_missed_words", allEntries = true)
+    })
     public void saveQuizResult(long chatId, int score, int total, List<QuizAnswer> answers) {
         int percentage = Math.round((float) score / total * 100);
         Integer quizId = jdbc.queryForObject(
@@ -38,6 +45,7 @@ public class QuizRepository {
         }
     }
 
+    @Cacheable(value = "most_missed_words", key = "#chatId + '_' + #limit")
     public List<Map<String, Object>> getMostMissedWords(long chatId, int limit) {
         return jdbc.queryForList(
             """
@@ -88,6 +96,7 @@ public class QuizRepository {
         return new ArrayList<>(quizMap.values());
     }
 
+    @Cacheable(value = "quiz_stats", key = "#chatId")
     public Map<String, Object> getQuizStats(long chatId) {
         return jdbc.queryForMap(
             """

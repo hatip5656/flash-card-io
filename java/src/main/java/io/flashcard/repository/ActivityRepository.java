@@ -1,5 +1,8 @@
 package io.flashcard.repository;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +17,11 @@ public class ActivityRepository {
         this.jdbc = jdbc;
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = "activity_stats", key = "#chatId"),
+        @CacheEvict(value = "today_activity", key = "#chatId"),
+        @CacheEvict(value = "activity_streak", key = "#chatId")
+    })
     public int logWordActivity(long chatId) {
         jdbc.update(
             """
@@ -26,6 +34,11 @@ public class ActivityRepository {
         return total != null ? total : 0;
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = "activity_stats", key = "#chatId"),
+        @CacheEvict(value = "today_activity", key = "#chatId"),
+        @CacheEvict(value = "activity_streak", key = "#chatId")
+    })
     public void logQuizActivity(long chatId) {
         jdbc.update(
             """
@@ -35,6 +48,7 @@ public class ActivityRepository {
             chatId);
     }
 
+    @Cacheable(value = "activity_streak", key = "#chatId")
     public int getStreak(long chatId) {
         Integer streak = jdbc.queryForObject(
             """
@@ -50,6 +64,7 @@ public class ActivityRepository {
         return streak != null ? streak : 0;
     }
 
+    @Cacheable(value = "today_activity", key = "#chatId")
     public Map<String, Object> getTodayActivity(long chatId) {
         var rows = jdbc.queryForList(
             "SELECT words_learned, quizzes_taken FROM activity_log WHERE chat_id = ? AND activity_date = CURRENT_DATE",
@@ -61,6 +76,7 @@ public class ActivityRepository {
             "quizzesTaken", ((Number) row.get("quizzes_taken")).intValue());
     }
 
+    @Cacheable(value = "activity_stats", key = "#chatId")
     public Map<String, Object> getStats(long chatId) {
         var rows = jdbc.queryForList(
             """

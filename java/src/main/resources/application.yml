@@ -3,13 +3,18 @@ server:
 
 spring:
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/flashcard_io}
-    username: ${DB_USERNAME:}
-    password: ${DB_PASSWORD:}
+    url: ${SPRING_DATASOURCE_URL:${DATABASE_URL:jdbc:postgresql://localhost:5432/flashcard_io}}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
     hikari:
       maximum-pool-size: 20
       idle-timeout: 30000
       connection-timeout: 10000
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
   jackson:
@@ -25,6 +30,9 @@ management:
       show-details: never
       probes:
         enabled: true
+
+feature:
+  telegram: ${FEATURE_TELEGRAM:false}
 
 app:
   unsplash-access-key: ${UNSPLASH_ACCESS_KEY:}

@@ -1,0 +1,133 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flash-card-io-java
+  namespace: flash-card-io
+  labels:
+    app: flash-card-io-java
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: flash-card-io-java
+  template:
+    metadata:
+      labels:
+        app: flash-card-io-java
+    spec:
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: flash-card-io-java
+          image: ghcr.io/hatip5656/flash-card-io-java:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: FEATURE_TELEGRAM
+              value: "false"
+            - name: TELEGRAM_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: flash-card-io-secrets
+                  key: TELEGRAM_BOT_TOKEN
+            # Reuses existing DATABASE_URL secret (postgresql://user:pass@host:5432/db)
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: flash-card-io-secrets
+                  key: DATABASE_URL
+            - name: APP_UNSPLASH_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: flash-card-io-secrets
+                  key: UNSPLASH_ACCESS_KEY
+            - name: APP_EKILEX_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: flash-card-io-secrets
+                  key: EKILEX_API_KEY
+            - name: APP_PEXELS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: flash-card-io-secrets
+                  key: PEXELS_API_KEY
+                  optional: true
+            - name: APP_TTS_API_URL
+              value: "http://tts-api:8000"
+            - name: APP_TTS_SPEAKER
+              value: "mari"
+            - name: APP_CRON_TIMEZONE
+              value: "Europe/Tallinn"
+            - name: APP_CRON_SCHEDULE
+              value: "0 9 * * *"
+            - name: APP_CEFR_LEVELS
+              value: "A1,A2,B1,B2"
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: CACHE_DIR
+              value: "/app/cache"
+            - name: JAVA_OPTS
+              value: "-XX:+UseZGC -XX:MaxRAMPercentage=75.0"
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 5
+            failureThreshold: 20
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 3
+          volumeMounts:
+            - name: cache
+              mountPath: /app/cache
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1500m
+              memory: 1536Mi
+      volumes:
+        - name: cache
+          persistentVolumeClaim:
+            claimName: flash-card-cache
+      imagePullSecrets:
+        - name: ghcr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flash-card-io-java-api
+  namespace: flash-card-io
+spec:
+  type: NodePort
+  selector:
+    app: flash-card-io-java
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30148
+      protocol: TCP

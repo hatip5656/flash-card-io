@@ -1,6 +1,5 @@
 package io.flashcard.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,7 +7,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 
 @Component
@@ -20,14 +18,8 @@ public class AuthFilter implements Filter {
     );
 
     private static final Set<String> PUBLIC_PREFIXES = Set.of(
-        "/api/idioms/", "/api/audio/"
+        "/api/idioms/", "/api/audio/", "/api/admin/cache/"
     );
-
-    private final ObjectMapper objectMapper;
-
-    public AuthFilter(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -37,19 +29,16 @@ public class AuthFilter implements Filter {
 
         String path = req.getRequestURI();
 
-        // Skip non-API paths
         if (!path.startsWith("/api/")) {
             chain.doFilter(request, response);
             return;
         }
 
-        // Public routes
         if (isPublicPath(path, req.getMethod())) {
             chain.doFilter(request, response);
             return;
         }
 
-        // Extract userId from header or query param
         String userIdStr = req.getHeader("X-User-Id");
         if (userIdStr == null) {
             userIdStr = req.getParameter("userId");
@@ -76,7 +65,6 @@ public class AuthFilter implements Filter {
         for (String prefix : PUBLIC_PREFIXES) {
             if (path.startsWith(prefix)) return true;
         }
-        // POST /api/users and POST /api/users/auto are public
         if (path.equals("/api/users") && "POST".equals(method)) return true;
         if (path.equals("/api/users/auto") && "POST".equals(method)) return true;
         return false;
@@ -85,6 +73,6 @@ public class AuthFilter implements Filter {
     private void sendError(HttpServletResponse res, int status, String message) throws IOException {
         res.setStatus(status);
         res.setContentType("application/json");
-        objectMapper.writeValue(res.getOutputStream(), Map.of("error", message));
+        res.getWriter().write("{\"error\":\"" + message.replace("\"", "\\\"") + "\"}");
     }
 }

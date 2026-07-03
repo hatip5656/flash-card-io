@@ -5,6 +5,7 @@ import io.flashcard.repository.DialogRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,16 @@ public class DialogController {
     public ResponseEntity<?> getDialog(@PathVariable String id) {
         Dialog dialog = dialogRepo.getDialog(id);
         if (dialog == null) return ResponseEntity.status(404).body(Map.of("error", "Dialog not found"));
-        return ResponseEntity.ok(dialog);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("id", dialog.getId());
+        result.put("title", dialog.getTitle());
+        result.put("title_tr", dialog.getTitleTr());
+        result.put("cefr_level", dialog.getCefrLevel());
+        result.put("category", dialog.getCategory());
+        result.put("situation", dialog.getSituation());
+        result.put("situation_tr", dialog.getSituationTr());
+        result.put("icon", dialog.getIcon());
+        result.put("lines", dialog.getLines());
+        return ResponseEntity.ok(result);
     }
 }

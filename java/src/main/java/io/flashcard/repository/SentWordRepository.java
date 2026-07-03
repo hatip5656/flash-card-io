@@ -1,5 +1,8 @@
 package io.flashcard.repository;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -17,16 +20,24 @@ public class SentWordRepository {
         this.jdbc = jdbc;
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = "sent_word_ids", key = "#chatId"),
+        @CacheEvict(value = "sent_word_values", key = "#chatId"),
+        @CacheEvict(value = "word_counts", key = "#chatId"),
+        @CacheEvict(value = "activity_stats", key = "#chatId")
+    })
     public void markWordSent(long chatId, String wordId, String wordValue, String english) {
         jdbc.update(
             "INSERT INTO sent_words (chat_id, word_id, word_value, english) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING",
             chatId, wordId, wordValue, english);
     }
 
+    @Cacheable(value = "sent_word_ids", key = "#chatId")
     public List<String> getSentWordIds(long chatId) {
         return jdbc.queryForList("SELECT word_id FROM sent_words WHERE chat_id = ?", String.class, chatId);
     }
 
+    @Cacheable(value = "sent_word_values", key = "#chatId")
     public Set<String> getSentWordValues(long chatId) {
         return jdbc.queryForList(
             "SELECT word_value FROM sent_words WHERE chat_id = ? AND word_value IS NOT NULL",
@@ -46,6 +57,7 @@ public class SentWordRepository {
             chatId, limit);
     }
 
+    @CacheEvict(value = "learned_quiz_words", key = "#chatId")
     public void updateSm2(long chatId, String wordValue, int quality) {
         List<Map<String, Object>> rows = jdbc.queryForList(
             "SELECT ease_factor, interval_days, repetitions FROM sent_words WHERE chat_id = ? AND word_value = ?",
@@ -90,6 +102,7 @@ public class SentWordRepository {
             chatId, limit, offset);
     }
 
+    @Cacheable(value = "learned_quiz_words", key = "#chatId")
     public List<Map<String, Object>> getLearnedWordsForQuiz(long chatId) {
         return jdbc.queryForList(
             """
@@ -100,6 +113,10 @@ public class SentWordRepository {
             chatId);
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = "learned_quiz_words", key = "#chatId"),
+        @CacheEvict(value = "word_counts", key = "#chatId")
+    })
     public void incrementQuizCount(long chatId, List<String> wordValues) {
         if (wordValues.isEmpty()) return;
         jdbc.update(
@@ -107,6 +124,7 @@ public class SentWordRepository {
             chatId, wordValues.toArray(new String[0]));
     }
 
+    @CacheEvict(value = "word_counts", key = "#chatId")
     public void trackFeedShown(long chatId, List<String> wordIds) {
         if (wordIds.isEmpty()) return;
         jdbc.update(
@@ -114,6 +132,7 @@ public class SentWordRepository {
             chatId, wordIds.toArray(new String[0]));
     }
 
+    @CacheEvict(value = "word_counts", key = "#chatId")
     public void trackCrushFound(long chatId, List<String> wordValues) {
         if (wordValues.isEmpty()) return;
         jdbc.update(
@@ -121,12 +140,20 @@ public class SentWordRepository {
             chatId, wordValues.toArray(new String[0]));
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = "learned_quiz_words", key = "#chatId"),
+        @CacheEvict(value = "word_counts", key = "#chatId")
+    })
     public void markWordMastered(long chatId, String wordId) {
         jdbc.update(
             "UPDATE sent_words SET mastered = TRUE, mastered_at = NOW() WHERE chat_id = ? AND word_id = ?",
             chatId, wordId);
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = "learned_quiz_words", key = "#chatId"),
+        @CacheEvict(value = "word_counts", key = "#chatId")
+    })
     public void unmarkWordMastered(long chatId, String wordId) {
         jdbc.update(
             "UPDATE sent_words SET mastered = FALSE, mastered_at = NULL WHERE chat_id = ? AND word_id = ?",
@@ -138,6 +165,7 @@ public class SentWordRepository {
         return count != null ? count : 0;
     }
 
+    @Cacheable(value = "word_counts", key = "#chatId")
     public Map<String, Object> getWordCounts(long chatId) {
         return jdbc.queryForMap(
             """

@@ -49,7 +49,9 @@ public class GrammarPracticeController {
         for (GrammarStory s : levelStories) {
             for (GrammarStory.Slide slide : s.getSlides()) {
                 if (slide.examples() != null) {
-                    slide.examples().forEach(e -> allLevelExamples.add(new Example(e.estonian(), e.english(), e.turkish())));
+                    slide.examples().stream()
+                        .filter(e -> e.estonian() != null && e.english() != null)
+                        .forEach(e -> allLevelExamples.add(new Example(e.estonian(), e.english(), e.turkish())));
                 }
             }
         }
@@ -59,7 +61,9 @@ public class GrammarPracticeController {
         for (GrammarStory s : targetStories) {
             for (GrammarStory.Slide slide : s.getSlides()) {
                 if (slide.examples() != null) {
-                    slide.examples().forEach(e -> storyExamples.add(new Example(e.estonian(), e.english(), e.turkish())));
+                    slide.examples().stream()
+                        .filter(e -> e.estonian() != null && e.english() != null)
+                        .forEach(e -> storyExamples.add(new Example(e.estonian(), e.english(), e.turkish())));
                 }
             }
         }
@@ -162,7 +166,10 @@ public class GrammarPracticeController {
             reindexed.add(q);
         }
 
-        return ResponseEntity.ok(Map.of("totalQuestions", reindexed.size(), "questions", reindexed,
-            "storyId", storyId != null ? storyId : (Object) null));
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("totalQuestions", reindexed.size());
+        response.put("questions", reindexed);
+        response.put("storyId", storyId);
+        return ResponseEntity.ok(response);
     }
 }

@@ -6,6 +6,8 @@ import io.flashcard.service.WordBankService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
+
 import java.util.List;
 import java.util.Map;
 
@@ -30,13 +32,16 @@ public class SavedController {
         return wordIds.stream()
             .map(wordBankService::getWordById)
             .filter(w -> w != null)
-            .map(w -> Map.<String, Object>of(
-                "id", w.getId(),
-                "estonian", w.getEstonian(),
-                "english", w.getEnglish(),
-                "turkish", w.getTurkish() != null ? w.getTurkish() : "",
-                "cefrLevel", w.getCefrLevel(),
-                "sentences", w.getSentences()))
+            .map(w -> {
+                Map<String, Object> map = new LinkedHashMap<>();
+                map.put("id", w.getId());
+                map.put("estonian", w.getEstonian());
+                map.put("english", w.getEnglish());
+                map.put("turkish", w.getTurkish());
+                map.put("cefrLevel", w.getCefrLevel());
+                map.put("sentences", w.getSentences());
+                return map;
+            })
             .toList();
     }
 

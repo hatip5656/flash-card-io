@@ -1,5 +1,7 @@
 package io.flashcard.repository;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -16,12 +18,14 @@ public class GrammarRepository {
         this.jdbc = jdbc;
     }
 
+    @Cacheable(value = "grammar_sent_ids", key = "#chatId")
     public Set<String> getSentGrammarIds(long chatId) {
         return jdbc.queryForList(
             "SELECT lesson_id FROM sent_grammar WHERE chat_id = ?", String.class, chatId)
             .stream().collect(Collectors.toSet());
     }
 
+    @CacheEvict(value = "grammar_sent_ids", key = "#chatId")
     public void markGrammarSent(long chatId, String lessonId) {
         jdbc.update(
             "INSERT INTO sent_grammar (chat_id, lesson_id) VALUES (?, ?) ON CONFLICT DO NOTHING",

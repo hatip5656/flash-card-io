@@ -6,10 +6,14 @@ namespace: flash-card-io
 resources:
   - namespace.yaml
   - deployment.yaml
+  - java-deployment.yaml
+  - redis.yaml
 
 commonLabels:
   app: flash-card-io
 
 images:
   - name: ghcr.io/hatip5656/flash-card-io
+    newTag: latest
+  - name: ghcr.io/hatip5656/flash-card-io-java
     newTag: latest

@@ -5,12 +5,10 @@ import io.flashcard.model.Word;
 import io.flashcard.service.CategoryService;
 import io.flashcard.service.IdiomService;
 import io.flashcard.service.WordBankService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 import java.util.Map;
@@ -19,21 +17,21 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ContentController.class)
-@AutoConfigureMockMvc(addFilters = false)
 class ContentControllerTest {
 
-    @Autowired
     private MockMvc mvc;
-
-    @MockitoBean
     private CategoryService categoryService;
-
-    @MockitoBean
     private IdiomService idiomService;
-
-    @MockitoBean
     private WordBankService wordBankService;
+
+    @BeforeEach
+    void setUp() {
+        categoryService = mock(CategoryService.class);
+        idiomService = mock(IdiomService.class);
+        wordBankService = mock(WordBankService.class);
+        mvc = MockMvcBuilders.standaloneSetup(
+            new ContentController(categoryService, idiomService, wordBankService)).build();
+    }
 
     @Test
     void getLevelsReturnsAllLevels() throws Exception {

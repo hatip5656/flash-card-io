@@ -1,10 +1,12 @@
 package io.flashcard.controller;
 
 import io.flashcard.model.Word;
+import io.flashcard.repository.ActivityRepository;
 import io.flashcard.repository.SavedWordRepository;
 import io.flashcard.repository.SentWordRepository;
 import io.flashcard.repository.SubscriberRepository;
 import io.flashcard.repository.WordDbRepository;
+import io.flashcard.service.ImageService;
 import io.flashcard.service.WordBankService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -22,17 +24,22 @@ public class FeedController {
     private final SubscriberRepository subscriberRepo;
     private final SentWordRepository sentWordRepo;
     private final SavedWordRepository savedWordRepo;
+    private final ActivityRepository activityRepo;
     private final WordBankService wordBankService;
     private final WordDbRepository wordDbRepo;
+    private final ImageService imageService;
 
     public FeedController(SubscriberRepository subscriberRepo, SentWordRepository sentWordRepo,
-                          SavedWordRepository savedWordRepo, WordBankService wordBankService,
-                          WordDbRepository wordDbRepo) {
+                          SavedWordRepository savedWordRepo, ActivityRepository activityRepo,
+                          WordBankService wordBankService, WordDbRepository wordDbRepo,
+                          ImageService imageService) {
         this.subscriberRepo = subscriberRepo;
         this.sentWordRepo = sentWordRepo;
         this.savedWordRepo = savedWordRepo;
+        this.activityRepo = activityRepo;
         this.wordBankService = wordBankService;
         this.wordDbRepo = wordDbRepo;
+        this.imageService = imageService;
     }
 
     @GetMapping
@@ -100,6 +107,16 @@ public class FeedController {
             boolean isNew = (boolean) raw.get("isNew");
             Map<String, String> img = imageCache.get(word.getId());
 
+            // If no cached image, try to fetch dynamically
+            if (img == null) {
+                String query = word.getImageQuery() != null ? word.getImageQuery() : word.getEnglish();
+                ImageService.ImageResult fetched = imageService.fetchImage(query);
+                if (fetched != null) {
+                    img = Map.of("url", fetched.url(), "photographer", fetched.photographer());
+                    wordDbRepo.updateImageCache(word.getId(), fetched.url(), fetched.photographer());
+                }
+            }
+
             Map<String, Object> item = new LinkedHashMap<>();
             item.put("word", Map.of(
                 "id", word.getId(),
@@ -136,6 +153,7 @@ public class FeedController {
         String estonian = body != null ? (String) body.get("estonian") : null;
         String english = body != null ? (String) body.get("english") : null;
         sentWordRepo.markWordSent(chatId, wordId, estonian, english);
+        activityRepo.logWordActivity(chatId);
         return Map.of("seen", true, "wordId", wordId);
     }
 

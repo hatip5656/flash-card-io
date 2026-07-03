@@ -2,6 +2,8 @@ package io.flashcard.repository;
 
 import io.flashcard.model.Word;
 import io.flashcard.model.GrammarStory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,6 +123,7 @@ public class WordDbRepository {
         return id;
     }
 
+    @Cacheable(value = "word_detail", key = "#id")
     public Map<String, Object> getWordDetail(String id) {
         var wordRows = jdbc.queryForList(
             "SELECT id, estonian, english, turkish, cefr_level FROM words WHERE id = ?", id);
@@ -145,6 +148,7 @@ public class WordDbRepository {
             limit);
     }
 
+    @CacheEvict(value = "word_detail", key = "#id")
     public int translateWord(String id, String turkish) {
         return jdbc.update(
             "UPDATE words SET turkish = ? WHERE id = ?", turkish, id);
@@ -170,6 +174,7 @@ public class WordDbRepository {
         return count != null ? count : 0;
     }
 
+    @CacheEvict(value = "word_detail", key = "#wordId")
     public void updateImageCache(String wordId, String imageUrl, String photographer) {
         jdbc.update(
             "UPDATE words SET image_url = ?, image_photographer = ? WHERE id = ?",

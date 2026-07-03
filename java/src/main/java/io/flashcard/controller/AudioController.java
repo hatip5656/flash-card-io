@@ -21,11 +21,9 @@ public class AudioController {
     private final AppProperties appProperties;
     private final HttpClient httpClient;
 
-    public AudioController(AppProperties appProperties) {
+    public AudioController(AppProperties appProperties, HttpClient httpClient) {
         this.appProperties = appProperties;
-        this.httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(10))
-            .build();
+        this.httpClient = httpClient;
     }
 
     @GetMapping("/{word}")

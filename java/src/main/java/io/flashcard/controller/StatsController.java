@@ -60,7 +60,7 @@ public class StatsController {
             recentTrend = (int) Math.round(recentAvg.doubleValue() - olderAvg.doubleValue());
         }
 
-        String streakEmoji = streak >= 7 ? "\uD83D\uDD25" : streak >= 3 ? "\u26A1" : "\uD83D\uDCC5";
+        String streakEmoji = io.flashcard.service.TextUtils.streakEmoji(streak);
 
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("level", level);
@@ -72,10 +72,9 @@ public class StatsController {
         result.put("streak", streak);
         result.put("streakEmoji", streakEmoji);
         result.put("today", today);
-        result.put("quiz", Map.of(
-            "totalQuizzes", totalQuizzes,
-            "avgPercentage", (int) Math.round(avgPct),
-            "recentTrend", recentTrend != null ? recentTrend : (Object) null));
+        @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS)
+        record QuizStats(int totalQuizzes, int avgPercentage, Integer recentTrend) {}
+        result.put("quiz", new QuizStats(totalQuizzes, (int) Math.round(avgPct), recentTrend));
         result.put("words", Map.of(
             "seen", ((Number) wordCounts.get("seen")).intValue(),
             "mastered", ((Number) wordCounts.get("mastered")).intValue(),

@@ -47,11 +47,12 @@ public class WordCrushController {
             for (Word w : wordBankService.getWordsForLevel(LEVEL_ORDER[i])) {
                 String est = w.getEstonian().toLowerCase();
                 if (est.length() <= gridSize && est.length() >= 3 && !est.contains(" ")) {
-                    pool.add(Map.of(
-                        "estonian", est,
-                        "english", w.getEnglish(),
-                        "turkish", w.getTurkish() != null ? w.getTurkish() : "",
-                        "cefrLevel", w.getCefrLevel()));
+                    Map<String, Object> entry = new LinkedHashMap<>();
+                    entry.put("estonian", est);
+                    entry.put("english", w.getEnglish());
+                    entry.put("turkish", w.getTurkish());
+                    entry.put("cefrLevel", w.getCefrLevel());
+                    pool.add(entry);
                 }
             }
         }
@@ -79,10 +80,11 @@ public class WordCrushController {
 
         Map<String, Map<String, Object>> validWords = new LinkedHashMap<>();
         for (Map<String, Object> w : pool) {
-            validWords.put((String) w.get("estonian"), Map.of(
-                "english", w.get("english"),
-                "turkish", w.get("turkish"),
-                "cefrLevel", w.get("cefrLevel")));
+            Map<String, Object> entry = new LinkedHashMap<>();
+            entry.put("english", w.get("english"));
+            entry.put("turkish", w.get("turkish"));
+            entry.put("cefrLevel", w.get("cefrLevel"));
+            validWords.put((String) w.get("estonian"), entry);
         }
 
         return Map.of(

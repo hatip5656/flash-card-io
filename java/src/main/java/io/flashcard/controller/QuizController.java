@@ -187,8 +187,11 @@ public class QuizController {
         return quizRepo.getQuizHistory(getUserId(request), Math.min(limit, 20));
     }
 
+    @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS)
+    record QuizStatsResponse(int totalQuizzes, int avgPercentage, Integer recentTrend) {}
+
     @GetMapping("/stats")
-    public Map<String, Object> getStats(HttpServletRequest request) {
+    public QuizStatsResponse getStats(HttpServletRequest request) {
         long chatId = getUserId(request);
         Map<String, Object> raw = quizRepo.getQuizStats(chatId);
         int total = ((Number) raw.get("total")).intValue();
@@ -197,7 +200,7 @@ public class QuizController {
         if (total >= 4 && raw.get("older_avg") != null) {
             recentTrend = (int) Math.round(((Number) raw.get("recent_avg")).doubleValue() - ((Number) raw.get("older_avg")).doubleValue());
         }
-        return Map.of("totalQuizzes", total, "avgPercentage", avgPct, "recentTrend", recentTrend != null ? recentTrend : (Object) null);
+        return new QuizStatsResponse(total, avgPct, recentTrend);
     }
 
     @GetMapping("/missed")

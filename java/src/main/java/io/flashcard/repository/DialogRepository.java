@@ -1,6 +1,7 @@
 package io.flashcard.repository;
 
 import io.flashcard.model.Dialog;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +16,7 @@ public class DialogRepository {
         this.jdbc = jdbc;
     }
 
+    @Cacheable(value = "dialog_list", key = "#level != null ? #level : 'all'")
     public List<Dialog> listDialogs(String level) {
         String query = "SELECT id, title, title_tr, cefr_level, category, situation, situation_tr, icon, sort_order FROM dialogs";
         List<Map<String, Object>> rows;
@@ -51,6 +53,7 @@ public class DialogRepository {
         }).toList();
     }
 
+    @Cacheable(value = "dialog_detail", key = "#id")
     public Dialog getDialog(String id) {
         var rows = jdbc.queryForList(
             "SELECT id, title, title_tr, cefr_level, category, situation, situation_tr, icon FROM dialogs WHERE id = ?", id);

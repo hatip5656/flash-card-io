@@ -1,6 +1,5 @@
 package io.flashcard.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -10,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class RateLimitFilterTest {
 
-    private final RateLimitFilter filter = new RateLimitFilter(new ObjectMapper());
+    private final RateLimitFilter filter = new RateLimitFilter();
 
     @Test
     void allowsNormalRequests() throws Exception {

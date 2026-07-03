@@ -1,6 +1,9 @@
 package io.flashcard.repository;
 
 import io.flashcard.model.WordComment;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +18,10 @@ public class CommentRepository {
         this.jdbc = jdbc;
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = "word_comments", allEntries = true),
+        @CacheEvict(value = "word_comment_count", key = "#wordId")
+    })
     public WordComment addComment(long chatId, String wordId, String comment) {
         var row = jdbc.queryForMap(
             """
@@ -36,6 +43,7 @@ public class CommentRepository {
         );
     }
 
+    @Cacheable(value = "word_comments", key = "#wordId + '_' + #limit")
     public List<WordComment> getComments(String wordId, int limit) {
         return jdbc.query(
             """
@@ -56,6 +64,7 @@ public class CommentRepository {
             wordId, limit);
     }
 
+    @Cacheable(value = "word_comment_count", key = "#wordId")
     public int getCommentCount(String wordId) {
         Integer count = jdbc.queryForObject(
             "SELECT COUNT(*) FROM word_comments WHERE word_id = ?", Integer.class, wordId);

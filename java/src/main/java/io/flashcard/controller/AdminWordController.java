@@ -1,9 +1,12 @@
 package io.flashcard.controller;
 
+import io.flashcard.config.AppProperties;
 import io.flashcard.repository.WordDbRepository;
+import io.flashcard.service.EkilexService;
 import io.flashcard.service.WordBankService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -16,10 +19,17 @@ public class AdminWordController {
 
     private final WordDbRepository wordDbRepo;
     private final WordBankService wordBankService;
+    private final EkilexService ekilexService;
+    private final AppProperties appProperties;
+    private final JdbcTemplate jdbc;
 
-    public AdminWordController(WordDbRepository wordDbRepo, WordBankService wordBankService) {
+    public AdminWordController(WordDbRepository wordDbRepo, WordBankService wordBankService,
+                               EkilexService ekilexService, AppProperties appProperties, JdbcTemplate jdbc) {
         this.wordDbRepo = wordDbRepo;
         this.wordBankService = wordBankService;
+        this.ekilexService = ekilexService;
+        this.appProperties = appProperties;
+        this.jdbc = jdbc;
     }
 
     @PostMapping
@@ -46,6 +56,64 @@ public class AdminWordController {
         wordBankService.reload();
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
             "id", id, "estonian", estonian, "english", english, "turkish", turkish, "cefrLevel", cefrLevel));
+    }
+
+    @PostMapping("/from-ekilex")
+    public ResponseEntity<?> addFromEkilex(@RequestBody Map<String, Object> body) {
+        String apiKey = appProperties.getEkilexApiKey();
+        if (apiKey == null || apiKey.isBlank()) {
+            return ResponseEntity.status(500).body(Map.of("error", "EKILEX_API_KEY not configured"));
+        }
+
+        String search = (String) body.get("search");
+        String level = (String) body.get("level");
+        Integer count = body.get("count") != null ? ((Number) body.get("count")).intValue() : 10;
+
+        List<Map<String, Object>> added = new ArrayList<>();
+        List<String> skipped = new ArrayList<>();
+
+        if (search != null) {
+            var results = ekilexService.searchWord(search, apiKey);
+            for (var w : results) {
+                if (w.cefrLevel() == null || w.english() == null) continue;
+                String id = w.cefrLevel().toLowerCase() + "-" + w.wordValue().toLowerCase().replaceAll("\\s+", "-");
+                if (wordDbRepo.wordExists(w.wordValue().toLowerCase())) {
+                    skipped.add(w.wordValue());
+                    continue;
+                }
+                List<Map<String, String>> sentences = w.usages().stream()
+                    .filter(u -> u.estonian() != null && !u.estonian().isBlank())
+                    .map(u -> Map.of("estonian", u.estonian(), "english", u.english()))
+                    .toList();
+                String wordId = wordDbRepo.addWord(w.wordValue().toLowerCase(), w.english(), null, w.cefrLevel(), new ArrayList<>(sentences));
+                if (wordId != null) {
+                    added.add(Map.of("id", wordId, "estonian", w.wordValue(), "english", w.english(), "cefrLevel", w.cefrLevel()));
+                }
+            }
+        } else if (level != null && VALID_LEVELS.contains(level)) {
+            int target = Math.min(count, 50);
+            Set<String> existingSet = new HashSet<>(jdbc.queryForList("SELECT estonian FROM words", String.class));
+            for (int attempt = 0; attempt < target * 3 && added.size() < target; attempt++) {
+                var w = ekilexService.getRandomWordForLevel(level, existingSet, apiKey);
+                if (w == null || w.english() == null || existingSet.contains(w.wordValue().toLowerCase())) continue;
+                existingSet.add(w.wordValue().toLowerCase());
+                List<Map<String, String>> sentences = w.usages().stream()
+                    .filter(u -> u.estonian() != null && !u.estonian().isBlank())
+                    .map(u -> Map.of("estonian", u.estonian(), "english", u.english()))
+                    .toList();
+                String wordId = wordDbRepo.addWord(w.wordValue().toLowerCase(), w.english(), null, level, new ArrayList<>(sentences));
+                if (wordId != null) {
+                    added.add(Map.of("id", wordId, "estonian", w.wordValue(), "english", w.english(), "cefrLevel", level));
+                } else {
+                    skipped.add(w.wordValue());
+                }
+            }
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("error", "Provide {search} or {level, count}"));
+        }
+
+        if (!added.isEmpty()) wordBankService.reload();
+        return ResponseEntity.ok(Map.of("added", added.size(), "skipped", skipped.size(), "words", added));
     }
 
     @GetMapping("/untranslated")

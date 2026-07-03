@@ -1,17 +1,17 @@
 package io.flashcard.controller;
 
+import io.flashcard.filter.AuthFilter;
 import io.flashcard.model.UserPreferences;
 import io.flashcard.repository.ActivityRepository;
 import io.flashcard.repository.SubscriberRepository;
 import io.flashcard.service.ScheduleService;
 import io.flashcard.service.WordBankService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
 import java.util.Map;
@@ -21,17 +21,27 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(UserController.class)
-@AutoConfigureMockMvc(addFilters = false)
 class UserControllerTest {
 
-    @Autowired
     private MockMvc mvc;
+    private SubscriberRepository subscriberRepo;
+    private ActivityRepository activityRepo;
+    private ScheduleService scheduleService;
+    private WordBankService wordBankService;
 
-    @MockitoBean private SubscriberRepository subscriberRepo;
-    @MockitoBean private ActivityRepository activityRepo;
-    @MockitoBean private ScheduleService scheduleService;
-    @MockitoBean private WordBankService wordBankService;
+    private static final String AUTH = "12345";
+
+    @BeforeEach
+    void setUp() {
+        subscriberRepo = mock(SubscriberRepository.class);
+        activityRepo = mock(ActivityRepository.class);
+        scheduleService = mock(ScheduleService.class);
+        wordBankService = mock(WordBankService.class);
+        mvc = MockMvcBuilders.standaloneSetup(
+                new UserController(subscriberRepo, activityRepo, scheduleService, wordBankService))
+            .addFilters(new AuthFilter())
+            .build();
+    }
 
     @Test
     void registerCreatesUser() throws Exception {
@@ -74,7 +84,7 @@ class UserControllerTest {
         when(scheduleService.findLabelForCron("0 9 * * *")).thenReturn("Daily at 9 AM");
         when(wordBankService.getWordsForLevel("A1")).thenReturn(List.of());
 
-        mvc.perform(get("/api/users/me").requestAttr("userId", 12345L))
+        mvc.perform(get("/api/users/me").header("X-User-Id", AUTH))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.userId").value(12345))
             .andExpect(jsonPath("$.level").value("A1"))
@@ -83,11 +93,17 @@ class UserControllerTest {
     }
 
     @Test
+    void getUserRejectsWithoutAuth() throws Exception {
+        mvc.perform(get("/api/users/me"))
+            .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void setLevelWithValidLevel() throws Exception {
         when(wordBankService.getWordsForLevel("B1")).thenReturn(List.of());
 
         mvc.perform(patch("/api/users/me/level")
-                .requestAttr("userId", 12345L)
+                .header("X-User-Id", AUTH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"level\": \"B1\"}"))
             .andExpect(status().isOk())
@@ -98,7 +114,7 @@ class UserControllerTest {
     @Test
     void setLevelRejectsInvalidLevel() throws Exception {
         mvc.perform(patch("/api/users/me/level")
-                .requestAttr("userId", 12345L)
+                .header("X-User-Id", AUTH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"level\": \"C1\"}"))
             .andExpect(status().isBadRequest());
@@ -109,7 +125,7 @@ class UserControllerTest {
         when(scheduleService.getPreset("invalid")).thenReturn(null);
 
         mvc.perform(patch("/api/users/me/schedule")
-                .requestAttr("userId", 12345L)
+                .header("X-User-Id", AUTH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"schedule\": \"invalid\"}"))
             .andExpect(status().isBadRequest());
@@ -121,7 +137,7 @@ class UserControllerTest {
         when(subscriberRepo.getSubscriberSchedule(12345L)).thenReturn("off");
 
         mvc.perform(patch("/api/users/me/schedule")
-                .requestAttr("userId", 12345L)
+                .header("X-User-Id", AUTH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"schedule\": \"morning\"}"))
             .andExpect(status().isOk())
@@ -133,7 +149,7 @@ class UserControllerTest {
     void getPreferencesReturnsDefaults() throws Exception {
         when(subscriberRepo.getPreferences(12345L)).thenReturn(UserPreferences.defaults());
 
-        mvc.perform(get("/api/users/me/preferences").requestAttr("userId", 12345L))
+        mvc.perform(get("/api/users/me/preferences").header("X-User-Id", AUTH))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.audio").value(true))
             .andExpect(jsonPath("$.voiceName").value("mari"));
@@ -142,7 +158,7 @@ class UserControllerTest {
     @Test
     void setPreferenceRejectsInvalidKey() throws Exception {
         mvc.perform(patch("/api/users/me/preferences")
-                .requestAttr("userId", 12345L)
+                .header("X-User-Id", AUTH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"key\": \"invalid\", \"value\": true}"))
             .andExpect(status().isBadRequest());
@@ -151,7 +167,7 @@ class UserControllerTest {
     @Test
     void setPreferenceRejectsWrongTypeForBoolean() throws Exception {
         mvc.perform(patch("/api/users/me/preferences")
-                .requestAttr("userId", 12345L)
+                .header("X-User-Id", AUTH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"key\": \"audio\", \"value\": \"yes\"}"))
             .andExpect(status().isBadRequest());
@@ -162,7 +178,7 @@ class UserControllerTest {
         when(subscriberRepo.getPreferences(12345L)).thenReturn(UserPreferences.defaults());
 
         mvc.perform(patch("/api/users/me/preferences")
-                .requestAttr("userId", 12345L)
+                .header("X-User-Id", AUTH)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"key\": \"voiceName\", \"value\": \"albert\"}"))
             .andExpect(status().isOk());
@@ -170,7 +186,7 @@ class UserControllerTest {
 
     @Test
     void unsubscribeReturnsTrue() throws Exception {
-        mvc.perform(delete("/api/users/me").requestAttr("userId", 12345L))
+        mvc.perform(delete("/api/users/me").header("X-User-Id", AUTH))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.unsubscribed").value(true));
     }

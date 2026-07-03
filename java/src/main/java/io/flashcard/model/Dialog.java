@@ -1,17 +1,22 @@
 package io.flashcard.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 public class Dialog {
 
     private String id;
     private String title;
+    @JsonProperty("title_tr")
     private String titleTr;
+    @JsonProperty("cefr_level")
     private String cefrLevel;
     private String category;
     private String situation;
+    @JsonProperty("situation_tr")
     private String situationTr;
     private String icon;
+    @JsonProperty("sort_order")
     private int sortOrder;
     private int lineCount;
     private List<Line> lines;
