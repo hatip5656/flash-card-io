@@ -1,5 +1,6 @@
 package io.flashcard.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,8 @@ import java.util.Map;
 @RequestMapping("/api/admin/cache")
 public class CacheController {
 
-    private static final String SECRET = "HatipIsTheBoss";
+    @Value("${admin.cache-secret:HatipIsTheBoss}")
+    private String secret;
 
     private final CacheManager cacheManager;
 
@@ -19,8 +21,8 @@ public class CacheController {
     }
 
     @PostMapping("/evict-all")
-    public ResponseEntity<Map<String, Object>> evictAll(@RequestHeader("X-Cache-Secret") String secret) {
-        if (!SECRET.equals(secret)) {
+    public ResponseEntity<Map<String, Object>> evictAll(@RequestHeader("X-Cache-Secret") String secretHeader) {
+        if (!this.secret.equals(secretHeader)) {
             return ResponseEntity.status(403).body(Map.of("error", "Invalid secret"));
         }
 
@@ -40,9 +42,9 @@ public class CacheController {
 
     @PostMapping("/evict/{cacheName}")
     public ResponseEntity<Map<String, Object>> evictCache(
-            @RequestHeader("X-Cache-Secret") String secret,
+            @RequestHeader("X-Cache-Secret") String secretHeader,
             @PathVariable String cacheName) {
-        if (!SECRET.equals(secret)) {
+        if (!this.secret.equals(secretHeader)) {
             return ResponseEntity.status(403).body(Map.of("error", "Invalid secret"));
         }
 
@@ -56,8 +58,8 @@ public class CacheController {
     }
 
     @GetMapping("/names")
-    public ResponseEntity<Map<String, Object>> listCaches(@RequestHeader("X-Cache-Secret") String secret) {
-        if (!SECRET.equals(secret)) {
+    public ResponseEntity<Map<String, Object>> listCaches(@RequestHeader("X-Cache-Secret") String secretHeader) {
+        if (!this.secret.equals(secretHeader)) {
             return ResponseEntity.status(403).body(Map.of("error", "Invalid secret"));
         }
 

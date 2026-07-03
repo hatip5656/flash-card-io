@@ -107,14 +107,16 @@ public class FeedController {
             boolean isNew = (boolean) raw.get("isNew");
             Map<String, String> img = imageCache.get(word.getId());
 
-            // If no cached image, try to fetch dynamically
+            // If no cached image, fetch in background — don't block the request
             if (img == null) {
-                String query = word.getImageQuery() != null ? word.getImageQuery() : word.getEnglish();
-                ImageService.ImageResult fetched = imageService.fetchImage(query);
-                if (fetched != null) {
-                    img = Map.of("url", fetched.url(), "photographer", fetched.photographer());
-                    wordDbRepo.updateImageCache(word.getId(), fetched.url(), fetched.photographer());
-                }
+                final String wordId = word.getId();
+                final String query = word.getImageQuery() != null ? word.getImageQuery() : word.getEnglish();
+                Thread.ofVirtual().start(() -> {
+                    ImageService.ImageResult fetched = imageService.fetchImage(query);
+                    if (fetched != null) {
+                        wordDbRepo.updateImageCache(wordId, fetched.url(), fetched.photographer());
+                    }
+                });
             }
 
             Map<String, Object> item = new LinkedHashMap<>();
