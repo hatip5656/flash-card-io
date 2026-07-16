@@ -11,5 +11,7 @@
     <include file="db/changelog/004-additional-columns.sql"/>
     <include file="db/changelog/005-dialogs.sql"/>
     <include file="db/changelog/006-indexes.sql"/>
+    <include file="db/changelog/007-feed-phrases.sql"/>
+    <include file="db/changelog/008-more-phrases.sql"/>
 
 </databaseChangeLog>
