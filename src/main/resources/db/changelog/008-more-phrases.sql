@@ -1,5 +1,7 @@
 --liquibase formatted sql
---changeset claude:008-more-phrases
+
+--changeset flashcard:008 splitStatements:true
+
 -- Expand phrases to 200+ for communication variety
 
 -- ============================================

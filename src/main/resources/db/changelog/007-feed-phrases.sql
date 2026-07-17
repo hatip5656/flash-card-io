@@ -1,5 +1,7 @@
 --liquibase formatted sql
---changeset claude:007-feed-phrases
+
+--changeset flashcard:007 splitStatements:true
+
 -- Daily phrases and expressions for mixed feed
 
 CREATE TABLE IF NOT EXISTS feed_phrases (
