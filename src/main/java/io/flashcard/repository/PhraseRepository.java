@@ -22,19 +22,24 @@ public class PhraseRepository {
 
         String placeholders = String.join(",", Collections.nCopies(allowedLevels.size(), "?"));
 
+        // Prioritize user's level, mix in lower levels, unseen first, then randomize
         String sql = """
             SELECT p.id, p.estonian, p.english, p.turkish, p.category, p.cefr_level, p.context_note,
                    sp.seen_at
             FROM feed_phrases p
             LEFT JOIN sent_phrases sp ON sp.phrase_id = p.id AND sp.chat_id = ?
             WHERE p.cefr_level IN (%s)
-            ORDER BY sp.seen_at ASC NULLS FIRST, p.sort_order
+            ORDER BY
+                CASE WHEN sp.seen_at IS NULL THEN 0 ELSE 1 END,
+                CASE WHEN p.cefr_level = ? THEN 0 ELSE 1 END,
+                RANDOM()
             LIMIT ?
             """.formatted(placeholders);
 
         List<Object> params = new ArrayList<>();
         params.add(chatId);
         params.addAll(allowedLevels);
+        params.add(userLevel);
         params.add(limit);
 
         return jdbc.queryForList(sql, params.toArray());
