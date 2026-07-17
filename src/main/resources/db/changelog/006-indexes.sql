@@ -24,9 +24,9 @@ CREATE INDEX IF NOT EXISTS idx_word_sentences_word ON word_sentences (word_id, s
 CREATE INDEX IF NOT EXISTS idx_grammar_stories_cefr ON grammar_stories (cefr_level);
 CREATE INDEX IF NOT EXISTS idx_grammar_slides_story ON grammar_story_slides (story_id, sort_order);
 
---changeset flashcard:029 splitStatements:true
--- sent_words indexes
-CREATE INDEX IF NOT EXISTS idx_sent_words_next_review ON sent_words (chat_id, next_review) WHERE next_review <= CURRENT_DATE;
+--changeset flashcard:029 splitStatements:true failOnError:false
+-- sent_words indexes (partial index already exists from legacy migration)
+CREATE INDEX IF NOT EXISTS idx_sent_words_next_review ON sent_words (chat_id, next_review);
 CREATE INDEX IF NOT EXISTS idx_sent_words_sent_at ON sent_words (chat_id, sent_at DESC);
 CREATE INDEX IF NOT EXISTS idx_sent_words_quiz_count ON sent_words (chat_id, quiz_count ASC);
 CREATE INDEX IF NOT EXISTS idx_sent_words_feed ON sent_words (chat_id, last_fed_at ASC NULLS FIRST);
