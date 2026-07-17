@@ -1,1 +1,1 @@
-io.flashcard.config.DatabaseUrlNormalizer
+org.springframework.boot.env.EnvironmentPostProcessor=io.flashcard.config.DatabaseUrlNormalizer
