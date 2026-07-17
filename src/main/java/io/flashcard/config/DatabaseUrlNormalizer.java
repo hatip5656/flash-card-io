@@ -20,6 +20,7 @@ public class DatabaseUrlNormalizer implements EnvironmentPostProcessor {
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         String dbUrl = environment.getProperty("DATABASE_URL");
+        log.info("[db-url-normalizer] DATABASE_URL present: {}", dbUrl != null);
         if (dbUrl == null || dbUrl.startsWith("jdbc:")) return;
 
         try {
