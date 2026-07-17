@@ -32,14 +32,20 @@ public class DatabaseUrlNormalizer implements EnvironmentPostProcessor {
 
             Map<String, Object> props = new HashMap<>();
             props.put("spring.datasource.url", jdbcUrl);
+            // Liquibase needs its own URL explicitly
+            props.put("spring.liquibase.url", jdbcUrl);
 
             if (userInfo != null) {
                 String[] parts = userInfo.split(":", 2);
                 props.put("spring.datasource.username", parts[0]);
+                props.put("spring.liquibase.user", parts[0]);
                 if (parts.length > 1) {
                     props.put("spring.datasource.password", parts[1]);
+                    props.put("spring.liquibase.password", parts[1]);
                 }
             }
+
+            System.err.println("[db-url-normalizer] Converted DATABASE_URL to JDBC: " + jdbcUrl);
 
             environment.getPropertySources().addFirst(
                 new MapPropertySource("databaseUrlNormalized", props)
