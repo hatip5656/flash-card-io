@@ -1,5 +1,6 @@
 package io.flashcard.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -13,6 +14,7 @@ import java.util.Map;
  * Converts DATABASE_URL from postgresql:// format to jdbc:postgresql:// format
  * so both HikariCP and Liquibase work correctly.
  */
+@Slf4j
 public class DatabaseUrlNormalizer implements EnvironmentPostProcessor {
 
     @Override
@@ -45,13 +47,13 @@ public class DatabaseUrlNormalizer implements EnvironmentPostProcessor {
                 }
             }
 
-            System.err.println("[db-url-normalizer] Converted DATABASE_URL to JDBC: " + jdbcUrl);
+            log.info("[db-url-normalizer] Converted DATABASE_URL to JDBC format: {}", jdbcUrl);
 
             environment.getPropertySources().addFirst(
                 new MapPropertySource("databaseUrlNormalized", props)
             );
         } catch (Exception e) {
-            System.err.println("[db-url-normalizer] Failed to parse DATABASE_URL: " + e.getMessage());
+            log.error("[db-url-normalizer] Failed to parse DATABASE_URL: {}", e.getMessage());
         }
     }
 }
