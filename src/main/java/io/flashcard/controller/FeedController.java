@@ -170,4 +170,23 @@ public class FeedController {
         sentWordRepo.unmarkWordMastered(getUserId(request), wordId);
         return Map.of("mastered", false, "wordId", wordId);
     }
+
+    @PostMapping("/track-game-words")
+    public Map<String, Object> trackGameWords(HttpServletRequest request, @RequestBody Map<String, Object> body) {
+        long chatId = getUserId(request);
+        @SuppressWarnings("unchecked")
+        List<String> words = (List<String>) body.get("words");
+        String gameType = (String) body.getOrDefault("gameType", "unknown");
+
+        if (words != null && !words.isEmpty()) {
+            if ("crush".equals(gameType)) {
+                sentWordRepo.trackCrushFound(chatId, words);
+            } else {
+                // For other games, increment feed_count as "exposure"
+                sentWordRepo.trackFeedShown(chatId, words);
+            }
+        }
+        return Map.of("ok", true, "tracked", words != null ? words.size() : 0);
+    }
+
 }

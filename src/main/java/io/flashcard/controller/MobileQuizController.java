@@ -135,6 +135,12 @@ public class MobileQuizController {
         activityRepo.logQuizActivity(chatId);
         sentWordRepo.incrementQuizCount(chatId, answers.stream().map(QuizAnswer::estonian).toList());
 
+        // Update SM-2 spaced repetition for each answered word
+        for (QuizAnswer answer : answers) {
+            int quality = answer.isCorrect() ? 4 : 1; // 4=good recall, 1=poor recall
+            sentWordRepo.updateSm2(chatId, answer.estonian(), quality);
+        }
+
         return ResponseEntity.ok(Map.of(
             "score", score,
             "total", total,
@@ -146,4 +152,23 @@ public class MobileQuizController {
             .filter(w -> w.getTurkish() != null)
             .collect(Collectors.toMap(Word::getEstonian, Word::getTurkish, (a, b) -> a));
     }
+
+    @PostMapping("/answer")
+    public Map<String, Object> submitSingleAnswer(HttpServletRequest request, @RequestBody Map<String, Object> body) {
+        long chatId = getUserId(request);
+        String estonian = (String) body.get("estonian");
+        String correctAnswer = (String) body.get("correctAnswer");
+        String userAnswer = (String) body.get("userAnswer");
+        boolean isCorrect = Boolean.TRUE.equals(body.get("isCorrect"));
+
+        if (estonian == null) return Map.of("error", "estonian required");
+
+        // Track the answer
+        sentWordRepo.incrementQuizCount(chatId, java.util.List.of(estonian));
+        int quality = isCorrect ? 4 : 1;
+        sentWordRepo.updateSm2(chatId, estonian, quality);
+
+        return Map.of("ok", true, "isCorrect", isCorrect);
+    }
+
 }

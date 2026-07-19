@@ -96,7 +96,11 @@ public class SentWordRepository {
             """
             SELECT word_id, word_value, english FROM sent_words
             WHERE chat_id = ? AND word_value IS NOT NULL AND mastered = FALSE
-            ORDER BY last_fed_at ASC NULLS FIRST, sent_at DESC
+            ORDER BY
+                CASE WHEN next_review <= CURRENT_DATE THEN 0 ELSE 1 END,
+                ease_factor ASC,
+                last_fed_at ASC NULLS FIRST,
+                sent_at DESC
             LIMIT ? OFFSET ?
             """,
             chatId, limit, offset);
