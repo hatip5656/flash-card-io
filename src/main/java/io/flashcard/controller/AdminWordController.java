@@ -236,7 +236,9 @@ public class AdminWordController {
 
     @PatchMapping("/sentences/batch")
     public Map<String, Object> batchUpdateSentenceTranslations(
-            @RequestBody List<Map<String, String>> items) {
+            @RequestBody Map<String, Object> body) {
+        @SuppressWarnings("unchecked")
+        List<Map<String, String>> items = (List<Map<String, String>>) body.get("items");
         int updated = 0;
         int failed = 0;
         for (var item : items) {
