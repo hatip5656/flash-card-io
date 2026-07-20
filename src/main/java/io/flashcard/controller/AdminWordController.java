@@ -209,9 +209,11 @@ public class AdminWordController {
     @GetMapping("/sentences/missing")
     public Map<String, Object> getMissingSentenceTranslations(
             @RequestParam(defaultValue = "turkish") String lang,
-            @RequestParam(defaultValue = "50") int limit) {
-        List<Map<String, Object>> sentences = wordDbRepo.getSentencesWithMissingTranslations(lang, Math.min(limit, 200));
-        return Map.of("sentences", sentences, "count", sentences.size(), "lang", lang);
+            @RequestParam(defaultValue = "200") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
+        int total = wordDbRepo.countMissingTranslations(lang);
+        List<Map<String, Object>> sentences = wordDbRepo.getSentencesWithMissingTranslations(lang, Math.min(limit, 500), offset);
+        return Map.of("sentences", sentences, "count", sentences.size(), "total", total, "lang", lang, "offset", offset);
     }
 
     @GetMapping("/sentences/{wordId}")

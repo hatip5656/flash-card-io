@@ -194,19 +194,25 @@ public class WordDbRepository {
         return count != null && count > 0;
     }
 
-    public List<Map<String, Object>> getSentencesWithMissingTranslations(String lang, int limit) {
-        String condition;
-        if ("turkish".equals(lang)) {
-            condition = "(ws.turkish IS NULL OR ws.turkish = '')";
-        } else {
-            condition = "(ws.english IS NULL OR ws.english = '')";
-        }
+    public List<Map<String, Object>> getSentencesWithMissingTranslations(String lang, int limit, int offset) {
+        String condition = "turkish".equals(lang)
+            ? "(ws.turkish IS NULL OR ws.turkish = '')"
+            : "(ws.english IS NULL OR ws.english = '')";
         return jdbc.queryForList(
             "SELECT ws.word_id, w.estonian, ws.estonian as sentence_ee, ws.english as sentence_en, " +
             "ws.turkish as sentence_tr, ws.sort_order " +
             "FROM word_sentences ws JOIN words w ON w.id = ws.word_id " +
-            "WHERE " + condition + " ORDER BY w.cefr_level, w.estonian LIMIT ?",
-            limit);
+            "WHERE " + condition + " ORDER BY w.cefr_level, w.estonian LIMIT ? OFFSET ?",
+            limit, offset);
+    }
+
+    public int countMissingTranslations(String lang) {
+        String condition = "turkish".equals(lang)
+            ? "(ws.turkish IS NULL OR ws.turkish = '')"
+            : "(ws.english IS NULL OR ws.english = '')";
+        Integer count = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM word_sentences ws WHERE " + condition, Integer.class);
+        return count != null ? count : 0;
     }
 
     public List<Map<String, Object>> getSentencesByWord(String wordId) {
