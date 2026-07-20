@@ -234,7 +234,7 @@ public class AdminWordController {
         return Map.of("ok", true, "updated", updated);
     }
 
-    @PatchMapping("/sentences/batch")
+    @PostMapping("/sentences-batch")
     public Map<String, Object> batchUpdateSentenceTranslations(
             @RequestBody Map<String, Object> body) {
         @SuppressWarnings("unchecked")
