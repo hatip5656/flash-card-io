@@ -216,6 +216,15 @@ public class AdminWordController {
         return Map.of("sentences", sentences, "count", sentences.size(), "total", total, "lang", lang, "offset", offset);
     }
 
+    @GetMapping("/without-sentences")
+    public Map<String, Object> getWordsWithoutSentences(
+            @RequestParam(defaultValue = "500") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
+        int total = wordDbRepo.countWordsWithoutSentences();
+        List<Map<String, Object>> words = wordDbRepo.getWordsWithoutSentences(Math.min(limit, 500), offset);
+        return Map.of("words", words, "count", words.size(), "total", total, "offset", offset);
+    }
+
     @GetMapping("/sentences/{wordId}")
     public Map<String, Object> getWordSentences(@PathVariable String wordId) {
         List<Map<String, Object>> sentences = wordDbRepo.getSentencesByWord(wordId);

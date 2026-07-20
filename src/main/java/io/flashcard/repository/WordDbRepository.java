@@ -215,6 +215,21 @@ public class WordDbRepository {
         return count != null ? count : 0;
     }
 
+    public int countWordsWithoutSentences() {
+        Integer count = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM words w WHERE NOT EXISTS (SELECT 1 FROM word_sentences ws WHERE ws.word_id = w.id)",
+            Integer.class);
+        return count != null ? count : 0;
+    }
+
+    public List<Map<String, Object>> getWordsWithoutSentences(int limit, int offset) {
+        return jdbc.queryForList(
+            "SELECT w.id, w.estonian, w.english, w.turkish, w.cefr_level " +
+            "FROM words w WHERE NOT EXISTS (SELECT 1 FROM word_sentences ws WHERE ws.word_id = w.id) " +
+            "ORDER BY w.cefr_level, w.estonian LIMIT ? OFFSET ?",
+            limit, offset);
+    }
+
     public List<Map<String, Object>> getSentencesByWord(String wordId) {
         return jdbc.queryForList(
             "SELECT estonian, english, turkish, sort_order FROM word_sentences WHERE word_id = ? ORDER BY sort_order",
