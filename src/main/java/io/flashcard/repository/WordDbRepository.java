@@ -230,6 +230,12 @@ public class WordDbRepository {
             limit, offset);
     }
 
+    public void insertSentence(String wordId, String estonian, String english, String turkish, int sortOrder) {
+        jdbc.update(
+            "INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VALUES (?, ?, ?, ?, ?)",
+            wordId, estonian, english, turkish, sortOrder);
+    }
+
     public List<Map<String, Object>> getSentencesByWord(String wordId) {
         return jdbc.queryForList(
             "SELECT estonian, english, turkish, sort_order FROM word_sentences WHERE word_id = ? ORDER BY sort_order",

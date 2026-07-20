@@ -263,4 +263,27 @@ public class AdminWordController {
         return Map.of("ok", true, "updated", updated, "failed", failed, "total", items.size());
     }
 
+    @PostMapping("/sentences/add-batch")
+    public Map<String, Object> batchAddSentences(@RequestBody Map<String, Object> body) {
+        @SuppressWarnings("unchecked")
+        List<Map<String, String>> items = (List<Map<String, String>>) body.get("items");
+        int inserted = 0;
+        int failed = 0;
+        for (var item : items) {
+            String wordId = item.get("wordId");
+            String estonian = item.get("estonian");
+            String english = item.get("english");
+            String turkish = item.get("turkish");
+            String sortStr = item.get("sortOrder");
+            int sortOrder = sortStr != null ? Integer.parseInt(sortStr) : 0;
+            if (wordId == null || estonian == null) { failed++; continue; }
+            try {
+                wordDbRepo.insertSentence(wordId, estonian, english, turkish, sortOrder);
+                inserted++;
+            } catch (Exception e) { failed++; }
+        }
+        if (inserted > 0) wordBankService.reload();
+        return Map.of("ok", true, "inserted", inserted, "failed", failed, "total", items.size());
+    }
+
 }
