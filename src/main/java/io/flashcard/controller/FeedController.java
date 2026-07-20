@@ -56,7 +56,7 @@ public class FeedController {
         String level = subscriberRepo.getSubscriberLevel(chatId);
         List<String> sentIds = sentWordRepo.getSentWordIds(chatId);
         Set<String> savedIds = new HashSet<>(savedWordRepo.getSavedWordIds(chatId));
-        List<Word> unsent = wordBankService.getUnsent(level, sentIds);
+        List<Word> unsent = wordBankService.getUnsentUpToLevel(level, sentIds);
 
         List<Map<String, Object>> rawItems = new ArrayList<>();
         String nextMode = cursorMode;
@@ -187,6 +187,35 @@ public class FeedController {
             }
         }
         return Map.of("ok", true, "tracked", words != null ? words.size() : 0);
+    }
+
+
+    @GetMapping("/vocabulary")
+    public Map<String, Object> getVocabulary(HttpServletRequest request) {
+        long chatId = getUserId(request);
+        List<Map<String, Object>> words = sentWordRepo.getVocabularyCollection(chatId);
+
+        List<Map<String, Object>> items = new ArrayList<>();
+        for (Map<String, Object> w : words) {
+            Map<String, Object> item = new java.util.LinkedHashMap<>();
+            item.put("wordId", w.get("word_id"));
+            item.put("estonian", w.get("word_value"));
+            item.put("english", w.get("english"));
+            item.put("turkish", w.get("turkish"));
+            item.put("cefrLevel", w.get("cefr_level"));
+            item.put("feedCount", w.get("feed_count"));
+            item.put("quizCount", w.get("quiz_count"));
+            item.put("crushCount", w.get("crush_count"));
+            item.put("mastered", w.get("mastered"));
+            item.put("easeFactor", w.get("ease_factor"));
+            item.put("nextReview", w.get("next_review"));
+            item.put("firstSeen", w.get("sent_at"));
+            item.put("lastSeen", w.get("last_fed_at"));
+            item.put("lastQuizzed", w.get("last_quizzed_at"));
+            items.add(item);
+        }
+
+        return Map.of("words", items, "total", items.size());
     }
 
 }

@@ -83,4 +83,34 @@ public class WordBankService {
             lock.readLock().unlock();
         }
     }
+
+    /**
+     * Get unseen words up to and including the given level.
+     * Prioritizes current level, then fills with lower levels.
+     */
+    public List<Word> getUnsentUpToLevel(String level, Collection<String> sentIds) {
+        Set<String> sent = new HashSet<>(sentIds);
+        List<String> levelOrder = List.of("A1", "A2", "B1", "B2");
+        int maxIdx = levelOrder.indexOf(level);
+        if (maxIdx < 0) maxIdx = 0;
+        Set<String> allowedLevels = new HashSet<>(levelOrder.subList(0, maxIdx + 1));
+
+        lock.readLock().lock();
+        try {
+            // Current level first, then lower levels
+            List<Word> currentLevel = words.stream()
+                .filter(w -> w.getCefrLevel().equals(level) && !sent.contains(w.getId()))
+                .toList();
+            List<Word> lowerLevels = words.stream()
+                .filter(w -> allowedLevels.contains(w.getCefrLevel()) && !w.getCefrLevel().equals(level) && !sent.contains(w.getId()))
+                .toList();
+
+            List<Word> result = new ArrayList<>(currentLevel);
+            result.addAll(lowerLevels);
+            return result;
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
 }

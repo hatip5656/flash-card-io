@@ -185,6 +185,22 @@ public class SentWordRepository {
             chatId);
     }
 
+
+    public List<Map<String, Object>> getVocabularyCollection(long chatId) {
+        return jdbc.queryForList(
+            """
+            SELECT sw.word_id, sw.word_value, sw.english, sw.feed_count, sw.quiz_count,
+                   sw.crush_count, sw.mastered, sw.mastered_at, sw.ease_factor,
+                   sw.interval_days, sw.next_review, sw.sent_at, sw.last_fed_at,
+                   sw.last_quizzed_at, w.cefr_level, w.turkish
+            FROM sent_words sw
+            LEFT JOIN words w ON w.id = sw.word_id
+            WHERE sw.chat_id = ? AND sw.word_value IS NOT NULL
+            ORDER BY sw.sent_at DESC
+            """,
+            chatId);
+    }
+
     public int backfillEnglish(long chatId, String wordId, String english) {
         return jdbc.update(
             "UPDATE sent_words SET english = ? WHERE chat_id = ? AND word_id = ? AND english IS NULL",
