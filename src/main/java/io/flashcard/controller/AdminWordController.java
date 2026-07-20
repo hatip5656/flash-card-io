@@ -234,4 +234,22 @@ public class AdminWordController {
         return Map.of("ok", true, "updated", updated);
     }
 
+    @PatchMapping("/sentences/batch")
+    public Map<String, Object> batchUpdateSentenceTranslations(
+            @RequestBody List<Map<String, String>> items) {
+        int updated = 0;
+        int failed = 0;
+        for (var item : items) {
+            String wordId = item.get("wordId");
+            String estonian = item.get("estonian");
+            String english = item.get("english");
+            String turkish = item.get("turkish");
+            if (wordId == null || estonian == null) { failed++; continue; }
+            try {
+                updated += wordDbRepo.updateSentenceTranslation(wordId, estonian, english, turkish);
+            } catch (Exception e) { failed++; }
+        }
+        return Map.of("ok", true, "updated", updated, "failed", failed, "total", items.size());
+    }
+
 }
