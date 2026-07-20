@@ -205,4 +205,31 @@ public class AdminWordController {
         if (wordsUpdated > 0) wordBankService.reload();
         return ResponseEntity.ok(Map.of("wordsUpdated", wordsUpdated, "sentencesUpdated", sentencesUpdated, "total", translations.size()));
     }
+
+    @GetMapping("/sentences/missing")
+    public Map<String, Object> getMissingSentenceTranslations(
+            @RequestParam(defaultValue = "turkish") String lang,
+            @RequestParam(defaultValue = "50") int limit) {
+        List<Map<String, Object>> sentences = wordDbRepo.getSentencesWithMissingTranslations(lang, Math.min(limit, 200));
+        return Map.of("sentences", sentences, "count", sentences.size(), "lang", lang);
+    }
+
+    @GetMapping("/sentences/{wordId}")
+    public Map<String, Object> getWordSentences(@PathVariable String wordId) {
+        List<Map<String, Object>> sentences = wordDbRepo.getSentencesByWord(wordId);
+        return Map.of("wordId", wordId, "sentences", sentences);
+    }
+
+    @PatchMapping("/sentences/{wordId}")
+    public Map<String, Object> updateSentenceTranslation(
+            @PathVariable String wordId,
+            @RequestBody Map<String, String> body) {
+        String sentenceEe = body.get("estonian");
+        String english = body.get("english");
+        String turkish = body.get("turkish");
+        if (sentenceEe == null) return Map.of("error", "estonian sentence required");
+        int updated = wordDbRepo.updateSentenceTranslation(wordId, sentenceEe, english, turkish);
+        return Map.of("ok", true, "updated", updated);
+    }
+
 }

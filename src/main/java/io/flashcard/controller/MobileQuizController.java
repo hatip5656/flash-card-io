@@ -67,7 +67,7 @@ public class MobileQuizController {
         Set<String> missedIds = missedWords.stream().map(w -> (String) w.get("word_value")).collect(Collectors.toSet());
         List<Map<String, Object>> otherWords = new ArrayList<>(allWords.stream()
             .filter(w -> !missedIds.contains(w.get("word_value"))).toList());
-        Collections.shuffle(otherWords);
+        // Keep DB order: viewed-but-never-quizzed first, then by ease_factor (struggling)
 
         List<Map<String, Object>> selected = new ArrayList<>(missedWords);
         selected.addAll(otherWords.subList(0, Math.min(count - missedWords.size(), otherWords.size())));

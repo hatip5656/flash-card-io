@@ -110,9 +110,13 @@ public class SentWordRepository {
     public List<Map<String, Object>> getLearnedWordsForQuiz(long chatId) {
         return jdbc.queryForList(
             """
-            SELECT word_value, english, quiz_count FROM sent_words
+            SELECT word_value, english, quiz_count, feed_count, ease_factor FROM sent_words
             WHERE chat_id = ? AND word_value IS NOT NULL AND english IS NOT NULL AND mastered = FALSE
-            ORDER BY last_quizzed_at ASC NULLS FIRST, quiz_count ASC
+            ORDER BY
+                CASE WHEN quiz_count = 0 AND feed_count > 0 THEN 0 ELSE 1 END,
+                ease_factor ASC,
+                last_quizzed_at ASC NULLS FIRST,
+                quiz_count ASC
             """,
             chatId);
     }

@@ -193,4 +193,48 @@ public class WordDbRepository {
             "SELECT COUNT(*) FROM words WHERE estonian = ?", Integer.class, estonian);
         return count != null && count > 0;
     }
+
+    public List<Map<String, Object>> getSentencesWithMissingTranslations(String lang, int limit) {
+        String condition;
+        if ("turkish".equals(lang)) {
+            condition = "(ws.turkish IS NULL OR ws.turkish = '')";
+        } else {
+            condition = "(ws.english IS NULL OR ws.english = '')";
+        }
+        return jdbc.queryForList(
+            "SELECT ws.word_id, w.estonian, ws.estonian as sentence_ee, ws.english as sentence_en, " +
+            "ws.turkish as sentence_tr, ws.sort_order " +
+            "FROM word_sentences ws JOIN words w ON w.id = ws.word_id " +
+            "WHERE " + condition + " ORDER BY w.cefr_level, w.estonian LIMIT ?",
+            limit);
+    }
+
+    public List<Map<String, Object>> getSentencesByWord(String wordId) {
+        return jdbc.queryForList(
+            "SELECT estonian, english, turkish, sort_order FROM word_sentences WHERE word_id = ? ORDER BY sort_order",
+            wordId);
+    }
+
+    public int updateSentenceTranslation(String wordId, String sentenceEe, String english, String turkish) {
+        StringBuilder sql = new StringBuilder("UPDATE word_sentences SET ");
+        List<Object> params = new ArrayList<>();
+        boolean hasField = false;
+        if (english != null) {
+            sql.append("english = ?");
+            params.add(english);
+            hasField = true;
+        }
+        if (turkish != null) {
+            if (hasField) sql.append(", ");
+            sql.append("turkish = ?");
+            params.add(turkish);
+            hasField = true;
+        }
+        if (!hasField) return 0;
+        sql.append(" WHERE word_id = ? AND estonian = ?");
+        params.add(wordId);
+        params.add(sentenceEe);
+        return jdbc.update(sql.toString(), params.toArray());
+    }
+
 }
