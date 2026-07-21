@@ -26,7 +26,7 @@ public class GrammarShuffleController {
             "gs.estonian_tokens, gs.turkish_tokens, gs.english_tokens, " +
             "gs.turkish, gs.english " +
             "FROM grammar_shuffle gs " +
-            "WHERE gs.word_id IN (SELECT word_id FROM sent_words WHERE chat_id = ?) " +
+            "WHERE gs.word_id IN (SELECT word_id FROM sent_words WHERE chat_id = CAST(? AS BIGINT)) " +
             "ORDER BY RANDOM() LIMIT ?",
             userId, limit);
 
