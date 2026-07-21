@@ -45,6 +45,12 @@ public class GrammarShuffleController {
         return Map.of("sentences", sentences, "count", sentences.size());
     }
 
+    @DeleteMapping
+    public Map<String, Object> clearAll() {
+        int deleted = jdbc.update("DELETE FROM grammar_shuffle");
+        return Map.of("ok", true, "deleted", deleted);
+    }
+
     @PostMapping("/seed")
     public Map<String, Object> seedSentences(@RequestBody Map<String, Object> body) {
         @SuppressWarnings("unchecked")
