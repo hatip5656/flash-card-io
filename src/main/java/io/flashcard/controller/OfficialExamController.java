@@ -40,7 +40,7 @@ public class OfficialExamController {
             @RequestHeader("X-User-Id") String userId,
             @PathVariable String examId) {
         List<Map<String, Object>> rows = jdbc.queryForList(
-            "SELECT id, cefr_level, title, title_tr, title_en, source, questions FROM official_exams WHERE id = ?",
+            "SELECT id, cefr_level, title, title_tr, title_en, source, questions::text as questions FROM official_exams WHERE id = ?",
             examId);
         if (rows.isEmpty()) return Map.of("error", "Exam not found");
         return rows.get(0);
