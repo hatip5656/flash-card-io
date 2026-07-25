@@ -137,3 +137,4 @@ spec:
       targetPort: 8080
       nodePort: 30148
       protocol: TCP
+
