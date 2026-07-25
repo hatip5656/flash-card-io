@@ -100,7 +100,7 @@ public class ChatbotController {
             ));
             requestBody.put("contents", contents);
             requestBody.put("generationConfig", Map.of(
-                "maxOutputTokens", 500,
+                "maxOutputTokens", 2048,
                 "temperature", 0.7
             ));
 
