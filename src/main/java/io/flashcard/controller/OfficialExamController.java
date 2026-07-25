@@ -62,6 +62,12 @@ public class OfficialExamController {
         return Map.of("ok", true, "score", score, "total", total);
     }
 
+    @DeleteMapping("/{examId}")
+    public Map<String, Object> deleteExam(@PathVariable String examId) {
+        int deleted = jdbc.update("DELETE FROM official_exams WHERE id = ?", examId);
+        return Map.of("ok", true, "deleted", deleted);
+    }
+
     @PostMapping("/seed")
     public Map<String, Object> seedExams(@RequestBody Map<String, Object> body) {
         @SuppressWarnings("unchecked")
