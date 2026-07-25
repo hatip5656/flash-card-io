@@ -14,5 +14,6 @@
     <include file="db/changelog/007-feed-phrases.sql"/>
     <include file="db/changelog/008-more-phrases.sql"/>
     <include file="db/changelog/009-grammar-shuffle.sql"/>
+    <include file="db/changelog/010-official-exams.sql"/>
 
 </databaseChangeLog>
