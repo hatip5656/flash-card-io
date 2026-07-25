@@ -71,6 +71,12 @@ spec:
               value: "0 9 * * *"
             - name: APP_CEFR_LEVELS
               value: "A1,A2,B1,B2"
+            - name: APP_GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: flash-card-io-secrets
+                  key: GEMINI_API_KEY
+                  optional: true
             - name: REDIS_HOST
               value: "redis"
             - name: REDIS_PORT
