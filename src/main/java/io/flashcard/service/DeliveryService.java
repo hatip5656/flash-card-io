@@ -33,6 +33,7 @@ public class DeliveryService {
     private final EkilexService ekilexService;
     private final PrebuildQueueService prebuildQueue;
     private final DiskCacheService diskCache;
+    private final GeminiService geminiService;
     private final Semaphore buildSemaphore = new Semaphore(MAX_CONCURRENT_BUILDS);
 
     private volatile TelegramDeliveryChannel telegramChannel;
@@ -42,7 +43,7 @@ public class DeliveryService {
                            AppProperties appProperties, WordBankService wordBankService,
                            GrammarBankService grammarBankService, FlashcardBuilderService flashcardBuilder,
                            EkilexService ekilexService, PrebuildQueueService prebuildQueue,
-                           DiskCacheService diskCache) {
+                           DiskCacheService diskCache, GeminiService geminiService) {
         this.subscriberRepo = subscriberRepo;
         this.sentWordRepo = sentWordRepo;
         this.activityRepo = activityRepo;
@@ -54,6 +55,7 @@ public class DeliveryService {
         this.ekilexService = ekilexService;
         this.prebuildQueue = prebuildQueue;
         this.diskCache = diskCache;
+        this.geminiService = geminiService;
     }
 
     public interface TelegramDeliveryChannel {
@@ -163,9 +165,23 @@ public class DeliveryService {
         var lesson = grammarBankService.getRandomLesson(level, sentIds);
 
         if (lesson != null) {
-            telegramChannel.sendMessage(chatId, lesson.content());
+            String content = lesson.content();
+
+            // Translate explanations to Turkish if user prefers it
+            if ("turkish".equals(prefs.getNativeLanguage()) && geminiService.isAvailable()) {
+                String translated = geminiService.chat(
+                    "Translate only the English explanations in this Estonian grammar card to Turkish. " +
+                    "Keep ALL Estonian words/sentences exactly as they are. Keep the HTML formatting (<b>, <i>, etc). " +
+                    "Only translate the English parts to Turkish. Return the full card:\n\n" + content,
+                    List.of(), level);
+                if (translated != null && !translated.isBlank()) {
+                    content = translated;
+                }
+            }
+
+            telegramChannel.sendMessage(chatId, content);
             grammarRepo.markGrammarSent(chatId, lesson.id());
-            log.info("[delivery] Sent grammar lesson \"{}\" -> chat {}", lesson.topic(), chatId);
+            log.info("[delivery] Sent grammar lesson \"{}\" -> chat {} lang={}", lesson.topic(), chatId, prefs.getNativeLanguage());
         }
     }
 
