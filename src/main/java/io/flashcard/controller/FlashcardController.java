@@ -64,6 +64,30 @@ public class FlashcardController {
             "content", lesson.content()));
     }
 
+    @GetMapping("/flashcards/grammar-feed")
+    public List<Map<String, Object>> getGrammarFeed(HttpServletRequest request,
+                                                      @RequestParam(defaultValue = "3") int limit) {
+        long chatId = getUserId(request);
+        String level = subscriberRepo.getSubscriberLevel(chatId);
+        var all = grammarBankService.getAllLessons().stream()
+            .filter(l -> l.cefrLevel().equals(level) || compareLevels(l.cefrLevel(), level) < 0)
+            .limit(Math.min(limit, 10))
+            .map(l -> Map.<String, Object>of(
+                "id", l.id(),
+                "topic", l.topic(),
+                "topicTr", l.topicTr() != null ? l.topicTr() : l.topic(),
+                "cefrLevel", l.cefrLevel(),
+                "content", l.content(),
+                "contentTr", l.contentTr() != null ? l.contentTr() : l.content()))
+            .toList();
+        return all;
+    }
+
+    private int compareLevels(String a, String b) {
+        var order = List.of("A1", "A2", "B1", "B2");
+        return order.indexOf(a) - order.indexOf(b);
+    }
+
     @GetMapping("/review/due")
     public List<Map<String, Object>> getDueWords(HttpServletRequest request,
                                                   @RequestParam(defaultValue = "10") int limit) {
