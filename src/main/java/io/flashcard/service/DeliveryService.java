@@ -165,23 +165,10 @@ public class DeliveryService {
         var lesson = grammarBankService.getRandomLesson(level, sentIds);
 
         if (lesson != null) {
-            String content = lesson.content();
-
-            // Translate explanations to Turkish if user prefers it
-            if ("turkish".equals(prefs.getNativeLanguage()) && geminiService.isAvailable()) {
-                String translated = geminiService.chat(
-                    "Translate only the English explanations in this Estonian grammar card to Turkish. " +
-                    "Keep ALL Estonian words/sentences exactly as they are. Keep the HTML formatting (<b>, <i>, etc). " +
-                    "Only translate the English parts to Turkish. Return the full card:\n\n" + content,
-                    List.of(), level);
-                if (translated != null && !translated.isBlank()) {
-                    content = translated;
-                }
-            }
-
-            telegramChannel.sendMessage(chatId, content);
+            String lang = prefs.getNativeLanguage();
+            telegramChannel.sendMessage(chatId, lesson.getContent(lang));
             grammarRepo.markGrammarSent(chatId, lesson.id());
-            log.info("[delivery] Sent grammar lesson \"{}\" -> chat {} lang={}", lesson.topic(), chatId, prefs.getNativeLanguage());
+            log.info("[delivery] Sent grammar lesson \"{}\" -> chat {} lang={}", lesson.getTopic(lang), chatId, lang);
         }
     }
 

@@ -286,4 +286,25 @@ public class AdminWordController {
         return Map.of("ok", true, "inserted", inserted, "failed", failed, "total", items.size());
     }
 
+    @PostMapping("/grammar-lessons/seed")
+    public Map<String, Object> seedGrammarLessons(@RequestBody Map<String, Object> body) {
+        @SuppressWarnings("unchecked")
+        List<Map<String, String>> items = (List<Map<String, String>>) body.get("items");
+        int inserted = 0;
+        int failed = 0;
+        for (var item : items) {
+            try {
+                jdbc.update(
+                    "INSERT INTO grammar_lessons (id, cefr_level, topic, topic_tr, content, content_tr) " +
+                    "VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET topic = EXCLUDED.topic, " +
+                    "topic_tr = EXCLUDED.topic_tr, content = EXCLUDED.content, content_tr = EXCLUDED.content_tr",
+                    item.get("id"), item.get("cefrLevel"), item.get("topic"), item.get("topicTr"),
+                    item.get("content"), item.get("contentTr"));
+                inserted++;
+            } catch (Exception e) { failed++; }
+        }
+        wordBankService.reload();
+        return Map.of("ok", true, "inserted", inserted, "failed", failed);
+    }
+
 }
