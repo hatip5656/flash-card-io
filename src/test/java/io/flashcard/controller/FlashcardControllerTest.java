@@ -60,7 +60,7 @@ class FlashcardControllerTest {
         when(subscriberRepo.getSubscriberLevel(12345L)).thenReturn("A1");
         when(grammarRepo.getSentGrammarIds(12345L)).thenReturn(Set.of());
         when(grammarBankService.getRandomLesson("A1", Set.of())).thenReturn(
-            new GrammarLesson("lesson-1", "A1", "Verb 'olema'", "<b>olema</b> = to be"));
+            new GrammarLesson("lesson-1", "A1", "Verb 'olema'", "'olema' fiili", "<b>olema</b> = to be", "<b>olema</b> = olmak"));
 
         mvc.perform(get("/api/flashcards/grammar").header("X-User-Id", AUTH))
             .andExpect(status().isOk())
