@@ -80,9 +80,9 @@ public class FlashcardBuilderService {
         SentenceService.Sentence sentence;
         if (!ekilexWord.usages().isEmpty()) {
             var usage = ekilexWord.usages().get(ThreadLocalRandom.current().nextInt(ekilexWord.usages().size()));
-            sentence = new SentenceService.Sentence(usage.estonian(), usage.english());
+            sentence = new SentenceService.Sentence(usage.estonian(), usage.english(), null);
         } else {
-            sentence = new SentenceService.Sentence(ekilexWord.wordValue(), ekilexWord.english() != null ? ekilexWord.english() : "");
+            sentence = new SentenceService.Sentence(ekilexWord.wordValue(), ekilexWord.english() != null ? ekilexWord.english() : "", null);
         }
 
         // Run image fetch and TTS in parallel
@@ -143,9 +143,12 @@ public class FlashcardBuilderService {
         sb.append("\uD83C\uDFF7\uFE0F ").append(TextUtils.escapeHtml(cefrLevel));
 
         sb.append("\n\n\uD83D\uDCAC <i>").append(TextUtils.escapeHtml(sentence.estonian())).append("</i>");
-        if (sentence.english() != null && !sentence.english().equals(sentence.estonian())) {
-            String sentTrans = TextUtils.escapeHtml(sentence.english());
-            sb.append("\n\uD83D\uDCDD ").append(isReview ? "<tg-spoiler>" + sentTrans + "</tg-spoiler>" : sentTrans);
+        String sentTrans = useTurkish && sentence.turkish() != null && !sentence.turkish().isBlank()
+            ? sentence.turkish()
+            : sentence.english();
+        if (sentTrans != null && !sentTrans.equals(sentence.estonian())) {
+            String sentTransEsc = TextUtils.escapeHtml(sentTrans);
+            sb.append("\n\uD83D\uDCDD ").append(isReview ? "<tg-spoiler>" + sentTransEsc + "</tg-spoiler>" : sentTransEsc);
         }
 
         if (forms != null && !forms.isEmpty()) {
