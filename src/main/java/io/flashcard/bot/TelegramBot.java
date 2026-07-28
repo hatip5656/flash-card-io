@@ -5,6 +5,7 @@ import io.flashcard.model.GrammarLesson;
 import io.flashcard.model.UserPreferences;
 import io.flashcard.repository.*;
 import io.flashcard.service.*;
+import java.util.concurrent.ConcurrentHashMap;
 import static io.flashcard.service.TextUtils.streakEmoji;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -44,15 +45,19 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
     private final ScheduleService scheduleService;
     private final DeliveryService deliveryService;
     private final QuizRepository quizRepo;
+    private final GeminiService geminiService;
 
     private TelegramClient telegramClient;
     private TelegramBotsLongPollingApplication botApplication;
+
+    // Per-user chat history for Gemini context (last 10 messages)
+    private final ConcurrentHashMap<Long, List<Map<String, String>>> chatHistory = new ConcurrentHashMap<>();
 
     public TelegramBot(AppProperties appProperties, SubscriberRepository subscriberRepo,
                        ActivityRepository activityRepo, SentWordRepository sentWordRepo,
                        GrammarRepository grammarRepo, WordBankService wordBankService,
                        ScheduleService scheduleService, DeliveryService deliveryService,
-                       QuizRepository quizRepo) {
+                       QuizRepository quizRepo, GeminiService geminiService) {
         this.appProperties = appProperties;
         this.subscriberRepo = subscriberRepo;
         this.activityRepo = activityRepo;
@@ -62,6 +67,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
         this.scheduleService = scheduleService;
         this.deliveryService = deliveryService;
         this.quizRepo = quizRepo;
+        this.geminiService = geminiService;
     }
 
     @PostConstruct
@@ -131,7 +137,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
         String username = message.getFrom() != null ? message.getFrom().getUserName() : null;
 
         if (!text.startsWith("/")) {
-            log.debug("[bot] Ignoring non-command text from chat={}: {}", chatId, text.substring(0, Math.min(50, text.length())));
+            handleChat(chatId, text);
             return;
         }
 
@@ -290,6 +296,43 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
         } catch (Exception e) {
             log.error("[bot] Error handling callback data={} from chat={}: {}", data, chatId, e.getMessage(), e);
         }
+    }
+
+    // --- Gemini chat ---
+
+    private void handleChat(long chatId, String text) {
+        if (!geminiService.isAvailable()) {
+            sendText(chatId, "AI chat is not configured.");
+            return;
+        }
+
+        log.info("[bot] Chat message from chat={}: {}", chatId, text.substring(0, Math.min(50, text.length())));
+
+        if (telegramChannel != null) telegramChannel.sendTyping(chatId);
+
+        Thread.ofVirtual().start(() -> {
+            try {
+                String level = subscriberRepo.getSubscriberLevel(chatId);
+                var history = chatHistory.computeIfAbsent(chatId, k -> new ArrayList<>());
+
+                String reply = geminiService.chat(text, history, level);
+
+                if (reply != null) {
+                    // Update history (keep last 10 exchanges)
+                    synchronized (history) {
+                        history.add(Map.of("role", "user", "text", text));
+                        history.add(Map.of("role", "bot", "text", reply));
+                        while (history.size() > 20) history.remove(0);
+                    }
+                    sendText(chatId, reply);
+                } else {
+                    sendText(chatId, "\u26A0\uFE0F Could not get a response. Try again.");
+                }
+            } catch (Exception e) {
+                log.error("[bot] Chat error for chat={}: {}", chatId, e.getMessage(), e);
+                sendText(chatId, "\u26A0\uFE0F Error: " + e.getMessage());
+            }
+        });
     }
 
     // --- Keyboard builders ---
