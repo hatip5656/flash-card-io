@@ -70,7 +70,7 @@ public class DeliveryService {
         long startTime = System.currentTimeMillis();
         String level = subscriberRepo.getSubscriberLevel(chatId);
         UserPreferences prefs = subscriberRepo.getPreferences(chatId);
-        var buildOpts = new FlashcardBuilderService.BuildOptions(prefs.isAudio(), prefs.getVoiceName(), prefs.isWordForms(), false);
+        var buildOpts = new FlashcardBuilderService.BuildOptions(prefs.isAudio(), prefs.getVoiceName(), prefs.isWordForms(), false, prefs.getNativeLanguage());
 
         List<String> sentIds = sentWordRepo.getSentWordIds(chatId);
         List<Word> unsent = wordBankService.getUnsent(level, sentIds);

@@ -42,8 +42,11 @@ public class FlashcardBuilderService {
         byte[] audio
     ) {}
 
-    public record BuildOptions(boolean audioEnabled, String voiceName, boolean wordFormsEnabled, boolean isReview) {
-        public BuildOptions() { this(true, null, true, false); }
+    public record BuildOptions(boolean audioEnabled, String voiceName, boolean wordFormsEnabled, boolean isReview, String nativeLang) {
+        public BuildOptions() { this(true, null, true, false, "english"); }
+        public BuildOptions(boolean audioEnabled, String voiceName, boolean wordFormsEnabled, boolean isReview) {
+            this(audioEnabled, voiceName, wordFormsEnabled, isReview, "english");
+        }
     }
 
     public Flashcard buildFlashcard(Word word, BuildOptions options) {
@@ -62,8 +65,8 @@ public class FlashcardBuilderService {
         ImageService.ImageResult photo = imageFuture.join();
         byte[] audio = audioFuture.join();
 
-        String caption = buildCaption(word.getEstonian(), word.getEnglish(), word.getCefrLevel(),
-            sentence, photo, List.of(), null, null, options.isReview());
+        String caption = buildCaption(word.getEstonian(), word.getEnglish(), word.getTurkish(), word.getCefrLevel(),
+            sentence, photo, List.of(), null, null, options.isReview(), options.nativeLang());
 
         return new Flashcard(word, sentence,
             photo != null ? photo.url() : null,
@@ -118,19 +121,31 @@ public class FlashcardBuilderService {
                                 ImageService.ImageResult photo,
                                 List<GrammarBuilderService.SelectedForm> forms,
                                 String pos, String source, boolean isReview) {
-        String englishText = TextUtils.escapeHtml(english);
-        String englishDisplay = isReview ? "<tg-spoiler>" + englishText + "</tg-spoiler>" : englishText;
+        return buildCaption(estonian, english, null, cefrLevel, sentence, photo, forms, pos, source, isReview, "english");
+    }
+
+    public String buildCaption(String estonian, String english, String turkish, String cefrLevel,
+                                SentenceService.Sentence sentence,
+                                ImageService.ImageResult photo,
+                                List<GrammarBuilderService.SelectedForm> forms,
+                                String pos, String source, boolean isReview, String nativeLang) {
+        boolean useTurkish = "turkish".equals(nativeLang) && turkish != null && !turkish.isBlank();
+        String translation = useTurkish ? turkish : english;
+        String langLabel = useTurkish ? "TR" : "EN";
+
+        String translationText = TextUtils.escapeHtml(translation);
+        String translationDisplay = isReview ? "<tg-spoiler>" + translationText + "</tg-spoiler>" : translationText;
 
         StringBuilder sb = new StringBuilder();
         sb.append("\uD83D\uDCDA <b>").append(TextUtils.escapeHtml(estonian)).append("</b>\n");
-        sb.append("\uD83D\uDD04 ").append(englishDisplay).append("\n");
-        sb.append("\uD83C\uDF10 ET \u2192 EN\n");
+        sb.append("\uD83D\uDD04 ").append(translationDisplay).append("\n");
+        sb.append("\uD83C\uDF10 ET \u2192 ").append(langLabel).append("\n");
         sb.append("\uD83C\uDFF7\uFE0F ").append(TextUtils.escapeHtml(cefrLevel));
 
         sb.append("\n\n\uD83D\uDCAC <i>").append(TextUtils.escapeHtml(sentence.estonian())).append("</i>");
         if (sentence.english() != null && !sentence.english().equals(sentence.estonian())) {
-            String sentEng = TextUtils.escapeHtml(sentence.english());
-            sb.append("\n\uD83D\uDCDD ").append(isReview ? "<tg-spoiler>" + sentEng + "</tg-spoiler>" : sentEng);
+            String sentTrans = TextUtils.escapeHtml(sentence.english());
+            sb.append("\n\uD83D\uDCDD ").append(isReview ? "<tg-spoiler>" + sentTrans + "</tg-spoiler>" : sentTrans);
         }
 
         if (forms != null && !forms.isEmpty()) {

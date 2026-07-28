@@ -84,6 +84,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
                     BotCommand.builder().command("quiz").description("Start a vocabulary quiz").build(),
                     BotCommand.builder().command("stats").description("See your progress").build(),
                     BotCommand.builder().command("level").description("Change level").build(),
+                    BotCommand.builder().command("language").description("Change language (TR/EN)").build(),
                     BotCommand.builder().command("schedule").description("Change schedule").build(),
                     BotCommand.builder().command("stop").description("Stop receiving flashcards").build()))
                 .build());
@@ -164,6 +165,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
                 }
                 case "/stats", "/settings" -> sendStats(chatId);
                 case "/level" -> sendLevelPicker(chatId);
+                case "/language" -> sendLanguagePicker(chatId);
                 case "/schedule" -> sendSchedulePicker(chatId);
                 case "/stop" -> {
                     log.info("[bot] /stop from chat={}", chatId);
@@ -199,9 +201,13 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
             int totalForLevel = wordBankService.getWordsForLevel(level).size();
             int pct = totalForLevel > 0 ? Math.round((float) sent / totalForLevel * 100) : 0;
 
-            String text = "<b>\uD83C\uDDEA\uD83C\uDDEA Flash Card IO</b>\n\n"
+            UserPreferences prefs = subscriberRepo.getPreferences(chatId);
+            String langLabel = "turkish".equals(prefs.getNativeLanguage()) ? "\uD83C\uDDF9\uD83C\uDDF7 Türkçe" : "\uD83C\uDDEC\uD83C\uDDE7 English";
+
+            String text = "<b>\uD83C\uDDEA\uD83C\uDDEA Wordagram</b>\n\n"
                 + emoji + " Streak: <b>" + streak + " day" + (streak != 1 ? "s" : "") + "</b>\n"
                 + "\uD83C\uDFF7\uFE0F Level: <b>" + level + "</b>\n"
+                + "\uD83C\uDF10 Language: <b>" + langLabel + "</b>\n"
                 + "\u23F0 Schedule: <b>" + TextUtils.escapeHtml(scheduleLabel) + "</b>\n"
                 + "\uD83D\uDCDA Words learned: <b>" + sent + "</b>\n"
                 + "\uD83D\uDCD6 Local " + level + " words: " + totalForLevel + "\n"
@@ -243,6 +249,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
                 log.info("[bot] Edit callback chat={} field={}", chatId, field);
                 switch (field) {
                     case "level" -> sendLevelPicker(chatId);
+                    case "language" -> sendLanguagePicker(chatId);
                     case "schedule" -> sendSchedulePicker(chatId);
                     default -> log.warn("[bot] Unknown edit field: {} from chat={}", field, chatId);
                 }
@@ -251,6 +258,13 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
                 log.info("[bot] Set level chat={} level={}", chatId, level);
                 subscriberRepo.setSubscriberLevel(chatId, level);
                 sendText(chatId, "Level set to " + level + ".");
+                sendStats(chatId);
+            } else if (data.startsWith("set:lang:")) {
+                String lang = data.split(":")[2];
+                log.info("[bot] Set language chat={} lang={}", chatId, lang);
+                subscriberRepo.updatePreference(chatId, "nativeLanguage", lang);
+                String label = "turkish".equals(lang) ? "\uD83C\uDDF9\uD83C\uDDF7 Türkçe" : "\uD83C\uDDEC\uD83C\uDDE7 English";
+                sendText(chatId, "Language set to " + label);
                 sendStats(chatId);
             } else if (data.startsWith("set:schedule:")) {
                 String key = data.split(":")[2];
@@ -287,7 +301,9 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
                 InlineKeyboardButton.builder().text("\uD83D\uDCD6 Grammar").callbackData("action:grammar").build()))
             .keyboardRow(new InlineKeyboardRow(
                 InlineKeyboardButton.builder().text("\uD83D\uDCCA Stats").callbackData("action:stats").build(),
-                InlineKeyboardButton.builder().text("\uD83C\uDFF7\uFE0F Level").callbackData("edit_level").build(),
+                InlineKeyboardButton.builder().text("\uD83C\uDFF7\uFE0F Level").callbackData("edit_level").build()))
+            .keyboardRow(new InlineKeyboardRow(
+                InlineKeyboardButton.builder().text("\uD83C\uDF10 Language").callbackData("edit_language").build(),
                 InlineKeyboardButton.builder().text("\u23F0 Schedule").callbackData("edit_schedule").build()))
             .build();
     }
@@ -304,6 +320,22 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
                     .toList()))
             .build();
         sendHtmlWithKeyboard(chatId, "Select your level:", kb);
+    }
+
+    private void sendLanguagePicker(long chatId) {
+        UserPreferences prefs = subscriberRepo.getPreferences(chatId);
+        String current = prefs.getNativeLanguage();
+        log.debug("[bot] Sending language picker to chat={} current={}", chatId, current);
+        InlineKeyboardMarkup kb = InlineKeyboardMarkup.builder()
+            .keyboardRow(new InlineKeyboardRow(
+                InlineKeyboardButton.builder()
+                    .text(("turkish".equals(current) ? "\u2705 " : "") + "\uD83C\uDDF9\uD83C\uDDF7 Türkçe")
+                    .callbackData("set:lang:turkish").build(),
+                InlineKeyboardButton.builder()
+                    .text(("english".equals(current) ? "\u2705 " : "") + "\uD83C\uDDEC\uD83C\uDDE7 English")
+                    .callbackData("set:lang:english").build()))
+            .build();
+        sendHtmlWithKeyboard(chatId, "Select your native language:", kb);
     }
 
     private void sendSchedulePicker(long chatId) {
