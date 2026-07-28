@@ -3,6 +3,7 @@ package io.flashcard.controller;
 import io.flashcard.config.AppProperties;
 import io.flashcard.repository.WordDbRepository;
 import io.flashcard.service.EkilexService;
+import io.flashcard.service.GrammarBankService;
 import io.flashcard.service.WordBankService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,14 +20,17 @@ public class AdminWordController {
 
     private final WordDbRepository wordDbRepo;
     private final WordBankService wordBankService;
+    private final GrammarBankService grammarBankService;
     private final EkilexService ekilexService;
     private final AppProperties appProperties;
     private final JdbcTemplate jdbc;
 
     public AdminWordController(WordDbRepository wordDbRepo, WordBankService wordBankService,
+                               GrammarBankService grammarBankService,
                                EkilexService ekilexService, AppProperties appProperties, JdbcTemplate jdbc) {
         this.wordDbRepo = wordDbRepo;
         this.wordBankService = wordBankService;
+        this.grammarBankService = grammarBankService;
         this.ekilexService = ekilexService;
         this.appProperties = appProperties;
         this.jdbc = jdbc;
@@ -303,6 +307,7 @@ public class AdminWordController {
                 inserted++;
             } catch (Exception e) { failed++; }
         }
+        grammarBankService.reload();
         return Map.of("ok", true, "inserted", inserted, "failed", failed);
     }
 
