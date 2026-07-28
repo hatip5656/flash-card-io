@@ -73,7 +73,7 @@ public class DeliveryService {
         var buildOpts = new FlashcardBuilderService.BuildOptions(prefs.isAudio(), prefs.getVoiceName(), prefs.isWordForms(), false, prefs.getNativeLanguage());
 
         List<String> sentIds = sentWordRepo.getSentWordIds(chatId);
-        List<Word> unsent = wordBankService.getUnsent(level, sentIds);
+        List<Word> unsent = wordBankService.getUnsentUpToLevel(level, sentIds);
         log.info("[delivery] chat={} level={} sentCount={} unsentCount={}", chatId, level, sentIds.size(), unsent.size());
 
         FlashcardBuilderService.Flashcard flashcard;
