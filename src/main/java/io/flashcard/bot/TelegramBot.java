@@ -308,7 +308,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
 
         log.info("[bot] Chat message from chat={}: {}", chatId, text.substring(0, Math.min(50, text.length())));
 
-        if (telegramChannel != null) telegramChannel.sendTyping(chatId);
+        sendTyping(chatId);
 
         Thread.ofVirtual().start(() -> {
             try {
