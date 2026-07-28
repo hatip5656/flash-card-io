@@ -303,7 +303,6 @@ public class AdminWordController {
                 inserted++;
             } catch (Exception e) { failed++; }
         }
-        wordBankService.reload();
         return Map.of("ok", true, "inserted", inserted, "failed", failed);
     }
 
