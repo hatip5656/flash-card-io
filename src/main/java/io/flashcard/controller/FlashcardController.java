@@ -88,6 +88,13 @@ public class FlashcardController {
         return order.indexOf(a) - order.indexOf(b);
     }
 
+    @PostMapping("/flashcards/grammar-feed/{lessonId}/read")
+    public Map<String, Object> markGrammarLessonRead(HttpServletRequest request, @PathVariable String lessonId) {
+        long chatId = getUserId(request);
+        grammarRepo.markGrammarSent(chatId, lessonId);
+        return Map.of("ok", true, "lessonId", lessonId);
+    }
+
     @GetMapping("/review/due")
     public List<Map<String, Object>> getDueWords(HttpServletRequest request,
                                                   @RequestParam(defaultValue = "10") int limit) {

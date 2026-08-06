@@ -145,9 +145,11 @@ public class FeedController {
         long chatId = getUserId(request);
         String estonian = body != null ? (String) body.get("estonian") : null;
         String english = body != null ? (String) body.get("english") : null;
-        sentWordRepo.markWordSent(chatId, wordId, estonian, english);
+        boolean isNew = sentWordRepo.markWordSent(chatId, wordId, estonian, english);
         sentWordRepo.trackSeenCount(chatId, List.of(wordId));
-        activityRepo.logWordActivity(chatId);
+        if (isNew) {
+            activityRepo.logWordActivity(chatId);
+        }
         return Map.of("seen", true, "wordId", wordId);
     }
 

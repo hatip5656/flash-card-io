@@ -26,10 +26,11 @@ public class SentWordRepository {
         @CacheEvict(value = "word_counts", key = "#chatId"),
         @CacheEvict(value = "activity_stats", key = "#chatId")
     })
-    public void markWordSent(long chatId, String wordId, String wordValue, String english) {
-        jdbc.update(
+    public boolean markWordSent(long chatId, String wordId, String wordValue, String english) {
+        int rows = jdbc.update(
             "INSERT INTO sent_words (chat_id, word_id, word_value, english) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING",
             chatId, wordId, wordValue, english);
+        return rows > 0;
     }
 
     @Cacheable(value = "sent_word_ids", key = "#chatId")
