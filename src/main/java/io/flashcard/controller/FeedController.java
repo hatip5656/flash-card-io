@@ -134,15 +134,6 @@ public class FeedController {
             return item;
         }).toList();
 
-        // Track feed views
-        List<String> shownWordIds = items.stream()
-            .filter(i -> !(boolean) i.get("isNew"))
-            .map(i -> (String) ((Map<?, ?>) i.get("word")).get("id"))
-            .toList();
-        if (!shownWordIds.isEmpty()) {
-            sentWordRepo.trackFeedShown(chatId, shownWordIds);
-        }
-
         boolean hasMore = items.size() == limit;
         String nextCursor = hasMore ? nextMode + ":" + nextOffset : null;
         return Map.of("items", items, "nextCursor", nextCursor, "hasMore", hasMore);
@@ -155,6 +146,7 @@ public class FeedController {
         String estonian = body != null ? (String) body.get("estonian") : null;
         String english = body != null ? (String) body.get("english") : null;
         sentWordRepo.markWordSent(chatId, wordId, estonian, english);
+        sentWordRepo.trackFeedShown(chatId, List.of(wordId));
         activityRepo.logWordActivity(chatId);
         return Map.of("seen", true, "wordId", wordId);
     }
