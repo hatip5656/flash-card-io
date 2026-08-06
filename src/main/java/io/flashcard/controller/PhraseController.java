@@ -1,5 +1,6 @@
 package io.flashcard.controller;
 
+import io.flashcard.repository.ActivityRepository;
 import io.flashcard.repository.PhraseRepository;
 import io.flashcard.repository.SubscriberRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,10 +14,13 @@ public class PhraseController {
 
     private final PhraseRepository phraseRepo;
     private final SubscriberRepository subscriberRepo;
+    private final ActivityRepository activityRepo;
 
-    public PhraseController(PhraseRepository phraseRepo, SubscriberRepository subscriberRepo) {
+    public PhraseController(PhraseRepository phraseRepo, SubscriberRepository subscriberRepo,
+                            ActivityRepository activityRepo) {
         this.phraseRepo = phraseRepo;
         this.subscriberRepo = subscriberRepo;
+        this.activityRepo = activityRepo;
     }
 
     @GetMapping
@@ -56,6 +60,7 @@ public class PhraseController {
 
         long userId = (long) request.getAttribute("userId");
         phraseRepo.markSeen(userId, phraseId);
+        activityRepo.logPhraseActivity(userId);
         return Map.of("ok", true);
     }
 }

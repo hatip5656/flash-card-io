@@ -16,5 +16,6 @@
     <include file="db/changelog/009-grammar-shuffle.sql"/>
     <include file="db/changelog/010-official-exams.sql"/>
     <include file="db/changelog/011-grammar-lessons-db.sql"/>
+    <include file="db/changelog/012-learning-loop-fixes.sql"/>
 
 </databaseChangeLog>

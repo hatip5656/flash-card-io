@@ -162,6 +162,13 @@ public class QuizController {
 
             quizRepo.saveQuizResult(chatId, score, total, quizAnswers);
             sentWordRepo.incrementQuizCount(chatId, words.stream().map(QuizSession.QuizWord::estonian).toList());
+
+            for (int i = 0; i < questions.size(); i++) {
+                QuizSession.AnswerEntry a = allAnswers.get(i);
+                int quality = a.correct() ? 4 : 1;
+                sentWordRepo.updateSm2(chatId, words.get(i).estonian(), quality);
+            }
+
             quizRepo.deleteQuizSession(chatId);
 
             result.put("complete", true);

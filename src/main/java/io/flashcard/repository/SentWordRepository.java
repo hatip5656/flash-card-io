@@ -148,6 +148,13 @@ public class SentWordRepository {
             chatId, wordValues.toArray(new String[0]));
     }
 
+    public boolean canBeMastered(long chatId, String wordId) {
+        Integer count = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM sent_words WHERE chat_id = ? AND word_id = ? AND quiz_count >= 2 AND ease_factor >= 2.0",
+            Integer.class, chatId, wordId);
+        return count != null && count > 0;
+    }
+
     @Caching(evict = {
         @CacheEvict(value = "learned_quiz_words", key = "#chatId"),
         @CacheEvict(value = "word_counts", key = "#chatId")
@@ -170,6 +177,41 @@ public class SentWordRepository {
 
     public int countSentWords(long chatId) {
         Integer count = jdbc.queryForObject("SELECT COUNT(*) FROM sent_words WHERE chat_id = ?", Integer.class, chatId);
+        return count != null ? count : 0;
+    }
+
+    public Map<String, Object> getLevelReadiness(long chatId, String level) {
+        var rows = jdbc.queryForList("""
+            SELECT
+              COUNT(*) as total_seen,
+              COUNT(*) FILTER (WHERE quiz_count >= 1) as quizzed,
+              COUNT(*) FILTER (WHERE mastered = TRUE) as mastered,
+              COUNT(*) FILTER (WHERE ease_factor >= 2.0 AND quiz_count >= 2) as strong,
+              COALESCE(AVG(ease_factor) FILTER (WHERE quiz_count > 0), 2.5) as avg_ease
+            FROM sent_words sw
+            JOIN words w ON w.id = sw.word_id
+            WHERE sw.chat_id = ? AND w.cefr_level = ?
+            """, chatId, level);
+        if (rows.isEmpty()) return Map.of("total_seen", 0, "quizzed", 0, "mastered", 0, "strong", 0, "avg_ease", 2.5);
+        return rows.get(0);
+    }
+
+    public List<Map<String, Object>> getWeakWords(long chatId, int limit) {
+        return jdbc.queryForList("""
+            SELECT sw.word_id, sw.word_value, sw.english, sw.ease_factor, sw.quiz_count,
+                   sw.next_review, w.cefr_level, w.turkish
+            FROM sent_words sw
+            JOIN words w ON w.id = sw.word_id
+            WHERE sw.chat_id = ? AND sw.ease_factor < 1.8 AND sw.quiz_count > 0 AND sw.mastered = FALSE
+            ORDER BY sw.ease_factor ASC
+            LIMIT ?
+            """, chatId, limit);
+    }
+
+    public int countSentWordsForLevel(long chatId, String level) {
+        Integer count = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM sent_words sw JOIN words w ON w.id = sw.word_id WHERE sw.chat_id = ? AND w.cefr_level = ?",
+            Integer.class, chatId, level);
         return count != null ? count : 0;
     }
 

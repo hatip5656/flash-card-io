@@ -83,6 +83,28 @@ public class MobileQuizController {
             String english = (String) word.get("english");
             String nativeT = useTurkish && turkishLookup.containsKey(estonian) ? turkishLookup.get(estonian) : english;
 
+            // ~20% fill-blank questions for words with sentences
+            Word fullWord = wordBankService.getAllWords().stream()
+                .filter(w -> w.getEstonian().equals(estonian)).findFirst().orElse(null);
+            if (rnd.nextInt(5) == 0 && fullWord != null && fullWord.getSentences() != null && !fullWord.getSentences().isEmpty()) {
+                Word.Sentence sent = fullWord.getSentences().get(rnd.nextInt(fullWord.getSentences().size()));
+                String sentenceEst = sent.estonian();
+                if (sentenceEst != null && sentenceEst.toLowerCase().contains(estonian.toLowerCase())) {
+                    String blanked = sentenceEst.replaceFirst("(?i)" + java.util.regex.Pattern.quote(estonian), "___");
+                    String hint = estonian.substring(0, 1);
+                    questions.add(Map.of(
+                        "index", i,
+                        "type", "fill_blank",
+                        "prompt", blanked,
+                        "hint", hint,
+                        "correctAnswer", estonian,
+                        "options", List.of(),
+                        "correctIndex", -1,
+                        "word", Map.of("estonian", estonian, "english", english)));
+                    continue;
+                }
+            }
+
             boolean isEstToNative = rnd.nextBoolean();
             String correct = isEstToNative ? nativeT : estonian;
             List<String> pool = allWords.stream()
@@ -135,16 +157,37 @@ public class MobileQuizController {
         activityRepo.logQuizActivity(chatId);
         sentWordRepo.incrementQuizCount(chatId, answers.stream().map(QuizAnswer::estonian).toList());
 
-        // Update SM-2 spaced repetition for each answered word
         for (QuizAnswer answer : answers) {
-            int quality = answer.isCorrect() ? 4 : 1; // 4=good recall, 1=poor recall
+            int quality = answer.isCorrect() ? 4 : 1;
             sentWordRepo.updateSm2(chatId, answer.estonian(), quality);
         }
 
-        return ResponseEntity.ok(Map.of(
-            "score", score,
-            "total", total,
-            "percentage", Math.round((float) score / total * 100)));
+        Map<String, Object> response = new java.util.LinkedHashMap<>();
+        response.put("score", score);
+        response.put("total", total);
+        response.put("percentage", Math.round((float) score / total * 100));
+
+        String level = subscriberRepo.getSubscriberLevel(chatId);
+        if (!"B2".equals(level)) {
+            int totalForLevel = wordBankService.getWordsForLevel(level).size();
+            Map<String, Object> readiness = sentWordRepo.getLevelReadiness(chatId, level);
+            int strongWords = ((Number) readiness.get("strong")).intValue();
+            int requiredStrong = (int) Math.ceil(totalForLevel * 0.6);
+            double avgEase = ((Number) readiness.get("avg_ease")).doubleValue();
+            if (strongWords >= requiredStrong && avgEase >= 2.0) {
+                String nextLevel = switch (level) {
+                    case "A1" -> "A2";
+                    case "A2" -> "B1";
+                    case "B1" -> "B2";
+                    default -> null;
+                };
+                if (nextLevel != null) {
+                    response.put("suggestLevelUp", Map.of("nextLevel", nextLevel));
+                }
+            }
+        }
+
+        return ResponseEntity.ok(response);
     }
 
     private Map<String, String> buildTurkishLookup() {

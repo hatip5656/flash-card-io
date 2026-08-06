@@ -25,14 +25,15 @@ public class PhraseRepository {
         // Prioritize user's level, mix in lower levels, unseen first, then randomize
         String sql = """
             SELECT p.id, p.estonian, p.english, p.turkish, p.category, p.cefr_level, p.context_note,
-                   sp.seen_at
+                   sp.seen_at, sp.times_seen
             FROM feed_phrases p
             LEFT JOIN sent_phrases sp ON sp.phrase_id = p.id AND sp.chat_id = ?
             WHERE p.cefr_level IN (%s)
             ORDER BY
                 CASE WHEN sp.seen_at IS NULL THEN 0 ELSE 1 END,
                 CASE WHEN p.cefr_level = ? THEN 0 ELSE 1 END,
-                RANDOM()
+                COALESCE(sp.times_seen, 0) ASC,
+                sp.seen_at ASC NULLS FIRST
             LIMIT ?
             """.formatted(placeholders);
 
@@ -47,8 +48,8 @@ public class PhraseRepository {
 
     public void markSeen(long chatId, int phraseId) {
         jdbc.update("""
-            INSERT INTO sent_phrases (chat_id, phrase_id) VALUES (?, ?)
-            ON CONFLICT (chat_id, phrase_id) DO UPDATE SET seen_at = NOW()
+            INSERT INTO sent_phrases (chat_id, phrase_id, times_seen) VALUES (?, ?, 1)
+            ON CONFLICT (chat_id, phrase_id) DO UPDATE SET seen_at = NOW(), times_seen = sent_phrases.times_seen + 1
             """, chatId, phraseId);
     }
 }

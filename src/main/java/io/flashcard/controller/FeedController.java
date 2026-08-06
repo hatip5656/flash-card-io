@@ -160,9 +160,15 @@ public class FeedController {
     }
 
     @PostMapping("/mastered/{wordId}")
-    public Map<String, Object> markMastered(HttpServletRequest request, @PathVariable String wordId) {
-        sentWordRepo.markWordMastered(getUserId(request), wordId);
-        return Map.of("mastered", true, "wordId", wordId);
+    public ResponseEntity<?> markMastered(HttpServletRequest request, @PathVariable String wordId) {
+        long chatId = getUserId(request);
+        if (!sentWordRepo.canBeMastered(chatId, wordId)) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "error", "notReady",
+                "message", "Quiz this word at least twice with good results before mastering"));
+        }
+        sentWordRepo.markWordMastered(chatId, wordId);
+        return ResponseEntity.ok(Map.of("mastered", true, "wordId", wordId));
     }
 
     @DeleteMapping("/mastered/{wordId}")
@@ -182,13 +188,24 @@ public class FeedController {
             if ("crush".equals(gameType)) {
                 sentWordRepo.trackCrushFound(chatId, words);
             } else {
-                // For other games, increment feed_count as "exposure"
                 sentWordRepo.trackFeedShown(chatId, words);
             }
+            for (String word : words) {
+                sentWordRepo.updateSm2(chatId, word, 3);
+            }
         }
+        activityRepo.logGameActivity(chatId);
         return Map.of("ok", true, "tracked", words != null ? words.size() : 0);
     }
 
+
+    @GetMapping("/weak-words")
+    public Map<String, Object> getWeakWords(HttpServletRequest request,
+                                             @RequestParam(defaultValue = "10") int limit) {
+        long chatId = getUserId(request);
+        List<Map<String, Object>> words = sentWordRepo.getWeakWords(chatId, Math.min(limit, 20));
+        return Map.of("words", words, "total", words.size());
+    }
 
     @GetMapping("/vocabulary")
     public Map<String, Object> getVocabulary(HttpServletRequest request) {

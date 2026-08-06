@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static io.flashcard.controller.UserController.getUserId;
@@ -47,9 +48,10 @@ public class StatsController {
 
         String level = (String) stats.get("level");
         int sent = (int) stats.get("sent");
+        int sentForLevel = sentWordRepo.countSentWordsForLevel(chatId, level);
         int totalForLevel = wordBankService.getWordsForLevel(level).size();
         int totalWords = wordBankService.getAllWords().size();
-        int progress = totalForLevel > 0 ? Math.round((float) sent / totalForLevel * 100) : 0;
+        int progress = totalForLevel > 0 ? Math.min(100, Math.round((float) sentForLevel / totalForLevel * 100)) : 0;
 
         int totalQuizzes = ((Number) quizStats.get("total")).intValue();
         double avgPct = ((Number) quizStats.get("avg_pct")).doubleValue();
@@ -83,6 +85,40 @@ public class StatsController {
             "totalQuizAnswers", ((Number) wordCounts.get("total_quiz_answers")).intValue(),
             "totalFeedViews", ((Number) wordCounts.get("total_feed_views")).intValue(),
             "totalCrushFinds", ((Number) wordCounts.get("total_crush_finds")).intValue()));
+
+        // Level readiness
+        Map<String, Object> readiness = sentWordRepo.getLevelReadiness(chatId, level);
+        int strongWords = ((Number) readiness.get("strong")).intValue();
+        double avgEase = ((Number) readiness.get("avg_ease")).doubleValue();
+        int requiredStrong = (int) Math.ceil(totalForLevel * 0.6);
+        boolean readyToAdvance = strongWords >= requiredStrong && avgEase >= 2.0 && !level.equals("B2");
+        String nextLevel = getNextLevel(level);
+        result.put("levelReadiness", Map.of(
+            "strongWords", strongWords,
+            "requiredStrong", requiredStrong,
+            "avgEase", Math.round(avgEase * 100) / 100.0,
+            "readyToAdvance", readyToAdvance,
+            "nextLevel", nextLevel != null ? nextLevel : level));
+
+        // Daily goal
+        int todayWords = ((Number) today.get("wordsLearned")).intValue();
+        int todayQuizzes = ((Number) today.get("quizzesTaken")).intValue();
+        int todayGames = ((Number) today.get("gamesPlayed")).intValue();
+        result.put("dailyGoal", Map.of(
+            "wordsTarget", 5, "wordsProgress", todayWords,
+            "quizzesTarget", 1, "quizzesProgress", todayQuizzes,
+            "gamesTarget", 1, "gamesProgress", todayGames,
+            "completed", todayWords >= 5 && todayQuizzes >= 1));
+
         return result;
+    }
+
+    private static String getNextLevel(String level) {
+        return switch (level) {
+            case "A1" -> "A2";
+            case "A2" -> "B1";
+            case "B1" -> "B2";
+            default -> null;
+        };
     }
 }

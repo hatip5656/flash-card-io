@@ -1,6 +1,7 @@
 package io.flashcard.controller;
 
 import io.flashcard.model.GrammarStory;
+import io.flashcard.repository.ActivityRepository;
 import io.flashcard.repository.StoryReadRepository;
 import io.flashcard.repository.SubscriberRepository;
 import io.flashcard.service.StoryBankService;
@@ -19,12 +20,14 @@ public class StoryController {
     private final StoryBankService storyBankService;
     private final StoryReadRepository storyReadRepo;
     private final SubscriberRepository subscriberRepo;
+    private final ActivityRepository activityRepo;
 
     public StoryController(StoryBankService storyBankService, StoryReadRepository storyReadRepo,
-                           SubscriberRepository subscriberRepo) {
+                           SubscriberRepository subscriberRepo, ActivityRepository activityRepo) {
         this.storyBankService = storyBankService;
         this.storyReadRepo = storyReadRepo;
         this.subscriberRepo = subscriberRepo;
+        this.activityRepo = activityRepo;
     }
 
     @GetMapping
@@ -58,7 +61,9 @@ public class StoryController {
 
     @PostMapping("/{storyId}/read")
     public Map<String, Object> markStoryAsRead(HttpServletRequest request, @PathVariable String storyId) {
-        storyReadRepo.markStoryRead(getUserId(request), storyId);
+        long chatId = getUserId(request);
+        storyReadRepo.markStoryRead(chatId, storyId);
+        activityRepo.logStoryActivity(chatId);
         return Map.of("storyId", storyId, "read", true);
     }
 }

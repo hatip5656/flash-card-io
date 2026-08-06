@@ -107,6 +107,7 @@ public class WordBankService {
 
             List<Word> result = new ArrayList<>(currentLevel);
             result.addAll(lowerLevels);
+            Collections.shuffle(result);
             return result;
         } finally {
             lock.readLock().unlock();

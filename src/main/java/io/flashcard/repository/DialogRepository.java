@@ -82,4 +82,15 @@ public class DialogRepository {
         d.setLines(lines);
         return d;
     }
-}
+
+    public void markCompleted(long chatId, String dialogId) {
+        jdbc.update("""
+            INSERT INTO sent_dialogs (chat_id, dialog_id) VALUES (?, ?::INTEGER)
+            ON CONFLICT (chat_id, dialog_id) DO UPDATE SET completed_at = NOW()
+            """, chatId, dialogId);
+    }
+
+    public Set<String> getCompletedDialogIds(long chatId) {
+        return new HashSet<>(jdbc.queryForList(
+            "SELECT dialog_id::TEXT FROM sent_dialogs WHERE chat_id = ?", String.class, chatId));
+    }

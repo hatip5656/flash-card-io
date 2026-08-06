@@ -67,13 +67,17 @@ public class ActivityRepository {
     @Cacheable(value = "today_activity", key = "#chatId")
     public Map<String, Object> getTodayActivity(long chatId) {
         var rows = jdbc.queryForList(
-            "SELECT words_learned, quizzes_taken FROM activity_log WHERE chat_id = ? AND activity_date = CURRENT_DATE",
+            "SELECT words_learned, quizzes_taken, games_played, phrases_seen, stories_read, dialogs_completed FROM activity_log WHERE chat_id = ? AND activity_date = CURRENT_DATE",
             chatId);
-        if (rows.isEmpty()) return Map.of("wordsLearned", 0, "quizzesTaken", 0);
+        if (rows.isEmpty()) return Map.of("wordsLearned", 0, "quizzesTaken", 0, "gamesPlayed", 0, "phrasesSeen", 0, "storiesRead", 0, "dialogsCompleted", 0);
         Map<String, Object> row = rows.get(0);
         return Map.of(
             "wordsLearned", ((Number) row.get("words_learned")).intValue(),
-            "quizzesTaken", ((Number) row.get("quizzes_taken")).intValue());
+            "quizzesTaken", ((Number) row.get("quizzes_taken")).intValue(),
+            "gamesPlayed", ((Number) row.get("games_played")).intValue(),
+            "phrasesSeen", ((Number) row.get("phrases_seen")).intValue(),
+            "storiesRead", ((Number) row.get("stories_read")).intValue(),
+            "dialogsCompleted", ((Number) row.get("dialogs_completed")).intValue());
     }
 
     @Cacheable(value = "activity_stats", key = "#chatId")
@@ -93,6 +97,62 @@ public class ActivityRepository {
             "sent", ((Number) row.get("sent")).intValue(),
             "level", row.get("cefr_level") != null ? row.get("cefr_level") : "A1",
             "schedule", row.get("schedule") != null ? row.get("schedule") : "0 9 * * *");
+    }
+
+    @Caching(evict = {
+        @CacheEvict(value = "activity_stats", key = "#chatId"),
+        @CacheEvict(value = "today_activity", key = "#chatId"),
+        @CacheEvict(value = "activity_streak", key = "#chatId")
+    })
+    public void logGameActivity(long chatId) {
+        jdbc.update(
+            """
+            INSERT INTO activity_log (chat_id, games_played) VALUES (?, 1)
+            ON CONFLICT (chat_id, activity_date) DO UPDATE SET games_played = activity_log.games_played + 1
+            """,
+            chatId);
+    }
+
+    @Caching(evict = {
+        @CacheEvict(value = "activity_stats", key = "#chatId"),
+        @CacheEvict(value = "today_activity", key = "#chatId"),
+        @CacheEvict(value = "activity_streak", key = "#chatId")
+    })
+    public void logPhraseActivity(long chatId) {
+        jdbc.update(
+            """
+            INSERT INTO activity_log (chat_id, phrases_seen) VALUES (?, 1)
+            ON CONFLICT (chat_id, activity_date) DO UPDATE SET phrases_seen = activity_log.phrases_seen + 1
+            """,
+            chatId);
+    }
+
+    @Caching(evict = {
+        @CacheEvict(value = "activity_stats", key = "#chatId"),
+        @CacheEvict(value = "today_activity", key = "#chatId"),
+        @CacheEvict(value = "activity_streak", key = "#chatId")
+    })
+    public void logStoryActivity(long chatId) {
+        jdbc.update(
+            """
+            INSERT INTO activity_log (chat_id, stories_read) VALUES (?, 1)
+            ON CONFLICT (chat_id, activity_date) DO UPDATE SET stories_read = activity_log.stories_read + 1
+            """,
+            chatId);
+    }
+
+    @Caching(evict = {
+        @CacheEvict(value = "activity_stats", key = "#chatId"),
+        @CacheEvict(value = "today_activity", key = "#chatId"),
+        @CacheEvict(value = "activity_streak", key = "#chatId")
+    })
+    public void logDialogActivity(long chatId) {
+        jdbc.update(
+            """
+            INSERT INTO activity_log (chat_id, dialogs_completed) VALUES (?, 1)
+            ON CONFLICT (chat_id, activity_date) DO UPDATE SET dialogs_completed = activity_log.dialogs_completed + 1
+            """,
+            chatId);
     }
 
     public static final int[] MILESTONES = {10, 25, 50, 100, 250, 500, 1000};
