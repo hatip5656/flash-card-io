@@ -83,7 +83,7 @@ public class StatsController {
             "quizzed", ((Number) wordCounts.get("quizzed")).intValue(),
             "saved", savedCount,
             "totalQuizAnswers", ((Number) wordCounts.get("total_quiz_answers")).intValue(),
-            "totalFeedViews", ((Number) wordCounts.get("total_feed_views")).intValue(),
+            "totalSeenCount", ((Number) wordCounts.get("total_seen_count")).intValue(),
             "totalCrushFinds", ((Number) wordCounts.get("total_crush_finds")).intValue()));
 
         // Level readiness

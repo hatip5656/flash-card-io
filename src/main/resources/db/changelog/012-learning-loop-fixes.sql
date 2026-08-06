@@ -17,3 +17,6 @@ CREATE INDEX IF NOT EXISTS idx_sent_dialogs_chat ON sent_dialogs (chat_id);
 
 --changeset hatip:012-phrase-times-seen
 ALTER TABLE sent_phrases ADD COLUMN IF NOT EXISTS times_seen INTEGER DEFAULT 1;
+
+--changeset hatip:012-rename-feed-count
+ALTER TABLE sent_words RENAME COLUMN feed_count TO seen_count;

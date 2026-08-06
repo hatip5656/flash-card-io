@@ -146,7 +146,7 @@ public class FeedController {
         String estonian = body != null ? (String) body.get("estonian") : null;
         String english = body != null ? (String) body.get("english") : null;
         sentWordRepo.markWordSent(chatId, wordId, estonian, english);
-        sentWordRepo.trackFeedShown(chatId, List.of(wordId));
+        sentWordRepo.trackSeenCount(chatId, List.of(wordId));
         activityRepo.logWordActivity(chatId);
         return Map.of("seen", true, "wordId", wordId);
     }
@@ -180,7 +180,7 @@ public class FeedController {
             if ("crush".equals(gameType)) {
                 sentWordRepo.trackCrushFound(chatId, words);
             } else {
-                sentWordRepo.trackFeedShown(chatId, words);
+                sentWordRepo.trackSeenCount(chatId, words);
             }
             for (String word : words) {
                 sentWordRepo.updateSm2(chatId, word, 3);
@@ -212,7 +212,7 @@ public class FeedController {
             item.put("english", w.get("english"));
             item.put("turkish", w.get("turkish"));
             item.put("cefrLevel", w.get("cefr_level"));
-            item.put("feedCount", w.get("feed_count"));
+            item.put("seenCount", w.get("seen_count"));
             item.put("quizCount", w.get("quiz_count"));
             item.put("crushCount", w.get("crush_count"));
             item.put("mastered", w.get("mastered"));

@@ -110,10 +110,10 @@ public class SentWordRepository {
     public List<Map<String, Object>> getLearnedWordsForQuiz(long chatId) {
         return jdbc.queryForList(
             """
-            SELECT word_value, english, quiz_count, feed_count, ease_factor FROM sent_words
+            SELECT word_value, english, quiz_count, seen_count, ease_factor FROM sent_words
             WHERE chat_id = ? AND word_value IS NOT NULL AND english IS NOT NULL AND mastered = FALSE
             ORDER BY
-                CASE WHEN quiz_count = 0 AND feed_count > 0 THEN 0 ELSE 1 END,
+                CASE WHEN quiz_count = 0 AND seen_count > 0 THEN 0 ELSE 1 END,
                 ease_factor ASC,
                 last_quizzed_at ASC NULLS FIRST,
                 quiz_count ASC
@@ -133,10 +133,10 @@ public class SentWordRepository {
     }
 
     @CacheEvict(value = "word_counts", key = "#chatId")
-    public void trackFeedShown(long chatId, List<String> wordIds) {
+    public void trackSeenCount(long chatId, List<String> wordIds) {
         if (wordIds.isEmpty()) return;
         jdbc.update(
-            "UPDATE sent_words SET feed_count = feed_count + 1, last_fed_at = NOW() WHERE chat_id = ? AND word_id = ANY(?)",
+            "UPDATE sent_words SET seen_count = seen_count + 1, last_fed_at = NOW() WHERE chat_id = ? AND word_id = ANY(?)",
             chatId, wordIds.toArray(new String[0]));
     }
 
@@ -224,7 +224,7 @@ public class SentWordRepository {
               COUNT(*) FILTER (WHERE mastered = TRUE) as mastered,
               COUNT(*) FILTER (WHERE quiz_count > 0) as quizzed,
               COALESCE(SUM(quiz_count), 0) as total_quiz_answers,
-              COALESCE(SUM(feed_count), 0) as total_feed_views,
+              COALESCE(SUM(seen_count), 0) as total_seen_count,
               COALESCE(SUM(crush_count), 0) as total_crush_finds
             FROM sent_words WHERE chat_id = ?
             """,
@@ -235,7 +235,7 @@ public class SentWordRepository {
     public List<Map<String, Object>> getVocabularyCollection(long chatId) {
         return jdbc.queryForList(
             """
-            SELECT sw.word_id, sw.word_value, sw.english, sw.feed_count, sw.quiz_count,
+            SELECT sw.word_id, sw.word_value, sw.english, sw.seen_count, sw.quiz_count,
                    sw.crush_count, sw.mastered, sw.mastered_at, sw.ease_factor,
                    sw.interval_days, sw.next_review, sw.sent_at, sw.last_fed_at,
                    sw.last_quizzed_at, w.cefr_level, w.turkish
