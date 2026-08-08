@@ -94,3 +94,4 @@ public class DialogRepository {
         return new HashSet<>(jdbc.queryForList(
             "SELECT dialog_id::TEXT FROM sent_dialogs WHERE chat_id = ?", String.class, chatId));
     }
+}
