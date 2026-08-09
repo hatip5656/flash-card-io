@@ -2,7 +2,6 @@ package io.flashcard.controller;
 
 import io.flashcard.model.Idiom;
 import io.flashcard.model.Word;
-import io.flashcard.service.CategoryService;
 import io.flashcard.service.IdiomService;
 import io.flashcard.service.WordBankService;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +10,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -20,17 +18,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ContentControllerTest {
 
     private MockMvc mvc;
-    private CategoryService categoryService;
     private IdiomService idiomService;
     private WordBankService wordBankService;
 
     @BeforeEach
     void setUp() {
-        categoryService = mock(CategoryService.class);
         idiomService = mock(IdiomService.class);
         wordBankService = mock(WordBankService.class);
         mvc = MockMvcBuilders.standaloneSetup(
-            new ContentController(categoryService, idiomService, wordBankService)).build();
+            new ContentController(idiomService, wordBankService)).build();
     }
 
     @Test
@@ -45,18 +41,6 @@ class ContentControllerTest {
             .andExpect(jsonPath("$.length()").value(4))
             .andExpect(jsonPath("$[0].level").exists())
             .andExpect(jsonPath("$[0].wordCount").exists());
-    }
-
-    @Test
-    void getCategoriesReturnsCategories() throws Exception {
-        when(categoryService.getAllCategories()).thenReturn(List.of(
-            Map.of("key", "food", "label", "Food", "emoji", "apple", "wordCount", 20)
-        ));
-
-        mvc.perform(get("/api/categories"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].label").value("Food"));
     }
 
     @Test
