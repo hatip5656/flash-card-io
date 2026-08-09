@@ -1,7 +1,6 @@
 package io.flashcard.controller;
 
 import io.flashcard.model.Idiom;
-import io.flashcard.service.CategoryService;
 import io.flashcard.service.IdiomService;
 import io.flashcard.service.WordBankService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,12 +17,10 @@ public class ContentController {
 
     private static final Set<String> VALID_LEVELS = Set.of("A1", "A2", "B1", "B2");
 
-    private final CategoryService categoryService;
     private final IdiomService idiomService;
     private final WordBankService wordBankService;
 
-    public ContentController(CategoryService categoryService, IdiomService idiomService, WordBankService wordBankService) {
-        this.categoryService = categoryService;
+    public ContentController(IdiomService idiomService, WordBankService wordBankService) {
         this.idiomService = idiomService;
         this.wordBankService = wordBankService;
     }
@@ -35,11 +32,6 @@ public class ContentController {
                 "level", level,
                 "wordCount", wordBankService.getWordsForLevel(level).size()))
             .toList();
-    }
-
-    @GetMapping("/categories")
-    public List<Map<String, Object>> getCategories() {
-        return categoryService.getAllCategories();
     }
 
     @GetMapping("/idioms")
