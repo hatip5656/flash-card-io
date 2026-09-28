@@ -82,7 +82,7 @@ public class DeliveryService {
         String wordId, wordValue, english;
 
         if (!unsent.isEmpty()) {
-            Word word = unsent.get(ThreadLocalRandom.current().nextInt(unsent.size()));
+            Word word = unsent.get(0); // First unsent word — deterministic, ensures systematic coverage
             log.info("[delivery] Building flashcard for \"{}\" ({}) -> chat {} audio={} wordForms={}",
                 word.getEstonian(), word.getCefrLevel(), chatId, prefs.isAudio(), prefs.isWordForms());
 
@@ -268,16 +268,6 @@ public class DeliveryService {
             } catch (Exception e) {
                 log.error("[broadcast] Daily summary error for {}: {}", sub.getChatId(), e.getMessage());
             }
-        }
-    }
-
-    @Scheduled(cron = "0 0 */6 * * *") // Every 6 hours
-    public void cacheEviction() {
-        int tts = diskCache.evictExpired("tts", DiskCacheService.TTS_TTL_MS);
-        int unsplash = diskCache.evictExpired("unsplash", DiskCacheService.UNSPLASH_TTL_MS);
-        int ekilex = diskCache.evictExpired("ekilex", DiskCacheService.EKILEX_TTL_MS);
-        if (tts + unsplash + ekilex > 0) {
-            log.info("[cache] Evicted {} TTS, {} Unsplash, {} Ekilex expired entries", tts, unsplash, ekilex);
         }
     }
 

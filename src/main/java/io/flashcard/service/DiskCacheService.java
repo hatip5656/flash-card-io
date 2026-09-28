@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.nio.file.*;
 import java.security.MessageDigest;
 import java.util.HexFormat;
@@ -18,10 +17,6 @@ public class DiskCacheService {
     private static final Logger log = LoggerFactory.getLogger(DiskCacheService.class);
 
     private final Path cacheDir;
-
-    public static final long TTS_TTL_MS = 30L * 24 * 60 * 60 * 1000;
-    public static final long UNSPLASH_TTL_MS = 90L * 24 * 60 * 60 * 1000;
-    public static final long EKILEX_TTL_MS = 90L * 24 * 60 * 60 * 1000;
 
     public DiskCacheService() {
         String dir = System.getenv("CACHE_DIR");
@@ -45,12 +40,10 @@ public class DiskCacheService {
         return cacheDir.resolve(namespace).resolve(hashKey(key) + "." + ext);
     }
 
-    public byte[] getCachedBuffer(String namespace, String key, String ext, long ttlMs) {
+    public byte[] getCachedBuffer(String namespace, String key, String ext) {
         Path path = filePath(namespace, key, ext);
         try {
             if (!Files.exists(path)) return null;
-            long modified = Files.getLastModifiedTime(path).toMillis();
-            if (System.currentTimeMillis() - modified > ttlMs) return null;
             return Files.readAllBytes(path);
         } catch (Exception e) {
             return null;
@@ -67,12 +60,10 @@ public class DiskCacheService {
         }
     }
 
-    public String getCachedJson(String namespace, String key, long ttlMs) {
+    public String getCachedJson(String namespace, String key) {
         Path path = filePath(namespace, key, "json");
         try {
             if (!Files.exists(path)) return null;
-            long modified = Files.getLastModifiedTime(path).toMillis();
-            if (System.currentTimeMillis() - modified > ttlMs) return null;
             return Files.readString(path);
         } catch (Exception e) {
             return null;
@@ -87,24 +78,6 @@ public class DiskCacheService {
         } catch (Exception e) {
             log.error("[cache] Write error ({}): {}", namespace, e.getMessage());
         }
-    }
-
-    public int evictExpired(String namespace, long ttlMs) {
-        int evicted = 0;
-        Path dir = cacheDir.resolve(namespace);
-        if (!Files.isDirectory(dir)) return 0;
-        try (Stream<Path> stream = Files.list(dir)) {
-            long now = System.currentTimeMillis();
-            for (Path path : stream.toList()) {
-                try {
-                    if (now - Files.getLastModifiedTime(path).toMillis() > ttlMs) {
-                        Files.deleteIfExists(path);
-                        evicted++;
-                    }
-                } catch (Exception ignored) {}
-            }
-        } catch (Exception ignored) {}
-        return evicted;
     }
 
     public Map<String, Map<String, Object>> getCacheStats() {

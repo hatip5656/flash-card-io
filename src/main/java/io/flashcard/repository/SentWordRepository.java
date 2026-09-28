@@ -99,6 +99,7 @@ public class SentWordRepository {
             WHERE chat_id = ? AND word_value IS NOT NULL AND mastered = FALSE
             ORDER BY
                 CASE WHEN next_review <= CURRENT_DATE THEN 0 ELSE 1 END,
+                seen_count ASC,
                 ease_factor ASC,
                 last_fed_at ASC NULLS FIRST,
                 sent_at DESC
@@ -115,9 +116,9 @@ public class SentWordRepository {
             WHERE chat_id = ? AND word_value IS NOT NULL AND english IS NOT NULL AND mastered = FALSE
             ORDER BY
                 CASE WHEN quiz_count = 0 AND seen_count > 0 THEN 0 ELSE 1 END,
+                quiz_count ASC,
                 ease_factor ASC,
-                last_quizzed_at ASC NULLS FIRST,
-                quiz_count ASC
+                last_quizzed_at ASC NULLS FIRST
             """,
             chatId);
     }

@@ -66,7 +66,7 @@ public class TtsService {
         String cacheKey = CACHE_VERSION + "\0" + text + "\0" + voice;
 
         // Disk cache check — outside circuit breaker
-        byte[] cached = diskCache.getCachedBuffer("tts", cacheKey, "ogg", DiskCacheService.TTS_TTL_MS);
+        byte[] cached = diskCache.getCachedBuffer("tts", cacheKey, "ogg");
         if (cached != null) {
             log.debug("[tts] Cache hit for \"{}\" ({})", word, voice);
             return cached;

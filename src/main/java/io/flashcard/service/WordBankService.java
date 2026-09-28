@@ -86,28 +86,30 @@ public class WordBankService {
 
     /**
      * Get unseen words up to and including the given level.
-     * Prioritizes current level, then fills with lower levels.
+     * Deterministic order: current level first, then lower levels descending.
+     * Within each level, words appear in stable DB order.
      */
     public List<Word> getUnsentUpToLevel(String level, Collection<String> sentIds) {
         Set<String> sent = new HashSet<>(sentIds);
         List<String> levelOrder = List.of("A1", "A2", "B1", "B2");
         int maxIdx = levelOrder.indexOf(level);
         if (maxIdx < 0) maxIdx = 0;
-        Set<String> allowedLevels = new HashSet<>(levelOrder.subList(0, maxIdx + 1));
+
+        // Current level first, then lower levels descending (B1, A2, A1)
+        List<String> orderedLevels = new ArrayList<>();
+        orderedLevels.add(level);
+        for (int i = maxIdx - 1; i >= 0; i--) {
+            orderedLevels.add(levelOrder.get(i));
+        }
 
         lock.readLock().lock();
         try {
-            // Current level first, then lower levels
-            List<Word> currentLevel = words.stream()
-                .filter(w -> w.getCefrLevel().equals(level) && !sent.contains(w.getId()))
-                .toList();
-            List<Word> lowerLevels = words.stream()
-                .filter(w -> allowedLevels.contains(w.getCefrLevel()) && !w.getCefrLevel().equals(level) && !sent.contains(w.getId()))
-                .toList();
-
-            List<Word> result = new ArrayList<>(currentLevel);
-            result.addAll(lowerLevels);
-            Collections.shuffle(result);
+            List<Word> result = new ArrayList<>();
+            for (String l : orderedLevels) {
+                words.stream()
+                    .filter(w -> w.getCefrLevel().equals(l) && !sent.contains(w.getId()))
+                    .forEach(result::add);
+            }
             return result;
         } finally {
             lock.readLock().unlock();

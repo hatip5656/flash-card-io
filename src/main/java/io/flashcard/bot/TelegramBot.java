@@ -3,6 +3,7 @@ package io.flashcard.bot;
 import io.flashcard.config.AppProperties;
 import io.flashcard.model.GrammarLesson;
 import io.flashcard.model.UserPreferences;
+import io.flashcard.model.Word;
 import io.flashcard.repository.*;
 import io.flashcard.service.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,6 +43,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
     private final SentWordRepository sentWordRepo;
     private final GrammarRepository grammarRepo;
     private final WordBankService wordBankService;
+    private final WordDbRepository wordDbRepo;
     private final ScheduleService scheduleService;
     private final DeliveryService deliveryService;
     private final QuizRepository quizRepo;
@@ -56,6 +58,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
     public TelegramBot(AppProperties appProperties, SubscriberRepository subscriberRepo,
                        ActivityRepository activityRepo, SentWordRepository sentWordRepo,
                        GrammarRepository grammarRepo, WordBankService wordBankService,
+                       WordDbRepository wordDbRepo,
                        ScheduleService scheduleService, DeliveryService deliveryService,
                        QuizRepository quizRepo, GeminiService geminiService) {
         this.appProperties = appProperties;
@@ -64,6 +67,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
         this.sentWordRepo = sentWordRepo;
         this.grammarRepo = grammarRepo;
         this.wordBankService = wordBankService;
+        this.wordDbRepo = wordDbRepo;
         this.scheduleService = scheduleService;
         this.deliveryService = deliveryService;
         this.quizRepo = quizRepo;
@@ -92,6 +96,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
                     BotCommand.builder().command("level").description("Change level").build(),
                     BotCommand.builder().command("language").description("Change language (TR/EN)").build(),
                     BotCommand.builder().command("schedule").description("Change schedule").build(),
+                    BotCommand.builder().command("search").description("Search a word").build(),
+                    BotCommand.builder().command("add").description("Add a new word").build(),
                     BotCommand.builder().command("stop").description("Stop receiving flashcards").build()))
                 .build());
             log.info("[bot] Bot commands registered");
@@ -173,6 +179,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
                 case "/level" -> sendLevelPicker(chatId);
                 case "/language" -> sendLanguagePicker(chatId);
                 case "/schedule" -> sendSchedulePicker(chatId);
+                case "/search" -> handleSearch(chatId, text);
+                case "/add" -> handleAdd(chatId, text);
                 case "/stop" -> {
                     log.info("[bot] /stop from chat={}", chatId);
                     subscriberRepo.removeSubscriber(chatId);
@@ -296,6 +304,101 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
         } catch (Exception e) {
             log.error("[bot] Error handling callback data={} from chat={}: {}", data, chatId, e.getMessage(), e);
         }
+    }
+
+    // --- Search & Add ---
+
+    private void handleSearch(long chatId, String text) {
+        String query = text.replaceFirst("(?i)/search\\s*", "").trim();
+        if (query.isEmpty()) {
+            sendText(chatId, "Usage: <code>/search word</code>\nSearch by Estonian or English.");
+            return;
+        }
+
+        String q = query.toLowerCase();
+        List<Word> matches = wordBankService.getAllWords().stream()
+            .filter(w -> w.getEstonian().toLowerCase().contains(q)
+                || w.getEnglish().toLowerCase().contains(q)
+                || (w.getTurkish() != null && w.getTurkish().toLowerCase().contains(q)))
+            .limit(10)
+            .toList();
+
+        if (matches.isEmpty()) {
+            sendText(chatId, "No words found for \"" + TextUtils.escapeHtml(query) + "\".");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("\uD83D\uDD0D <b>Results for \"").append(TextUtils.escapeHtml(query)).append("\"</b>\n\n");
+        for (Word w : matches) {
+            sb.append("<b>").append(TextUtils.escapeHtml(w.getEstonian())).append("</b>");
+            sb.append(" [").append(w.getCefrLevel()).append("]\n");
+            sb.append("\uD83C\uDDEC\uD83C\uDDE7 ").append(TextUtils.escapeHtml(w.getEnglish()));
+            if (w.getTurkish() != null && !w.getTurkish().isBlank()) {
+                sb.append("\n\uD83C\uDDF9\uD83C\uDDF7 ").append(TextUtils.escapeHtml(w.getTurkish()));
+            }
+            if (w.getSentences() != null && !w.getSentences().isEmpty()) {
+                Word.Sentence s = w.getSentences().get(0);
+                sb.append("\n\uD83D\uDCAC <i>").append(TextUtils.escapeHtml(s.estonian())).append("</i>");
+            }
+            sb.append("\n\n");
+        }
+
+        if (matches.size() == 10) {
+            sb.append("<i>Showing first 10 results. Refine your query for more specific results.</i>");
+        }
+
+        sendText(chatId, sb.toString().trim());
+    }
+
+    private void handleAdd(long chatId, String text) {
+        String args = text.replaceFirst("(?i)/add\\s*", "").trim();
+        if (args.isEmpty()) {
+            sendText(chatId, "Usage: <code>/add estonian | english | turkish</code>\n"
+                + "Turkish is optional. Word is added at your current level.\n\n"
+                + "Example: <code>/add kala | fish | balık</code>");
+            return;
+        }
+
+        String[] parts = args.split("\\|");
+        if (parts.length < 2) {
+            sendText(chatId, "Provide at least Estonian and English separated by <code>|</code>\n"
+                + "Example: <code>/add kala | fish</code>");
+            return;
+        }
+
+        String estonian = parts[0].trim();
+        String english = parts[1].trim();
+        String turkish = parts.length >= 3 ? parts[2].trim() : null;
+
+        if (estonian.isEmpty() || english.isEmpty()) {
+            sendText(chatId, "Estonian and English cannot be empty.");
+            return;
+        }
+
+        if (wordDbRepo.wordExists(estonian.toLowerCase())) {
+            sendText(chatId, "\"" + TextUtils.escapeHtml(estonian) + "\" already exists in the word bank.");
+            return;
+        }
+
+        String level = subscriberRepo.getSubscriberLevel(chatId);
+        String id = wordDbRepo.addWord(estonian, english, turkish, level, null);
+
+        if (id == null) {
+            sendText(chatId, "Could not add word — it may already exist.");
+            return;
+        }
+
+        wordBankService.reload();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("\u2705 <b>Word added!</b>\n\n");
+        sb.append("<b>").append(TextUtils.escapeHtml(estonian)).append("</b> [").append(level).append("]\n");
+        sb.append("\uD83C\uDDEC\uD83C\uDDE7 ").append(TextUtils.escapeHtml(english));
+        if (turkish != null && !turkish.isBlank()) {
+            sb.append("\n\uD83C\uDDF9\uD83C\uDDF7 ").append(TextUtils.escapeHtml(turkish));
+        }
+        sendText(chatId, sb.toString());
     }
 
     // --- Gemini chat ---
