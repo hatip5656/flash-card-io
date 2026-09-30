@@ -28,10 +28,19 @@ public class PodcastService {
             LEARNER PROFILE:
             %s
 
-            Generate a podcast script as a JSON array of segments. Each segment object has:
+            Generate a podcast script as a JSON array of segments. Each segment has EXACTLY these 3 fields:
             - "text": the spoken text (string)
-            - "language": "en" or "et"
+            - "language": "en" or "et" (ONLY these two values)
             - "pause_after_ms": pause in milliseconds after this segment (integer)
+
+            EXAMPLE OUTPUT (follow this format exactly):
+            [
+              {"text": "Welcome to your daily Estonian lesson.", "language": "en", "pause_after_ms": 1000},
+              {"text": "raamat", "language": "et", "pause_after_ms": 2000},
+              {"text": "It means book.", "language": "en", "pause_after_ms": 800},
+              {"text": "Ma loen raamatut.", "language": "et", "pause_after_ms": 1500},
+              {"text": "I am reading a book.", "language": "en", "pause_after_ms": 1000}
+            ]
 
             STRUCTURE:
             1. Greeting (EN) — warm, reference their streak or recent progress
