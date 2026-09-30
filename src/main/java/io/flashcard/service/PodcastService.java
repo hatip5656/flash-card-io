@@ -187,7 +187,7 @@ public class PodcastService {
             }
 
             // 4. Cache audio and update record
-            String cacheKey = "podcast\0" + podcastId;
+            String cacheKey = "podcast:" + podcastId;
             diskCache.setCachedBuffer("podcast", cacheKey, "wav", audio);
 
             int durationSeconds = estimateDuration(audio);
