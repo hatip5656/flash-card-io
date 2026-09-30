@@ -53,6 +53,10 @@ public class GeminiService {
     }
 
     public String chat(String message, List<Map<String, String>> history, String learnerContext) {
+        return chat(message, history, learnerContext, 2048);
+    }
+
+    public String chat(String message, List<Map<String, String>> history, String learnerContext, int maxTokens) {
         if (!isAvailable()) return null;
 
         try {
@@ -77,7 +81,7 @@ public class GeminiService {
             Map<String, Object> requestBody = new LinkedHashMap<>();
             requestBody.put("system_instruction", Map.of("parts", List.of(Map.of("text", systemWithContext))));
             requestBody.put("contents", contents);
-            requestBody.put("generationConfig", Map.of("maxOutputTokens", 2048, "temperature", 0.7));
+            requestBody.put("generationConfig", Map.of("maxOutputTokens", maxTokens, "temperature", 0.7));
 
             String jsonBody = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(requestBody);
             URL url = new URL(GEMINI_URL + "?key=" + geminiApiKey);

@@ -119,10 +119,10 @@ public class PodcastService {
             // 1. Build learner context
             String learnerContext = buildLearnerContext(chatId, level);
 
-            // 2. Generate script via Gemini
+            // 2. Generate script via Gemini (8192 tokens for full podcast script)
             log.info("[podcast] Generating script for user {} ({})", chatId, level);
             String prompt = String.format(PODCAST_PROMPT, learnerContext);
-            String scriptJson = geminiService.chat(prompt, List.of(), "");
+            String scriptJson = geminiService.chat(prompt, List.of(), "", 8192);
 
             if (scriptJson == null || scriptJson.isBlank()) {
                 podcastRepo.updateStatus(podcastId, "failed", "AI did not generate a script");
@@ -134,6 +134,9 @@ public class PodcastService {
             if (scriptJson.startsWith("```")) {
                 scriptJson = scriptJson.replaceFirst("```[a-z]*\\n?", "").replaceFirst("\\n?```$", "").strip();
             }
+
+            // Repair truncated JSON: if it doesn't end with ], try to close it
+            scriptJson = repairTruncatedJson(scriptJson);
 
             // Validate JSON
             List<?> segments = objectMapper.readValue(scriptJson, List.class);
@@ -195,6 +198,25 @@ public class PodcastService {
             log.error("[podcast] TTS API call failed: {}", e.getMessage());
             return null;
         }
+    }
+
+    private String repairTruncatedJson(String json) {
+        if (json.endsWith("]")) return json;
+
+        // Find the last complete object (ends with })
+        int lastBrace = json.lastIndexOf('}');
+        if (lastBrace <= 0) return json;
+
+        // Truncate to last complete object and close the array
+        String repaired = json.substring(0, lastBrace + 1).strip();
+        // Remove trailing comma if present
+        if (repaired.endsWith(",")) {
+            repaired = repaired.substring(0, repaired.length() - 1);
+        }
+        repaired += "]";
+
+        log.warn("[podcast] Repaired truncated JSON (cut at position {})", lastBrace);
+        return repaired;
     }
 
     private int estimateDuration(byte[] wavData) {
