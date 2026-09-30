@@ -54,8 +54,11 @@ public class PodcastService {
             - English text: keep sentences under 20 words
             - Adjust complexity to the learner's CEFR level
             - Be encouraging and personal
+            - Keep the TOTAL response under 15 segments to stay concise
+            - Keep each "text" field SHORT: max 1-2 sentences
             - Do NOT wrap the JSON in markdown code fences
             - Return ONLY the JSON array, no other text
+            - IMPORTANT: your response MUST be valid, complete JSON — always close the array with ]
             """;
 
     private final GeminiService geminiService;
