@@ -26,16 +26,26 @@ public class PodcastService {
 
     private static final String PODCAST_PROMPT = """
             You are creating a daily language learning podcast episode for an Estonian language learner.
+            The learner's native language is %s. Use their native language for explanations and translations.
 
             LEARNER PROFILE:
             %s
 
             Generate a podcast script as a JSON array of segments. Each segment has EXACTLY these 3 fields:
             - "text": the spoken text (string)
-            - "language": "en" or "et" (ONLY these two values)
+            - "language": one of "en", "et", or "tr" (use the learner's native language code for explanations)
             - "pause_after_ms": pause in milliseconds after this segment (integer)
 
-            EXAMPLE OUTPUT (follow this format exactly):
+            EXAMPLE OUTPUT for a TURKISH-native learner (follow this format exactly):
+            [
+              {"text": "Gunluk Estonca dersine hos geldiniz.", "language": "tr", "pause_after_ms": 1000},
+              {"text": "raamat", "language": "et", "pause_after_ms": 2000},
+              {"text": "Kitap demektir.", "language": "tr", "pause_after_ms": 800},
+              {"text": "Ma loen raamatut.", "language": "et", "pause_after_ms": 1500},
+              {"text": "Ben kitap okuyorum.", "language": "tr", "pause_after_ms": 1000}
+            ]
+
+            EXAMPLE OUTPUT for an ENGLISH-native learner:
             [
               {"text": "Welcome to your daily Estonian lesson.", "language": "en", "pause_after_ms": 1000},
               {"text": "raamat", "language": "et", "pause_after_ms": 2000},
@@ -45,24 +55,24 @@ public class PodcastService {
             ]
 
             STRUCTURE:
-            1. Greeting (EN) — warm, reference their streak or recent progress
-            2. Today's Focus (EN) — introduce 3-5 words from their weak/missed list
+            1. Greeting (native language) — warm, reference their streak or recent progress
+            2. Today's Focus (native language) — introduce 3-5 words from their weak/missed list
             3. For EACH word:
-               a. Introduce the word (EN): "Our next word is..."
+               a. Introduce the word (native language): "Our next word is..."
                b. Say the Estonian word (ET): clear pronunciation
                c. Pause 2000ms for the listener to repeat
                d. Use it in a sentence (ET): natural sentence with the word
-               e. Translate (EN): explain the sentence meaning
+               e. Translate (native language): explain the sentence meaning
                f. Pause 1000ms
-            4. Quick Review (mixed EN/ET): rapid-fire all today's words with short pauses
-            5. Grammar Mini-Lesson (EN+ET): one pattern relevant to the words covered
-            6. Closing (EN): encouragement, summary
+            4. Quick Review (mixed native+ET): rapid-fire all today's words with short pauses
+            5. Grammar Mini-Lesson (native+ET): one pattern relevant to the words covered
+            6. Closing (native language): encouragement, summary
 
             RULES:
             - Target 15-25 segments total
             - Estonian text: spell out ALL numbers (e.g., "kaks" not "2")
             - Estonian text: keep sentences under 15 words
-            - English text: keep sentences under 20 words
+            - Explanation text: keep sentences under 20 words
             - Adjust complexity to the learner's CEFR level
             - Be encouraging and personal
             - Keep the TOTAL response under 15 segments to stay concise
@@ -135,11 +145,13 @@ public class PodcastService {
             podcastRepo.updateStatus(podcastId, "generating", null);
 
             // 1. Build learner context
+            var prefs = subscriberRepo.getPreferences(chatId);
+            String nativeLang = prefs != null ? prefs.getNativeLanguage() : "english";
             String learnerContext = buildLearnerContext(chatId, level);
 
             // 2. Generate script via Gemini (8192 tokens for full podcast script)
-            log.info("[podcast] Generating script for user {} ({})", chatId, level);
-            String prompt = String.format(PODCAST_PROMPT, learnerContext);
+            log.info("[podcast] Generating script for user {} ({}, native={})", chatId, level, nativeLang);
+            String prompt = String.format(PODCAST_PROMPT, nativeLang, learnerContext);
             String scriptJson = geminiService.chat(prompt, List.of(), "", 8192);
 
             if (scriptJson == null || scriptJson.isBlank()) {
