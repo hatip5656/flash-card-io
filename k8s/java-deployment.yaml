@@ -63,8 +63,6 @@ spec:
                   optional: true
             - name: APP_TTS_API_URL
               value: "http://tts-api:8000"
-            - name: APP_TTS_SPEAKER
-              value: "mari"
             - name: APP_CRON_TIMEZONE
               value: "Europe/Tallinn"
             - name: APP_CRON_SCHEDULE

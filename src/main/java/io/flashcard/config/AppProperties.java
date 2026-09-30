@@ -13,7 +13,6 @@ public class AppProperties {
     private String pexelsApiKey = "";
     private String ekilexApiKey = "";
     private String ttsApiUrl = "http://tts-api:8000";
-    private String ttsSpeaker = "mari";
     private String cronTimezone = "Europe/Tallinn";
     private String cronSchedule = "0 9 * * *";
     private List<String> cefrLevels = List.of("A1", "A2");
@@ -29,9 +28,6 @@ public class AppProperties {
 
     public String getTtsApiUrl() { return ttsApiUrl; }
     public void setTtsApiUrl(String v) { this.ttsApiUrl = v; }
-
-    public String getTtsSpeaker() { return ttsSpeaker; }
-    public void setTtsSpeaker(String v) { this.ttsSpeaker = v; }
 
     public String getCronTimezone() { return cronTimezone; }
     public void setCronTimezone(String v) { this.cronTimezone = v; }

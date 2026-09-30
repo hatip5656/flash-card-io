@@ -24,8 +24,8 @@ import java.util.UUID;
 public class TtsService {
 
     private static final Logger log = LoggerFactory.getLogger(TtsService.class);
-    private static final String CACHE_VERSION = "v4";
-    private static final int TTS_TIMEOUT_SECONDS = 8;
+    private static final String CACHE_VERSION = "v5";
+    private static final int TTS_TIMEOUT_SECONDS = 30;
 
     private final AppProperties appProperties;
     private final DiskCacheService diskCache;
@@ -61,20 +61,17 @@ public class TtsService {
     }
 
     public byte[] synthesizeSpeech(String word, String sentence, String voiceName) {
-        String voice = voiceName != null ? voiceName : appProperties.getTtsSpeaker();
         String text = sentence != null && !sentence.equals(word) ? word + ". ... " + sentence : word;
-        String cacheKey = CACHE_VERSION + "\0" + text + "\0" + voice;
+        String cacheKey = CACHE_VERSION + "\0" + text + "\0et";
 
-        // Disk cache check — outside circuit breaker
         byte[] cached = diskCache.getCachedBuffer("tts", cacheKey, "ogg");
         if (cached != null) {
-            log.debug("[tts] Cache hit for \"{}\" ({})", word, voice);
+            log.debug("[tts] Cache hit for \"{}\"", word);
             return cached;
         }
 
-        // Circuit breaker wraps the API call
         try {
-            return circuitBreaker.executeSupplier(() -> callTtsApi(word, text, voice, cacheKey));
+            return circuitBreaker.executeSupplier(() -> callTtsApi(word, text, cacheKey));
         } catch (io.github.resilience4j.circuitbreaker.CallNotPermittedException e) {
             log.debug("[tts] Circuit open, skipping \"{}\"", word);
             return null;
@@ -84,10 +81,14 @@ public class TtsService {
         }
     }
 
-    private byte[] callTtsApi(String word, String text, String voice, String cacheKey) {
+    private byte[] callTtsApi(String word, String text, String cacheKey) {
         String body;
         try {
-            body = objectMapper.writeValueAsString(Map.of("text", text, "speaker", voice, "speed", 0.85));
+            body = objectMapper.writeValueAsString(Map.of(
+                "text", text,
+                "language", "et",
+                "voice", "default"
+            ));
         } catch (Exception e) {
             throw new RuntimeException("Failed to serialize TTS request", e);
         }
@@ -95,7 +96,7 @@ public class TtsService {
         long start = System.currentTimeMillis();
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(appProperties.getTtsApiUrl() + "/v2"))
+                .uri(URI.create(appProperties.getTtsApiUrl() + "/v1/synthesize"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .timeout(Duration.ofSeconds(TTS_TIMEOUT_SECONDS))

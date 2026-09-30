@@ -18,5 +18,6 @@
     <include file="db/changelog/011-grammar-lessons-db.sql"/>
     <include file="db/changelog/012-learning-loop-fixes.sql"/>
     <include file="db/changelog/013-a1-class-material.sql"/>
+    <include file="db/changelog/014-podcasts.sql"/>
 
 </databaseChangeLog>
