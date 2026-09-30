@@ -137,25 +137,46 @@ public class PodcastService {
             String scriptJson = geminiService.chat(prompt, List.of(), "", 8192);
 
             if (scriptJson == null || scriptJson.isBlank()) {
+                log.error("[podcast] {} Gemini returned null/blank", podcastId);
                 podcastRepo.updateStatus(podcastId, "failed", "AI did not generate a script");
                 return;
             }
 
+            log.info("[podcast] {} Gemini raw response ({} chars): {}", podcastId, scriptJson.length(),
+                scriptJson.substring(0, Math.min(500, scriptJson.length())));
+
             // Clean up response: strip markdown fences if present
             scriptJson = scriptJson.strip();
             if (scriptJson.startsWith("```")) {
+                log.info("[podcast] {} Stripping markdown fences", podcastId);
                 scriptJson = scriptJson.replaceFirst("```[a-z]*\\n?", "").replaceFirst("\\n?```$", "").strip();
             }
 
             // Repair truncated JSON: if it doesn't end with ], try to close it
+            if (!scriptJson.strip().endsWith("]")) {
+                log.warn("[podcast] {} JSON appears truncated, last 100 chars: ...{}", podcastId,
+                    scriptJson.substring(Math.max(0, scriptJson.length() - 100)));
+            }
             scriptJson = repairTruncatedJson(scriptJson);
 
             // Validate JSON
-            List<?> segments = objectMapper.readValue(scriptJson, List.class);
+            List<?> segments;
+            try {
+                segments = objectMapper.readValue(scriptJson, List.class);
+            } catch (Exception e) {
+                log.error("[podcast] {} JSON parse failed: {}. Cleaned JSON: {}", podcastId, e.getMessage(),
+                    scriptJson.substring(0, Math.min(500, scriptJson.length())));
+                podcastRepo.updateStatus(podcastId, "failed", "Invalid script JSON: " + e.getMessage());
+                return;
+            }
+
             if (segments.isEmpty()) {
+                log.error("[podcast] {} Script parsed but has 0 segments", podcastId);
                 podcastRepo.updateStatus(podcastId, "failed", "Script has no segments");
                 return;
             }
+
+            log.info("[podcast] {} Script OK: {} segments, sending to TTS", podcastId, segments.size());
 
             // 3. Call TTS service to synthesize
             log.info("[podcast] Synthesizing {} segments for podcast {}", segments.size(), podcastId);
