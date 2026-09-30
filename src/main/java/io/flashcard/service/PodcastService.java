@@ -13,6 +13,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -77,17 +79,18 @@ public class PodcastService {
     private final QuizRepository quizRepo;
     private final ActivityRepository activityRepo;
     private final WordBankService wordBankService;
-    private final DiskCacheService diskCache;
     private final AppProperties appProperties;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
+    private final Path podcastDir;
 
     public PodcastService(GeminiService geminiService, PodcastRepository podcastRepo,
                           SentWordRepository sentWordRepo, SubscriberRepository subscriberRepo,
                           QuizRepository quizRepo, ActivityRepository activityRepo,
-                          WordBankService wordBankService, DiskCacheService diskCache,
+                          WordBankService wordBankService,
                           AppProperties appProperties, HttpClient httpClient,
-                          ObjectMapper objectMapper) {
+                          ObjectMapper objectMapper,
+                          @org.springframework.beans.factory.annotation.Value("${CACHE_DIR:/app/cache}") String cacheDir) {
         this.geminiService = geminiService;
         this.podcastRepo = podcastRepo;
         this.sentWordRepo = sentWordRepo;
@@ -95,10 +98,13 @@ public class PodcastService {
         this.quizRepo = quizRepo;
         this.activityRepo = activityRepo;
         this.wordBankService = wordBankService;
-        this.diskCache = diskCache;
         this.appProperties = appProperties;
         this.httpClient = httpClient;
         this.objectMapper = objectMapper;
+        this.podcastDir = Path.of(cacheDir, "podcasts");
+        try { Files.createDirectories(podcastDir); } catch (Exception e) {
+            log.warn("[podcast] Could not create podcast dir: {}", e.getMessage());
+        }
     }
 
     public String requestGeneration(long chatId) {
@@ -186,12 +192,14 @@ public class PodcastService {
                 return;
             }
 
-            // 4. Cache audio and update record
-            String cacheKey = "podcast:" + podcastId;
-            diskCache.setCachedBuffer("podcast", cacheKey, "wav", audio);
+            // 4. Save audio file and update record
+            String filename = podcastId + ".wav";
+            Path audioPath = podcastDir.resolve(filename);
+            Files.write(audioPath, audio);
+            log.info("[podcast] {} Saved audio to {} ({} bytes)", podcastId, audioPath, audio.length);
 
             int durationSeconds = estimateDuration(audio);
-            podcastRepo.updateReady(podcastId, scriptJson, cacheKey, durationSeconds);
+            podcastRepo.updateReady(podcastId, scriptJson, filename, durationSeconds);
 
             log.info("[podcast] Podcast {} ready ({} segments, ~{}s)", podcastId, segments.size(), durationSeconds);
 
@@ -269,11 +277,10 @@ public class PodcastService {
         return podcastRepo.findById(podcastId);
     }
 
-    public byte[] getAudio(String podcastId) {
+    public Optional<String> getAudioFilename(String podcastId) {
         return podcastRepo.findById(podcastId)
             .filter(p -> "ready".equals(p.getStatus()))
-            .map(p -> diskCache.getCachedBuffer("podcast", p.getAudioCacheKey(), "wav"))
-            .orElse(null);
+            .map(Podcast::getAudioCacheKey);
     }
 
     public Optional<Podcast> getLatest(long chatId) {

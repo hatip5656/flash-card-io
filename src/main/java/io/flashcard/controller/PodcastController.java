@@ -43,20 +43,6 @@ public class PodcastController {
             .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/{id}/audio")
-    public ResponseEntity<?> getAudio(@PathVariable String id) {
-        byte[] audio = podcastService.getAudio(id);
-        if (audio == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "audio/wav");
-        headers.setCacheControl("public, max-age=86400");
-        headers.setContentLength(audio.length);
-        return new ResponseEntity<>(audio, headers, HttpStatus.OK);
-    }
-
     @GetMapping("/latest")
     public ResponseEntity<?> getLatest(HttpServletRequest request) {
         long chatId = getUserId(request);
@@ -84,6 +70,9 @@ public class PodcastController {
         map.put("cefrLevel", p.getCefrLevel());
         map.put("durationSeconds", p.getDurationSeconds());
         map.put("createdAt", p.getCreatedAt() != null ? p.getCreatedAt().toString() : null);
+        if ("ready".equals(p.getStatus()) && p.getAudioCacheKey() != null) {
+            map.put("audioUrl", "https://wordagram.hatip.dev/podcasts/" + p.getAudioCacheKey());
+        }
         if (p.getErrorMessage() != null) {
             map.put("errorMessage", p.getErrorMessage());
         }
