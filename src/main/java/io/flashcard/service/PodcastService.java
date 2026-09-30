@@ -192,7 +192,9 @@ public class PodcastService {
             HttpResponse<byte[]> response = httpClient.send(httpReq, HttpResponse.BodyHandlers.ofByteArray());
 
             if (response.statusCode() != 200) {
-                log.error("[podcast] TTS API returned {}", response.statusCode());
+                String errBody = new String(response.body(), java.nio.charset.StandardCharsets.UTF_8);
+                log.error("[podcast] TTS API returned {}: {}", response.statusCode(),
+                    errBody.substring(0, Math.min(500, errBody.length())));
                 return null;
             }
 
