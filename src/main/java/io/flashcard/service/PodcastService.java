@@ -29,16 +29,18 @@ public class PodcastService {
     private static final String PART_GRAMMAR = """
             You are a language teacher creating an AUDIO podcast segment about Estonian grammar.
             The learner's native language is %s. Speak in their native language for explanations.
-            CEFR Level: %s
 
-            Pick ONE grammar topic relevant to these weak/recent words: %s
+            LEARNER PROFILE:
+            %s
+
+            Pick ONE grammar topic relevant to the learner's weak/recent words.
 
             Generate a JSON array of segments teaching this grammar point with examples.
             Each segment: {"text": "...", "language": "%s" or "et", "pause_after_ms": int}
 
             Include:
             - Brief intro of the grammar rule (native lang)
-            - 2-3 Estonian example sentences showing the rule
+            - 2-3 Estonian example sentences showing the rule, using the learner's weak words where possible
             - Translation of each example (native lang)
             - Pause after each Estonian sentence for the listener to repeat
 
@@ -46,16 +48,20 @@ public class PodcastService {
             - 8-12 segments max
             - Keep each text SHORT: 1 sentence
             - Estonian: spell out numbers, max 12 words per sentence
+            - Adjust complexity to the learner's CEFR level and quiz performance
             - Return ONLY valid JSON array, no markdown, no extra text
+            - Do NOT mention the learner's stats/streak in the audio
             - MUST end with ]
             """;
 
     private static final String PART_VOCABULARY = """
             You are a language teacher creating an AUDIO podcast segment teaching Estonian vocabulary.
             The learner's native language is %s. Speak in their native language for explanations.
-            CEFR Level: %s
 
-            Teach these specific words: %s
+            LEARNER PROFILE:
+            %s
+
+            Choose 4-6 words from the learner's weak/missed words to teach.
 
             Generate a JSON array of segments. For EACH word:
             1. Say the Estonian word (et)
@@ -70,16 +76,20 @@ public class PodcastService {
             RULES:
             - Keep each text SHORT: 1 sentence
             - Estonian: spell out numbers, max 12 words per sentence
+            - Prioritize words the learner struggles with most
             - Return ONLY valid JSON array, no markdown, no extra text
+            - Do NOT mention the learner's stats/streak in the audio
             - MUST end with ]
             """;
 
     private static final String PART_PRACTICE = """
             You are a language teacher creating an AUDIO podcast practice segment.
             The learner's native language is %s. Speak in their native language for instructions.
-            CEFR Level: %s
 
-            Create a fill-in-the-blank / translation practice using these words: %s
+            LEARNER PROFILE:
+            %s
+
+            Create fill-in-the-blank and translation exercises using the learner's weak/missed words.
 
             Generate a JSON array of segments with:
             - Prompt in native lang: "How do you say X in Estonian?" or "Complete: Ma ___ raamatut"
@@ -163,10 +173,7 @@ public class PodcastService {
             String nativeLang = prefs != null ? prefs.getNativeLanguage() : "english";
             String langCode = "turkish".equals(nativeLang) ? "tr" : "en";
 
-            // Gather words for the lesson
-            var weakWords = sentWordRepo.getWeakWords(chatId, 8);
-            var missedWords = quizRepo.getMostMissedWords(chatId, 5);
-            String wordList = buildWordList(weakWords, missedWords);
+            String learnerContext = buildLearnerContext(chatId, level);
 
             log.info("[podcast] {} Generating parts for user {} ({}, native={})", podcastId, chatId, level, nativeLang);
 
@@ -176,19 +183,19 @@ public class PodcastService {
             // Part 1: Grammar
             log.info("[podcast] {} Part 1: Grammar", podcastId);
             byte[] grammarAudio = generatePart(podcastId, "grammar",
-                String.format(PART_GRAMMAR, nativeLang, level, wordList, langCode));
+                String.format(PART_GRAMMAR, nativeLang, learnerContext, langCode));
             if (grammarAudio != null) audioParts.add(grammarAudio);
 
             // Part 2: Vocabulary
             log.info("[podcast] {} Part 2: Vocabulary", podcastId);
             byte[] vocabAudio = generatePart(podcastId, "vocabulary",
-                String.format(PART_VOCABULARY, nativeLang, level, wordList, langCode));
+                String.format(PART_VOCABULARY, nativeLang, learnerContext, langCode));
             if (vocabAudio != null) audioParts.add(vocabAudio);
 
             // Part 3: Practice
             log.info("[podcast] {} Part 3: Practice", podcastId);
             byte[] practiceAudio = generatePart(podcastId, "practice",
-                String.format(PART_PRACTICE, nativeLang, level, wordList, langCode));
+                String.format(PART_PRACTICE, nativeLang, learnerContext, langCode));
             if (practiceAudio != null) audioParts.add(practiceAudio);
 
             if (audioParts.isEmpty()) {
@@ -350,20 +357,6 @@ public class PodcastService {
         return dataSize / (sampleRate * 2);
     }
 
-    private String buildWordList(List<Map<String, Object>> weakWords, List<Map<String, Object>> missedWords) {
-        Set<String> seen = new LinkedHashSet<>();
-        for (var w : weakWords) {
-            String word = (String) w.get("word_value");
-            String eng = (String) w.get("english");
-            seen.add("\"" + word + "\" (" + eng + ")");
-        }
-        for (var w : missedWords) {
-            String word = (String) w.get("estonian");
-            seen.add("\"" + word + "\"");
-        }
-        return seen.isEmpty() ? "common A1 words" : String.join(", ", seen);
-    }
-
     public Optional<Podcast> getStatus(String podcastId) {
         return podcastRepo.findById(podcastId);
     }
@@ -380,5 +373,48 @@ public class PodcastService {
 
     public List<Podcast> getHistory(long chatId, int limit) {
         return podcastRepo.findHistory(chatId, limit);
+    }
+
+    private String buildLearnerContext(long chatId, String level) {
+        var prefs = subscriberRepo.getPreferences(chatId);
+        String nativeLang = prefs != null ? prefs.getNativeLanguage() : "english";
+
+        var wordCounts = sentWordRepo.getWordCounts(chatId);
+        var quizStats = quizRepo.getQuizStats(chatId);
+
+        int seen = ((Number) wordCounts.get("seen")).intValue();
+        int mastered = ((Number) wordCounts.get("mastered")).intValue();
+        int totalQuizzes = ((Number) quizStats.get("total")).intValue();
+        int avgPct = (int) Math.round(((Number) quizStats.get("avg_pct")).doubleValue());
+
+        var weakWords = sentWordRepo.getWeakWords(chatId, 10);
+        String weakList = weakWords.stream()
+            .map(w -> "\"" + w.get("word_value") + "\" (" + w.get("english") + ", ease=" + String.format("%.1f", ((Number) w.get("ease_factor")).doubleValue()) + ")")
+            .collect(Collectors.joining(", "));
+
+        var missedWords = quizRepo.getMostMissedWords(chatId, 8);
+        String missedList = missedWords.stream()
+            .map(w -> "\"" + w.get("estonian") + "\" (missed " + w.get("mistakes") + "x)")
+            .collect(Collectors.joining(", "));
+
+        var vocab = sentWordRepo.getVocabularyCollection(chatId);
+        String recentList = vocab.stream()
+            .limit(15)
+            .map(w -> "\"" + w.get("word_value") + "\" (" + w.get("english") + ")")
+            .collect(Collectors.joining(", "));
+
+        int strongWords = ((Number) sentWordRepo.getLevelReadiness(chatId, level).get("strong")).intValue();
+        int totalForLevel = wordBankService.getWordsForLevel(level).size();
+
+        StringBuilder ctx = new StringBuilder();
+        ctx.append("CEFR Level: ").append(level).append("\n");
+        ctx.append("Native language: ").append(nativeLang).append("\n");
+        ctx.append("Vocabulary: ").append(seen).append(" seen, ").append(mastered).append(" mastered\n");
+        ctx.append("Level progress: ").append(strongWords).append("/").append(totalForLevel).append(" strong words\n");
+        ctx.append("Quiz performance: ").append(totalQuizzes).append(" quizzes, avg ").append(avgPct).append("%\n");
+        if (!weakList.isEmpty()) ctx.append("Weak words (prioritize these): ").append(weakList).append("\n");
+        if (!missedList.isEmpty()) ctx.append("Most missed in quizzes: ").append(missedList).append("\n");
+        if (!recentList.isEmpty()) ctx.append("Recently learned: ").append(recentList).append("\n");
+        return ctx.toString();
     }
 }
