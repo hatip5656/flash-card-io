@@ -43,17 +43,18 @@ public class PodcastRepository {
             .update();
     }
 
-    public void updateReady(String id, String script, String audioCacheKey, int durationSeconds) {
+    public void updateReady(String id, String script, String audioCacheKey, int durationSeconds, String title) {
         jdbc.sql("""
             UPDATE podcasts
             SET status = 'ready', script = :script::jsonb, audio_cache_key = :cacheKey,
-                duration_seconds = :duration
+                duration_seconds = :duration, title = :title
             WHERE id = :id
             """)
             .param("id", id)
             .param("script", script)
             .param("cacheKey", audioCacheKey)
             .param("duration", durationSeconds)
+            .param("title", title)
             .update();
     }
 

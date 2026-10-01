@@ -210,12 +210,13 @@ public class PodcastService {
             Files.write(audioPath, combined);
 
             String timingsJson = objectMapper.writeValueAsString(allTimings);
+            String title = buildTitle(allTimings);
 
             int durationSeconds = estimateDuration(combined);
-            log.info("[podcast] {} Complete: {} parts, {} subtitles, ~{}s",
-                podcastId, parts.size(), allTimings.size(), durationSeconds);
+            log.info("[podcast] {} Complete: {} parts, {} subtitles, ~{}s, title={}",
+                podcastId, parts.size(), allTimings.size(), durationSeconds, title);
 
-            podcastRepo.updateReady(podcastId, timingsJson, filename, durationSeconds);
+            podcastRepo.updateReady(podcastId, timingsJson, filename, durationSeconds, title);
 
         } catch (Exception e) {
             log.error("[podcast] Generation failed for {}: {}", podcastId, e.getMessage(), e);
@@ -345,6 +346,21 @@ public class PodcastService {
         }
 
         return merged;
+    }
+
+    private String buildTitle(List<Map<String, Object>> timings) {
+        // Collect short Estonian texts (single words or 2-word phrases) as topic keywords
+        List<String> keywords = timings.stream()
+            .filter(t -> "et".equals(t.get("language")))
+            .map(t -> ((String) t.get("text")).trim())
+            .filter(t -> t.split("\\s+").length <= 2 && t.length() <= 20)
+            .distinct()
+            .limit(4)
+            .toList();
+
+        if (keywords.isEmpty()) return "Estonian Lesson";
+
+        return String.join(", ", keywords);
     }
 
     /**
