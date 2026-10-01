@@ -51,6 +51,9 @@ public class PodcastService {
             - Adjust complexity to the learner's CEFR level and quiz performance
             - Return ONLY valid JSON array, no markdown, no extra text
             - Do NOT mention the learner's stats/streak in the audio
+            - IMPORTANT: In non-Estonian segments, wrap Estonian words with <<>> markers
+              Example: "<<jõulud>> kelimesi Noel demektir" or "The word <<jõulud>> means Christmas"
+              This helps TTS pronounce Estonian words correctly in other languages.
             - MUST end with ]
             """;
 
@@ -79,6 +82,9 @@ public class PodcastService {
             - Prioritize words the learner struggles with most
             - Return ONLY valid JSON array, no markdown, no extra text
             - Do NOT mention the learner's stats/streak in the audio
+            - IMPORTANT: In non-Estonian segments, wrap Estonian words with <<>> markers
+              Example: "<<jõulud>> kelimesi Noel demektir" or "The word <<jõulud>> means Christmas"
+              This helps TTS pronounce Estonian words correctly in other languages.
             - MUST end with ]
             """;
 
@@ -104,6 +110,8 @@ public class PodcastService {
             - 8-10 segments max
             - Keep each text SHORT: 1 sentence
             - Return ONLY valid JSON array, no markdown, no extra text
+            - IMPORTANT: In non-Estonian segments, wrap Estonian words with <<>> markers
+              Example: "<<raamat>> kelimesini soyleyin" or "How do you say <<raamat>>?"
             - MUST end with ]
             """;
 
