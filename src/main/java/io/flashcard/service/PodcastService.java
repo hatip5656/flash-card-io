@@ -177,46 +177,45 @@ public class PodcastService {
 
             log.info("[podcast] {} Generating parts for user {} ({}, native={})", podcastId, chatId, level, nativeLang);
 
-            // Generate each part separately, synthesize, collect WAV bytes
-            List<byte[]> audioParts = new ArrayList<>();
+            // Generate each part separately, synthesize, collect results
+            List<PartResult> parts = new ArrayList<>();
 
-            // Part 1: Grammar
             log.info("[podcast] {} Part 1: Grammar", podcastId);
-            byte[] grammarAudio = generatePart(podcastId, "grammar",
+            var grammar = generatePart(podcastId, "grammar",
                 String.format(PART_GRAMMAR, nativeLang, learnerContext, langCode));
-            if (grammarAudio != null) audioParts.add(grammarAudio);
+            if (grammar != null) parts.add(grammar);
 
-            // Part 2: Vocabulary
             log.info("[podcast] {} Part 2: Vocabulary", podcastId);
-            byte[] vocabAudio = generatePart(podcastId, "vocabulary",
+            var vocab = generatePart(podcastId, "vocabulary",
                 String.format(PART_VOCABULARY, nativeLang, learnerContext, langCode));
-            if (vocabAudio != null) audioParts.add(vocabAudio);
+            if (vocab != null) parts.add(vocab);
 
-            // Part 3: Practice
             log.info("[podcast] {} Part 3: Practice", podcastId);
-            byte[] practiceAudio = generatePart(podcastId, "practice",
+            var practice = generatePart(podcastId, "practice",
                 String.format(PART_PRACTICE, nativeLang, learnerContext, langCode));
-            if (practiceAudio != null) audioParts.add(practiceAudio);
+            if (practice != null) parts.add(practice);
 
-            if (audioParts.isEmpty()) {
+            if (parts.isEmpty()) {
                 podcastRepo.updateStatus(podcastId, "failed", "All parts failed to generate");
                 return;
             }
 
-            // Concatenate WAV files
-            byte[] combined = concatenateWav(audioParts);
+            // Concatenate WAV files and merge timings with offset adjustment
+            byte[] combined = concatenateWav(parts.stream().map(PartResult::audio).toList());
+            List<Map<String, Object>> allTimings = mergeTimings(parts);
 
-            // Save
+            // Save audio + timings
             String filename = podcastId + ".wav";
             Path audioPath = podcastDir.resolve(filename);
             Files.write(audioPath, combined);
 
-            int durationSeconds = estimateDuration(combined);
-            log.info("[podcast] {} Complete: {} parts, ~{}s, {} bytes",
-                podcastId, audioParts.size(), durationSeconds, combined.length);
+            String timingsJson = objectMapper.writeValueAsString(allTimings);
 
-            // Store all scripts together
-            podcastRepo.updateReady(podcastId, null, filename, durationSeconds);
+            int durationSeconds = estimateDuration(combined);
+            log.info("[podcast] {} Complete: {} parts, {} subtitles, ~{}s",
+                podcastId, parts.size(), allTimings.size(), durationSeconds);
+
+            podcastRepo.updateReady(podcastId, timingsJson, filename, durationSeconds);
 
         } catch (Exception e) {
             log.error("[podcast] Generation failed for {}: {}", podcastId, e.getMessage(), e);
@@ -224,7 +223,9 @@ public class PodcastService {
         }
     }
 
-    private byte[] generatePart(String podcastId, String partName, String prompt) {
+    private record PartResult(byte[] audio, List<Map<String, Object>> timings) {}
+
+    private PartResult generatePart(String podcastId, String partName, String prompt) {
         try {
             String scriptJson = geminiService.chat(prompt, List.of(), "", 4096);
             if (scriptJson == null || scriptJson.isBlank()) {
@@ -240,14 +241,15 @@ public class PodcastService {
             }
 
             log.info("[podcast] {} {} - {} segments, sending to TTS", podcastId, partName, segments.size());
-            byte[] audio = callTtsPodcastApi(scriptJson);
-            if (audio == null) {
+            var result = callTtsPodcastApi(scriptJson);
+            if (result == null) {
                 log.warn("[podcast] {} {} - TTS failed", podcastId, partName);
                 return null;
             }
 
-            log.info("[podcast] {} {} - OK ({} bytes)", podcastId, partName, audio.length);
-            return audio;
+            log.info("[podcast] {} {} - OK ({} bytes, {} timings)", podcastId, partName,
+                result.audio.length, result.timings.size());
+            return result;
 
         } catch (Exception e) {
             log.warn("[podcast] {} {} - Error: {}", podcastId, partName, e.getMessage());
@@ -276,7 +278,8 @@ public class PodcastService {
         return repaired;
     }
 
-    private byte[] callTtsPodcastApi(String scriptJson) throws JsonProcessingException {
+    @SuppressWarnings("unchecked")
+    private PartResult callTtsPodcastApi(String scriptJson) throws JsonProcessingException {
         List<?> segments = objectMapper.readValue(scriptJson, List.class);
         Map<String, Object> request = Map.of(
             "segments", segments,
@@ -300,11 +303,48 @@ public class PodcastService {
                     errBody.substring(0, Math.min(500, errBody.length())));
                 return null;
             }
-            return response.body();
+
+            // Parse timings from header
+            List<Map<String, Object>> timings = List.of();
+            String timingsHeader = response.headers().firstValue("X-Segment-Timings").orElse(null);
+            if (timingsHeader != null) {
+                timings = objectMapper.readValue(timingsHeader, List.class);
+            }
+
+            return new PartResult(response.body(), timings);
         } catch (Exception e) {
             log.error("[podcast] TTS API call failed: {}", e.getMessage());
             return null;
         }
+    }
+
+    private List<Map<String, Object>> mergeTimings(List<PartResult> parts) {
+        List<Map<String, Object>> merged = new ArrayList<>();
+        int offsetMs = 0;
+
+        for (int p = 0; p < parts.size(); p++) {
+            var part = parts.get(p);
+
+            for (var timing : part.timings) {
+                Map<String, Object> adjusted = new LinkedHashMap<>(timing);
+                adjusted.put("start_ms", ((Number) timing.get("start_ms")).intValue() + offsetMs);
+                adjusted.put("end_ms", ((Number) timing.get("end_ms")).intValue() + offsetMs);
+                merged.add(adjusted);
+            }
+
+            // Offset = duration of this part's audio + 1s silence gap between parts
+            int partDuration = estimateDuration(part.audio) * 1000;
+            if (partDuration <= 0 && !part.timings.isEmpty()) {
+                // Fallback: use last timing end_ms
+                partDuration = ((Number) part.timings.get(part.timings.size() - 1).get("end_ms")).intValue();
+            }
+            offsetMs += partDuration;
+            if (p < parts.size() - 1) {
+                offsetMs += 1000; // 1s silence between parts
+            }
+        }
+
+        return merged;
     }
 
     /**

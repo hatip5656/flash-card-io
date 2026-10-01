@@ -1,5 +1,6 @@
 package io.flashcard.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.flashcard.model.Podcast;
 import io.flashcard.service.PodcastService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,9 +18,11 @@ import static io.flashcard.controller.UserController.getUserId;
 public class PodcastController {
 
     private final PodcastService podcastService;
+    private final ObjectMapper objectMapper;
 
-    public PodcastController(PodcastService podcastService) {
+    public PodcastController(PodcastService podcastService, ObjectMapper objectMapper) {
         this.podcastService = podcastService;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping("/generate")
@@ -72,6 +75,11 @@ public class PodcastController {
         map.put("createdAt", p.getCreatedAt() != null ? p.getCreatedAt().toString() : null);
         if ("ready".equals(p.getStatus()) && p.getAudioCacheKey() != null) {
             map.put("audioUrl", "https://wordagram.hatip.dev/podcasts/" + p.getAudioCacheKey());
+        }
+        if ("ready".equals(p.getStatus()) && p.getScript() != null) {
+            try {
+                map.put("subtitles", objectMapper.readValue(p.getScript(), List.class));
+            } catch (Exception ignored) {}
         }
         if (p.getErrorMessage() != null) {
             map.put("errorMessage", p.getErrorMessage());
