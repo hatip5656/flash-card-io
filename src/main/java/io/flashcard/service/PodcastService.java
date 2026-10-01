@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -24,62 +25,76 @@ public class PodcastService {
 
     private static final Logger log = LoggerFactory.getLogger(PodcastService.class);
 
-    private static final String PODCAST_PROMPT = """
-            You are creating a daily language learning podcast episode for an Estonian language learner.
-            The learner's native language is %s. Use their native language for explanations and translations.
+    // Each part is a separate Gemini call → separate TTS call → concatenated at the end
+    private static final String PART_GRAMMAR = """
+            You are a language teacher creating an AUDIO podcast segment about Estonian grammar.
+            The learner's native language is %s. Speak in their native language for explanations.
+            CEFR Level: %s
 
-            LEARNER PROFILE:
-            %s
+            Pick ONE grammar topic relevant to these weak/recent words: %s
 
-            Generate a podcast script as a JSON array of segments. Each segment has EXACTLY these 3 fields:
-            - "text": the spoken text (string)
-            - "language": one of "en", "et", or "tr" (use the learner's native language code for explanations)
-            - "pause_after_ms": pause in milliseconds after this segment (integer)
+            Generate a JSON array of segments teaching this grammar point with examples.
+            Each segment: {"text": "...", "language": "%s" or "et", "pause_after_ms": int}
 
-            EXAMPLE OUTPUT for a TURKISH-native learner (follow this format exactly):
-            [
-              {"text": "Gunluk Estonca dersine hos geldiniz.", "language": "tr", "pause_after_ms": 1000},
-              {"text": "raamat", "language": "et", "pause_after_ms": 2000},
-              {"text": "Kitap demektir.", "language": "tr", "pause_after_ms": 800},
-              {"text": "Ma loen raamatut.", "language": "et", "pause_after_ms": 1500},
-              {"text": "Ben kitap okuyorum.", "language": "tr", "pause_after_ms": 1000}
-            ]
-
-            EXAMPLE OUTPUT for an ENGLISH-native learner:
-            [
-              {"text": "Welcome to your daily Estonian lesson.", "language": "en", "pause_after_ms": 1000},
-              {"text": "raamat", "language": "et", "pause_after_ms": 2000},
-              {"text": "It means book.", "language": "en", "pause_after_ms": 800},
-              {"text": "Ma loen raamatut.", "language": "et", "pause_after_ms": 1500},
-              {"text": "I am reading a book.", "language": "en", "pause_after_ms": 1000}
-            ]
-
-            STRUCTURE:
-            1. Greeting (native language) — warm, reference their streak or recent progress
-            2. Today's Focus (native language) — introduce 3-5 words from their weak/missed list
-            3. For EACH word:
-               a. Introduce the word (native language): "Our next word is..."
-               b. Say the Estonian word (ET): clear pronunciation
-               c. Pause 2000ms for the listener to repeat
-               d. Use it in a sentence (ET): natural sentence with the word
-               e. Translate (native language): explain the sentence meaning
-               f. Pause 1000ms
-            4. Quick Review (mixed native+ET): rapid-fire all today's words with short pauses
-            5. Grammar Mini-Lesson (native+ET): one pattern relevant to the words covered
-            6. Closing (native language): encouragement, summary
+            Include:
+            - Brief intro of the grammar rule (native lang)
+            - 2-3 Estonian example sentences showing the rule
+            - Translation of each example (native lang)
+            - Pause after each Estonian sentence for the listener to repeat
 
             RULES:
-            - Target 15-25 segments total
-            - Estonian text: spell out ALL numbers (e.g., "kaks" not "2")
-            - Estonian text: keep sentences under 15 words
-            - Explanation text: keep sentences under 20 words
-            - Adjust complexity to the learner's CEFR level
-            - Be encouraging and personal
-            - Keep the TOTAL response under 15 segments to stay concise
-            - Keep each "text" field SHORT: max 1-2 sentences
-            - Do NOT wrap the JSON in markdown code fences
-            - Return ONLY the JSON array, no other text
-            - IMPORTANT: your response MUST be valid, complete JSON — always close the array with ]
+            - 8-12 segments max
+            - Keep each text SHORT: 1 sentence
+            - Estonian: spell out numbers, max 12 words per sentence
+            - Return ONLY valid JSON array, no markdown, no extra text
+            - MUST end with ]
+            """;
+
+    private static final String PART_VOCABULARY = """
+            You are a language teacher creating an AUDIO podcast segment teaching Estonian vocabulary.
+            The learner's native language is %s. Speak in their native language for explanations.
+            CEFR Level: %s
+
+            Teach these specific words: %s
+
+            Generate a JSON array of segments. For EACH word:
+            1. Say the Estonian word (et)
+            2. Pause 2000ms
+            3. Give the meaning (native lang)
+            4. Use it in a natural Estonian sentence (et)
+            5. Translate the sentence (native lang)
+            6. Pause 1500ms
+
+            Each segment: {"text": "...", "language": "%s" or "et", "pause_after_ms": int}
+
+            RULES:
+            - Keep each text SHORT: 1 sentence
+            - Estonian: spell out numbers, max 12 words per sentence
+            - Return ONLY valid JSON array, no markdown, no extra text
+            - MUST end with ]
+            """;
+
+    private static final String PART_PRACTICE = """
+            You are a language teacher creating an AUDIO podcast practice segment.
+            The learner's native language is %s. Speak in their native language for instructions.
+            CEFR Level: %s
+
+            Create a fill-in-the-blank / translation practice using these words: %s
+
+            Generate a JSON array of segments with:
+            - Prompt in native lang: "How do you say X in Estonian?" or "Complete: Ma ___ raamatut"
+            - Pause 3000ms for the listener to think
+            - Give the answer in Estonian (et)
+            - Pause 1000ms
+            - Repeat for 3-4 exercises
+
+            Each segment: {"text": "...", "language": "%s" or "et", "pause_after_ms": int}
+
+            RULES:
+            - 8-10 segments max
+            - Keep each text SHORT: 1 sentence
+            - Return ONLY valid JSON array, no markdown, no extra text
+            - MUST end with ]
             """;
 
     private final GeminiService geminiService;
@@ -131,7 +146,7 @@ public class PodcastService {
         podcast.setChatId(chatId);
         podcast.setTitle("Daily Estonian Lesson");
         podcast.setCefrLevel(level);
-        podcast.setDescription("Personalized lesson based on your learning progress");
+        podcast.setDescription("Grammar, vocabulary and practice");
 
         String podcastId = podcastRepo.create(podcast);
 
@@ -144,76 +159,57 @@ public class PodcastService {
         try {
             podcastRepo.updateStatus(podcastId, "generating", null);
 
-            // 1. Build learner context
             var prefs = subscriberRepo.getPreferences(chatId);
             String nativeLang = prefs != null ? prefs.getNativeLanguage() : "english";
-            String learnerContext = buildLearnerContext(chatId, level);
+            String langCode = "turkish".equals(nativeLang) ? "tr" : "en";
 
-            // 2. Generate script via Gemini (8192 tokens for full podcast script)
-            log.info("[podcast] Generating script for user {} ({}, native={})", chatId, level, nativeLang);
-            String prompt = String.format(PODCAST_PROMPT, nativeLang, learnerContext);
-            String scriptJson = geminiService.chat(prompt, List.of(), "", 8192);
+            // Gather words for the lesson
+            var weakWords = sentWordRepo.getWeakWords(chatId, 8);
+            var missedWords = quizRepo.getMostMissedWords(chatId, 5);
+            String wordList = buildWordList(weakWords, missedWords);
 
-            if (scriptJson == null || scriptJson.isBlank()) {
-                log.error("[podcast] {} Gemini returned null/blank", podcastId);
-                podcastRepo.updateStatus(podcastId, "failed", "AI did not generate a script");
+            log.info("[podcast] {} Generating parts for user {} ({}, native={})", podcastId, chatId, level, nativeLang);
+
+            // Generate each part separately, synthesize, collect WAV bytes
+            List<byte[]> audioParts = new ArrayList<>();
+
+            // Part 1: Grammar
+            log.info("[podcast] {} Part 1: Grammar", podcastId);
+            byte[] grammarAudio = generatePart(podcastId, "grammar",
+                String.format(PART_GRAMMAR, nativeLang, level, wordList, langCode));
+            if (grammarAudio != null) audioParts.add(grammarAudio);
+
+            // Part 2: Vocabulary
+            log.info("[podcast] {} Part 2: Vocabulary", podcastId);
+            byte[] vocabAudio = generatePart(podcastId, "vocabulary",
+                String.format(PART_VOCABULARY, nativeLang, level, wordList, langCode));
+            if (vocabAudio != null) audioParts.add(vocabAudio);
+
+            // Part 3: Practice
+            log.info("[podcast] {} Part 3: Practice", podcastId);
+            byte[] practiceAudio = generatePart(podcastId, "practice",
+                String.format(PART_PRACTICE, nativeLang, level, wordList, langCode));
+            if (practiceAudio != null) audioParts.add(practiceAudio);
+
+            if (audioParts.isEmpty()) {
+                podcastRepo.updateStatus(podcastId, "failed", "All parts failed to generate");
                 return;
             }
 
-            log.info("[podcast] {} Gemini raw response ({} chars): {}", podcastId, scriptJson.length(),
-                scriptJson.substring(0, Math.min(500, scriptJson.length())));
+            // Concatenate WAV files
+            byte[] combined = concatenateWav(audioParts);
 
-            // Clean up response: strip markdown fences if present
-            scriptJson = scriptJson.strip();
-            if (scriptJson.startsWith("```")) {
-                log.info("[podcast] {} Stripping markdown fences", podcastId);
-                scriptJson = scriptJson.replaceFirst("```[a-z]*\\n?", "").replaceFirst("\\n?```$", "").strip();
-            }
-
-            // Repair truncated JSON: if it doesn't end with ], try to close it
-            if (!scriptJson.strip().endsWith("]")) {
-                log.warn("[podcast] {} JSON appears truncated, last 100 chars: ...{}", podcastId,
-                    scriptJson.substring(Math.max(0, scriptJson.length() - 100)));
-            }
-            scriptJson = repairTruncatedJson(scriptJson);
-
-            // Validate JSON
-            List<?> segments;
-            try {
-                segments = objectMapper.readValue(scriptJson, List.class);
-            } catch (Exception e) {
-                log.error("[podcast] {} JSON parse failed: {}. Cleaned JSON: {}", podcastId, e.getMessage(),
-                    scriptJson.substring(0, Math.min(500, scriptJson.length())));
-                podcastRepo.updateStatus(podcastId, "failed", "Invalid script JSON: " + e.getMessage());
-                return;
-            }
-
-            if (segments.isEmpty()) {
-                log.error("[podcast] {} Script parsed but has 0 segments", podcastId);
-                podcastRepo.updateStatus(podcastId, "failed", "Script has no segments");
-                return;
-            }
-
-            log.info("[podcast] {} Script OK: {} segments, sending to TTS", podcastId, segments.size());
-
-            // 3. Call TTS service to synthesize
-            log.info("[podcast] Synthesizing {} segments for podcast {}", segments.size(), podcastId);
-            byte[] audio = callTtsPodcastApi(scriptJson);
-            if (audio == null) {
-                podcastRepo.updateStatus(podcastId, "failed", "TTS synthesis failed");
-                return;
-            }
-
-            // 4. Save audio file and update record
+            // Save
             String filename = podcastId + ".wav";
             Path audioPath = podcastDir.resolve(filename);
-            Files.write(audioPath, audio);
-            log.info("[podcast] {} Saved audio to {} ({} bytes)", podcastId, audioPath, audio.length);
+            Files.write(audioPath, combined);
 
-            int durationSeconds = estimateDuration(audio);
-            podcastRepo.updateReady(podcastId, scriptJson, filename, durationSeconds);
+            int durationSeconds = estimateDuration(combined);
+            log.info("[podcast] {} Complete: {} parts, ~{}s, {} bytes",
+                podcastId, audioParts.size(), durationSeconds, combined.length);
 
-            log.info("[podcast] Podcast {} ready ({} segments, ~{}s)", podcastId, segments.size(), durationSeconds);
+            // Store all scripts together
+            podcastRepo.updateReady(podcastId, null, filename, durationSeconds);
 
         } catch (Exception e) {
             log.error("[podcast] Generation failed for {}: {}", podcastId, e.getMessage(), e);
@@ -221,14 +217,64 @@ public class PodcastService {
         }
     }
 
+    private byte[] generatePart(String podcastId, String partName, String prompt) {
+        try {
+            String scriptJson = geminiService.chat(prompt, List.of(), "", 4096);
+            if (scriptJson == null || scriptJson.isBlank()) {
+                log.warn("[podcast] {} {} - Gemini returned null", podcastId, partName);
+                return null;
+            }
+
+            scriptJson = cleanJson(scriptJson);
+            List<?> segments = objectMapper.readValue(scriptJson, List.class);
+            if (segments.isEmpty()) {
+                log.warn("[podcast] {} {} - 0 segments", podcastId, partName);
+                return null;
+            }
+
+            log.info("[podcast] {} {} - {} segments, sending to TTS", podcastId, partName, segments.size());
+            byte[] audio = callTtsPodcastApi(scriptJson);
+            if (audio == null) {
+                log.warn("[podcast] {} {} - TTS failed", podcastId, partName);
+                return null;
+            }
+
+            log.info("[podcast] {} {} - OK ({} bytes)", podcastId, partName, audio.length);
+            return audio;
+
+        } catch (Exception e) {
+            log.warn("[podcast] {} {} - Error: {}", podcastId, partName, e.getMessage());
+            return null;
+        }
+    }
+
+    private String cleanJson(String raw) {
+        String json = raw.strip();
+        if (json.startsWith("```")) {
+            json = json.replaceFirst("```[a-z]*\\n?", "").replaceFirst("\\n?```$", "").strip();
+        }
+        return repairTruncatedJson(json);
+    }
+
+    private String repairTruncatedJson(String json) {
+        if (json.endsWith("]")) return json;
+        int lastBrace = json.lastIndexOf('}');
+        if (lastBrace <= 0) return json;
+        String repaired = json.substring(0, lastBrace + 1).strip();
+        if (repaired.endsWith(",")) {
+            repaired = repaired.substring(0, repaired.length() - 1);
+        }
+        repaired += "]";
+        log.warn("[podcast] Repaired truncated JSON (cut at position {})", lastBrace);
+        return repaired;
+    }
+
     private byte[] callTtsPodcastApi(String scriptJson) throws JsonProcessingException {
-        // Parse segments from Gemini output and wrap in podcast request
         List<?> segments = objectMapper.readValue(scriptJson, List.class);
         Map<String, Object> request = Map.of(
             "segments", segments,
             "output_sample_rate", 24000
         );
-
         String body = objectMapper.writeValueAsString(request);
 
         try {
@@ -247,7 +293,6 @@ public class PodcastService {
                     errBody.substring(0, Math.min(500, errBody.length())));
                 return null;
             }
-
             return response.body();
         } catch (Exception e) {
             log.error("[podcast] TTS API call failed: {}", e.getMessage());
@@ -255,34 +300,68 @@ public class PodcastService {
         }
     }
 
-    private String repairTruncatedJson(String json) {
-        if (json.endsWith("]")) return json;
+    /**
+     * Concatenate multiple WAV files (same sample rate, 16-bit mono) into one.
+     * Strips headers from all but the first, recalculates sizes.
+     */
+    private byte[] concatenateWav(List<byte[]> wavParts) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        // Find the last complete object (ends with })
-        int lastBrace = json.lastIndexOf('}');
-        if (lastBrace <= 0) return json;
+        // Write header from first file, we'll fix sizes at the end
+        byte[] first = wavParts.get(0);
+        out.write(first);
 
-        // Truncate to last complete object and close the array
-        String repaired = json.substring(0, lastBrace + 1).strip();
-        // Remove trailing comma if present
-        if (repaired.endsWith(",")) {
-            repaired = repaired.substring(0, repaired.length() - 1);
+        // Append raw PCM data from remaining files (skip 44-byte WAV header)
+        for (int i = 1; i < wavParts.size(); i++) {
+            byte[] part = wavParts.get(i);
+            if (part.length > 44) {
+                // Add 1 second of silence between parts (24000 samples * 2 bytes)
+                out.write(new byte[48000]);
+                out.write(part, 44, part.length - 44);
+            }
         }
-        repaired += "]";
 
-        log.warn("[podcast] Repaired truncated JSON (cut at position {})", lastBrace);
-        return repaired;
+        byte[] combined = out.toByteArray();
+
+        // Fix RIFF size (file size - 8)
+        int riffSize = combined.length - 8;
+        combined[4] = (byte) (riffSize & 0xFF);
+        combined[5] = (byte) ((riffSize >> 8) & 0xFF);
+        combined[6] = (byte) ((riffSize >> 16) & 0xFF);
+        combined[7] = (byte) ((riffSize >> 24) & 0xFF);
+
+        // Fix data chunk size (file size - 44)
+        int dataSize = combined.length - 44;
+        combined[40] = (byte) (dataSize & 0xFF);
+        combined[41] = (byte) ((dataSize >> 8) & 0xFF);
+        combined[42] = (byte) ((dataSize >> 16) & 0xFF);
+        combined[43] = (byte) ((dataSize >> 24) & 0xFF);
+
+        return combined;
     }
 
     private int estimateDuration(byte[] wavData) {
-        // WAV header: sample rate at offset 24 (4 bytes LE), data size at offset 40 (4 bytes LE)
         if (wavData.length < 44) return 0;
         int sampleRate = (wavData[24] & 0xFF) | ((wavData[25] & 0xFF) << 8)
                        | ((wavData[26] & 0xFF) << 16) | ((wavData[27] & 0xFF) << 24);
         int dataSize = (wavData[40] & 0xFF) | ((wavData[41] & 0xFF) << 8)
                      | ((wavData[42] & 0xFF) << 16) | ((wavData[43] & 0xFF) << 24);
         if (sampleRate <= 0) return 0;
-        return dataSize / (sampleRate * 2); // 16-bit mono
+        return dataSize / (sampleRate * 2);
+    }
+
+    private String buildWordList(List<Map<String, Object>> weakWords, List<Map<String, Object>> missedWords) {
+        Set<String> seen = new LinkedHashSet<>();
+        for (var w : weakWords) {
+            String word = (String) w.get("word_value");
+            String eng = (String) w.get("english");
+            seen.add("\"" + word + "\" (" + eng + ")");
+        }
+        for (var w : missedWords) {
+            String word = (String) w.get("estonian");
+            seen.add("\"" + word + "\"");
+        }
+        return seen.isEmpty() ? "common A1 words" : String.join(", ", seen);
     }
 
     public Optional<Podcast> getStatus(String podcastId) {
@@ -301,50 +380,5 @@ public class PodcastService {
 
     public List<Podcast> getHistory(long chatId, int limit) {
         return podcastRepo.findHistory(chatId, limit);
-    }
-
-    private String buildLearnerContext(long chatId, String level) {
-        var prefs = subscriberRepo.getPreferences(chatId);
-        String nativeLang = prefs != null ? prefs.getNativeLanguage() : "english";
-
-        int streak = activityRepo.getStreak(chatId);
-        var wordCounts = sentWordRepo.getWordCounts(chatId);
-        var quizStats = quizRepo.getQuizStats(chatId);
-
-        int seen = ((Number) wordCounts.get("seen")).intValue();
-        int mastered = ((Number) wordCounts.get("mastered")).intValue();
-        int totalQuizzes = ((Number) quizStats.get("total")).intValue();
-        int avgPct = (int) Math.round(((Number) quizStats.get("avg_pct")).doubleValue());
-
-        var weakWords = sentWordRepo.getWeakWords(chatId, 10);
-        String weakList = weakWords.stream()
-            .map(w -> "\"" + w.get("word_value") + "\" (" + w.get("english") + ")")
-            .collect(Collectors.joining(", "));
-
-        var missedWords = quizRepo.getMostMissedWords(chatId, 8);
-        String missedList = missedWords.stream()
-            .map(w -> "\"" + w.get("estonian") + "\" (missed " + w.get("mistakes") + "x)")
-            .collect(Collectors.joining(", "));
-
-        var vocab = sentWordRepo.getVocabularyCollection(chatId);
-        String recentList = vocab.stream()
-            .limit(15)
-            .map(w -> "\"" + w.get("word_value") + "\" (" + w.get("english") + ")")
-            .collect(Collectors.joining(", "));
-
-        int strongWords = ((Number) sentWordRepo.getLevelReadiness(chatId, level).get("strong")).intValue();
-        int totalForLevel = wordBankService.getWordsForLevel(level).size();
-
-        StringBuilder ctx = new StringBuilder();
-        ctx.append("CEFR Level: ").append(level).append("\n");
-        ctx.append("Native language: ").append(nativeLang).append("\n");
-        ctx.append("Streak: ").append(streak).append(" days\n");
-        ctx.append("Vocabulary: ").append(seen).append(" seen, ").append(mastered).append(" mastered\n");
-        ctx.append("Level progress: ").append(strongWords).append("/").append(totalForLevel).append(" strong words\n");
-        ctx.append("Quiz performance: ").append(totalQuizzes).append(" quizzes, avg ").append(avgPct).append("%\n");
-        if (!weakList.isEmpty()) ctx.append("Weak words (prioritize these): ").append(weakList).append("\n");
-        if (!missedList.isEmpty()) ctx.append("Most missed in quizzes: ").append(missedList).append("\n");
-        if (!recentList.isEmpty()) ctx.append("Recently learned: ").append(recentList).append("\n");
-        return ctx.toString();
     }
 }
