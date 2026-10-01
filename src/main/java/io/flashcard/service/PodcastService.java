@@ -210,7 +210,7 @@ public class PodcastService {
             Files.write(audioPath, combined);
 
             String timingsJson = objectMapper.writeValueAsString(allTimings);
-            String title = buildTitle(allTimings);
+            String title = generateTitle(allTimings);
 
             int durationSeconds = estimateDuration(combined);
             log.info("[podcast] {} Complete: {} parts, {} subtitles, ~{}s, title={}",
@@ -348,19 +348,25 @@ public class PodcastService {
         return merged;
     }
 
-    private String buildTitle(List<Map<String, Object>> timings) {
-        // Collect short Estonian texts (single words or 2-word phrases) as topic keywords
-        List<String> keywords = timings.stream()
-            .filter(t -> "et".equals(t.get("language")))
-            .map(t -> ((String) t.get("text")).trim())
-            .filter(t -> t.split("\\s+").length <= 2 && t.length() <= 20)
-            .distinct()
-            .limit(4)
-            .toList();
+    private String generateTitle(List<Map<String, Object>> timings) {
+        try {
+            String content = timings.stream()
+                .map(t -> "[" + t.get("language") + "] " + t.get("text"))
+                .collect(Collectors.joining("\n"));
 
-        if (keywords.isEmpty()) return "Estonian Lesson";
+            String title = geminiService.chat(
+                "Here is a podcast lesson transcript:\n" + content +
+                "\n\nGenerate a short, descriptive title (max 6 words) for this lesson. " +
+                "Return ONLY the title text, nothing else.",
+                List.of(), "");
 
-        return String.join(", ", keywords);
+            if (title != null && !title.isBlank()) {
+                return title.strip().replaceAll("^\"|\"$", "");
+            }
+        } catch (Exception e) {
+            log.warn("[podcast] Title generation failed: {}", e.getMessage());
+        }
+        return "Estonian Lesson";
     }
 
     /**
