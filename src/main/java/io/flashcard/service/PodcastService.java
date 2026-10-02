@@ -47,8 +47,9 @@ public class PodcastService {
             RULES:
             - 8-12 segments max
             - Keep each text SHORT: 1 sentence
-            - Estonian: spell out numbers, max 12 words per sentence
-            - Adjust complexity to the learner's CEFR level and quiz performance
+            - ALL text: spell out numbers and codes (say "B bir" not "B1", "iki" not "2")
+            - Estonian: max 12 words per sentence
+            - NEVER include level codes (A1, A2, B1, B2) or numbers in spoken text — spell them out
             - Return ONLY valid JSON array, no markdown, no extra text
             - Do NOT mention the learner's stats/streak in the audio
             - In non-Estonian segments (Turkish or English), wrap Estonian words with <<>> markers
