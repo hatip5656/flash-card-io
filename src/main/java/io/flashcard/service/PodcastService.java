@@ -47,9 +47,10 @@ public class PodcastService {
             RULES:
             - 8-12 segments max
             - Keep each text SHORT: 1 sentence
-            - ALL text: spell out numbers and codes (say "B bir" not "B1", "iki" not "2")
+            - ALL text must be speakable by TTS — it CANNOT read numbers, codes, or symbols.
+              Write numbers as words: 1->bir/one/üks, 2->iki/two/kaks, 3->üç/three/kolm, 5->beş/five/viis, 10->on/ten/kümme
+              Write codes as words: A1->A bir, B2->B iki. Never use digits or alphanumeric codes.
             - Estonian: max 12 words per sentence
-            - NEVER include level codes (A1, A2, B1, B2) or numbers in spoken text — spell them out
             - Return ONLY valid JSON array, no markdown, no extra text
             - Do NOT mention the learner's stats/streak in the audio
             - In non-Estonian segments (Turkish or English), wrap Estonian words with <<>> markers
