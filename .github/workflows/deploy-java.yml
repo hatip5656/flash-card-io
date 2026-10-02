@@ -90,6 +90,9 @@ jobs:
           EKILEX_API_KEY: ${{ secrets.EKILEX_API_KEY }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          ADMIN_JWT_SECRET: ${{ secrets.ADMIN_JWT_SECRET }}
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           DB_HOST: ${{ secrets.DB_HOST }}
@@ -122,6 +125,9 @@ jobs:
               --from-literal=PEXELS_API_KEY="${PEXELS_API_KEY:-}" \
               --from-literal=GEMINI_API_KEY="${GEMINI_API_KEY:-}" \
               --from-literal=DATABASE_URL="${DATABASE_URL}" \
+              --from-literal=ADMIN_USERNAME="${ADMIN_USERNAME:-admin}" \
+              --from-literal=ADMIN_PASSWORD="${ADMIN_PASSWORD:-changeme}" \
+              --from-literal=ADMIN_JWT_SECRET="${ADMIN_JWT_SECRET:-default-secret}" \
               --dry-run=client -o yaml | kubectl apply -f -
 
             sed -i "s|ghcr.io/hatip5656/flash-card-io-java:latest|ghcr.io/hatip5656/flash-card-io-java:${IMAGE_TAG:-latest}|g" java-deployment.yaml
