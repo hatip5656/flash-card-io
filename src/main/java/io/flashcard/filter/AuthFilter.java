@@ -18,7 +18,7 @@ public class AuthFilter implements Filter {
     );
 
     private static final Set<String> PUBLIC_PREFIXES = Set.of(
-        "/api/idioms/", "/api/audio/", "/api/admin/cache/"
+        "/api/idioms/", "/api/audio/", "/api/admin/"
     );
 
     @Override

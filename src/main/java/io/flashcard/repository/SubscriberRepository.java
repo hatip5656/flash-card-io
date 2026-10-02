@@ -190,4 +190,24 @@ public class SubscriberRepository {
         if (stored.containsKey("theme")) defaults.setTheme((String) stored.get("theme"));
         return defaults;
     }
+
+    public List<Map<String, Object>> getAllSubscribers(int limit, int offset, String level, Boolean active) {
+        StringBuilder sql = new StringBuilder("""
+            SELECT s.chat_id, s.channel, s.cefr_level, s.schedule, s.active, s.username, s.first_name,
+                   (SELECT COUNT(*) FROM sent_words sw WHERE sw.chat_id = s.chat_id) as words_learned
+            FROM subscribers s WHERE 1=1
+            """);
+        if (level != null) sql.append(" AND s.cefr_level = '").append(level.replace("'", "")).append("'");
+        if (active != null) sql.append(" AND s.active = ").append(active);
+        sql.append(" ORDER BY s.chat_id DESC LIMIT ? OFFSET ?");
+        return jdbc.queryForList(sql.toString(), limit, offset);
+    }
+
+    public int countSubscribers(String level, Boolean active) {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM subscribers WHERE 1=1");
+        if (level != null) sql.append(" AND cefr_level = '").append(level.replace("'", "")).append("'");
+        if (active != null) sql.append(" AND active = ").append(active);
+        Integer count = jdbc.queryForObject(sql.toString(), Integer.class);
+        return count != null ? count : 0;
+    }
 }

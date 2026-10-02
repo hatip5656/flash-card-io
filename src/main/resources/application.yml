@@ -42,3 +42,8 @@ app:
   cron-timezone: ${CRON_TIMEZONE:Europe/Tallinn}
   cron-schedule: ${CRON_SCHEDULE:0 9 * * *}
   cefr-levels: ${CEFR_LEVELS:A1,A2}
+
+admin:
+  username: ${ADMIN_USERNAME:admin}
+  password: ${ADMIN_PASSWORD:changeme}
+  jwt-secret: ${ADMIN_JWT_SECRET:default-secret-change-in-production}

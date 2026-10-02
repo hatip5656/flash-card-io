@@ -449,6 +449,68 @@ public class PodcastService {
         return podcastRepo.findHistory(chatId, limit);
     }
 
+    /**
+     * Generate podcast from admin-provided raw segments JSON (no Gemini).
+     */
+    public String generateFromScript(String title, String cefrLevel, String segmentsJson) {
+        Podcast podcast = new Podcast();
+        podcast.setChatId(0); // admin-generated
+        podcast.setTitle(title);
+        podcast.setCefrLevel(cefrLevel);
+        podcast.setDescription("Admin-generated podcast");
+
+        String podcastId = podcastRepo.create(podcast);
+
+        Thread.startVirtualThread(() -> {
+            try {
+                podcastRepo.updateStatus(podcastId, "generating", null);
+
+                log.info("[podcast] {} Admin generating from script", podcastId);
+                var result = callTtsPodcastApi(segmentsJson);
+                if (result == null) {
+                    podcastRepo.updateStatus(podcastId, "failed", "TTS synthesis failed");
+                    return;
+                }
+
+                String filename = podcastId + ".wav";
+                Path audioPath = podcastDir.resolve(filename);
+                Files.write(audioPath, result.audio());
+
+                int durationSeconds = estimateDuration(result.audio());
+                String timingsJson = objectMapper.writeValueAsString(result.timings());
+
+                podcastRepo.updateReady(podcastId, timingsJson, filename, durationSeconds, title);
+                log.info("[podcast] {} Admin podcast ready (~{}s)", podcastId, durationSeconds);
+
+            } catch (Exception e) {
+                log.error("[podcast] {} Admin generation failed: {}", podcastId, e.getMessage(), e);
+                podcastRepo.updateStatus(podcastId, "failed", e.getMessage());
+            }
+        });
+
+        return podcastId;
+    }
+
+    public int assignToUsers(String podcastId, List<Long> chatIds) {
+        int count = 0;
+        for (long chatId : chatIds) {
+            podcastRepo.cloneForUser(podcastId, chatId);
+            count++;
+        }
+        return count;
+    }
+
+    public int assignToAll(String podcastId) {
+        var allUsers = subscriberRepo.getAllSubscribers(10000, 0, null, true);
+        int count = 0;
+        for (var user : allUsers) {
+            long chatId = ((Number) user.get("chat_id")).longValue();
+            podcastRepo.cloneForUser(podcastId, chatId);
+            count++;
+        }
+        return count;
+    }
+
     private String buildLearnerContext(long chatId, String level) {
         var prefs = subscriberRepo.getPreferences(chatId);
         String nativeLang = prefs != null ? prefs.getNativeLanguage() : "english";

@@ -98,6 +98,40 @@ public class PodcastRepository {
             .single() > 0;
     }
 
+    public List<Podcast> findAll(int limit, int offset) {
+        return jdbc.sql("SELECT * FROM podcasts ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
+            .param("limit", limit)
+            .param("offset", offset)
+            .query(this::mapRow)
+            .list();
+    }
+
+    public int countAll() {
+        return jdbc.sql("SELECT COUNT(*) FROM podcasts")
+            .query(Integer.class)
+            .single();
+    }
+
+    public void deleteById(String id) {
+        jdbc.sql("DELETE FROM podcasts WHERE id = :id").param("id", id).update();
+    }
+
+    public String cloneForUser(String sourcePodcastId, long chatId) {
+        String newId = UUID.randomUUID().toString();
+        jdbc.sql("""
+            INSERT INTO podcasts (id, chat_id, title, description, script, audio_cache_key,
+                duration_seconds, cefr_level, status, created_at)
+            SELECT :newId, :chatId, title, description, script, audio_cache_key,
+                duration_seconds, cefr_level, status, NOW()
+            FROM podcasts WHERE id = :sourceId AND status = 'ready'
+            """)
+            .param("newId", newId)
+            .param("chatId", chatId)
+            .param("sourceId", sourcePodcastId)
+            .update();
+        return newId;
+    }
+
     private Podcast mapRow(ResultSet rs, int rowNum) throws SQLException {
         Podcast p = new Podcast();
         p.setId(rs.getString("id"));

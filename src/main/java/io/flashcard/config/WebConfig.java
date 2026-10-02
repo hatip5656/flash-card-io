@@ -12,6 +12,6 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/api/**")
             .allowedOrigins("*")
             .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
-            .allowedHeaders("Content-Type", "X-User-Id");
+            .allowedHeaders("Content-Type", "X-User-Id", "Authorization", "X-Cache-Secret");
     }
 }
