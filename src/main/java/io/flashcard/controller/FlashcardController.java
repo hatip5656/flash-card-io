@@ -23,13 +23,16 @@ public class FlashcardController {
     private final SentWordRepository sentWordRepo;
     private final GrammarRepository grammarRepo;
     private final GrammarBankService grammarBankService;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbc;
 
     public FlashcardController(SubscriberRepository subscriberRepo, SentWordRepository sentWordRepo,
-                               GrammarRepository grammarRepo, GrammarBankService grammarBankService) {
+                               GrammarRepository grammarRepo, GrammarBankService grammarBankService,
+                               org.springframework.jdbc.core.JdbcTemplate jdbc) {
         this.subscriberRepo = subscriberRepo;
         this.sentWordRepo = sentWordRepo;
         this.grammarRepo = grammarRepo;
         this.grammarBankService = grammarBankService;
+        this.jdbc = jdbc;
     }
 
     @GetMapping("/flashcards/next")
@@ -72,13 +75,28 @@ public class FlashcardController {
         var all = grammarBankService.getAllLessons().stream()
             .filter(l -> l.cefrLevel().equals(level) || compareLevels(l.cefrLevel(), level) < 0)
             .limit(Math.min(limit, 10))
-            .map(l -> Map.<String, Object>of(
-                "id", l.id(),
-                "topic", l.topic(),
-                "topicTr", l.topicTr() != null ? l.topicTr() : l.topic(),
-                "cefrLevel", l.cefrLevel(),
-                "content", l.content(),
-                "contentTr", l.contentTr() != null ? l.contentTr() : l.content()))
+            .<Map<String, Object>>map(l -> {
+                var map = new java.util.LinkedHashMap<String, Object>();
+                map.put("id", l.id());
+                map.put("topic", l.topic());
+                map.put("topicTr", l.topicTr() != null ? l.topicTr() : l.topic());
+                map.put("cefrLevel", l.cefrLevel());
+                map.put("content", l.content());
+                map.put("contentTr", l.contentTr() != null ? l.contentTr() : l.content());
+                // Include podcast URL if grammar lesson has an associated podcast
+                try {
+                    var podcasts = jdbc.queryForList(
+                        "SELECT p.audio_cache_key FROM grammar_lessons g JOIN podcasts p ON p.id = g.podcast_id WHERE g.id = ? AND p.status = 'ready'",
+                        l.id());
+                    if (!podcasts.isEmpty()) {
+                        String audioKey = (String) podcasts.get(0).get("audio_cache_key");
+                        if (audioKey != null) {
+                            map.put("podcastUrl", "https://wordagram.hatip.dev/podcasts/" + audioKey);
+                        }
+                    }
+                } catch (Exception ignored) {}
+                return map;
+            })
             .toList();
         return all;
     }

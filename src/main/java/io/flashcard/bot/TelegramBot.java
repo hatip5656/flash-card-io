@@ -48,6 +48,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
     private final DeliveryService deliveryService;
     private final QuizRepository quizRepo;
     private final GeminiService geminiService;
+    private final io.flashcard.service.AccountLinkService linkService;
 
     private TelegramClient telegramClient;
     private TelegramBotsLongPollingApplication botApplication;
@@ -60,7 +61,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
                        GrammarRepository grammarRepo, WordBankService wordBankService,
                        WordDbRepository wordDbRepo,
                        ScheduleService scheduleService, DeliveryService deliveryService,
-                       QuizRepository quizRepo, GeminiService geminiService) {
+                       QuizRepository quizRepo, GeminiService geminiService,
+                       io.flashcard.service.AccountLinkService linkService) {
         this.appProperties = appProperties;
         this.subscriberRepo = subscriberRepo;
         this.activityRepo = activityRepo;
@@ -72,6 +74,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
         this.deliveryService = deliveryService;
         this.quizRepo = quizRepo;
         this.geminiService = geminiService;
+        this.linkService = linkService;
     }
 
     @PostConstruct
@@ -98,6 +101,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
                     BotCommand.builder().command("schedule").description("Change schedule").build(),
                     BotCommand.builder().command("search").description("Search a word").build(),
                     BotCommand.builder().command("add").description("Add a new word").build(),
+                    BotCommand.builder().command("connect").description("Connect to mobile app").build(),
                     BotCommand.builder().command("stop").description("Stop receiving flashcards").build()))
                 .build());
             log.info("[bot] Bot commands registered");
@@ -187,6 +191,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
                     sendText(chatId, "Stopped. Send /start to resume.");
                 }
                 case "/quiz" -> sendText(chatId, "Use the mobile app for quizzes, or tap the Quiz button in settings.");
+                case "/connect" -> handleConnect(chatId, text);
                 default -> log.debug("[bot] Unknown command from chat={}: {}", chatId, command);
             }
         } catch (Exception e) {
@@ -566,6 +571,29 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
             telegramClient.execute(SendChatAction.builder().chatId(chatId).action("typing").build());
         } catch (Exception e) {
             log.debug("[telegram] Failed to send typing to chat={}: {}", chatId, e.getMessage());
+        }
+    }
+
+    private void handleConnect(long chatId, String text) {
+        String[] parts = text.trim().split("\\s+");
+        if (parts.length < 2) {
+            sendText(chatId, "To connect your Telegram account to the mobile app:\n\n" +
+                "1. Open the mobile app\n" +
+                "2. Go to Profile → Connect Telegram\n" +
+                "3. Copy the 6-digit code\n" +
+                "4. Send: /connect <code>\n\n" +
+                "Example: /connect 482916");
+            return;
+        }
+
+        String code = parts[1].trim();
+        var result = linkService.connectTelegram(chatId, code);
+        if (result.isPresent()) {
+            sendText(chatId, "✅ Account linked successfully!\n\n" +
+                "Your Telegram is now connected to your mobile account. " +
+                "Daily podcasts will be delivered here.");
+        } else {
+            sendText(chatId, "❌ Invalid or expired code. Please generate a new code in the mobile app.");
         }
     }
 

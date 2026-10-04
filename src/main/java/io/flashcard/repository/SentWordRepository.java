@@ -83,6 +83,15 @@ public class SentWordRepository {
         ef = ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
         if (ef < 1.3) ef = 1.3;
 
+        // Recovery boost: accelerate weak word recovery when answered well
+        if (ef < 1.8 && quality >= 4) {
+            ef += 0.15; // Extra boost for weak words answered correctly
+        }
+        // Force exit weak status after 3+ consecutive correct answers while weak
+        if (ef < 1.8 && reps >= 3) {
+            ef = 1.8;
+        }
+
         jdbc.update(
             """
             UPDATE sent_words SET ease_factor = ?, interval_days = ?, repetitions = ?,

@@ -38,7 +38,7 @@ class FlashcardControllerTest {
         grammarRepo = mock(GrammarRepository.class);
         grammarBankService = mock(GrammarBankService.class);
         mvc = MockMvcBuilders.standaloneSetup(
-                new FlashcardController(subscriberRepo, sentWordRepo, grammarRepo, grammarBankService))
+                new FlashcardController(subscriberRepo, sentWordRepo, grammarRepo, grammarBankService, mock(org.springframework.jdbc.core.JdbcTemplate.class)))
             .addFilters(new AuthFilter())
             .build();
     }

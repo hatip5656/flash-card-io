@@ -3,6 +3,7 @@ package io.flashcard.controller;
 import io.flashcard.model.UserPreferences;
 import io.flashcard.repository.ActivityRepository;
 import io.flashcard.repository.SubscriberRepository;
+import io.flashcard.service.AccountLinkService;
 import io.flashcard.service.ScheduleService;
 import io.flashcard.service.WordBankService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,13 +25,16 @@ public class UserController {
     private final ActivityRepository activityRepo;
     private final ScheduleService scheduleService;
     private final WordBankService wordBankService;
+    private final AccountLinkService linkService;
 
     public UserController(SubscriberRepository subscriberRepo, ActivityRepository activityRepo,
-                          ScheduleService scheduleService, WordBankService wordBankService) {
+                          ScheduleService scheduleService, WordBankService wordBankService,
+                          AccountLinkService linkService) {
         this.subscriberRepo = subscriberRepo;
         this.activityRepo = activityRepo;
         this.scheduleService = scheduleService;
         this.wordBankService = wordBankService;
+        this.linkService = linkService;
     }
 
     @PostMapping("/users")
@@ -164,6 +168,28 @@ public class UserController {
     @GetMapping("/schedules")
     public List<Map<String, Object>> getSchedulePresets() {
         return scheduleService.getSchedulePresets();
+    }
+
+    // ── Account Linking ──
+
+    @PostMapping("/users/me/link-code")
+    public ResponseEntity<?> generateLinkCode(HttpServletRequest request) {
+        long chatId = getUserId(request);
+        String code = linkService.generateLinkCode(chatId);
+        return ResponseEntity.ok(Map.of("code", code, "expiresInSeconds", 300));
+    }
+
+    @GetMapping("/users/me/link-status")
+    public ResponseEntity<?> getLinkStatus(HttpServletRequest request) {
+        long chatId = getUserId(request);
+        return ResponseEntity.ok(linkService.getLinkStatus(chatId));
+    }
+
+    @DeleteMapping("/users/me/link")
+    public ResponseEntity<?> unlinkAccount(HttpServletRequest request) {
+        long chatId = getUserId(request);
+        linkService.unlink(chatId);
+        return ResponseEntity.ok(Map.of("unlinked", true));
     }
 
     static long getUserId(HttpServletRequest request) {

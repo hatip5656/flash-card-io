@@ -3,6 +3,7 @@ package io.flashcard.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.flashcard.model.Podcast;
 import io.flashcard.repository.PodcastRepository;
+import io.flashcard.repository.SubscriberRepository;
 import io.flashcard.service.PodcastService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +19,14 @@ public class AdminPodcastController {
 
     private final PodcastService podcastService;
     private final PodcastRepository podcastRepo;
+    private final SubscriberRepository subscriberRepo;
     private final ObjectMapper objectMapper;
 
     public AdminPodcastController(PodcastService podcastService, PodcastRepository podcastRepo,
-                                  ObjectMapper objectMapper) {
+                                  SubscriberRepository subscriberRepo, ObjectMapper objectMapper) {
         this.podcastService = podcastService;
         this.podcastRepo = podcastRepo;
+        this.subscriberRepo = subscriberRepo;
         this.objectMapper = objectMapper;
     }
 
@@ -116,6 +119,12 @@ public class AdminPodcastController {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("id", p.getId());
         map.put("chatId", p.getChatId());
+        if (p.getChatId() == 0) {
+            map.put("userName", "Admin");
+        } else {
+            String name = subscriberRepo.getFirstName(p.getChatId());
+            map.put("userName", name != null ? name : "User " + p.getChatId());
+        }
         map.put("title", p.getTitle());
         map.put("description", p.getDescription());
         map.put("status", p.getStatus());

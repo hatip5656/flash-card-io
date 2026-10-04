@@ -38,7 +38,7 @@ class UserControllerTest {
         scheduleService = mock(ScheduleService.class);
         wordBankService = mock(WordBankService.class);
         mvc = MockMvcBuilders.standaloneSetup(
-                new UserController(subscriberRepo, activityRepo, scheduleService, wordBankService))
+                new UserController(subscriberRepo, activityRepo, scheduleService, wordBankService, mock(io.flashcard.service.AccountLinkService.class)))
             .addFilters(new AuthFilter())
             .build();
     }
