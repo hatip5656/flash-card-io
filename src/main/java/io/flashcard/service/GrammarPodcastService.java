@@ -242,8 +242,8 @@ public class GrammarPodcastService {
      * Manually trigger generation for a specific lesson.
      */
     public void triggerManual(String lessonId) {
-        // Just clear the podcast_id so the scheduler picks it up next
         jdbc.update("UPDATE grammar_lessons SET podcast_id = NULL WHERE id = ?", lessonId);
         log.info("[grammar-podcast] Manual trigger for lesson {}", lessonId);
     }
+
 }

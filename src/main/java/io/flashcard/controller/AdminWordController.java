@@ -120,6 +120,22 @@ public class AdminWordController {
         return ResponseEntity.ok(Map.of("added", added.size(), "skipped", skipped.size(), "words", added));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<?> listAllWords(
+            @RequestParam(defaultValue = "50") int limit,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(required = false) String level) {
+        String filter = level != null && VALID_LEVELS.contains(level) ? " WHERE w.cefr_level = '" + level + "'" : "";
+        var words = jdbc.queryForList(
+            "SELECT w.id, w.estonian, w.english, w.turkish, w.cefr_level, " +
+            "(SELECT COUNT(*) FROM word_sentences s WHERE s.word_id = w.id) AS sentence_count " +
+            "FROM words w" + filter + " ORDER BY w.cefr_level, w.estonian LIMIT ? OFFSET ?",
+            limit, offset);
+        int total = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM words w" + filter, Integer.class);
+        return ResponseEntity.ok(Map.of("items", words, "total", total));
+    }
+
     @GetMapping("/untranslated")
     public Map<String, Object> getUntranslated(@RequestParam(required = false) String level,
                                                 @RequestParam(defaultValue = "50") int limit) {
