@@ -79,6 +79,15 @@ public class AdminGrammarController {
         if (audioKey != null) {
             lesson.put("audioUrl", "https://wordagram.hatip.dev/podcasts/" + audioKey);
         }
+        // Parse JSONB fields into proper JSON for the frontend
+        for (String key : List.of("podcast_timings", "podcast_script")) {
+            Object obj = lesson.get(key);
+            if (obj != null) {
+                try {
+                    lesson.put(key, objectMapper.readValue(obj.toString(), List.class));
+                } catch (Exception ignored) {}
+            }
+        }
         return ResponseEntity.ok(lesson);
     }
 

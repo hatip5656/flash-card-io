@@ -11,7 +11,8 @@ import java.util.*;
 
 /**
  * Scheduled service that discovers new candidate words from Ekilex API.
- * Runs every 5 hours, fetches random words for each CEFR level.
+ * Runs every 5 hours. Uses systematic two-letter prefix crawling with pattern
+ * rotation to explore the full Ekilex vocabulary over time.
  */
 @Service
 public class CandidateDiscoveryService {
@@ -19,7 +20,8 @@ public class CandidateDiscoveryService {
     private static final Logger log = LoggerFactory.getLogger(CandidateDiscoveryService.class);
     private static final String JOB_NAME = "candidate-discovery";
     private static final String[] LEVELS = {"A1", "A2", "B1", "B2"};
-    private static final int WORDS_PER_LEVEL = 5;
+    private static final int WORDS_PER_LEVEL = 8;
+    private static final int MAX_ATTEMPTS_PER_LEVEL = 30;
 
     private final EkilexService ekilexService;
     private final AppProperties appProperties;
@@ -36,8 +38,21 @@ public class CandidateDiscoveryService {
         this.wordBankService = wordBankService;
     }
 
+    /** Get the next pattern index, rotating through all patterns across runs */
+    private int getNextPatternIndex() {
+        try {
+            Integer idx = jdbc.queryForObject(
+                "SELECT COALESCE((items_processed + items_failed), 0) FROM scheduler_status WHERE job_name = ?",
+                Integer.class, JOB_NAME);
+            return idx != null ? idx : 0;
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     /**
-     * Runs every 5 hours. Discovers new words from Ekilex and adds as candidates.
+     * Runs every 5 hours. Uses systematic pattern rotation to discover new words.
+     * Each run tries multiple different two-letter prefixes to maximize coverage.
      */
     @Scheduled(fixedDelay = 18000000, initialDelay = 300000) // 5h, 5min initial delay
     public void discoverCandidates() {
@@ -59,39 +74,65 @@ public class CandidateDiscoveryService {
         int totalSkipped = 0;
 
         try {
-            Set<String> existingWords = new HashSet<>(
+            // Build combined exclusion set — words + non-rejected candidates
+            Set<String> excludeWords = new HashSet<>(
                 jdbc.queryForList("SELECT estonian FROM words", String.class));
-            Set<String> existingCandidates = new HashSet<>(
+            excludeWords.addAll(
                 jdbc.queryForList("SELECT estonian FROM candidate_words WHERE status != 'rejected'", String.class));
+
+            int patternBase = getNextPatternIndex();
+            int patternCount = ekilexService.getPatternCount();
 
             for (String level : LEVELS) {
                 int added = 0;
-                for (int attempt = 0; attempt < WORDS_PER_LEVEL * 3 && added < WORDS_PER_LEVEL; attempt++) {
+                int attempts = 0;
+                // Try different patterns for each level
+                while (added < WORDS_PER_LEVEL && attempts < MAX_ATTEMPTS_PER_LEVEL) {
+                    // Rotate through patterns systematically — each level uses different offsets
+                    int patternIdx = (patternBase + attempts * LEVELS.length + Arrays.asList(LEVELS).indexOf(level)) % patternCount;
+                    String pattern = ekilexService.getPattern(patternIdx);
+                    attempts++;
+
                     try {
-                        var word = ekilexService.getRandomWordForLevel(level, existingWords, apiKey);
+                        var word = ekilexService.getRandomWordForLevel(level, excludeWords, apiKey, pattern);
                         if (word == null || word.english() == null) continue;
 
                         String estonian = word.wordValue().toLowerCase();
-                        if (existingWords.contains(estonian) || existingCandidates.contains(estonian)) {
+                        if (excludeWords.contains(estonian)) {
                             totalSkipped++;
                             continue;
                         }
 
-                        // Insert as candidate
+                        // Insert candidate word
                         jdbc.update("""
                             INSERT INTO candidate_words (estonian, english, cefr_level, status)
                             VALUES (?, ?, ?, 'pending')
                             ON CONFLICT (estonian) DO NOTHING
                             """, estonian, word.english(), level);
 
-                        existingCandidates.add(estonian);
+                        // Save example sentences from Ekilex
+                        if (word.usages() != null && !word.usages().isEmpty()) {
+                            Integer candidateId = jdbc.queryForObject(
+                                "SELECT id FROM candidate_words WHERE estonian = ?", Integer.class, estonian);
+                            if (candidateId != null) {
+                                int sortOrder = 0;
+                                for (var usage : word.usages()) {
+                                    jdbc.update("""
+                                        INSERT INTO candidate_sentences (candidate_id, estonian, english, sort_order)
+                                        VALUES (?, ?, ?, ?)
+                                        """, candidateId, usage.estonian(), usage.english(), sortOrder++);
+                                }
+                            }
+                        }
+
+                        excludeWords.add(estonian);
                         added++;
                         totalAdded++;
                     } catch (Exception e) {
-                        log.debug("[candidate-discovery] Error fetching word for {}: {}", level, e.getMessage());
+                        log.debug("[candidate-discovery] Error with pattern {} for {}: {}", pattern, level, e.getMessage());
                     }
                 }
-                log.info("[candidate-discovery] {} level: {} new candidates", level, added);
+                log.info("[candidate-discovery] {} level: {} new candidates ({} patterns tried)", level, added, attempts);
             }
 
             long duration = System.currentTimeMillis() - start;
@@ -141,13 +182,20 @@ public class CandidateDiscoveryService {
             "SELECT * FROM scheduler_status WHERE job_name = ?", JOB_NAME);
 
         int totalWords = jdbc.queryForObject("SELECT COUNT(*) FROM words", Integer.class);
-        int totalCandidates = jdbc.queryForObject(
+        int pendingCandidates = jdbc.queryForObject(
             "SELECT COUNT(*) FROM candidate_words WHERE status = 'pending'", Integer.class);
+        int totalCandidates = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM candidate_words", Integer.class);
+        int withSentences = jdbc.queryForObject(
+            "SELECT COUNT(DISTINCT candidate_id) FROM candidate_sentences", Integer.class);
 
         Map<String, Object> result = new LinkedHashMap<>();
         if (!rows.isEmpty()) result.putAll(rows.get(0));
         result.put("totalWords", totalWords);
-        result.put("pendingCandidates", totalCandidates);
+        result.put("pendingCandidates", pendingCandidates);
+        result.put("totalCandidates", totalCandidates);
+        result.put("candidatesWithSentences", withSentences);
+        result.put("totalPatterns", ekilexService.getPatternCount());
         return result;
     }
 }

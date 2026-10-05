@@ -194,7 +194,8 @@ public class SubscriberRepository {
     public List<Map<String, Object>> getAllSubscribers(int limit, int offset, String level, Boolean active) {
         StringBuilder sql = new StringBuilder("""
             SELECT s.chat_id, s.channel, s.cefr_level, s.schedule, s.active, s.username, s.first_name,
-                   (SELECT COUNT(*) FROM sent_words sw WHERE sw.chat_id = s.chat_id) as words_learned
+                   (SELECT COUNT(*) FROM sent_words sw WHERE sw.chat_id = s.chat_id) as words_learned,
+                   (SELECT MAX(activity_date) FROM activity_log al WHERE al.chat_id = s.chat_id) as last_active
             FROM subscribers s WHERE 1=1
             """);
         if (level != null) sql.append(" AND s.cefr_level = '").append(level.replace("'", "")).append("'");

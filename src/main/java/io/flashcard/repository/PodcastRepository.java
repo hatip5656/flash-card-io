@@ -112,6 +112,22 @@ public class PodcastRepository {
             .single();
     }
 
+    public List<Podcast> findByChatId(long chatId, int limit, int offset) {
+        return jdbc.sql("SELECT * FROM podcasts WHERE chat_id = :chatId ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
+            .param("chatId", chatId)
+            .param("limit", limit)
+            .param("offset", offset)
+            .query(this::mapRow)
+            .list();
+    }
+
+    public int countByChatId(long chatId) {
+        return jdbc.sql("SELECT COUNT(*) FROM podcasts WHERE chat_id = :chatId")
+            .param("chatId", chatId)
+            .query(Integer.class)
+            .single();
+    }
+
     public void deleteById(String id) {
         jdbc.sql("DELETE FROM podcasts WHERE id = :id").param("id", id).update();
     }

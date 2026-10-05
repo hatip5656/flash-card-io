@@ -33,9 +33,17 @@ public class AdminPodcastController {
     @GetMapping
     public ResponseEntity<?> listAll(
             @RequestParam(defaultValue = "50") int limit,
-            @RequestParam(defaultValue = "0") int offset) {
-        var items = podcastRepo.findAll(limit, offset);
-        int total = podcastRepo.countAll();
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(required = false) Long chatId) {
+        List<Podcast> items;
+        int total;
+        if (chatId != null) {
+            items = podcastRepo.findByChatId(chatId, limit, offset);
+            total = podcastRepo.countByChatId(chatId);
+        } else {
+            items = podcastRepo.findAll(limit, offset);
+            total = podcastRepo.countAll();
+        }
         List<Map<String, Object>> summaries = items.stream().map(this::toSummary).toList();
         return ResponseEntity.ok(Map.of("items", summaries, "total", total));
     }

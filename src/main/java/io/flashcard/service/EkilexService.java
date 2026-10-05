@@ -30,10 +30,20 @@ public class EkilexService {
     private static final String LANG_EST = "est";
     private static final String LANG_ENG = "eng";
     private static final Set<String> VALID_LEVELS = Set.of("A1", "A2", "B1", "B2");
-    private static final String[] SEARCH_PATTERNS = {
-        "a*", "e*", "i*", "k*", "l*", "m*", "n*", "o*", "p*", "r*",
-        "s*", "t*", "u*", "v*", "õ*", "ä*", "ö*", "ü*", "h*", "j*"
-    };
+    // Two-letter prefixes for systematic vocabulary crawling
+    private static final String[] VOWELS = {"a", "e", "i", "o", "u", "õ", "ä", "ö", "ü"};
+    private static final String[] CONSONANTS = {"h", "j", "k", "l", "m", "n", "p", "r", "s", "t", "v"};
+    private static final String[] SEARCH_PATTERNS;
+    static {
+        List<String> patterns = new ArrayList<>();
+        // Consonant + vowel (most common Estonian word starts: ka, ke, ki, ko, ku, la, le...)
+        for (String c : CONSONANTS) for (String v : VOWELS) patterns.add(c + v + "*");
+        // Vowel + consonant (al, an, ar, el, en, er, il...)
+        for (String v : VOWELS) for (String c : CONSONANTS) patterns.add(v + c + "*");
+        // Vowel + vowel (aa, ea, ai, au, ei, oi, ui, õi...)
+        for (String v1 : VOWELS) for (String v2 : VOWELS) patterns.add(v1 + v2 + "*");
+        SEARCH_PATTERNS = patterns.toArray(new String[0]);
+    }
 
     private final ObjectMapper objectMapper;
     private final HttpClient httpClient;
@@ -159,24 +169,44 @@ public class EkilexService {
         return results;
     }
 
-    public EkilexWord getRandomWordForLevel(String level, Set<String> sentWordValues, String apiKey) {
-        String pattern = SEARCH_PATTERNS[ThreadLocalRandom.current().nextInt(SEARCH_PATTERNS.length)];
+    /**
+     * Search for a random word at the given CEFR level using a specific pattern.
+     * @param excludeWords combined set of words to skip (existing words + candidates)
+     */
+    public EkilexWord getRandomWordForLevel(String level, Set<String> excludeWords, String apiKey) {
+        return getRandomWordForLevel(level, excludeWords, apiKey, null);
+    }
+
+    /**
+     * Search for a random word at the given CEFR level using a specific pattern.
+     * If patternOverride is provided, uses that instead of picking randomly.
+     */
+    public EkilexWord getRandomWordForLevel(String level, Set<String> excludeWords, String apiKey, String patternOverride) {
+        String pattern = patternOverride != null ? patternOverride
+            : SEARCH_PATTERNS[ThreadLocalRandom.current().nextInt(SEARCH_PATTERNS.length)];
         JsonNode data = apiRequest("/word/search/" + URLEncoder.encode(pattern, StandardCharsets.UTF_8), apiKey);
         if (data == null || !data.has("words")) return null;
 
         JsonNode wordsNode = data.path("words");
-        List<JsonNode> shuffled = new ArrayList<>();
-        wordsNode.forEach(shuffled::add);
-        Collections.shuffle(shuffled);
+        // Pre-filter: only Estonian, not excluded, single-word (no spaces = simpler words)
+        List<JsonNode> candidates = new ArrayList<>();
+        for (JsonNode w : wordsNode) {
+            if (!LANG_EST.equals(w.path("lang").asText())) continue;
+            String wordValue = w.path("wordValue").asText("").toLowerCase();
+            if (wordValue.isBlank() || wordValue.contains(" ")) continue;
+            if (excludeWords.contains(wordValue)) continue;
+            candidates.add(w);
+        }
+
+        if (candidates.isEmpty()) return null;
+        Collections.shuffle(candidates);
 
         int lookups = 0;
-        for (JsonNode w : shuffled) {
-            if (!LANG_EST.equals(w.path("lang").asText())) continue;
-            String wordValue = w.path("wordValue").asText();
-            if (sentWordValues.contains(wordValue)) continue;
+        for (JsonNode w : candidates) {
             if (++lookups > MAX_DETAIL_LOOKUPS) break;
 
             int wordId = w.path("wordId").asInt();
+            String wordValue = w.path("wordValue").asText();
             JsonNode details = apiRequest("/word/details/" + wordId, apiKey);
             if (details == null) continue;
 
@@ -193,5 +223,15 @@ public class EkilexService {
             }
         }
         return null;
+    }
+
+    /** Returns the total number of available search patterns */
+    public int getPatternCount() {
+        return SEARCH_PATTERNS.length;
+    }
+
+    /** Returns a specific search pattern by index */
+    public String getPattern(int index) {
+        return SEARCH_PATTERNS[index % SEARCH_PATTERNS.length];
     }
 }
