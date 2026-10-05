@@ -77,11 +77,11 @@ public class CandidateDiscoveryService {
         int totalSkipped = 0;
 
         try {
-            // Build combined exclusion set
+            // Build combined exclusion set — include ALL candidates (even rejected, no point re-discovering)
             Set<String> excludeWords = new HashSet<>(
                 jdbc.queryForList("SELECT estonian FROM words", String.class));
             excludeWords.addAll(
-                jdbc.queryForList("SELECT estonian FROM candidate_words WHERE status != 'rejected'", String.class));
+                jdbc.queryForList("SELECT estonian FROM candidate_words", String.class));
 
             Set<Integer> checkedIds = new HashSet<>(
                 jdbc.queryForList("SELECT word_id FROM ekilex_checked_words", Integer.class));
@@ -150,11 +150,16 @@ public class CandidateDiscoveryService {
                     ? turkishTranslations.get(i) : null;
 
                 try {
-                    jdbc.update("""
+                    int inserted = jdbc.update("""
                         INSERT INTO candidate_words (estonian, english, turkish, cefr_level, status)
                         VALUES (?, ?, ?, ?, 'pending')
                         ON CONFLICT (estonian) DO NOTHING
                         """, estonian, word.english(), turkish, word.cefrLevel());
+
+                    if (inserted == 0) {
+                        totalSkipped++;
+                        continue; // already exists, skip sentences
+                    }
 
                     // Save example sentences
                     if (word.usages() != null && !word.usages().isEmpty()) {
