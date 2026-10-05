@@ -39,6 +39,7 @@ app:
   pexels-api-key: ${PEXELS_API_KEY:}
   ekilex-api-key: ${EKILEX_API_KEY:}
   tts-api-url: ${TTS_API_URL:http://tts-api:8000}
+  translator-api-url: ${TRANSLATOR_API_URL:http://translator-api:8000}
   cron-timezone: ${CRON_TIMEZONE:Europe/Tallinn}
   cron-schedule: ${CRON_SCHEDULE:0 9 * * *}
   cefr-levels: ${CEFR_LEVELS:A1,A2}

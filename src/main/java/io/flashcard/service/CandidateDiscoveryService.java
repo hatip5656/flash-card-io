@@ -24,15 +24,18 @@ public class CandidateDiscoveryService {
     private static final int LOOKUPS_PER_PATTERN = 15;
 
     private final EkilexService ekilexService;
+    private final TranslationService translationService;
     private final AppProperties appProperties;
     private final JdbcTemplate jdbc;
     private final WordBankService wordBankService;
 
     private volatile boolean running = false;
 
-    public CandidateDiscoveryService(EkilexService ekilexService, AppProperties appProperties,
-                                     JdbcTemplate jdbc, WordBankService wordBankService) {
+    public CandidateDiscoveryService(EkilexService ekilexService, TranslationService translationService,
+                                     AppProperties appProperties, JdbcTemplate jdbc,
+                                     WordBankService wordBankService) {
         this.ekilexService = ekilexService;
+        this.translationService = translationService;
         this.appProperties = appProperties;
         this.jdbc = jdbc;
         this.wordBankService = wordBankService;
@@ -125,28 +128,63 @@ public class CandidateDiscoveryService {
 
             log.info("[candidate-discovery] Phase 1: found {} words across {} patterns", foundWords.size(), patternsSearched);
 
-            // Phase 2: Insert all candidates (with or without CEFR level)
-            for (var word : foundWords) {
+            // Phase 2: Batch translate English → Turkish
+            List<String> englishTexts = foundWords.stream().map(EkilexService.EkilexWord::english).toList();
+            List<String> turkishTranslations = null;
+            if (!englishTexts.isEmpty()) {
+                try {
+                    turkishTranslations = translationService.translateBatch(englishTexts, "en", "tr");
+                    if (turkishTranslations != null) {
+                        log.info("[candidate-discovery] Translated {} words en→tr", turkishTranslations.size());
+                    }
+                } catch (Exception e) {
+                    log.warn("[candidate-discovery] Batch translation failed: {}", e.getMessage());
+                }
+            }
+
+            // Phase 3: Insert all candidates with translations
+            for (int i = 0; i < foundWords.size(); i++) {
+                var word = foundWords.get(i);
                 String estonian = word.wordValue().toLowerCase();
+                String turkish = (turkishTranslations != null && i < turkishTranslations.size())
+                    ? turkishTranslations.get(i) : null;
 
                 try {
                     jdbc.update("""
-                        INSERT INTO candidate_words (estonian, english, cefr_level, status)
-                        VALUES (?, ?, ?, 'pending')
+                        INSERT INTO candidate_words (estonian, english, turkish, cefr_level, status)
+                        VALUES (?, ?, ?, ?, 'pending')
                         ON CONFLICT (estonian) DO NOTHING
-                        """, estonian, word.english(), word.cefrLevel());
+                        """, estonian, word.english(), turkish, word.cefrLevel());
 
                     // Save example sentences
                     if (word.usages() != null && !word.usages().isEmpty()) {
                         Integer candidateId = jdbc.queryForObject(
                             "SELECT id FROM candidate_words WHERE estonian = ?", Integer.class, estonian);
                         if (candidateId != null) {
+                            // Batch translate sentences too
+                            List<String> sentenceTexts = word.usages().stream()
+                                .map(EkilexService.Usage::english)
+                                .filter(e -> e != null && !e.isBlank())
+                                .toList();
+                            List<String> sentenceTr = null;
+                            if (!sentenceTexts.isEmpty()) {
+                                try {
+                                    sentenceTr = translationService.translateBatch(sentenceTexts, "en", "tr");
+                                } catch (Exception ignored) {}
+                            }
+
                             int sortOrder = 0;
+                            int trIdx = 0;
                             for (var usage : word.usages()) {
+                                String sTurkish = null;
+                                if (usage.english() != null && !usage.english().isBlank()
+                                    && sentenceTr != null && trIdx < sentenceTr.size()) {
+                                    sTurkish = sentenceTr.get(trIdx++);
+                                }
                                 jdbc.update("""
-                                    INSERT INTO candidate_sentences (candidate_id, estonian, english, sort_order)
-                                    VALUES (?, ?, ?, ?)
-                                    """, candidateId, usage.estonian(), usage.english(), sortOrder++);
+                                    INSERT INTO candidate_sentences (candidate_id, estonian, english, turkish, sort_order)
+                                    VALUES (?, ?, ?, ?, ?)
+                                    """, candidateId, usage.estonian(), usage.english(), sTurkish, sortOrder++);
                             }
                         }
                     }
