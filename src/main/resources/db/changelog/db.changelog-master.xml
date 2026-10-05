@@ -23,5 +23,6 @@
     <include file="db/changelog/016-grammar-podcasts.sql"/>
     <include file="db/changelog/017-podcast-scripts.sql"/>
     <include file="db/changelog/018-sentence-grammar-links.sql"/>
+    <include file="db/changelog/019-ekilex-cache.sql"/>
 
 </databaseChangeLog>

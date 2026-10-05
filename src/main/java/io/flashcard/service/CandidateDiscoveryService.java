@@ -80,21 +80,38 @@ public class CandidateDiscoveryService {
             excludeWords.addAll(
                 jdbc.queryForList("SELECT estonian FROM candidate_words WHERE status != 'rejected'", String.class));
 
+            // Load already-checked Ekilex word IDs (no CEFR) to skip them
+            Set<Integer> checkedIds = new HashSet<>(
+                jdbc.queryForList("SELECT word_id FROM ekilex_checked_words", Integer.class));
+            log.info("[candidate-discovery] Exclusion set: {} words, {} checked Ekilex IDs", excludeWords.size(), checkedIds.size());
+
             int patternBase = getNextPatternIndex();
             int patternCount = ekilexService.getPatternCount();
 
             for (String level : LEVELS) {
                 int added = 0;
                 int attempts = 0;
-                // Try different patterns for each level
                 while (added < WORDS_PER_LEVEL && attempts < MAX_ATTEMPTS_PER_LEVEL) {
-                    // Rotate through patterns systematically — each level uses different offsets
                     int patternIdx = (patternBase + attempts * LEVELS.length + Arrays.asList(LEVELS).indexOf(level)) % patternCount;
                     String pattern = ekilexService.getPattern(patternIdx);
                     attempts++;
 
                     try {
-                        var word = ekilexService.getRandomWordForLevel(level, excludeWords, apiKey, pattern);
+                        var result = ekilexService.searchForLevel(level, excludeWords, apiKey, pattern, checkedIds);
+
+                        // Cache all checked words (CEFR or not) to avoid re-checking
+                        for (var checked : result.checked()) {
+                            checkedIds.add(checked.wordId());
+                            try {
+                                jdbc.update("""
+                                    INSERT INTO ekilex_checked_words (word_id, word_value, has_cefr)
+                                    VALUES (?, ?, ?)
+                                    ON CONFLICT (word_id) DO NOTHING
+                                    """, checked.wordId(), checked.wordValue(), checked.hasCefr());
+                            } catch (Exception ignored) {}
+                        }
+
+                        var word = result.word();
                         if (word == null || word.english() == null) continue;
 
                         String estonian = word.wordValue().toLowerCase();
@@ -188,6 +205,10 @@ public class CandidateDiscoveryService {
             "SELECT COUNT(*) FROM candidate_words", Integer.class);
         int withSentences = jdbc.queryForObject(
             "SELECT COUNT(DISTINCT candidate_id) FROM candidate_sentences", Integer.class);
+        int checkedCache = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM ekilex_checked_words", Integer.class);
+        int checkedWithCefr = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM ekilex_checked_words WHERE has_cefr = true", Integer.class);
 
         Map<String, Object> result = new LinkedHashMap<>();
         if (!rows.isEmpty()) result.putAll(rows.get(0));
@@ -196,6 +217,8 @@ public class CandidateDiscoveryService {
         result.put("totalCandidates", totalCandidates);
         result.put("candidatesWithSentences", withSentences);
         result.put("totalPatterns", ekilexService.getPatternCount());
+        result.put("ekilexCheckedWords", checkedCache);
+        result.put("ekilexWithCefr", checkedWithCefr);
         return result;
     }
 }
