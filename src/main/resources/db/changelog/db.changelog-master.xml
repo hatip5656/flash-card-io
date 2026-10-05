@@ -21,5 +21,6 @@
     <include file="db/changelog/014-podcasts.sql"/>
     <include file="db/changelog/015-account-linking.sql"/>
     <include file="db/changelog/016-grammar-podcasts.sql"/>
+    <include file="db/changelog/017-podcast-scripts.sql"/>
 
 </databaseChangeLog>

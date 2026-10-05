@@ -78,6 +78,7 @@ public class GrammarPodcastService {
 
     /**
      * Scheduled job: generates ONE grammar podcast every 30 minutes.
+     * Uses pre-written scripts from podcast_script column — no Gemini needed.
      */
     @Scheduled(fixedDelay = 1800000, initialDelay = 60000) // 30 min, 1 min initial delay
     public void generateNextGrammarPodcast() {
@@ -85,20 +86,16 @@ public class GrammarPodcastService {
             log.debug("[grammar-podcast] Already running, skipping");
             return;
         }
-        if (!geminiService.isAvailable()) {
-            log.debug("[grammar-podcast] Gemini not available, skipping");
-            return;
-        }
 
-        // Find next grammar lesson without a podcast
+        // Find next grammar lesson with a pre-written script but no podcast yet
         List<Map<String, Object>> rows = jdbc.queryForList("""
-            SELECT id, cefr_level, topic, topic_tr, content, content_tr
-            FROM grammar_lessons WHERE podcast_id IS NULL
+            SELECT id, cefr_level, topic, podcast_script
+            FROM grammar_lessons WHERE podcast_id IS NULL AND podcast_script IS NOT NULL
             ORDER BY cefr_level, id LIMIT 1
             """);
 
         if (rows.isEmpty()) {
-            log.debug("[grammar-podcast] All grammar lessons have podcasts");
+            log.debug("[grammar-podcast] No lessons with pre-written scripts pending");
             return;
         }
 
@@ -111,40 +108,9 @@ public class GrammarPodcastService {
             String lessonId = (String) lesson.get("id");
             String level = (String) lesson.get("cefr_level");
             String topic = (String) lesson.get("topic");
-            String topicTr = (String) lesson.get("topic_tr");
-            String content = (String) lesson.get("content");
-            String contentTr = (String) lesson.get("content_tr");
+            String scriptJson = lesson.get("podcast_script").toString();
 
-            log.info("[grammar-podcast] Generating for lesson {} ({}): {}", lessonId, level, topic);
-
-            // Generate for Turkish (primary audience)
-            String nativeLang = "turkish";
-            String langCode = "tr";
-            String useTopic = topicTr != null && !topicTr.isBlank() ? topicTr : topic;
-            String useContent = contentTr != null && !contentTr.isBlank() ? contentTr : content;
-
-            String prompt = String.format(GRAMMAR_PROMPT, nativeLang, useTopic, useContent, langCode);
-            String scriptJson = geminiService.chat(prompt, List.of(), "", 4096);
-
-            if (scriptJson == null || scriptJson.isBlank()) {
-                log.warn("[grammar-podcast] Gemini returned null for lesson {}", lessonId);
-                recordFailure(start);
-                return;
-            }
-
-            // Clean JSON
-            scriptJson = scriptJson.strip();
-            if (scriptJson.startsWith("```")) {
-                scriptJson = scriptJson.replaceFirst("```[a-z]*\\n?", "").replaceFirst("\\n?```$", "").strip();
-            }
-            if (!scriptJson.endsWith("]")) {
-                int lastBrace = scriptJson.lastIndexOf('}');
-                if (lastBrace > 0) {
-                    scriptJson = scriptJson.substring(0, lastBrace + 1);
-                    if (scriptJson.endsWith(",")) scriptJson = scriptJson.substring(0, scriptJson.length() - 1);
-                    scriptJson += "]";
-                }
-            }
+            log.info("[grammar-podcast] Generating from pre-written script for lesson {} ({}): {}", lessonId, level, topic);
 
             List<?> segments = objectMapper.readValue(scriptJson, List.class);
             if (segments.isEmpty()) {
