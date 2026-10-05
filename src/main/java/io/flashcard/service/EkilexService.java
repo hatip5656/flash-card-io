@@ -170,11 +170,13 @@ public class EkilexService {
     }
 
     /**
-     * Search for a random word at the given CEFR level using a specific pattern.
+     * Search for a random word at the given CEFR level using a random pattern.
      * @param excludeWords combined set of words to skip (existing words + candidates)
      */
     public EkilexWord getRandomWordForLevel(String level, Set<String> excludeWords, String apiKey) {
-        return getRandomWordForLevel(level, excludeWords, apiKey, null, Set.of());
+        String pattern = SEARCH_PATTERNS[ThreadLocalRandom.current().nextInt(SEARCH_PATTERNS.length)];
+        var result = searchForLevel(level, excludeWords, apiKey, pattern, Set.of());
+        return result.word();
     }
 
     /**
@@ -237,13 +239,116 @@ public class EkilexService {
         return new LookupResult(null, checkedWords);
     }
 
-    /** Legacy method for compatibility */
-    public EkilexWord getRandomWordForLevel(String level, Set<String> excludeWords, String apiKey,
-                                             String patternOverride, Set<Integer> alreadyCheckedIds) {
-        String pattern = patternOverride != null ? patternOverride
-            : SEARCH_PATTERNS[ThreadLocalRandom.current().nextInt(SEARCH_PATTERNS.length)];
-        var result = searchForLevel(level, excludeWords, apiKey, pattern, alreadyCheckedIds);
-        return result.word();
+    /**
+     * Search for ANY Estonian word with an English translation, regardless of CEFR level.
+     * Returns words that have CEFR tags (with level set) and words without (level=null).
+     * Caller is responsible for assigning levels to uncategorized words.
+     */
+    public LookupResult searchAnyWord(Set<String> excludeWords, String apiKey,
+                                       String pattern, Set<Integer> alreadyCheckedIds, int maxLookups) {
+        JsonNode data = apiRequest("/word/search/" + URLEncoder.encode(pattern, StandardCharsets.UTF_8), apiKey);
+        if (data == null || !data.has("words")) return new LookupResult(null, List.of());
+
+        List<JsonNode> candidates = new ArrayList<>();
+        for (JsonNode w : data.path("words")) {
+            if (!LANG_EST.equals(w.path("lang").asText())) continue;
+            String wordValue = w.path("wordValue").asText("").toLowerCase();
+            if (wordValue.isBlank() || wordValue.contains(" ") || wordValue.length() < 2) continue;
+            if (excludeWords.contains(wordValue)) continue;
+            if (alreadyCheckedIds.contains(w.path("wordId").asInt())) continue;
+            candidates.add(w);
+        }
+
+        if (candidates.isEmpty()) return new LookupResult(null, List.of());
+        Collections.shuffle(candidates);
+
+        List<CheckedWord> checkedWords = new ArrayList<>();
+        List<EkilexWord> foundWords = new ArrayList<>();
+        int lookups = 0;
+        for (JsonNode w : candidates) {
+            if (lookups >= maxLookups) break;
+            lookups++;
+
+            int wordId = w.path("wordId").asInt();
+            String wordValue = w.path("wordValue").asText();
+            JsonNode details = apiRequest("/word/details/" + wordId, apiKey);
+            if (details == null) continue;
+
+            boolean found = false;
+            for (JsonNode lexeme : details.path("lexemes")) {
+                String english = extractEnglish(lexeme);
+                if (english == null) continue;
+
+                String cefrLevel = lexeme.path("lexemeProficiencyLevelCode").asText(null);
+                if (cefrLevel != null && !VALID_LEVELS.contains(cefrLevel)) cefrLevel = null;
+
+                String pos = extractPos(lexeme);
+                List<Usage> usages = extractUsages(lexeme);
+                foundWords.add(new EkilexWord(wordId, wordValue, cefrLevel,
+                    english.toLowerCase(), pos, usages.size() > 3 ? usages.subList(0, 3) : usages));
+                checkedWords.add(new CheckedWord(wordId, wordValue, cefrLevel != null));
+                found = true;
+                break; // take first lexeme with English
+            }
+            if (!found) {
+                checkedWords.add(new CheckedWord(wordId, wordValue, false));
+            }
+        }
+
+        // Return first found word (if any), plus all checked info
+        return new LookupResult(foundWords.isEmpty() ? null : foundWords.get(0), checkedWords);
+    }
+
+    /** Returns all found words from a batch search (not just the first). */
+    public List<EkilexWord> batchSearchWords(Set<String> excludeWords, String apiKey,
+                                              String pattern, Set<Integer> alreadyCheckedIds,
+                                              int maxLookups, List<CheckedWord> checkedOut) {
+        JsonNode data = apiRequest("/word/search/" + URLEncoder.encode(pattern, StandardCharsets.UTF_8), apiKey);
+        if (data == null || !data.has("words")) return List.of();
+
+        List<JsonNode> candidates = new ArrayList<>();
+        for (JsonNode w : data.path("words")) {
+            if (!LANG_EST.equals(w.path("lang").asText())) continue;
+            String wordValue = w.path("wordValue").asText("").toLowerCase();
+            if (wordValue.isBlank() || wordValue.contains(" ") || wordValue.length() < 2) continue;
+            if (excludeWords.contains(wordValue)) continue;
+            if (alreadyCheckedIds.contains(w.path("wordId").asInt())) continue;
+            candidates.add(w);
+        }
+        if (candidates.isEmpty()) return List.of();
+        Collections.shuffle(candidates);
+
+        List<EkilexWord> results = new ArrayList<>();
+        int lookups = 0;
+        for (JsonNode w : candidates) {
+            if (lookups >= maxLookups) break;
+            lookups++;
+
+            int wordId = w.path("wordId").asInt();
+            String wordValue = w.path("wordValue").asText();
+            JsonNode details = apiRequest("/word/details/" + wordId, apiKey);
+            if (details == null) continue;
+
+            boolean found = false;
+            for (JsonNode lexeme : details.path("lexemes")) {
+                String english = extractEnglish(lexeme);
+                if (english == null) continue;
+
+                String cefrLevel = lexeme.path("lexemeProficiencyLevelCode").asText(null);
+                if (cefrLevel != null && !VALID_LEVELS.contains(cefrLevel)) cefrLevel = null;
+                String pos = extractPos(lexeme);
+                List<Usage> usages = extractUsages(lexeme);
+                results.add(new EkilexWord(wordId, wordValue, cefrLevel,
+                    english.toLowerCase(), pos, usages.size() > 3 ? usages.subList(0, 3) : usages));
+                checkedOut.add(new CheckedWord(wordId, wordValue, cefrLevel != null));
+                found = true;
+                break;
+            }
+            if (!found) {
+                checkedOut.add(new CheckedWord(wordId, wordValue, false));
+            }
+        }
+        return results;
     }
 
     /** Returns the total number of available search patterns */
