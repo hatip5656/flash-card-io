@@ -47,7 +47,7 @@ public class EkilexService {
 
     private final ObjectMapper objectMapper;
     private final HttpClient httpClient;
-    private final TokenBucketRateLimiter rateLimiter = new TokenBucketRateLimiter(30, 60_000);
+    private final TokenBucketRateLimiter rateLimiter = new TokenBucketRateLimiter(60, 60_000);
     private final CircuitBreaker circuitBreaker;
 
     public EkilexService(AppProperties appProperties, ObjectMapper objectMapper, HttpClient httpClient) {
@@ -70,8 +70,8 @@ public class EkilexService {
     public record Usage(String estonian, String english) {}
 
     private JsonNode apiRequest(String path, String apiKey) {
-        if (!rateLimiter.tryConsume()) {
-            log.warn("[ekilex] Rate limited, skipping {}", path);
+        if (!rateLimiter.consumeBlocking(10_000)) {
+            log.warn("[ekilex] Rate limit timeout, skipping {}", path);
             return null;
         }
         try {

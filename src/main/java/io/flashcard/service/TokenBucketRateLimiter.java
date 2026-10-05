@@ -27,4 +27,17 @@ public class TokenBucketRateLimiter {
         }
         return tokens.getAndUpdate(t -> t > 0 ? t - 1 : t) > 0;
     }
+
+    /** Block until a token is available, up to maxWaitMs. Returns false if timed out. */
+    public boolean consumeBlocking(long maxWaitMs) {
+        long deadline = System.currentTimeMillis() + maxWaitMs;
+        while (System.currentTimeMillis() < deadline) {
+            if (tryConsume()) return true;
+            try { Thread.sleep(refillIntervalMs); } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return false;
+            }
+        }
+        return false;
+    }
 }
