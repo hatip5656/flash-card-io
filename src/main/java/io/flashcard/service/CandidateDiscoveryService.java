@@ -28,16 +28,18 @@ public class CandidateDiscoveryService {
     private final AppProperties appProperties;
     private final JdbcTemplate jdbc;
     private final WordBankService wordBankService;
+    private final NotificationService notifications;
 
     private volatile boolean running = false;
 
     public CandidateDiscoveryService(EkilexService ekilexService, TranslationService translationService,
                                      AppProperties appProperties, JdbcTemplate jdbc,
-                                     WordBankService wordBankService) {
+                                     WordBankService wordBankService, NotificationService notifications) {
         this.ekilexService = ekilexService;
         this.translationService = translationService;
         this.appProperties = appProperties;
         this.jdbc = jdbc;
+        this.notifications = notifications;
         this.wordBankService = wordBankService;
     }
 
@@ -202,10 +204,15 @@ public class CandidateDiscoveryService {
             long duration = System.currentTimeMillis() - start;
             log.info("[candidate-discovery] Complete: {} added, {} skipped in {}ms", totalAdded, totalSkipped, duration);
             recordSuccess(start, totalAdded);
+            if (totalAdded > 0) {
+                notifications.success("candidates", "Candidate Discovery Complete",
+                    totalAdded + " new candidates discovered, " + totalSkipped + " skipped (" + (duration / 1000) + "s)");
+            }
 
         } catch (Exception e) {
             log.error("[candidate-discovery] Failed: {}", e.getMessage(), e);
             recordFailure(start);
+            notifications.error("candidates", "Candidate Discovery Failed", e.getMessage());
         } finally {
             running = false;
         }

@@ -59,19 +59,21 @@ public class GrammarPodcastService {
     private final AppProperties appProperties;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
+    private final NotificationService notifications;
     private final Path podcastDir;
 
     private volatile boolean running = false;
 
     public GrammarPodcastService(JdbcTemplate jdbc, GeminiService geminiService,
                                  AppProperties appProperties, HttpClient httpClient,
-                                 ObjectMapper objectMapper,
+                                 ObjectMapper objectMapper, NotificationService notifications,
                                  @org.springframework.beans.factory.annotation.Value("${CACHE_DIR:/app/cache}") String cacheDir) {
         this.jdbc = jdbc;
         this.geminiService = geminiService;
         this.appProperties = appProperties;
         this.httpClient = httpClient;
         this.objectMapper = objectMapper;
+        this.notifications = notifications;
         this.podcastDir = Path.of(cacheDir, "podcasts");
         try { Files.createDirectories(podcastDir); } catch (Exception ignored) {}
     }
@@ -177,10 +179,13 @@ public class GrammarPodcastService {
                 podcastId, lessonId, duration, durationSeconds);
 
             recordSuccess(start);
+            notifications.success("podcasts", "Grammar Podcast Generated",
+                "Lesson " + lessonId + " — " + durationSeconds + "s audio (" + (duration / 1000) + "s generation)");
 
         } catch (Exception e) {
             log.error("[grammar-podcast] Failed: {}", e.getMessage(), e);
             recordFailure(start);
+            notifications.error("podcasts", "Grammar Podcast Failed", e.getMessage());
         } finally {
             running = false;
         }
