@@ -69,7 +69,7 @@ public class RateLimitFilter implements Filter {
 
         if (path.startsWith("/api/admin/")) {
             Bucket bucket = adminBuckets.get(ip, k ->
-                Bucket.builder().addLimit(Bandwidth.simple(20, Duration.ofMinutes(1))).build());
+                Bucket.builder().addLimit(Bandwidth.simple(120, Duration.ofMinutes(1))).build());
             if (!bucket.tryConsume(1)) {
                 sendTooMany(res, "Too many admin requests, please wait");
                 return;
