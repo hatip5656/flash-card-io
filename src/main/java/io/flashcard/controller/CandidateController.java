@@ -154,6 +154,39 @@ public class CandidateController {
     }
 
     /**
+     * Update an existing sentence — fill in missing translations or correct text.
+     */
+    @PatchMapping("/{id}/sentences/{sentenceId}")
+    public ResponseEntity<?> updateSentence(@PathVariable int id, @PathVariable int sentenceId,
+                                             @RequestBody Map<String, String> body) {
+        var rows = jdbc.queryForList("SELECT * FROM candidate_sentences WHERE id = ? AND candidate_id = ?", sentenceId, id);
+        if (rows.isEmpty()) return ResponseEntity.status(404).body(Map.of("error", "Sentence not found"));
+
+        var existing = rows.get(0);
+        String estonian = body.containsKey("estonian") ? body.get("estonian") : (String) existing.get("estonian");
+        String english = body.containsKey("english") ? body.get("english") : (String) existing.get("english");
+        String turkish = body.containsKey("turkish") ? body.get("turkish") : (String) existing.get("turkish");
+
+        // Auto-translate any still-missing fields based on what we have
+        if ((estonian == null || estonian.isBlank()) && english != null && !english.isBlank()) {
+            estonian = translationService.translate(english, "en", "et");
+        }
+        if ((english == null || english.isBlank()) && estonian != null && !estonian.isBlank()) {
+            english = translationService.translate(estonian, "et", "en");
+        }
+        if ((turkish == null || turkish.isBlank()) && estonian != null && !estonian.isBlank()) {
+            turkish = translationService.translate(estonian, "et", "tr");
+        } else if ((turkish == null || turkish.isBlank()) && english != null && !english.isBlank()) {
+            turkish = translationService.translate(english, "en", "tr");
+        }
+
+        jdbc.update("UPDATE candidate_sentences SET estonian = ?, english = ?, turkish = ? WHERE id = ?",
+            estonian, english, turkish, sentenceId);
+
+        return ResponseEntity.ok(Map.of("id", sentenceId, "estonian", estonian, "english", english, "turkish", turkish));
+    }
+
+    /**
      * Delete a specific sentence from a candidate.
      */
     @DeleteMapping("/{id}/sentences/{sentenceId}")

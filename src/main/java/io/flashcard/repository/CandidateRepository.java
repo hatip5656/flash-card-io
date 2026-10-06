@@ -33,7 +33,7 @@ public class CandidateRepository {
         Map<Integer, List<Map<String, Object>>> sentMap = new HashMap<>();
         if (!wordIds.isEmpty()) {
             jdbc.queryForList(
-                "SELECT candidate_id, estonian, english, turkish, sort_order FROM candidate_sentences WHERE candidate_id = ANY(?) ORDER BY candidate_id, sort_order",
+                "SELECT id, candidate_id, estonian, english, turkish, sort_order FROM candidate_sentences WHERE candidate_id = ANY(?) ORDER BY candidate_id, sort_order",
                 (Object) wordIds.toArray(new Integer[0]))
                 .forEach(s -> sentMap.computeIfAbsent(((Number) s.get("candidate_id")).intValue(), k -> new ArrayList<>()).add(s));
         }
@@ -127,7 +127,7 @@ public class CandidateRepository {
         Map<Integer, List<Map<String, Object>>> sentMap = new HashMap<>();
         if (!candidateIds.isEmpty()) {
             jdbc.queryForList(
-                "SELECT candidate_id, estonian, english, turkish, sort_order FROM candidate_sentences WHERE candidate_id = ANY(?) ORDER BY candidate_id, sort_order",
+                "SELECT id, candidate_id, estonian, english, turkish, sort_order FROM candidate_sentences WHERE candidate_id = ANY(?) ORDER BY candidate_id, sort_order",
                 (Object) candidateIds.toArray(new Integer[0]))
                 .forEach(s -> sentMap.computeIfAbsent(((Number) s.get("candidate_id")).intValue(), k -> new ArrayList<>()).add(s));
         }
