@@ -33,8 +33,9 @@ public class RateLimitFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
         String path = req.getRequestURI();
 
-        if (!path.startsWith("/api/")) {
-            chain.doFilter(request, response);
+        // Only serve /api/* and /actuator/health/* — reject everything else (scanner bots, .env probes, etc.)
+        if (!path.startsWith("/api/") && !path.startsWith("/actuator/health")) {
+            res.setStatus(404);
             return;
         }
 

@@ -601,8 +601,18 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
         try {
             telegramClient.execute(SendMessage.builder().chatId(chatId).text(html).parseMode("HTML").build());
         } catch (Exception e) {
-            log.error("[telegram] Failed to send text to chat={}: {} | text preview: {}", chatId, e.getMessage(),
+            String msg = e.getMessage() != null ? e.getMessage() : "";
+            log.error("[telegram] Failed to send text to chat={}: {} | text preview: {}", chatId, msg,
                 html.substring(0, Math.min(100, html.length())));
+            // Auto-deactivate user if chat no longer exists
+            if (msg.contains("chat not found") || msg.contains("bot was blocked") || msg.contains("user is deactivated")) {
+                log.warn("[telegram] Deactivating user chat={} — {}", chatId, msg);
+                try {
+                    subscriberRepo.removeSubscriber(chatId);
+                } catch (Exception ex) {
+                    log.warn("[telegram] Failed to deactivate chat={}: {}", chatId, ex.getMessage());
+                }
+            }
         }
     }
 
