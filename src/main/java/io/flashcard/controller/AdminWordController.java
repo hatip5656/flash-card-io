@@ -124,15 +124,29 @@ public class AdminWordController {
     public ResponseEntity<?> listAllWords(
             @RequestParam(defaultValue = "50") int limit,
             @RequestParam(defaultValue = "0") int offset,
-            @RequestParam(required = false) String level) {
-        String filter = level != null && VALID_LEVELS.contains(level) ? " WHERE w.cefr_level = '" + level + "'" : "";
+            @RequestParam(required = false) String level,
+            @RequestParam(required = false) String q) {
+        var where = new StringBuilder();
+        var params = new java.util.ArrayList<Object>();
+        if (level != null && VALID_LEVELS.contains(level)) {
+            where.append(" WHERE w.cefr_level = ?");
+            params.add(level);
+        }
+        if (q != null && !q.isBlank()) {
+            where.append(where.isEmpty() ? " WHERE " : " AND ");
+            where.append("(LOWER(w.estonian) LIKE ? OR LOWER(w.english) LIKE ? OR LOWER(w.turkish) LIKE ?)");
+            String pattern = "%" + q.toLowerCase() + "%";
+            params.add(pattern); params.add(pattern); params.add(pattern);
+        }
+        var countParams = new java.util.ArrayList<>(params);
+        params.add(limit); params.add(offset);
         var words = jdbc.queryForList(
             "SELECT w.id, w.estonian, w.english, w.turkish, w.cefr_level, " +
             "(SELECT COUNT(*) FROM word_sentences s WHERE s.word_id = w.id) AS sentence_count " +
-            "FROM words w" + filter + " ORDER BY w.cefr_level, w.estonian LIMIT ? OFFSET ?",
-            limit, offset);
+            "FROM words w" + where + " ORDER BY w.cefr_level, w.estonian LIMIT ? OFFSET ?",
+            params.toArray());
         int total = jdbc.queryForObject(
-            "SELECT COUNT(*) FROM words w" + filter, Integer.class);
+            "SELECT COUNT(*) FROM words w" + where, Integer.class, countParams.toArray());
         return ResponseEntity.ok(Map.of("items", words, "total", total));
     }
 

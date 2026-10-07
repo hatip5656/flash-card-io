@@ -23,9 +23,10 @@ public class CandidateController {
     @GetMapping
     public Map<String, Object> listCandidates(@RequestParam(defaultValue = "pending") String status,
                                                @RequestParam(required = false) String level,
+                                               @RequestParam(required = false) String q,
                                                @RequestParam(defaultValue = "20") int limit,
                                                @RequestParam(defaultValue = "0") int offset) {
-        return candidateRepo.listCandidates(status, level, Math.min(limit, 100), offset);
+        return candidateRepo.listCandidates(status, level, q, Math.min(limit, 100), offset);
     }
 
     @GetMapping("/stats")

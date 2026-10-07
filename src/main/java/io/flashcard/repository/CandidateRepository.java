@@ -15,30 +15,33 @@ public class CandidateRepository {
         this.jdbc = jdbc;
     }
 
-    public Map<String, Object> listCandidates(String status, String level, int limit, int offset) {
-        // Count total for pagination
-        StringBuilder countQuery = new StringBuilder("SELECT COUNT(*) FROM candidate_words WHERE status = ?");
-        List<Object> countParams = new ArrayList<>();
-        countParams.add(status);
+    public Map<String, Object> listCandidates(String status, String level, String search, int limit, int offset) {
+        // Build WHERE clause
+        StringBuilder where = new StringBuilder(" WHERE status = ?");
+        List<Object> whereParams = new ArrayList<>();
+        whereParams.add(status);
         if (level != null) {
-            countQuery.append(" AND cefr_level = ?");
-            countParams.add(level);
+            where.append(" AND cefr_level = ?");
+            whereParams.add(level);
         }
-        Integer total = jdbc.queryForObject(countQuery.toString(), Integer.class, countParams.toArray());
+        if (search != null && !search.isBlank()) {
+            where.append(" AND (LOWER(estonian) LIKE ? OR LOWER(english) LIKE ? OR LOWER(turkish) LIKE ?)");
+            String pattern = "%" + search.toLowerCase() + "%";
+            whereParams.add(pattern);
+            whereParams.add(pattern);
+            whereParams.add(pattern);
+        }
+
+        // Count total
+        Integer total = jdbc.queryForObject("SELECT COUNT(*) FROM candidate_words" + where, Integer.class, whereParams.toArray());
 
         // Fetch page
-        StringBuilder query = new StringBuilder("SELECT * FROM candidate_words WHERE status = ?");
-        List<Object> params = new ArrayList<>();
-        params.add(status);
-        if (level != null) {
-            query.append(" AND cefr_level = ?");
-            params.add(level);
-        }
-        query.append(" ORDER BY discovered_at DESC LIMIT ? OFFSET ?");
+        List<Object> params = new ArrayList<>(whereParams);
         params.add(limit);
         params.add(offset);
+        String query = "SELECT * FROM candidate_words" + where + " ORDER BY discovered_at DESC LIMIT ? OFFSET ?";
 
-        List<Map<String, Object>> words = jdbc.queryForList(query.toString(), params.toArray());
+        List<Map<String, Object>> words = jdbc.queryForList(query, params.toArray());
         List<Integer> wordIds = words.stream().map(w -> ((Number) w.get("id")).intValue()).toList();
 
         Map<Integer, List<Map<String, Object>>> sentMap = new HashMap<>();
