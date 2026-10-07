@@ -15,17 +15,28 @@ public class CandidateRepository {
         this.jdbc = jdbc;
     }
 
-    public Map<String, Object> listCandidates(String status, String level, int limit) {
+    public Map<String, Object> listCandidates(String status, String level, int limit, int offset) {
+        // Count total for pagination
+        StringBuilder countQuery = new StringBuilder("SELECT COUNT(*) FROM candidate_words WHERE status = ?");
+        List<Object> countParams = new ArrayList<>();
+        countParams.add(status);
+        if (level != null) {
+            countQuery.append(" AND cefr_level = ?");
+            countParams.add(level);
+        }
+        Integer total = jdbc.queryForObject(countQuery.toString(), Integer.class, countParams.toArray());
+
+        // Fetch page
         StringBuilder query = new StringBuilder("SELECT * FROM candidate_words WHERE status = ?");
         List<Object> params = new ArrayList<>();
         params.add(status);
-
         if (level != null) {
             query.append(" AND cefr_level = ?");
             params.add(level);
         }
-        query.append(" ORDER BY discovered_at DESC LIMIT ?");
+        query.append(" ORDER BY discovered_at DESC LIMIT ? OFFSET ?");
         params.add(limit);
+        params.add(offset);
 
         List<Map<String, Object>> words = jdbc.queryForList(query.toString(), params.toArray());
         List<Integer> wordIds = words.stream().map(w -> ((Number) w.get("id")).intValue()).toList();
@@ -44,12 +55,10 @@ public class CandidateRepository {
             return entry;
         }).toList();
 
-        List<Map<String, Object>> stats = jdbc.queryForList("""
-            SELECT status, cefr_level, COUNT(*) as count
-            FROM candidate_words GROUP BY status, cefr_level ORDER BY status, cefr_level
-            """);
-
-        return Map.of("count", result.size(), "words", result, "stats", stats);
+        var response = new LinkedHashMap<String, Object>();
+        response.put("items", result);
+        response.put("total", total != null ? total : 0);
+        return response;
     }
 
     public Map<String, Object> translateCandidate(int id, String turkish, List<Map<String, String>> sentences) {
@@ -176,10 +185,20 @@ public class CandidateRepository {
             "SELECT COUNT(*) FROM candidate_words WHERE status = 'pending'", Integer.class);
         Integer translated = jdbc.queryForObject(
             "SELECT COUNT(*) FROM candidate_words WHERE status = 'translated'", Integer.class);
+        Integer approved = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM candidate_words WHERE status = 'approved'", Integer.class);
+        Integer rejected = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM candidate_words WHERE status = 'rejected'", Integer.class);
+        Integer total = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM candidate_words", Integer.class);
 
-        return Map.of(
-            "pending", pending != null ? pending : 0,
-            "readyToApprove", translated != null ? translated : 0,
-            "breakdown", stats);
+        var result = new LinkedHashMap<String, Object>();
+        result.put("pending", pending != null ? pending : 0);
+        result.put("readyToApprove", translated != null ? translated : 0);
+        result.put("approved", approved != null ? approved : 0);
+        result.put("rejected", rejected != null ? rejected : 0);
+        result.put("total", total != null ? total : 0);
+        result.put("breakdown", stats);
+        return result;
     }
 }

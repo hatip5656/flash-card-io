@@ -53,8 +53,13 @@ public class CandidateService {
             }
         }
 
-        jdbc.update("UPDATE candidate_words SET turkish = ?, status = 'translated', translated_at = NOW() WHERE id = ?", turkish, id);
-        return Map.of("turkish", turkish, "sentencesTranslated", sentencesUpdated);
+        // Only mark as 'translated' if all sentences also have Turkish
+        Integer missingTurkish = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM candidate_sentences WHERE candidate_id = ? AND (turkish IS NULL OR turkish = '')", Integer.class, id);
+        String newStatus = (missingTurkish == null || missingTurkish == 0) ? "translated" : "pending";
+
+        jdbc.update("UPDATE candidate_words SET turkish = ?, status = ?, translated_at = NOW() WHERE id = ?", turkish, newStatus, id);
+        return Map.of("turkish", turkish, "sentencesTranslated", sentencesUpdated, "status", newStatus);
     }
 
     // ─── Sentence management ─────────────────────────────
@@ -161,35 +166,86 @@ public class CandidateService {
     public void translateAllAsync() {
         Thread.startVirtualThread(() -> {
             long start = System.currentTimeMillis();
-            var untranslated = jdbc.queryForList(
-                "SELECT id, english FROM candidate_words WHERE (turkish IS NULL OR turkish = '') AND english IS NOT NULL AND english != ''");
             int wordsDone = 0, sentencesDone = 0, wordsFailed = 0;
 
-            for (var w : untranslated) {
+            // 1. Translate word-level Turkish for candidates missing it
+            var wordsNeedingTurkish = jdbc.queryForList(
+                "SELECT id, english FROM candidate_words WHERE (turkish IS NULL OR turkish = '') AND english IS NOT NULL AND english != '' AND status IN ('pending', 'translated')");
+
+            for (var w : wordsNeedingTurkish) {
                 try {
                     int wid = ((Number) w.get("id")).intValue();
                     String turkish = translationService.translate((String) w.get("english"), "en", "tr");
                     if (turkish != null) {
-                        jdbc.update("UPDATE candidate_words SET turkish = ?, status = 'translated', translated_at = NOW() WHERE id = ?", turkish, wid);
+                        jdbc.update("UPDATE candidate_words SET turkish = ? WHERE id = ?", turkish, wid);
                         wordsDone++;
-
-                        var sents = jdbc.queryForList(
-                            "SELECT id, english FROM candidate_sentences WHERE candidate_id = ? AND (turkish IS NULL OR turkish = '') AND english IS NOT NULL AND english != ''", wid);
-                        for (var s : sents) {
-                            String sentTr = translationService.translate((String) s.get("english"), "en", "tr");
-                            if (sentTr != null) {
-                                jdbc.update("UPDATE candidate_sentences SET turkish = ? WHERE id = ?", sentTr, s.get("id"));
-                                sentencesDone++;
-                            }
-                        }
                     } else {
                         wordsFailed++;
                     }
                 } catch (Exception e) {
                     wordsFailed++;
-                    log.warn("[candidate-translate] Error translating {}: {}", w.get("id"), e.getMessage());
+                    log.warn("[candidate-translate] Error translating word {}: {}", w.get("id"), e.getMessage());
                 }
             }
+
+            // 2. Translate ALL sentences missing English or Turkish
+            var incompleteSentences = jdbc.queryForList("""
+                SELECT cs.id, cs.candidate_id, cs.estonian, cs.english, cs.turkish
+                FROM candidate_sentences cs
+                JOIN candidate_words cw ON cw.id = cs.candidate_id
+                WHERE cw.status IN ('pending', 'translated')
+                  AND (cs.english IS NULL OR cs.english = '' OR cs.turkish IS NULL OR cs.turkish = '')
+                  AND (cs.estonian IS NOT NULL AND cs.estonian != '')
+                """);
+
+            for (var s : incompleteSentences) {
+                try {
+                    String est = (String) s.get("estonian");
+                    String en = (String) s.get("english");
+                    String tr = (String) s.get("turkish");
+                    boolean updated = false;
+
+                    if (isBlank(en)) {
+                        en = translationService.translate(est, "et", "en");
+                        updated = true;
+                    }
+                    if (isBlank(tr)) {
+                        tr = !isBlank(en) ? translationService.translate(en, "en", "tr")
+                                          : translationService.translate(est, "et", "tr");
+                        updated = true;
+                    }
+                    if (updated) {
+                        jdbc.update("UPDATE candidate_sentences SET english = COALESCE(?, english), turkish = COALESCE(?, turkish) WHERE id = ?",
+                            en, tr, s.get("id"));
+                        sentencesDone++;
+                    }
+                } catch (Exception e) {
+                    log.warn("[candidate-translate] Error translating sentence {}: {}", s.get("id"), e.getMessage());
+                }
+            }
+
+            // 3. Mark status: only set 'translated' if word AND all its sentences have Turkish
+            jdbc.update("""
+                UPDATE candidate_words SET status = 'translated', translated_at = NOW()
+                WHERE status = 'pending'
+                  AND turkish IS NOT NULL AND turkish != ''
+                  AND NOT EXISTS (
+                    SELECT 1 FROM candidate_sentences cs
+                    WHERE cs.candidate_id = candidate_words.id
+                      AND (cs.turkish IS NULL OR cs.turkish = '')
+                  )
+                """);
+
+            // Keep as 'pending' if sentences still missing Turkish
+            jdbc.update("""
+                UPDATE candidate_words SET status = 'pending'
+                WHERE status = 'translated'
+                  AND EXISTS (
+                    SELECT 1 FROM candidate_sentences cs
+                    WHERE cs.candidate_id = candidate_words.id
+                      AND (cs.turkish IS NULL OR cs.turkish = '')
+                  )
+                """);
 
             long duration = (System.currentTimeMillis() - start) / 1000;
             notificationService.success("candidates", "Bulk Translation Complete",
