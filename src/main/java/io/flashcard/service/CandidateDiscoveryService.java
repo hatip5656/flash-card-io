@@ -29,17 +29,20 @@ public class CandidateDiscoveryService {
     private final JdbcTemplate jdbc;
     private final WordBankService wordBankService;
     private final NotificationService notifications;
+    private final SchedulerHistoryService historyService;
 
     private volatile boolean running = false;
 
     public CandidateDiscoveryService(EkilexService ekilexService, TranslationService translationService,
                                      AppProperties appProperties, JdbcTemplate jdbc,
-                                     WordBankService wordBankService, NotificationService notifications) {
+                                     WordBankService wordBankService, NotificationService notifications,
+                                     SchedulerHistoryService historyService) {
         this.ekilexService = ekilexService;
         this.translationService = translationService;
         this.appProperties = appProperties;
         this.jdbc = jdbc;
         this.notifications = notifications;
+        this.historyService = historyService;
         this.wordBankService = wordBankService;
     }
 
@@ -204,14 +207,17 @@ public class CandidateDiscoveryService {
             long duration = System.currentTimeMillis() - start;
             log.info("[candidate-discovery] Complete: {} added, {} skipped in {}ms", totalAdded, totalSkipped, duration);
             recordSuccess(start, totalAdded);
+            String msg = totalAdded + " new candidates discovered, " + totalSkipped + " skipped (" + (duration / 1000) + "s)";
+            historyService.logRun(JOB_NAME, "success", java.time.Instant.ofEpochMilli(start), duration, totalAdded, 0, msg);
             if (totalAdded > 0) {
-                notifications.success("candidates", "Candidate Discovery Complete",
-                    totalAdded + " new candidates discovered, " + totalSkipped + " skipped (" + (duration / 1000) + "s)");
+                notifications.success("candidates", "Candidate Discovery Complete", msg);
             }
 
         } catch (Exception e) {
+            long duration = System.currentTimeMillis() - start;
             log.error("[candidate-discovery] Failed: {}", e.getMessage(), e);
             recordFailure(start);
+            historyService.logRun(JOB_NAME, "failed", java.time.Instant.ofEpochMilli(start), duration, 0, 0, e.getMessage());
             notifications.error("candidates", "Candidate Discovery Failed", e.getMessage());
         } finally {
             running = false;

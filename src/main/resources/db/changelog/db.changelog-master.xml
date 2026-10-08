@@ -25,5 +25,7 @@
     <include file="db/changelog/018-sentence-grammar-links.sql"/>
     <include file="db/changelog/019-ekilex-cache.sql"/>
     <include file="db/changelog/020-admin-notifications.sql"/>
+    <include file="db/changelog/021-word-audio-cache.sql"/>
+    <include file="db/changelog/022-scheduler-history.sql"/>
 
 </databaseChangeLog>

@@ -4,8 +4,12 @@ import io.flashcard.config.AppProperties;
 import io.flashcard.model.Word;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -20,16 +24,22 @@ public class FlashcardBuilderService {
     private final EkilexService ekilexService;
     private final GrammarBuilderService grammarBuilder;
     private final AppProperties appProperties;
+    private final JdbcTemplate jdbc;
+    private final Path wordAudioDir;
 
     public FlashcardBuilderService(ImageService imageService, SentenceService sentenceService,
                                    TtsService ttsService, EkilexService ekilexService,
-                                   GrammarBuilderService grammarBuilder, AppProperties appProperties) {
+                                   GrammarBuilderService grammarBuilder, AppProperties appProperties,
+                                   JdbcTemplate jdbc,
+                                   @Value("${CACHE_DIR:/app/cache}") String cacheDir) {
         this.imageService = imageService;
         this.sentenceService = sentenceService;
         this.ttsService = ttsService;
         this.ekilexService = ekilexService;
         this.grammarBuilder = grammarBuilder;
         this.appProperties = appProperties;
+        this.jdbc = jdbc;
+        this.wordAudioDir = Path.of(cacheDir, "word-audio");
     }
 
     public record Flashcard(
@@ -56,10 +66,9 @@ public class FlashcardBuilderService {
         // Run image fetch and TTS in parallel
         var imageFuture = java.util.concurrent.CompletableFuture.supplyAsync(() -> imageService.fetchImage(query));
 
-        boolean shouldTts = options.audioEnabled() && ttsService.isAvailable();
-        var audioFuture = shouldTts
-            ? java.util.concurrent.CompletableFuture.supplyAsync(() ->
-                ttsService.synthesizeSpeech(word.getEstonian(), sentence.estonian(), options.voiceName()))
+        // Try cached audio first, fall back to on-the-fly TTS
+        var audioFuture = options.audioEnabled()
+            ? java.util.concurrent.CompletableFuture.supplyAsync(() -> loadCachedAudioOrSynthesize(word, sentence, options))
             : java.util.concurrent.CompletableFuture.completedFuture((byte[]) null);
 
         ImageService.ImageResult photo = imageFuture.join();
@@ -168,6 +177,34 @@ public class FlashcardBuilderService {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * Try to load pre-generated audio from cache directory, fall back to on-the-fly TTS.
+     */
+    private byte[] loadCachedAudioOrSynthesize(Word word, SentenceService.Sentence sentence, BuildOptions options) {
+        try {
+            // Check if word has cached audio
+            var rows = jdbc.queryForList("SELECT audio_cache_key FROM words WHERE id = ?", word.getId());
+            if (!rows.isEmpty()) {
+                String audioKey = (String) rows.get(0).get("audio_cache_key");
+                if (audioKey != null) {
+                    Path audioPath = wordAudioDir.resolve(audioKey);
+                    if (Files.exists(audioPath)) {
+                        log.debug("[flashcard] Using cached audio for \"{}\"", word.getEstonian());
+                        return Files.readAllBytes(audioPath);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.debug("[flashcard] Failed to load cached audio for \"{}\": {}", word.getEstonian(), e.getMessage());
+        }
+
+        // Fall back to on-the-fly TTS
+        if (ttsService.isAvailable()) {
+            return ttsService.synthesizeSpeech(word.getEstonian(), sentence.estonian(), options.voiceName());
+        }
+        return null;
     }
 
 }

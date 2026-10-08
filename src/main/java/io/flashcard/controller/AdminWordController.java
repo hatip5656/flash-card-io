@@ -141,10 +141,17 @@ public class AdminWordController {
         var countParams = new java.util.ArrayList<>(params);
         params.add(limit); params.add(offset);
         var words = jdbc.queryForList(
-            "SELECT w.id, w.estonian, w.english, w.turkish, w.cefr_level, " +
+            "SELECT w.id, w.estonian, w.english, w.turkish, w.cefr_level, w.audio_cache_key, " +
             "(SELECT COUNT(*) FROM word_sentences s WHERE s.word_id = w.id) AS sentence_count " +
             "FROM words w" + where + " ORDER BY w.cefr_level, w.estonian LIMIT ? OFFSET ?",
             params.toArray());
+        // Add audio URLs for words that have cached audio
+        for (var w : words) {
+            String audioKey = (String) w.get("audio_cache_key");
+            if (audioKey != null) {
+                w.put("audioUrl", "https://wordagram.hatip.dev/word-audio/" + audioKey);
+            }
+        }
         int total = jdbc.queryForObject(
             "SELECT COUNT(*) FROM words w" + where, Integer.class, countParams.toArray());
         return ResponseEntity.ok(Map.of("items", words, "total", total));

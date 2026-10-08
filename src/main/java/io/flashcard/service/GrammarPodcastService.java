@@ -60,6 +60,7 @@ public class GrammarPodcastService {
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
     private final NotificationService notifications;
+    private final SchedulerHistoryService historyService;
     private final Path podcastDir;
 
     private volatile boolean running = false;
@@ -67,6 +68,7 @@ public class GrammarPodcastService {
     public GrammarPodcastService(JdbcTemplate jdbc, GeminiService geminiService,
                                  AppProperties appProperties, HttpClient httpClient,
                                  ObjectMapper objectMapper, NotificationService notifications,
+                                 SchedulerHistoryService historyService,
                                  @org.springframework.beans.factory.annotation.Value("${CACHE_DIR:/app/cache}") String cacheDir) {
         this.jdbc = jdbc;
         this.geminiService = geminiService;
@@ -74,6 +76,7 @@ public class GrammarPodcastService {
         this.httpClient = httpClient;
         this.objectMapper = objectMapper;
         this.notifications = notifications;
+        this.historyService = historyService;
         this.podcastDir = Path.of(cacheDir, "podcasts");
         try { Files.createDirectories(podcastDir); } catch (Exception ignored) {}
     }
@@ -179,12 +182,15 @@ public class GrammarPodcastService {
                 podcastId, lessonId, duration, durationSeconds);
 
             recordSuccess(start);
-            notifications.success("podcasts", "Grammar Podcast Generated",
-                "Lesson " + lessonId + " — " + durationSeconds + "s audio (" + (duration / 1000) + "s generation)");
+            String msg = "Lesson " + lessonId + " — " + durationSeconds + "s audio (" + (duration / 1000) + "s generation)";
+            historyService.logRun("grammar-podcast", "success", java.time.Instant.ofEpochMilli(start), duration, 1, 0, msg);
+            notifications.success("podcasts", "Grammar Podcast Generated", msg);
 
         } catch (Exception e) {
+            long duration = System.currentTimeMillis() - start;
             log.error("[grammar-podcast] Failed: {}", e.getMessage(), e);
             recordFailure(start);
+            historyService.logRun("grammar-podcast", "failed", java.time.Instant.ofEpochMilli(start), duration, 0, 1, e.getMessage());
             notifications.error("podcasts", "Grammar Podcast Failed", e.getMessage());
         } finally {
             running = false;

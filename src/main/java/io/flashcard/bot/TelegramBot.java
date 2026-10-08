@@ -49,6 +49,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
     private final QuizRepository quizRepo;
     private final GeminiService geminiService;
     private final io.flashcard.service.AccountLinkService linkService;
+    private final io.flashcard.service.NotificationService notificationService;
 
     private TelegramClient telegramClient;
     private TelegramBotsLongPollingApplication botApplication;
@@ -62,7 +63,8 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
                        WordDbRepository wordDbRepo,
                        ScheduleService scheduleService, DeliveryService deliveryService,
                        QuizRepository quizRepo, GeminiService geminiService,
-                       io.flashcard.service.AccountLinkService linkService) {
+                       io.flashcard.service.AccountLinkService linkService,
+                       io.flashcard.service.NotificationService notificationService) {
         this.appProperties = appProperties;
         this.subscriberRepo = subscriberRepo;
         this.activityRepo = activityRepo;
@@ -75,6 +77,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
         this.quizRepo = quizRepo;
         this.geminiService = geminiService;
         this.linkService = linkService;
+        this.notificationService = notificationService;
     }
 
     @PostConstruct
@@ -553,8 +556,10 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
             log.info("[telegram] Flashcard sent successfully to chat={} word={}", chatId, flashcard.word().getEstonian());
             return true;
         } catch (Exception e) {
+            String msg = e.getMessage() != null ? e.getMessage() : "";
             log.error("[telegram] Failed to send flashcard to chat={} word={}: {}", chatId,
-                flashcard.word().getEstonian(), e.getMessage(), e);
+                flashcard.word().getEstonian(), msg, e);
+            handleDeliveryFailure(chatId, msg);
             return false;
         }
     }
@@ -604,15 +609,7 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
             String msg = e.getMessage() != null ? e.getMessage() : "";
             log.error("[telegram] Failed to send text to chat={}: {} | text preview: {}", chatId, msg,
                 html.substring(0, Math.min(100, html.length())));
-            // Auto-deactivate user if chat no longer exists
-            if (msg.contains("chat not found") || msg.contains("bot was blocked") || msg.contains("user is deactivated")) {
-                log.warn("[telegram] Deactivating user chat={} — {}", chatId, msg);
-                try {
-                    subscriberRepo.removeSubscriber(chatId);
-                } catch (Exception ex) {
-                    log.warn("[telegram] Failed to deactivate chat={}: {}", chatId, ex.getMessage());
-                }
-            }
+            handleDeliveryFailure(chatId, msg);
         }
     }
 
@@ -621,8 +618,23 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer, Deliv
             telegramClient.execute(SendMessage.builder()
                 .chatId(chatId).text(html).parseMode("HTML").replyMarkup(keyboard).build());
         } catch (Exception e) {
+            String msg = e.getMessage() != null ? e.getMessage() : "";
             log.error("[telegram] Failed to send message with keyboard to chat={}: {} | text preview: {}", chatId,
-                e.getMessage(), html.substring(0, Math.min(100, html.length())));
+                msg, html.substring(0, Math.min(100, html.length())));
+            handleDeliveryFailure(chatId, msg);
+        }
+    }
+
+    private void handleDeliveryFailure(long chatId, String errorMsg) {
+        if (errorMsg.contains("chat not found") || errorMsg.contains("bot was blocked") || errorMsg.contains("user is deactivated")) {
+            log.warn("[telegram] Deactivating user chat={} — {}", chatId, errorMsg);
+            try {
+                subscriberRepo.removeSubscriber(chatId);
+                notificationService.warning("system", "User Disabled",
+                    "Chat " + chatId + " deactivated: " + errorMsg);
+            } catch (Exception ex) {
+                log.warn("[telegram] Failed to deactivate chat={}: {}", chatId, ex.getMessage());
+            }
         }
     }
 }
