@@ -3,6 +3,7 @@ package io.flashcard.controller;
 import io.flashcard.service.CandidateDiscoveryService;
 import io.flashcard.service.GrammarPodcastService;
 import io.flashcard.service.SchedulerHistoryService;
+import io.flashcard.service.SentenceTranslationService;
 import io.flashcard.service.WordAudioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,15 +17,18 @@ public class AdminSchedulerController {
     private final GrammarPodcastService grammarPodcastService;
     private final CandidateDiscoveryService candidateDiscoveryService;
     private final WordAudioService wordAudioService;
+    private final SentenceTranslationService sentenceTranslationService;
     private final SchedulerHistoryService historyService;
 
     public AdminSchedulerController(GrammarPodcastService grammarPodcastService,
                                     CandidateDiscoveryService candidateDiscoveryService,
                                     WordAudioService wordAudioService,
+                                    SentenceTranslationService sentenceTranslationService,
                                     SchedulerHistoryService historyService) {
         this.grammarPodcastService = grammarPodcastService;
         this.candidateDiscoveryService = candidateDiscoveryService;
         this.wordAudioService = wordAudioService;
+        this.sentenceTranslationService = sentenceTranslationService;
         this.historyService = historyService;
     }
 
@@ -61,6 +65,18 @@ public class AdminSchedulerController {
     @PostMapping("/word-audio/trigger")
     public ResponseEntity<?> triggerWordAudio() {
         wordAudioService.triggerGeneration();
+        return ResponseEntity.ok(Map.of("triggered", true));
+    }
+
+    // Sentence translation scheduler
+    @GetMapping("/sentence-translation")
+    public ResponseEntity<?> getSentenceTranslationStatus() {
+        return ResponseEntity.ok(sentenceTranslationService.getStatus());
+    }
+
+    @PostMapping("/sentence-translation/trigger")
+    public ResponseEntity<?> triggerSentenceTranslation() {
+        sentenceTranslationService.triggerTranslation();
         return ResponseEntity.ok(Map.of("triggered", true));
     }
 

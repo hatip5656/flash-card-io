@@ -148,7 +148,8 @@ public class FlashcardController {
                 JOIN word_sentences ws ON ws.word_id = sgl.word_id AND ws.estonian = sgl.sentence_estonian
                 JOIN words w ON w.id = sgl.word_id
                 WHERE sgl.confidence >= 0.8
-                ORDER BY sgl.confidence DESC
+                ORDER BY (CASE WHEN ws.turkish IS NOT NULL AND ws.turkish != '' THEN 0 ELSE 1 END),
+                         sgl.confidence DESC
                 """);
             for (var row : sentRows) {
                 String lessonId = (String) row.get("grammar_lesson_id");
