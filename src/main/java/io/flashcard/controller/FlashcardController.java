@@ -137,6 +137,33 @@ public class FlashcardController {
             }
         } catch (Exception ignored) {}
 
+        // Batch-fetch linked example sentences for all grammar lessons (up to 5 per lesson)
+        Map<String, List<Map<String, String>>> sentencesMap = new java.util.LinkedHashMap<>();
+        try {
+            var sentRows = jdbc.queryForList("""
+                SELECT sgl.grammar_lesson_id, sgl.sentence_estonian,
+                       ws.english AS sentence_english, ws.turkish AS sentence_turkish,
+                       w.estonian AS word
+                FROM sentence_grammar_links sgl
+                JOIN word_sentences ws ON ws.word_id = sgl.word_id AND ws.estonian = sgl.sentence_estonian
+                JOIN words w ON w.id = sgl.word_id
+                WHERE sgl.confidence >= 0.8
+                ORDER BY sgl.confidence DESC
+                """);
+            for (var row : sentRows) {
+                String lessonId = (String) row.get("grammar_lesson_id");
+                var list = sentencesMap.computeIfAbsent(lessonId, k -> new java.util.ArrayList<>());
+                if (list.size() < 5) {
+                    var sent = new java.util.LinkedHashMap<String, String>();
+                    sent.put("estonian", (String) row.get("sentence_estonian"));
+                    sent.put("english", (String) row.get("sentence_english"));
+                    sent.put("turkish", (String) row.get("sentence_turkish"));
+                    sent.put("word", (String) row.get("word"));
+                    list.add(sent);
+                }
+            }
+        } catch (Exception ignored) {}
+
         var items = allLessons.stream().map(l -> {
             var map = new java.util.LinkedHashMap<String, Object>();
             map.put("id", l.id());
@@ -149,6 +176,7 @@ public class FlashcardController {
             var podcast = podcastMap.get(l.id());
             map.put("podcastUrl", podcast != null ? podcast.get("podcastUrl") : null);
             map.put("durationSeconds", podcast != null ? podcast.get("durationSeconds") : null);
+            map.put("sentences", sentencesMap.getOrDefault(l.id(), List.of()));
             return map;
         }).toList();
 
