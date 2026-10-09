@@ -113,6 +113,48 @@ public class FlashcardController {
         return Map.of("ok", true, "lessonId", lessonId);
     }
 
+    @GetMapping("/grammar/lessons")
+    public Map<String, Object> getAllGrammarLessons(HttpServletRequest request) {
+        long chatId = getUserId(request);
+        Set<String> readIds = grammarRepo.getSentGrammarIds(chatId);
+        var allLessons = grammarBankService.getAllLessons();
+
+        // Batch-fetch podcast info for all lessons
+        Map<String, Map<String, Object>> podcastMap = new java.util.LinkedHashMap<>();
+        try {
+            var rows = jdbc.queryForList(
+                "SELECT g.id AS lesson_id, p.audio_cache_key, p.duration_seconds, p.title AS podcast_title " +
+                "FROM grammar_lessons g JOIN podcasts p ON p.id = g.podcast_id WHERE p.status = 'ready'");
+            for (var row : rows) {
+                String lessonId = (String) row.get("lesson_id");
+                String audioKey = (String) row.get("audio_cache_key");
+                if (audioKey != null) {
+                    podcastMap.put(lessonId, Map.of(
+                        "podcastUrl", "https://wordagram.hatip.dev/podcasts/" + audioKey,
+                        "durationSeconds", row.get("duration_seconds") != null ? row.get("duration_seconds") : 0
+                    ));
+                }
+            }
+        } catch (Exception ignored) {}
+
+        var items = allLessons.stream().map(l -> {
+            var map = new java.util.LinkedHashMap<String, Object>();
+            map.put("id", l.id());
+            map.put("topic", l.topic());
+            map.put("topicTr", l.topicTr() != null ? l.topicTr() : l.topic());
+            map.put("cefrLevel", l.cefrLevel());
+            map.put("content", l.content());
+            map.put("contentTr", l.contentTr() != null ? l.contentTr() : l.content());
+            map.put("isRead", readIds.contains(l.id()));
+            var podcast = podcastMap.get(l.id());
+            map.put("podcastUrl", podcast != null ? podcast.get("podcastUrl") : null);
+            map.put("durationSeconds", podcast != null ? podcast.get("durationSeconds") : null);
+            return map;
+        }).toList();
+
+        return Map.of("lessons", items, "total", items.size());
+    }
+
     @GetMapping("/review/due")
     public List<Map<String, Object>> getDueWords(HttpServletRequest request,
                                                   @RequestParam(defaultValue = "10") int limit) {

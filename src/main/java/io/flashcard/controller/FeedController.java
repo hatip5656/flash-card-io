@@ -91,14 +91,18 @@ public class FeedController {
             nextOffset = cursorOffset + seenWords.size();
         }
 
-        // Get cached images
+        // Get cached images and audio keys
         List<String> wordIds = rawItems.stream().map(r -> ((Word) r.get("word")).getId()).toList();
         Map<String, Map<String, String>> imageCache = new HashMap<>();
+        Map<String, String> audioCache = new HashMap<>();
         for (var row : wordDbRepo.getCachedImages(wordIds)) {
             if (row.get("image_url") != null) {
                 imageCache.put((String) row.get("id"), Map.of(
                     "url", (String) row.get("image_url"),
                     "photographer", row.get("image_photographer") != null ? (String) row.get("image_photographer") : ""));
+            }
+            if (row.get("audio_cache_key") != null) {
+                audioCache.put((String) row.get("id"), (String) row.get("audio_cache_key"));
             }
         }
 
@@ -129,6 +133,8 @@ public class FeedController {
                 "sentences", word.getSentences()));
             item.put("imageUrl", img != null ? img.get("url") : null);
             item.put("photographer", img != null ? img.get("photographer") : null);
+            String audioKey = audioCache.get(word.getId());
+            item.put("audioUrl", audioKey != null ? "https://wordagram.hatip.dev/word-audio/" + audioKey : null);
             item.put("isSaved", savedIds.contains(word.getId()));
             item.put("isNew", isNew);
             return item;

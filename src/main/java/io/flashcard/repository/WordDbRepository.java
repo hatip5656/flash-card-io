@@ -184,7 +184,7 @@ public class WordDbRepository {
     public List<Map<String, Object>> getCachedImages(List<String> wordIds) {
         if (wordIds.isEmpty()) return List.of();
         return jdbc.queryForList(
-            "SELECT id, image_url, image_photographer FROM words WHERE id = ANY(?)",
+            "SELECT id, image_url, image_photographer, audio_cache_key FROM words WHERE id = ANY(?)",
             (Object) wordIds.toArray(new String[0]));
     }
 
