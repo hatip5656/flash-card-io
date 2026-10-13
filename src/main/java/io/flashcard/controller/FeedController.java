@@ -123,14 +123,16 @@ public class FeedController {
                 });
             }
 
+            var wordMap = new LinkedHashMap<String, Object>();
+            wordMap.put("id", word.getId());
+            wordMap.put("estonian", word.getEstonian());
+            wordMap.put("english", word.getEnglish());
+            wordMap.put("turkish", word.getTurkish() != null ? word.getTurkish() : "");
+            wordMap.put("cefrLevel", word.getCefrLevel());
+            wordMap.put("sentences", word.getSentences() != null ? word.getSentences() : List.of());
+
             Map<String, Object> item = new LinkedHashMap<>();
-            item.put("word", Map.of(
-                "id", word.getId(),
-                "estonian", word.getEstonian(),
-                "english", word.getEnglish(),
-                "turkish", word.getTurkish(),
-                "cefrLevel", word.getCefrLevel(),
-                "sentences", word.getSentences()));
+            item.put("word", wordMap);
             item.put("imageUrl", img != null ? img.get("url") : null);
             item.put("photographer", img != null ? img.get("photographer") : null);
             String audioKey = audioCache.get(word.getId());
@@ -142,7 +144,11 @@ public class FeedController {
 
         boolean hasMore = items.size() == limit;
         String nextCursor = hasMore ? nextMode + ":" + nextOffset : null;
-        return Map.of("items", items, "nextCursor", nextCursor, "hasMore", hasMore);
+        var result = new LinkedHashMap<String, Object>();
+        result.put("items", items);
+        result.put("nextCursor", nextCursor);
+        result.put("hasMore", hasMore);
+        return result;
     }
 
     @PostMapping("/seen/{wordId}")
