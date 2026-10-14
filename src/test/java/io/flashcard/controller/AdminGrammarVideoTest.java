@@ -3,7 +3,7 @@ package io.flashcard.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.flashcard.service.GrammarBankService;
 import io.flashcard.service.GrammarPodcastService;
-import io.flashcard.service.TeacherSimulatorService;
+import io.flashcard.service.PodcastVideoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,15 +34,15 @@ class AdminGrammarVideoTest {
 
     private MockMvc mvc;
     private JdbcTemplate jdbc;
-    private TeacherSimulatorService simulator;
+    private PodcastVideoService videos;
 
     @BeforeEach
     void setUp() {
         jdbc = mock(JdbcTemplate.class);
-        simulator = mock(TeacherSimulatorService.class);
+        videos = mock(PodcastVideoService.class);
         mvc = MockMvcBuilders.standaloneSetup(new AdminGrammarController(
             jdbc, new ObjectMapper(), mock(GrammarPodcastService.class),
-            mock(GrammarBankService.class), simulator)).build();
+            mock(GrammarBankService.class), videos)).build();
     }
 
     private void lessonRow(Map<String, Object> row) {
@@ -63,7 +62,7 @@ class AdminGrammarVideoTest {
     @SuppressWarnings("unchecked")
     void generateSendsPodcastAudioAndTimings() throws Exception {
         lessonRow(readyPodcast());
-        when(simulator.requestVideo(anyString(), anyString(), anyList(), anyBoolean()))
+        when(videos.request(anyString(), anyString(), anyString(), anyList(), anyBoolean()))
             .thenReturn(Map.of("id", PODCAST_ID.toString(), "status", "queued"));
 
         mvc.perform(post("/api/admin/grammar/a1-plural-formation/video"))
@@ -71,7 +70,7 @@ class AdminGrammarVideoTest {
             .andExpect(jsonPath("$.status").value("queued"));
 
         ArgumentCaptor<List<Map<String, Object>>> subs = ArgumentCaptor.forClass(List.class);
-        verify(simulator).requestVideo(eq(PODCAST_ID.toString()),
+        verify(videos).request(eq("a1-plural-formation"), eq(PODCAST_ID.toString()),
             eq("https://wordagram.hatip.dev/podcasts/" + PODCAST_ID + ".wav"), subs.capture(), eq(false));
         assertEquals(2, subs.getValue().size());
         assertEquals(Map.of("text", "Bugün", "language", "tr", "start_ms", 0, "end_ms", 2720), subs.getValue().get(0));
@@ -85,13 +84,13 @@ class AdminGrammarVideoTest {
 
         mvc.perform(post("/api/admin/grammar/a1-plural-formation/video"))
             .andExpect(status().isConflict());
-        verifyNoInteractions(simulator);
+        verifyNoInteractions(videos);
     }
 
     @Test
     void generateReportsServiceOutage() throws Exception {
         lessonRow(readyPodcast());
-        when(simulator.requestVideo(anyString(), anyString(), anyList(), anyBoolean()))
+        when(videos.request(anyString(), anyString(), anyString(), anyList(), anyBoolean()))
             .thenThrow(new IOException("connection refused"));
 
         mvc.perform(post("/api/admin/grammar/a1-plural-formation/video"))
@@ -100,24 +99,15 @@ class AdminGrammarVideoTest {
     }
 
     @Test
-    void statusIsNoneWhenNeverRendered() throws Exception {
+    void statusComesFromTrackedRender() throws Exception {
         lessonRow(readyPodcast());
-        when(simulator.getStatus(PODCAST_ID.toString())).thenReturn(Optional.empty());
-
-        mvc.perform(get("/api/admin/grammar/a1-plural-formation/video"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status").value("none"));
-    }
-
-    @Test
-    void statusIncludesPublicUrlWhenDone() throws Exception {
-        lessonRow(readyPodcast());
-        when(simulator.getStatus(PODCAST_ID.toString())).thenReturn(Optional.of(Map.of(
+        when(videos.statusFor(PODCAST_ID.toString())).thenReturn(Map.of(
             "id", PODCAST_ID.toString(), "status", "done",
-            "videoUrl", "https://wordagram.hatip.dev/videos/" + PODCAST_ID + ".mp4")));
+            "videoUrl", "https://wordagram.hatip.dev/videos/" + PODCAST_ID + ".mp4"));
 
         mvc.perform(get("/api/admin/grammar/a1-plural-formation/video"))
             .andExpect(status().isOk())
+            .andExpect(jsonPath("$.status").value("done"))
             .andExpect(jsonPath("$.videoUrl").value("https://wordagram.hatip.dev/videos/" + PODCAST_ID + ".mp4"));
     }
 }

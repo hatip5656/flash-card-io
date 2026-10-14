@@ -3,7 +3,7 @@ package io.flashcard.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.flashcard.service.GrammarBankService;
 import io.flashcard.service.GrammarPodcastService;
-import io.flashcard.service.TeacherSimulatorService;
+import io.flashcard.service.PodcastVideoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -25,17 +25,17 @@ public class AdminGrammarController {
     private final ObjectMapper objectMapper;
     private final GrammarPodcastService grammarPodcastService;
     private final GrammarBankService grammarBankService;
-    private final TeacherSimulatorService teacherSimulatorService;
+    private final PodcastVideoService podcastVideoService;
 
     public AdminGrammarController(JdbcTemplate jdbc, ObjectMapper objectMapper,
                                   GrammarPodcastService grammarPodcastService,
                                   GrammarBankService grammarBankService,
-                                  TeacherSimulatorService teacherSimulatorService) {
+                                  PodcastVideoService podcastVideoService) {
         this.jdbc = jdbc;
         this.objectMapper = objectMapper;
         this.grammarPodcastService = grammarPodcastService;
         this.grammarBankService = grammarBankService;
-        this.teacherSimulatorService = teacherSimulatorService;
+        this.podcastVideoService = podcastVideoService;
     }
 
     @GetMapping
@@ -46,9 +46,11 @@ public class AdminGrammarController {
                    p.status AS podcast_status,
                    p.duration_seconds AS podcast_duration,
                    p.audio_cache_key,
-                   p.created_at AS podcast_created_at
+                   p.created_at AS podcast_created_at,
+                   v.status AS video_status, v.progress AS video_progress, v.video_url
             FROM grammar_lessons g
             LEFT JOIN podcasts p ON p.id = g.podcast_id
+            LEFT JOIN podcast_videos v ON v.podcast_id = g.podcast_id
             ORDER BY g.cefr_level, g.id
             """);
 
@@ -180,8 +182,8 @@ public class AdminGrammarController {
 
         String podcastId = podcast.get("podcast_id").toString();
         try {
-            return ResponseEntity.ok(teacherSimulatorService.requestVideo(
-                podcastId, PODCAST_BASE_URL + podcast.get("audio_cache_key"), subtitles, force));
+            return ResponseEntity.ok(podcastVideoService.request(
+                id, podcastId, PODCAST_BASE_URL + podcast.get("audio_cache_key"), subtitles, force));
         } catch (Exception e) {
             log.warn("Video request for lesson {} failed: {}", id, e.getMessage());
             return ResponseEntity.status(502).body(Map.of("error", "Video service unavailable: " + e.getMessage()));
@@ -194,14 +196,7 @@ public class AdminGrammarController {
         if (podcast == null) return ResponseEntity.notFound().build();
         if (podcast.get("podcast_id") == null) return ResponseEntity.ok(Map.of("status", "none"));
 
-        String podcastId = podcast.get("podcast_id").toString();
-        try {
-            return ResponseEntity.ok(teacherSimulatorService.getStatus(podcastId)
-                .<Map<String, Object>>map(s -> s)
-                .orElse(Map.of("id", podcastId, "status", "none")));
-        } catch (Exception e) {
-            return ResponseEntity.status(502).body(Map.of("error", "Video service unavailable: " + e.getMessage()));
-        }
+        return ResponseEntity.ok(podcastVideoService.statusFor(podcast.get("podcast_id").toString()));
     }
 
     private Map<String, Object> findPodcast(String lessonId) {
