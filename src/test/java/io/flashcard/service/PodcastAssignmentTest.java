@@ -72,6 +72,7 @@ class PodcastAssignmentTest {
             row("u1", "Grammar: Numbers", "num.wav", null),      // has the current version
             row("u2", "Grammar: Negation", "neg-old.wav", null), // has an older version
             row("u3", "Daily Estonian Lesson", "daily.wav", null)));
+        when(repo.findTemplateAudioKeys()).thenReturn(List.of("neg-new.wav", "num.wav", "aile.wav", "neg-old.wav"));
 
         var result = service.assignmentsFor(USER);
         var available = (List<Map<String, Object>>) result.get("available");
@@ -82,5 +83,21 @@ class PodcastAssignmentTest {
         assertEquals("u2", available.get(0).get("olderCopyId"));
         assertEquals("custom", available.get(1).get("kind"));
         assertEquals(List.of("library", "outdated", "personal"), assigned.stream().map(m -> m.get("kind")).toList());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void learnersOwnPodcastIsNeverAnOlderCopy() {
+        // An admin podcast shares a generic title with the learner's own generated podcast
+        when(repo.findAssignable()).thenReturn(List.of(row("c1", "Daily Estonian Lesson", "admin.wav", null)));
+        when(repo.findForUser(USER)).thenReturn(List.of(row("u1", "Daily Estonian Lesson", "own.wav", null)));
+        when(repo.findTemplateAudioKeys()).thenReturn(List.of("admin.wav"));
+
+        var result = service.assignmentsFor(USER);
+        var available = (List<Map<String, Object>>) result.get("available");
+        var assigned = (List<Map<String, Object>>) result.get("assigned");
+
+        assertEquals(null, available.get(0).get("olderCopyId"));
+        assertEquals("personal", assigned.get(0).get("kind"));
     }
 }

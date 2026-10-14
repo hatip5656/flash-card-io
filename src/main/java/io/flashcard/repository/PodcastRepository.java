@@ -162,6 +162,13 @@ public class PodcastRepository {
             .listOfRows();
     }
 
+    /** Audio of every admin/grammar podcast, including superseded ones: what a clone can have come from. */
+    public List<String> findTemplateAudioKeys() {
+        return jdbc.sql("SELECT DISTINCT audio_cache_key FROM podcasts WHERE chat_id = 0 AND audio_cache_key IS NOT NULL")
+            .query(String.class)
+            .list();
+    }
+
     public boolean userHasAudio(long chatId, String audioCacheKey) {
         return jdbc.sql("SELECT COUNT(*) FROM podcasts WHERE chat_id = :chatId AND audio_cache_key = :key")
             .param("chatId", chatId)

@@ -515,41 +515,68 @@ public class PodcastService {
     /**
      * A user's podcasts split for the assignment screen.
      * available: assignable podcasts the user lacks (olderCopyId set when they hold an outdated copy).
-     * assigned: the user's podcasts, each tagged library, outdated or personal.
+     * assigned: the user's podcasts, each tagged library, outdated or personal; sourceKind is
+     * grammar or custom for the first two.
+     *
+     * Provenance comes from the audio: a clone shares its source's audio file. A copy is outdated only
+     * when its audio belongs to a superseded admin podcast whose title a current one now carries, so a
+     * learner's own podcasts (unique audio, never titled "Grammar: ...") are never mistaken for older copies.
      */
     public Map<String, Object> assignmentsFor(long chatId) {
         var library = podcastRepo.findAssignable();
         var owned = podcastRepo.findForUser(chatId);
+        var templateAudio = new HashSet<>(podcastRepo.findTemplateAudioKeys());
 
+        var libraryByAudio = new HashMap<Object, Map<String, Object>>();
+        var libraryByTitle = new HashMap<Object, Map<String, Object>>();
+        library.forEach(p -> {
+            libraryByAudio.put(p.get("audio_cache_key"), p);
+            libraryByTitle.putIfAbsent(p.get("title"), p);
+        });
+
+        var assigned = new ArrayList<Map<String, Object>>();
         var ownedAudio = new HashSet<Object>();
-        owned.forEach(p -> ownedAudio.add(p.get("audio_cache_key")));
-        var libraryAudio = new HashSet<Object>();
-        var libraryTitles = new HashSet<Object>();
-        library.forEach(p -> { libraryAudio.add(p.get("audio_cache_key")); libraryTitles.add(p.get("title")); });
+        var olderCopyByTitle = new HashMap<Object, Object>();
+        for (var p : owned) {
+            Object audio = p.get("audio_cache_key");
+            ownedAudio.add(audio);
+            var item = assignmentItem(p);
+            var source = libraryByAudio.get(audio);
+            var newer = libraryByTitle.get(p.get("title"));
+            if (source != null) {
+                item.put("kind", "library");
+                item.put("sourceKind", kindOf(source));
+            } else if (newer != null && (templateAudio.contains(audio) || isGrammarTitle(p.get("title")))) {
+                item.put("kind", "outdated");
+                item.put("sourceKind", kindOf(newer));
+                olderCopyByTitle.putIfAbsent(p.get("title"), p.get("id"));
+            } else {
+                item.put("kind", "personal");
+            }
+            item.put("status", p.get("status"));
+            assigned.add(item);
+        }
 
         var available = new ArrayList<Map<String, Object>>();
         for (var p : library) {
             if (ownedAudio.contains(p.get("audio_cache_key"))) continue;
             var item = assignmentItem(p);
-            item.put("kind", p.get("lesson_id") != null ? "grammar" : "custom");
+            item.put("kind", kindOf(p));
             item.put("lessonId", p.get("lesson_id"));
-            owned.stream()
-                .filter(o -> Objects.equals(o.get("title"), p.get("title")))
-                .findFirst()
-                .ifPresent(o -> item.put("olderCopyId", o.get("id")));
+            if (olderCopyByTitle.containsKey(p.get("title"))) item.put("olderCopyId", olderCopyByTitle.get(p.get("title")));
             available.add(item);
         }
-
-        var assigned = new ArrayList<Map<String, Object>>();
-        for (var p : owned) {
-            var item = assignmentItem(p);
-            // Same audio as a library podcast: assigned. Same title only: an older version of one.
-            item.put("kind", libraryAudio.contains(p.get("audio_cache_key")) ? "library"
-                : libraryTitles.contains(p.get("title")) ? "outdated" : "personal");
-            item.put("status", p.get("status"));
-            assigned.add(item);
-        }
         return Map.of("available", available, "assigned", assigned);
+    }
+
+    // Only the grammar pipeline names podcasts "Grammar: <topic>", so such a title also proves provenance
+    // after superseded grammar podcasts were cleaned up
+    private static boolean isGrammarTitle(Object title) {
+        return title instanceof String t && t.startsWith("Grammar: ");
+    }
+
+        private static String kindOf(Map<String, Object> libraryRow) {
+        return libraryRow.get("lesson_id") != null ? "grammar" : "custom";
     }
 
     private static Map<String, Object> assignmentItem(Map<String, Object> row) {
