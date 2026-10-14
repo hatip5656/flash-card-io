@@ -19,6 +19,13 @@ import static io.flashcard.controller.UserController.getUserId;
 @RequestMapping("/api")
 public class FlashcardController {
 
+    private static final String PODCAST_BASE_URL = "https://wordagram.hatip.dev/podcasts/";
+    // The teacher-simulator renderer prepends this intro to every lesson video
+    // (bookends.introSec in its pipeline), so video time runs ahead of the subtitles.
+    private static final int VIDEO_INTRO_OFFSET_MS = 1500;
+    private static final com.fasterxml.jackson.databind.ObjectMapper OBJECT_MAPPER =
+        new com.fasterxml.jackson.databind.ObjectMapper();
+
     private final SubscriberRepository subscriberRepo;
     private final SentWordRepository sentWordRepo;
     private final GrammarRepository grammarRepo;
@@ -72,6 +79,7 @@ public class FlashcardController {
                                                       @RequestParam(defaultValue = "3") int limit) {
         long chatId = getUserId(request);
         String level = subscriberRepo.getSubscriberLevel(chatId);
+        var podcastMap = loadPodcastInfo();
         var all = grammarBankService.getAllLessons().stream()
             .filter(l -> l.cefrLevel().equals(level) || compareLevels(l.cefrLevel(), level) < 0)
             .limit(Math.min(limit, 10))
@@ -83,18 +91,12 @@ public class FlashcardController {
                 map.put("cefrLevel", l.cefrLevel());
                 map.put("content", l.content());
                 map.put("contentTr", l.contentTr() != null ? l.contentTr() : l.content());
-                // Include podcast URL if grammar lesson has an associated podcast
-                try {
-                    var podcasts = jdbc.queryForList(
-                        "SELECT p.audio_cache_key FROM grammar_lessons g JOIN podcasts p ON p.id = g.podcast_id WHERE g.id = ? AND p.status = 'ready'",
-                        l.id());
-                    if (!podcasts.isEmpty()) {
-                        String audioKey = (String) podcasts.get(0).get("audio_cache_key");
-                        if (audioKey != null) {
-                            map.put("podcastUrl", "https://wordagram.hatip.dev/podcasts/" + audioKey);
-                        }
-                    }
-                } catch (Exception ignored) {}
+                // Include podcast URL and video flag if the lesson has an associated podcast
+                var podcast = podcastMap.get(l.id());
+                if (podcast != null) {
+                    map.put("podcastUrl", podcast.get("podcastUrl"));
+                }
+                map.put("hasVideo", podcast != null && Boolean.TRUE.equals(podcast.get("hasVideo")));
                 return map;
             })
             .toList();
@@ -120,22 +122,7 @@ public class FlashcardController {
         var allLessons = grammarBankService.getAllLessons();
 
         // Batch-fetch podcast info for all lessons
-        Map<String, Map<String, Object>> podcastMap = new java.util.LinkedHashMap<>();
-        try {
-            var rows = jdbc.queryForList(
-                "SELECT g.id AS lesson_id, p.audio_cache_key, p.duration_seconds, p.title AS podcast_title " +
-                "FROM grammar_lessons g JOIN podcasts p ON p.id = g.podcast_id WHERE p.status = 'ready'");
-            for (var row : rows) {
-                String lessonId = (String) row.get("lesson_id");
-                String audioKey = (String) row.get("audio_cache_key");
-                if (audioKey != null) {
-                    podcastMap.put(lessonId, Map.of(
-                        "podcastUrl", "https://wordagram.hatip.dev/podcasts/" + audioKey,
-                        "durationSeconds", row.get("duration_seconds") != null ? row.get("duration_seconds") : 0
-                    ));
-                }
-            }
-        } catch (Exception ignored) {}
+        var podcastMap = loadPodcastInfo();
 
         // Batch-fetch linked example sentences for all grammar lessons (up to 5 per lesson)
         Map<String, List<Map<String, String>>> sentencesMap = new java.util.LinkedHashMap<>();
@@ -177,11 +164,93 @@ public class FlashcardController {
             var podcast = podcastMap.get(l.id());
             map.put("podcastUrl", podcast != null ? podcast.get("podcastUrl") : null);
             map.put("durationSeconds", podcast != null ? podcast.get("durationSeconds") : null);
+            map.put("podcastId", podcast != null ? podcast.get("podcastId") : null);
+            map.put("hasVideo", podcast != null && Boolean.TRUE.equals(podcast.get("hasVideo")));
             map.put("sentences", sentencesMap.getOrDefault(l.id(), List.of()));
             return map;
         }).toList();
 
         return Map.of("lessons", items, "total", items.size());
+    }
+
+    @GetMapping("/grammar/lessons/{id}/media")
+    public ResponseEntity<?> getGrammarLessonMedia(@PathVariable String id) {
+        var rows = jdbc.queryForList("""
+            SELECT g.id AS lesson_id, g.podcast_id, p.audio_cache_key, p.duration_seconds,
+                   p.script AS podcast_timings, v.video_url
+            FROM grammar_lessons g
+            LEFT JOIN podcasts p ON p.id = g.podcast_id AND p.status = 'ready'
+            LEFT JOIN podcast_videos v ON v.podcast_id = p.id AND v.status = 'done'
+            WHERE g.id = ?
+            """, id);
+        if (rows.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("error", "Lesson not found"));
+        }
+
+        var row = rows.get(0);
+        String audioKey = (String) row.get("audio_cache_key");
+        // Only expose the podcast when it is ready and has audio
+        boolean hasPodcast = audioKey != null;
+
+        var media = new java.util.LinkedHashMap<String, Object>();
+        media.put("lessonId", row.get("lesson_id"));
+        media.put("podcastId", hasPodcast && row.get("podcast_id") != null ? row.get("podcast_id").toString() : null);
+        media.put("podcastUrl", hasPodcast ? PODCAST_BASE_URL + audioKey : null);
+        media.put("durationSeconds", hasPodcast ? row.get("duration_seconds") : null);
+        Object videoUrl = hasPodcast ? row.get("video_url") : null;
+        media.put("videoUrl", videoUrl);
+        media.put("videoOffsetMs", videoUrl != null ? VIDEO_INTRO_OFFSET_MS : null);
+        media.put("subtitles", hasPodcast ? toLessonSubtitles(row.get("podcast_timings")) : List.of());
+        return ResponseEntity.ok(media);
+    }
+
+    // Podcast info (URL, duration, video flag) for every lesson with a ready podcast, in one query.
+    private Map<String, Map<String, Object>> loadPodcastInfo() {
+        Map<String, Map<String, Object>> podcastMap = new java.util.LinkedHashMap<>();
+        try {
+            var rows = jdbc.queryForList(
+                "SELECT g.id AS lesson_id, g.podcast_id, p.audio_cache_key, p.duration_seconds, p.title AS podcast_title, " +
+                "(v.podcast_id IS NOT NULL) AS has_video " +
+                "FROM grammar_lessons g JOIN podcasts p ON p.id = g.podcast_id " +
+                "LEFT JOIN podcast_videos v ON v.podcast_id = g.podcast_id AND v.status = 'done' AND v.video_url IS NOT NULL " +
+                "WHERE p.status = 'ready'");
+            for (var row : rows) {
+                String lessonId = (String) row.get("lesson_id");
+                String audioKey = (String) row.get("audio_cache_key");
+                if (audioKey != null) {
+                    var podcast = new java.util.HashMap<String, Object>();
+                    podcast.put("podcastId", row.get("podcast_id") != null ? row.get("podcast_id").toString() : null);
+                    podcast.put("podcastUrl", PODCAST_BASE_URL + audioKey);
+                    podcast.put("durationSeconds", row.get("duration_seconds") != null ? row.get("duration_seconds") : 0);
+                    podcast.put("hasVideo", Boolean.TRUE.equals(row.get("has_video")));
+                    podcastMap.put(lessonId, podcast);
+                }
+            }
+        } catch (Exception ignored) {}
+        return podcastMap;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> toLessonSubtitles(Object timings) {
+        if (timings == null) return List.of();
+        List<Map<String, Object>> raw;
+        try {
+            raw = OBJECT_MAPPER.readValue(timings.toString(), List.class);
+        } catch (Exception e) {
+            return List.of();
+        }
+        return raw.stream()
+            .filter(t -> t != null && t.get("text") != null && t.get("start_ms") instanceof Number
+                && t.get("end_ms") instanceof Number)
+            .<Map<String, Object>>map(t -> {
+                var s = new java.util.LinkedHashMap<String, Object>();
+                s.put("text", t.get("text").toString().replace("<<", "").replace(">>", ""));
+                s.put("language", t.get("language"));
+                s.put("startMs", ((Number) t.get("start_ms")).longValue());
+                s.put("endMs", ((Number) t.get("end_ms")).longValue());
+                return s;
+            })
+            .toList();
     }
 
     @GetMapping("/review/due")
