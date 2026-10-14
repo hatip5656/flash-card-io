@@ -28,5 +28,6 @@
     <include file="db/changelog/021-word-audio-cache.sql"/>
     <include file="db/changelog/022-scheduler-history.sql"/>
     <include file="db/changelog/023-podcast-videos.sql"/>
+    <include file="db/changelog/024-pipeline-timestamps.sql"/>
 
 </databaseChangeLog>

@@ -69,7 +69,7 @@ class PodcastVideoServiceTest {
 
         service.pollActiveRenders();
 
-        verify(jdbc).update(contains("SET status = ?, progress = ?"), eq("rendering"), eq(0.42), eq(PODCAST));
+        verify(jdbc).update(contains("COALESCE(started_at, NOW())"), eq("rendering"), eq(0.42), eq("rendering"), eq(PODCAST));
         verifyNoInteractions(notifications);
     }
 
@@ -81,5 +81,26 @@ class PodcastVideoServiceTest {
 
         verify(jdbc, never()).update(anyString(), any(Object[].class));
         verifyNoInteractions(notifications);
+    }
+
+    @Test
+    void requestRecordsTheJobTheServiceReturned() throws Exception {
+        when(simulator.requestVideo(eq(PODCAST), anyString(), anyList(), eq(false)))
+            .thenReturn(Map.of("id", PODCAST, "status", "rendering", "progress", 0.5));
+
+        service.request("a1-comitative-abessive", PODCAST, "https://audio", List.of(), false);
+
+        // An existing job keeps its timestamps, so time-left estimates stay valid
+        verify(jdbc).update(contains("THEN podcast_videos.started_at ELSE EXCLUDED.started_at"),
+            eq(PODCAST), eq("a1-comitative-abessive"), eq("rendering"), eq(0.5), isNull(), eq("rendering"), eq("rendering"));
+    }
+
+    @Test
+    void clearsStartTimeWhileQueued() throws Exception {
+        when(simulator.getStatus(PODCAST)).thenReturn(Optional.of(Map.of("id", PODCAST, "status", "queued", "progress", 0)));
+
+        service.pollActiveRenders();
+
+        verify(jdbc).update(contains("COALESCE(started_at, NOW())"), eq("queued"), eq(0.0), eq("queued"), eq(PODCAST));
     }
 }

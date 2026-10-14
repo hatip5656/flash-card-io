@@ -43,13 +43,22 @@ public class PodcastVideoService {
         Map<String, Object> status = simulator.requestVideo(podcastId, audioUrl, subtitles, force);
         String state = String.valueOf(status.get("status"));
         jdbc.update("""
-            INSERT INTO podcast_videos (podcast_id, lesson_id, status, progress, error, video_url, requested_at, completed_at)
-            VALUES (?, ?, ?, ?, NULL, ?, NOW(), CASE WHEN ? = 'done' THEN NOW() END)
+            INSERT INTO podcast_videos (podcast_id, lesson_id, status, progress, error, video_url,
+                                        requested_at, started_at, completed_at)
+            VALUES (?, ?, ?, ?, NULL, ?, NOW(), CASE WHEN ? = 'rendering' THEN NOW() END, CASE WHEN ? = 'done' THEN NOW() END)
             ON CONFLICT (podcast_id) DO UPDATE SET
                 lesson_id = EXCLUDED.lesson_id, status = EXCLUDED.status, progress = EXCLUDED.progress,
                 error = NULL, video_url = EXCLUDED.video_url,
-                requested_at = NOW(), completed_at = EXCLUDED.completed_at
-            """, podcastId, lessonId, state, progressOf(status), status.get("videoUrl"), state);
+                -- The service returns an existing job unchanged; keep its timestamps then
+                requested_at = CASE WHEN podcast_videos.status IN ('queued', 'rendering', 'done')
+                                     AND podcast_videos.status = EXCLUDED.status
+                                    THEN podcast_videos.requested_at ELSE NOW() END,
+                started_at = CASE WHEN podcast_videos.status IN ('rendering', 'done')
+                                   AND podcast_videos.status = EXCLUDED.status
+                                  THEN podcast_videos.started_at ELSE EXCLUDED.started_at END,
+                completed_at = CASE WHEN podcast_videos.status = 'done' AND EXCLUDED.status = 'done'
+                                    THEN podcast_videos.completed_at ELSE EXCLUDED.completed_at END
+            """, podcastId, lessonId, state, progressOf(status), status.get("videoUrl"), state, state);
         return statusFor(podcastId);
     }
 
@@ -95,8 +104,12 @@ public class PodcastVideoService {
                     case "done" -> finish(podcastId, lessonId, topic, "done", (String) s.get("videoUrl"), null);
                     case "failed" -> finish(podcastId, lessonId, topic, "failed", null,
                         s.get("error") != null ? s.get("error").toString() : "unknown error");
-                    default -> jdbc.update("UPDATE podcast_videos SET status = ?, progress = ? WHERE podcast_id = ?",
-                        s.get("status"), progressOf(s), podcastId);
+                    // started_at marks when rendering began, so the dashboard can estimate time left
+                    default -> jdbc.update("""
+                        UPDATE podcast_videos SET status = ?, progress = ?,
+                            started_at = CASE WHEN ? = 'rendering' THEN COALESCE(started_at, NOW()) END
+                        WHERE podcast_id = ?
+                        """, s.get("status"), progressOf(s), s.get("status"), podcastId);
                 }
             } catch (Exception e) {
                 // Service unreachable: keep tracking, try again next poll

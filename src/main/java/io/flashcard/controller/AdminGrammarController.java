@@ -47,7 +47,14 @@ public class AdminGrammarController {
                    p.duration_seconds AS podcast_duration,
                    p.audio_cache_key,
                    p.created_at AS podcast_created_at,
-                   v.status AS video_status, v.progress AS video_progress, v.video_url
+                   CASE WHEN jsonb_typeof(g.podcast_script) = 'array'
+                        THEN jsonb_array_length(g.podcast_script) END AS script_segments,
+                   CASE WHEN jsonb_typeof(p.script) = 'array' AND jsonb_array_length(p.script) > 0
+                        THEN jsonb_array_length(p.script) END AS podcast_segments,
+                   g.script_updated_at,
+                   v.status AS video_status, v.progress AS video_progress, v.video_url, v.error AS video_error,
+                   v.requested_at AS video_requested_at, v.started_at AS video_started_at,
+                   v.completed_at AS video_completed_at
             FROM grammar_lessons g
             LEFT JOIN podcasts p ON p.id = g.podcast_id
             LEFT JOIN podcast_videos v ON v.podcast_id = g.podcast_id
@@ -62,12 +69,24 @@ public class AdminGrammarController {
             }
         }
 
+        // Renders tracked by podcast, including ones whose podcast was regenerated meanwhile
+        var activeVideos = jdbc.queryForList("""
+            SELECT v.podcast_id, v.lesson_id, g.cefr_level, g.topic, v.status, v.progress,
+                   v.requested_at, v.started_at, p.duration_seconds AS podcast_duration
+            FROM podcast_videos v
+            LEFT JOIN grammar_lessons g ON g.id = v.lesson_id
+            LEFT JOIN podcasts p ON p.id = v.podcast_id
+            WHERE v.status IN ('queued', 'rendering')
+            ORDER BY v.requested_at
+            """);
+
         int total = lessons.size();
         int withScript = (int) lessons.stream().filter(l -> Boolean.TRUE.equals(l.get("has_script"))).count();
         int withPodcast = (int) lessons.stream().filter(l -> l.get("podcast_id") != null).count();
 
         return ResponseEntity.ok(Map.of(
             "items", lessons,
+            "activeVideos", activeVideos,
             "total", total,
             "withScript", withScript,
             "withPodcast", withPodcast,
@@ -118,7 +137,7 @@ public class AdminGrammarController {
                 return ResponseEntity.badRequest().body(Map.of("error", "Script must be a non-empty array"));
             }
 
-            jdbc.update("UPDATE grammar_lessons SET podcast_script = ?::jsonb WHERE id = ?",
+            jdbc.update("UPDATE grammar_lessons SET podcast_script = ?::jsonb, script_updated_at = NOW() WHERE id = ?",
                 scriptJson, id);
 
             return ResponseEntity.ok(Map.of("updated", id, "segments", segments.size()));
