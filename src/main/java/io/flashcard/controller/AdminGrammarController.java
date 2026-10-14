@@ -3,10 +3,14 @@ package io.flashcard.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.flashcard.service.GrammarBankService;
 import io.flashcard.service.GrammarPodcastService;
+import io.flashcard.service.TeacherSimulatorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,18 +18,24 @@ import java.util.Map;
 @RequestMapping("/api/admin/grammar")
 public class AdminGrammarController {
 
+    private static final Logger log = LoggerFactory.getLogger(AdminGrammarController.class);
+    private static final String PODCAST_BASE_URL = "https://wordagram.hatip.dev/podcasts/";
+
     private final JdbcTemplate jdbc;
     private final ObjectMapper objectMapper;
     private final GrammarPodcastService grammarPodcastService;
     private final GrammarBankService grammarBankService;
+    private final TeacherSimulatorService teacherSimulatorService;
 
     public AdminGrammarController(JdbcTemplate jdbc, ObjectMapper objectMapper,
                                   GrammarPodcastService grammarPodcastService,
-                                  GrammarBankService grammarBankService) {
+                                  GrammarBankService grammarBankService,
+                                  TeacherSimulatorService teacherSimulatorService) {
         this.jdbc = jdbc;
         this.objectMapper = objectMapper;
         this.grammarPodcastService = grammarPodcastService;
         this.grammarBankService = grammarBankService;
+        this.teacherSimulatorService = teacherSimulatorService;
     }
 
     @GetMapping
@@ -46,7 +56,7 @@ public class AdminGrammarController {
         for (var lesson : lessons) {
             String audioKey = (String) lesson.get("audio_cache_key");
             if (audioKey != null) {
-                lesson.put("audioUrl", "https://wordagram.hatip.dev/podcasts/" + audioKey);
+                lesson.put("audioUrl", PODCAST_BASE_URL + audioKey);
             }
         }
 
@@ -77,7 +87,7 @@ public class AdminGrammarController {
         var lesson = rows.get(0);
         String audioKey = (String) lesson.get("audio_cache_key");
         if (audioKey != null) {
-            lesson.put("audioUrl", "https://wordagram.hatip.dev/podcasts/" + audioKey);
+            lesson.put("audioUrl", PODCAST_BASE_URL + audioKey);
         }
         // Parse JSONB fields into proper JSON for the frontend
         for (String key : List.of("podcast_timings", "podcast_script")) {
@@ -146,6 +156,76 @@ public class AdminGrammarController {
     public ResponseEntity<?> removePodcast(@PathVariable String id) {
         jdbc.update("UPDATE grammar_lessons SET podcast_id = NULL WHERE id = ?", id);
         return ResponseEntity.ok(Map.of("cleared", id));
+    }
+
+    @PostMapping("/{id}/video")
+    public ResponseEntity<?> generateVideo(@PathVariable String id,
+                                           @RequestParam(defaultValue = "false") boolean force) {
+        var podcast = findPodcast(id);
+        if (podcast == null) return ResponseEntity.notFound().build();
+        if (podcast.get("podcast_id") == null || !"ready".equals(podcast.get("podcast_status"))
+                || podcast.get("audio_cache_key") == null) {
+            return ResponseEntity.status(409).body(Map.of("error", "Lesson has no ready podcast"));
+        }
+
+        List<Map<String, Object>> subtitles;
+        try {
+            subtitles = toSubtitles(podcast.get("podcast_timings"));
+        } catch (Exception e) {
+            return ResponseEntity.status(409).body(Map.of("error", "Podcast timings are not valid JSON"));
+        }
+        if (subtitles.isEmpty()) {
+            return ResponseEntity.status(409).body(Map.of("error", "Podcast has no timings"));
+        }
+
+        String podcastId = podcast.get("podcast_id").toString();
+        try {
+            return ResponseEntity.ok(teacherSimulatorService.requestVideo(
+                podcastId, PODCAST_BASE_URL + podcast.get("audio_cache_key"), subtitles, force));
+        } catch (Exception e) {
+            log.warn("Video request for lesson {} failed: {}", id, e.getMessage());
+            return ResponseEntity.status(502).body(Map.of("error", "Video service unavailable: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{id}/video")
+    public ResponseEntity<?> getVideo(@PathVariable String id) {
+        var podcast = findPodcast(id);
+        if (podcast == null) return ResponseEntity.notFound().build();
+        if (podcast.get("podcast_id") == null) return ResponseEntity.ok(Map.of("status", "none"));
+
+        String podcastId = podcast.get("podcast_id").toString();
+        try {
+            return ResponseEntity.ok(teacherSimulatorService.getStatus(podcastId)
+                .<Map<String, Object>>map(s -> s)
+                .orElse(Map.of("id", podcastId, "status", "none")));
+        } catch (Exception e) {
+            return ResponseEntity.status(502).body(Map.of("error", "Video service unavailable: " + e.getMessage()));
+        }
+    }
+
+    private Map<String, Object> findPodcast(String lessonId) {
+        var rows = jdbc.queryForList("""
+            SELECT g.podcast_id, p.status AS podcast_status, p.audio_cache_key, p.script AS podcast_timings
+            FROM grammar_lessons g
+            LEFT JOIN podcasts p ON p.id = g.podcast_id
+            WHERE g.id = ?
+            """, lessonId);
+        return rows.isEmpty() ? null : rows.get(0);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> toSubtitles(Object timings) throws Exception {
+        if (timings == null) return List.of();
+        List<Map<String, Object>> raw = objectMapper.readValue(timings.toString(), List.class);
+        return raw.stream().map(t -> {
+            var s = new LinkedHashMap<String, Object>();
+            s.put("text", t.get("text"));
+            s.put("language", t.get("language"));
+            s.put("start_ms", t.get("start_ms"));
+            s.put("end_ms", t.get("end_ms"));
+            return (Map<String, Object>) s;
+        }).toList();
     }
 
     @PostMapping("/cleanup-orphans")

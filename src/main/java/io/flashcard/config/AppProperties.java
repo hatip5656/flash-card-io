@@ -14,6 +14,8 @@ public class AppProperties {
     private String ekilexApiKey = "";
     private String ttsApiUrl = "http://tts-api:8000";
     private String translatorApiUrl = "http://translator-api:8000";
+    private String teacherSimulatorUrl = "http://teacher-simulator:8080";
+    private String videoPublicBaseUrl = "https://wordagram.hatip.dev/videos/";
     private String cronTimezone = "Europe/Tallinn";
     private String cronSchedule = "0 9 * * *";
     private List<String> cefrLevels = List.of("A1", "A2");
@@ -32,6 +34,12 @@ public class AppProperties {
 
     public String getTranslatorApiUrl() { return translatorApiUrl; }
     public void setTranslatorApiUrl(String v) { this.translatorApiUrl = v; }
+
+    public String getTeacherSimulatorUrl() { return teacherSimulatorUrl; }
+    public void setTeacherSimulatorUrl(String v) { this.teacherSimulatorUrl = v; }
+
+    public String getVideoPublicBaseUrl() { return videoPublicBaseUrl; }
+    public void setVideoPublicBaseUrl(String v) { this.videoPublicBaseUrl = v; }
 
     public String getCronTimezone() { return cronTimezone; }
     public void setCronTimezone(String v) { this.cronTimezone = v; }

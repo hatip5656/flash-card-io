@@ -40,6 +40,8 @@ app:
   ekilex-api-key: ${EKILEX_API_KEY:}
   tts-api-url: ${TTS_API_URL:http://tts-api:8000}
   translator-api-url: ${TRANSLATOR_API_URL:http://translator-api:8000}
+  teacher-simulator-url: ${TEACHER_SIMULATOR_URL:http://teacher-simulator:8080}
+  video-public-base-url: ${VIDEO_PUBLIC_BASE_URL:https://wordagram.hatip.dev/videos/}
   cron-timezone: ${CRON_TIMEZONE:Europe/Tallinn}
   cron-schedule: ${CRON_SCHEDULE:0 9 * * *}
   cefr-levels: ${CEFR_LEVELS:A1,A2}
