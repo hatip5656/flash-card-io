@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -130,6 +131,43 @@ public class PodcastRepository {
 
     public void deleteById(String id) {
         jdbc.sql("DELETE FROM podcasts WHERE id = :id").param("id", id).update();
+    }
+
+    /**
+     * Podcasts admins can assign: admin-made ones and the current grammar lesson podcasts.
+     * Superseded grammar podcasts (no longer linked to a lesson) are left out.
+     */
+    public List<Map<String, Object>> findAssignable() {
+        return jdbc.sql("""
+            SELECT p.id, p.title, p.cefr_level, p.duration_seconds, p.audio_cache_key, p.created_at,
+                   g.id AS lesson_id
+            FROM podcasts p
+            LEFT JOIN grammar_lessons g ON g.podcast_id = p.id
+            WHERE p.chat_id = 0 AND p.status = 'ready' AND p.audio_cache_key IS NOT NULL
+              AND (p.title NOT LIKE 'Grammar:%' OR g.id IS NOT NULL)
+            ORDER BY p.cefr_level, p.title
+            """)
+            .query()
+            .listOfRows();
+    }
+
+    /** All of a user's podcasts with what is needed to match them to assignable ones. */
+    public List<Map<String, Object>> findForUser(long chatId) {
+        return jdbc.sql("""
+            SELECT id, title, cefr_level, duration_seconds, audio_cache_key, status, created_at
+            FROM podcasts WHERE chat_id = :chatId ORDER BY created_at DESC
+            """)
+            .param("chatId", chatId)
+            .query()
+            .listOfRows();
+    }
+
+    public boolean userHasAudio(long chatId, String audioCacheKey) {
+        return jdbc.sql("SELECT COUNT(*) FROM podcasts WHERE chat_id = :chatId AND audio_cache_key = :key")
+            .param("chatId", chatId)
+            .param("key", audioCacheKey)
+            .query(Integer.class)
+            .single() > 0;
     }
 
     public String cloneForUser(String sourcePodcastId, long chatId) {

@@ -105,6 +105,12 @@ public class AdminPodcastController {
         return ResponseEntity.ok(Map.of("assigned", count));
     }
 
+    /** What a user has and which assignable podcasts they are missing. */
+    @GetMapping("/assignments")
+    public ResponseEntity<?> assignments(@RequestParam long chatId) {
+        return ResponseEntity.ok(podcastService.assignmentsFor(chatId));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable String id) {
         podcastRepo.deleteById(id);

@@ -493,9 +493,12 @@ public class PodcastService {
         return podcastId;
     }
 
+    /** Copy a podcast to each user's feed, skipping users who already have the same audio. */
     public int assignToUsers(String podcastId, List<Long> chatIds) {
+        String audioKey = podcastRepo.findById(podcastId).map(Podcast::getAudioCacheKey).orElse(null);
         int count = 0;
         for (long chatId : chatIds) {
+            if (audioKey != null && podcastRepo.userHasAudio(chatId, audioKey)) continue;
             podcastRepo.cloneForUser(podcastId, chatId);
             count++;
         }
@@ -503,14 +506,60 @@ public class PodcastService {
     }
 
     public int assignToAll(String podcastId) {
-        var allUsers = subscriberRepo.getAllSubscribers(10000, 0, null, true);
-        int count = 0;
-        for (var user : allUsers) {
-            long chatId = ((Number) user.get("chat_id")).longValue();
-            podcastRepo.cloneForUser(podcastId, chatId);
-            count++;
+        var chatIds = subscriberRepo.getAllSubscribers(10000, 0, null, true).stream()
+            .map(user -> ((Number) user.get("chat_id")).longValue())
+            .toList();
+        return assignToUsers(podcastId, chatIds);
+    }
+
+    /**
+     * A user's podcasts split for the assignment screen.
+     * available: assignable podcasts the user lacks (olderCopyId set when they hold an outdated copy).
+     * assigned: the user's podcasts, each tagged library, outdated or personal.
+     */
+    public Map<String, Object> assignmentsFor(long chatId) {
+        var library = podcastRepo.findAssignable();
+        var owned = podcastRepo.findForUser(chatId);
+
+        var ownedAudio = new HashSet<Object>();
+        owned.forEach(p -> ownedAudio.add(p.get("audio_cache_key")));
+        var libraryAudio = new HashSet<Object>();
+        var libraryTitles = new HashSet<Object>();
+        library.forEach(p -> { libraryAudio.add(p.get("audio_cache_key")); libraryTitles.add(p.get("title")); });
+
+        var available = new ArrayList<Map<String, Object>>();
+        for (var p : library) {
+            if (ownedAudio.contains(p.get("audio_cache_key"))) continue;
+            var item = assignmentItem(p);
+            item.put("kind", p.get("lesson_id") != null ? "grammar" : "custom");
+            item.put("lessonId", p.get("lesson_id"));
+            owned.stream()
+                .filter(o -> Objects.equals(o.get("title"), p.get("title")))
+                .findFirst()
+                .ifPresent(o -> item.put("olderCopyId", o.get("id")));
+            available.add(item);
         }
-        return count;
+
+        var assigned = new ArrayList<Map<String, Object>>();
+        for (var p : owned) {
+            var item = assignmentItem(p);
+            // Same audio as a library podcast: assigned. Same title only: an older version of one.
+            item.put("kind", libraryAudio.contains(p.get("audio_cache_key")) ? "library"
+                : libraryTitles.contains(p.get("title")) ? "outdated" : "personal");
+            item.put("status", p.get("status"));
+            assigned.add(item);
+        }
+        return Map.of("available", available, "assigned", assigned);
+    }
+
+    private static Map<String, Object> assignmentItem(Map<String, Object> row) {
+        var item = new LinkedHashMap<String, Object>();
+        item.put("id", row.get("id"));
+        item.put("title", row.get("title"));
+        item.put("cefrLevel", row.get("cefr_level"));
+        item.put("durationSeconds", row.get("duration_seconds"));
+        item.put("createdAt", row.get("created_at"));
+        return item;
     }
 
     private String buildLearnerContext(long chatId, String level) {
