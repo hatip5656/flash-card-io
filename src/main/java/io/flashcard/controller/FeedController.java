@@ -186,22 +186,57 @@ public class FeedController {
     @PostMapping("/track-game-words")
     public Map<String, Object> trackGameWords(HttpServletRequest request, @RequestBody Map<String, Object> body) {
         long chatId = getUserId(request);
-        @SuppressWarnings("unchecked")
-        List<String> words = (List<String>) body.get("words");
         String gameType = (String) body.getOrDefault("gameType", "unknown");
 
-        if (words != null && !words.isEmpty()) {
-            if ("crush".equals(gameType)) {
-                sentWordRepo.trackCrushFound(chatId, words);
-            } else {
-                sentWordRepo.trackSeenCount(chatId, words);
+        // Accepts {words: [{id, estonian}]} (current clients) and {words: ["..."]} (older
+        // installed apps, where each string may be either a word id or a word value).
+        Set<String> wordIds = new LinkedHashSet<>();
+        Set<String> wordValues = new LinkedHashSet<>();
+        Object rawWords = body.get("words");
+        int tracked = 0;
+        if (rawWords instanceof List<?> list) {
+            Map<String, String> idByValue = null;
+            for (Object item : list) {
+                if (item instanceof String legacy) {
+                    if (legacy.isBlank()) continue;
+                    wordIds.add(legacy);
+                    wordValues.add(legacy);
+                    tracked++;
+                } else if (item instanceof Map<?, ?> m) {
+                    String id = m.get("id") instanceof String v && !v.isBlank() ? v : null;
+                    String estonian = m.get("estonian") instanceof String v && !v.isBlank() ? v : null;
+                    if (id != null && estonian == null) {
+                        Word w = wordBankService.getWordById(id);
+                        if (w != null) estonian = w.getEstonian();
+                    } else if (id == null && estonian != null) {
+                        if (idByValue == null) {
+                            idByValue = new HashMap<>();
+                            for (Word w : wordBankService.getAllWords()) {
+                                idByValue.putIfAbsent(w.getEstonian().toLowerCase(), w.getId());
+                            }
+                        }
+                        id = idByValue.get(estonian.toLowerCase());
+                    }
+                    if (id == null && estonian == null) continue;
+                    if (id != null) wordIds.add(id);
+                    if (estonian != null) wordValues.add(estonian);
+                    tracked++;
+                }
             }
-            for (String word : words) {
+        }
+
+        if (!wordIds.isEmpty() || !wordValues.isEmpty()) {
+            if ("crush".equals(gameType)) {
+                sentWordRepo.trackCrushFound(chatId, new ArrayList<>(wordValues));
+            } else {
+                sentWordRepo.trackSeenCount(chatId, new ArrayList<>(wordIds));
+            }
+            for (String word : wordValues) {
                 sentWordRepo.updateSm2(chatId, word, 3);
             }
         }
         activityRepo.logGameActivity(chatId);
-        return Map.of("ok", true, "tracked", words != null ? words.size() : 0);
+        return Map.of("ok", true, "tracked", tracked);
     }
 
 
