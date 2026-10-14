@@ -168,9 +168,22 @@ public class AdminGrammarController {
 
     @PostMapping("/{id}/redo-podcast")
     public ResponseEntity<?> redoPodcast(@PathVariable String id) {
-        // Clear podcast_id so the scheduler picks it up again (if script exists)
+        // Clear podcast_id so the generator picks it up again (if script exists)
         jdbc.update("UPDATE grammar_lessons SET podcast_id = NULL WHERE id = ?", id);
-        return ResponseEntity.ok(Map.of("queued", id, "message", "Podcast will be regenerated on next scheduler run"));
+        Thread.startVirtualThread(grammarPodcastService::generateAllPending);
+        return ResponseEntity.ok(Map.of("queued", id, "message", "Podcast is being regenerated"));
+    }
+
+    @PostMapping("/redo-podcasts")
+    public ResponseEntity<?> redoPodcasts(@RequestBody Map<String, List<String>> body) {
+        List<String> ids = body.get("ids") == null ? List.of() : body.get("ids").stream().distinct().toList();
+        if (ids.isEmpty()) return ResponseEntity.badRequest().body(Map.of("error", "ids is required"));
+        // Lessons without a script would lose their podcast and never get a new one
+        List<String> queued = jdbc.queryForList(
+            "UPDATE grammar_lessons SET podcast_id = NULL WHERE id = ANY(?) AND podcast_script IS NOT NULL RETURNING id",
+            String.class, (Object) ids.toArray(String[]::new));
+        if (!queued.isEmpty()) Thread.startVirtualThread(grammarPodcastService::generateAllPending);
+        return ResponseEntity.ok(Map.of("queued", queued, "skipped", ids.size() - queued.size()));
     }
 
     @DeleteMapping("/{id}/podcast")

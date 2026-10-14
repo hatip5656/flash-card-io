@@ -35,13 +35,15 @@ class AdminGrammarVideoTest {
     private MockMvc mvc;
     private JdbcTemplate jdbc;
     private PodcastVideoService videos;
+    private GrammarPodcastService podcasts;
 
     @BeforeEach
     void setUp() {
         jdbc = mock(JdbcTemplate.class);
         videos = mock(PodcastVideoService.class);
+        podcasts = mock(GrammarPodcastService.class);
         mvc = MockMvcBuilders.standaloneSetup(new AdminGrammarController(
-            jdbc, new ObjectMapper(), mock(GrammarPodcastService.class),
+            jdbc, new ObjectMapper(), podcasts,
             mock(GrammarBankService.class), videos)).build();
     }
 
@@ -109,5 +111,25 @@ class AdminGrammarVideoTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.status").value("done"))
             .andExpect(jsonPath("$.videoUrl").value("https://wordagram.hatip.dev/videos/" + PODCAST_ID + ".mp4"));
+    }
+
+    @Test
+    void bulkRedoQueuesOnlyLessonsWithScripts() throws Exception {
+        when(jdbc.queryForList(contains("RETURNING id"), eq(String.class), any(Object.class)))
+            .thenReturn(List.of("a1-negation"));
+
+        mvc.perform(post("/api/admin/grammar/redo-podcasts")
+                .contentType("application/json").content("{\"ids\":[\"a1-negation\",\"a1-no-script\"]}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.queued[0]").value("a1-negation"))
+            .andExpect(jsonPath("$.skipped").value(1));
+        verify(podcasts, timeout(1000)).generateAllPending();
+    }
+
+    @Test
+    void bulkRedoRequiresIds() throws Exception {
+        mvc.perform(post("/api/admin/grammar/redo-podcasts").contentType("application/json").content("{\"ids\":[]}"))
+            .andExpect(status().isBadRequest());
+        verifyNoInteractions(podcasts);
     }
 }

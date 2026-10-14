@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class GrammarPodcastService {
@@ -64,7 +65,9 @@ public class GrammarPodcastService {
     private final AdminEventService events;
     private final Path podcastDir;
 
-    private volatile boolean running = false;
+    private final AtomicBoolean running = new AtomicBoolean();
+    private final AtomicBoolean draining = new AtomicBoolean();
+    private final AtomicBoolean rerun = new AtomicBoolean();
 
     public GrammarPodcastService(JdbcTemplate jdbc, GeminiService geminiService,
                                  AppProperties appProperties, HttpClient httpClient,
@@ -84,29 +87,73 @@ public class GrammarPodcastService {
     }
 
     /**
+     * Generates pending podcasts back to back instead of one per scheduler run.
+     * A lesson that fails is skipped for the rest of the run so it cannot block the others;
+     * a call made while a run is active makes that run look again before it stops.
+     */
+    public void generateAllPending() {
+        rerun.set(true);
+        while (rerun.get() && draining.compareAndSet(false, true)) {
+            try {
+                rerun.set(false);
+                Set<String> failed = new HashSet<>();
+                while (true) {
+                    Outcome result = generateNext(failed);
+                    if (result == null) break;         // nothing left to generate
+                    if (!result.ok()) failed.add(result.lessonId());
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            } finally {
+                draining.set(false);
+            }
+        }
+    }
+
+    /**
      * Scheduled job: generates ONE grammar podcast every 30 minutes.
      * Uses pre-written scripts from podcast_script column — no Gemini needed.
      */
     @Scheduled(fixedDelay = 1800000, initialDelay = 60000) // 30 min, 1 min initial delay
     public void generateNextGrammarPodcast() {
-        if (running) {
+        if (running.get()) {
             log.debug("[grammar-podcast] Already running, skipping");
             return;
         }
+        try {
+            generateNext(Set.of());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
 
+    private record Outcome(String lessonId, boolean ok) {}
+
+    /** Waits for any generation in progress, then generates one. Returns null when none is pending. */
+    private Outcome generateNext(Set<String> skip) throws InterruptedException {
+        while (!running.compareAndSet(false, true)) Thread.sleep(5000);
+        try {
+            return generateClaimed(skip);
+        } finally {
+            running.set(false);
+        }
+    }
+
+    private Outcome generateClaimed(Set<String> skip) {
         // Find next grammar lesson with a pre-written script but no podcast yet
         List<Map<String, Object>> rows = jdbc.queryForList("""
             SELECT id, cefr_level, topic, podcast_script
             FROM grammar_lessons WHERE podcast_id IS NULL AND podcast_script IS NOT NULL
+              AND NOT (id = ANY(?))
             ORDER BY cefr_level, id LIMIT 1
-            """);
+            """, (Object) skip.toArray(new String[0]));
 
         if (rows.isEmpty()) {
             log.debug("[grammar-podcast] No lessons with pre-written scripts pending");
-            return;
+            return null;
         }
 
-        running = true;
         long start = System.currentTimeMillis();
         updateStatus("running");
         var lesson = rows.get(0);
@@ -124,7 +171,7 @@ public class GrammarPodcastService {
             if (segments.isEmpty()) {
                 log.warn("[grammar-podcast] Empty segments for lesson {}", lessonId);
                 fail(lessonId, start, "Lesson " + lessonId + " has an empty script");
-                return;
+                return new Outcome(lessonId, false);
             }
 
             // Call TTS
@@ -143,7 +190,7 @@ public class GrammarPodcastService {
             if (response.statusCode() != 200) {
                 log.error("[grammar-podcast] TTS returned {} for lesson {}", response.statusCode(), lessonId);
                 fail(lessonId, start, "TTS returned " + response.statusCode() + " for lesson " + lessonId);
-                return;
+                return new Outcome(lessonId, false);
             }
 
             // Save audio
@@ -190,12 +237,12 @@ public class GrammarPodcastService {
             String msg = "Lesson " + lessonId + " — " + durationSeconds + "s audio (" + (duration / 1000) + "s generation)";
             historyService.logRun("grammar-podcast", "success", java.time.Instant.ofEpochMilli(start), duration, 1, 0, msg);
             notifications.success("podcasts", "Grammar Podcast Generated", msg);
+            return new Outcome(lessonId, true);
 
         } catch (Exception e) {
             log.error("[grammar-podcast] Failed: {}", e.getMessage(), e);
             fail(lessonId, start, String.valueOf(e.getMessage()));
-        } finally {
-            running = false;
+            return new Outcome(lessonId, false);
         }
     }
 
