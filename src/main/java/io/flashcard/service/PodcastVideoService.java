@@ -27,13 +27,16 @@ public class PodcastVideoService {
     private final TeacherSimulatorService simulator;
     private final NotificationService notifications;
     private final ObjectMapper objectMapper;
+    private final AdminEventService events;
 
     public PodcastVideoService(JdbcTemplate jdbc, TeacherSimulatorService simulator,
-                               NotificationService notifications, ObjectMapper objectMapper) {
+                               NotificationService notifications, ObjectMapper objectMapper,
+                               AdminEventService events) {
         this.jdbc = jdbc;
         this.simulator = simulator;
         this.notifications = notifications;
         this.objectMapper = objectMapper;
+        this.events = events;
     }
 
     /** Queue a render on the video service and start tracking it. */
@@ -59,13 +62,15 @@ public class PodcastVideoService {
                 completed_at = CASE WHEN podcast_videos.status = 'done' AND EXCLUDED.status = 'done'
                                     THEN podcast_videos.completed_at ELSE EXCLUDED.completed_at END
             """, podcastId, lessonId, state, progressOf(status), status.get("videoUrl"), state, state);
-        return statusFor(podcastId);
+        var result = statusFor(podcastId);
+        publish(podcastId, lessonId, result);
+        return result;
     }
 
     /** The tracked state of a podcast's video: status, progress, error and public videoUrl. */
     public Map<String, Object> statusFor(String podcastId) {
         var rows = jdbc.queryForList(
-            "SELECT status, progress, error, video_url FROM podcast_videos WHERE podcast_id = ?", podcastId);
+            "SELECT status, progress, error, video_url, started_at FROM podcast_videos WHERE podcast_id = ?", podcastId);
         var result = new LinkedHashMap<String, Object>();
         result.put("id", podcastId);
         if (rows.isEmpty()) {
@@ -77,13 +82,15 @@ public class PodcastVideoService {
         result.put("progress", row.get("progress"));
         if (row.get("error") != null) result.put("error", row.get("error"));
         if (row.get("video_url") != null) result.put("videoUrl", row.get("video_url"));
+        if (row.get("started_at") != null) result.put("startedAt", row.get("started_at"));
         return result;
     }
 
-    @Scheduled(fixedDelay = 30_000, initialDelay = 30_000)
+    // Frequent in-cluster check so the admin UI sees progress live; cheap when nothing is rendering
+    @Scheduled(fixedDelay = 3_000, initialDelay = 30_000)
     public void pollActiveRenders() {
         var active = jdbc.queryForList("""
-            SELECT v.podcast_id, v.lesson_id, g.topic
+            SELECT v.podcast_id, v.lesson_id, v.status, v.progress, g.topic
             FROM podcast_videos v
             LEFT JOIN grammar_lessons g ON g.id = v.lesson_id
             WHERE v.status IN ('queued', 'rendering')
@@ -105,11 +112,20 @@ public class PodcastVideoService {
                     case "failed" -> finish(podcastId, lessonId, topic, "failed", null,
                         s.get("error") != null ? s.get("error").toString() : "unknown error");
                     // started_at marks when rendering began, so the dashboard can estimate time left
-                    default -> jdbc.update("""
-                        UPDATE podcast_videos SET status = ?, progress = ?,
-                            started_at = CASE WHEN ? = 'rendering' THEN COALESCE(started_at, NOW()) END
-                        WHERE podcast_id = ?
-                        """, s.get("status"), progressOf(s), s.get("status"), podcastId);
+                    default -> {
+                        String state = String.valueOf(s.get("status"));
+                        double progress = progressOf(s);
+                        boolean changed = !state.equals(row.get("status"))
+                            || !(row.get("progress") instanceof Number p) || Math.abs(p.doubleValue() - progress) > 1e-4;
+                        if (changed) {
+                            jdbc.update("""
+                                UPDATE podcast_videos SET status = ?, progress = ?,
+                                    started_at = CASE WHEN ? = 'rendering' THEN COALESCE(started_at, NOW()) END
+                                WHERE podcast_id = ?
+                                """, state, progress, state, podcastId);
+                            publish(podcastId, lessonId, statusFor(podcastId));
+                        }
+                    }
                 }
             } catch (Exception e) {
                 // Service unreachable: keep tracking, try again next poll
@@ -125,6 +141,8 @@ public class PodcastVideoService {
             WHERE podcast_id = ?
             """, state, state, error, videoUrl, podcastId);
 
+        publish(podcastId, lessonId, statusFor(podcastId));
+
         String metadata = metadataJson(lessonId, podcastId, videoUrl);
         if ("done".equals(state)) {
             notifications.emit("success", CATEGORY, "Video ready: " + topic, videoUrl, metadata);
@@ -133,6 +151,12 @@ public class PodcastVideoService {
             notifications.emit("error", CATEGORY, "Video failed: " + topic, error, metadata);
             log.warn("Video failed for lesson {}: {}", lessonId, error);
         }
+    }
+
+    private void publish(String podcastId, String lessonId, Map<String, Object> status) {
+        var event = new LinkedHashMap<String, Object>(status);
+        event.put("lessonId", lessonId);
+        events.publish("video", event);
     }
 
     private String metadataJson(String lessonId, String podcastId, String videoUrl) {

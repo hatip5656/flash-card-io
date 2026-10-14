@@ -61,6 +61,7 @@ public class GrammarPodcastService {
     private final ObjectMapper objectMapper;
     private final NotificationService notifications;
     private final SchedulerHistoryService historyService;
+    private final AdminEventService events;
     private final Path podcastDir;
 
     private volatile boolean running = false;
@@ -68,7 +69,7 @@ public class GrammarPodcastService {
     public GrammarPodcastService(JdbcTemplate jdbc, GeminiService geminiService,
                                  AppProperties appProperties, HttpClient httpClient,
                                  ObjectMapper objectMapper, NotificationService notifications,
-                                 SchedulerHistoryService historyService,
+                                 SchedulerHistoryService historyService, AdminEventService events,
                                  @org.springframework.beans.factory.annotation.Value("${CACHE_DIR:/app/cache}") String cacheDir) {
         this.jdbc = jdbc;
         this.geminiService = geminiService;
@@ -77,6 +78,7 @@ public class GrammarPodcastService {
         this.objectMapper = objectMapper;
         this.notifications = notifications;
         this.historyService = historyService;
+        this.events = events;
         this.podcastDir = Path.of(cacheDir, "podcasts");
         try { Files.createDirectories(podcastDir); } catch (Exception ignored) {}
     }
@@ -107,10 +109,11 @@ public class GrammarPodcastService {
         running = true;
         long start = System.currentTimeMillis();
         updateStatus("running");
+        var lesson = rows.get(0);
+        String lessonId = (String) lesson.get("id");
+        events.publish("podcast", Map.of("lessonId", lessonId, "status", "running"));
 
         try {
-            var lesson = rows.get(0);
-            String lessonId = (String) lesson.get("id");
             String level = (String) lesson.get("cefr_level");
             String topic = (String) lesson.get("topic");
             String scriptJson = lesson.get("podcast_script").toString();
@@ -120,7 +123,7 @@ public class GrammarPodcastService {
             List<?> segments = objectMapper.readValue(scriptJson, List.class);
             if (segments.isEmpty()) {
                 log.warn("[grammar-podcast] Empty segments for lesson {}", lessonId);
-                recordFailure(start);
+                fail(lessonId, start, "Lesson " + lessonId + " has an empty script");
                 return;
             }
 
@@ -139,7 +142,7 @@ public class GrammarPodcastService {
 
             if (response.statusCode() != 200) {
                 log.error("[grammar-podcast] TTS returned {} for lesson {}", response.statusCode(), lessonId);
-                recordFailure(start);
+                fail(lessonId, start, "TTS returned " + response.statusCode() + " for lesson " + lessonId);
                 return;
             }
 
@@ -182,19 +185,26 @@ public class GrammarPodcastService {
                 podcastId, lessonId, duration, durationSeconds);
 
             recordSuccess(start);
+            events.publish("podcast", Map.of("lessonId", lessonId, "status", "ready",
+                "podcastId", podcastId, "durationSeconds", durationSeconds));
             String msg = "Lesson " + lessonId + " — " + durationSeconds + "s audio (" + (duration / 1000) + "s generation)";
             historyService.logRun("grammar-podcast", "success", java.time.Instant.ofEpochMilli(start), duration, 1, 0, msg);
             notifications.success("podcasts", "Grammar Podcast Generated", msg);
 
         } catch (Exception e) {
-            long duration = System.currentTimeMillis() - start;
             log.error("[grammar-podcast] Failed: {}", e.getMessage(), e);
-            recordFailure(start);
-            historyService.logRun("grammar-podcast", "failed", java.time.Instant.ofEpochMilli(start), duration, 0, 1, e.getMessage());
-            notifications.error("podcasts", "Grammar Podcast Failed", e.getMessage());
+            fail(lessonId, start, String.valueOf(e.getMessage()));
         } finally {
             running = false;
         }
+    }
+
+    private void fail(String lessonId, long start, String reason) {
+        long duration = System.currentTimeMillis() - start;
+        recordFailure(start);
+        historyService.logRun("grammar-podcast", "failed", java.time.Instant.ofEpochMilli(start), duration, 0, 1, reason);
+        events.publish("podcast", Map.of("lessonId", lessonId, "status", "failed", "error", reason));
+        notifications.error("podcasts", "Grammar Podcast Failed", reason);
     }
 
     private void updateStatus(String status) {

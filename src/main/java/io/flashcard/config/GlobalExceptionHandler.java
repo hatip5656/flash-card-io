@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Map;
@@ -37,6 +39,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleNotFound(NoResourceFoundException e) {
         // Don't log or notify — these are scanner bots probing for .env, secrets, etc.
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Not found"));
+    }
+
+    @ExceptionHandler({AsyncRequestTimeoutException.class, AsyncRequestNotUsableException.class})
+    public void handleClosedStream() {
+        // Expected when a live event stream times out or its client goes away: not an application error
     }
 
     @ExceptionHandler(Exception.class)

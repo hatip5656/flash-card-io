@@ -19,6 +19,11 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.xml
   jackson:
     default-property-inclusion: non_null
+  task:
+    scheduling:
+      pool:
+        # Long jobs (podcast TTS) must not hold up the frequent video poll and SSE heartbeat
+        size: 4
 
 management:
   endpoints:

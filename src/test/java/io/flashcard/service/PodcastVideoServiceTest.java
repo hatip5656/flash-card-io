@@ -21,6 +21,7 @@ class PodcastVideoServiceTest {
     private JdbcTemplate jdbc;
     private TeacherSimulatorService simulator;
     private NotificationService notifications;
+    private AdminEventService events;
     private PodcastVideoService service;
 
     @BeforeEach
@@ -28,9 +29,15 @@ class PodcastVideoServiceTest {
         jdbc = mock(JdbcTemplate.class);
         simulator = mock(TeacherSimulatorService.class);
         notifications = mock(NotificationService.class);
-        service = new PodcastVideoService(jdbc, simulator, notifications, new ObjectMapper());
+        events = mock(AdminEventService.class);
+        service = new PodcastVideoService(jdbc, simulator, notifications, new ObjectMapper(), events);
+        activeRow("rendering", 0.40f);
+    }
+
+    private void activeRow(String status, float progress) {
         when(jdbc.queryForList(contains("WHERE v.status IN"))).thenReturn(List.of(
-            Map.of("podcast_id", PODCAST, "lesson_id", "a1-comitative-abessive", "topic", "With (-ga) and Without (-ta)")));
+            Map.of("podcast_id", PODCAST, "lesson_id", "a1-comitative-abessive", "topic", "With (-ga) and Without (-ta)",
+                "status", status, "progress", progress)));
     }
 
     @Test
@@ -102,5 +109,31 @@ class PodcastVideoServiceTest {
         service.pollActiveRenders();
 
         verify(jdbc).update(contains("COALESCE(started_at, NOW())"), eq("queued"), eq(0.0), eq("queued"), eq(PODCAST));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void publishesLiveProgressToAdmins() throws Exception {
+        when(simulator.getStatus(PODCAST)).thenReturn(Optional.of(Map.of("id", PODCAST, "status", "rendering", "progress", 0.42)));
+        when(jdbc.queryForList(contains("FROM podcast_videos WHERE podcast_id"), eq(PODCAST))).thenReturn(List.of(
+            Map.of("status", "rendering", "progress", 0.42f)));
+
+        service.pollActiveRenders();
+
+        var event = org.mockito.ArgumentCaptor.forClass(Map.class);
+        verify(events).publish(eq("video"), event.capture());
+        org.junit.jupiter.api.Assertions.assertEquals("a1-comitative-abessive", event.getValue().get("lessonId"));
+        org.junit.jupiter.api.Assertions.assertEquals("rendering", event.getValue().get("status"));
+    }
+
+    @Test
+    void staysQuietWhenProgressDidNotChange() throws Exception {
+        activeRow("rendering", 0.42f);
+        when(simulator.getStatus(PODCAST)).thenReturn(Optional.of(Map.of("id", PODCAST, "status", "rendering", "progress", 0.42f)));
+
+        service.pollActiveRenders();
+
+        verify(jdbc, never()).update(contains("COALESCE(started_at, NOW())"), any(), any(), any(), any());
+        verifyNoInteractions(events);
     }
 }
