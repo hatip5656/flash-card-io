@@ -42,18 +42,19 @@ public class AdminOfficialExamController {
                 String scoring = exam.get("scoring") == null ? null : objectMapper.writeValueAsString(exam.get("scoring"));
                 jdbc.update(
                     "INSERT INTO official_exams (id, cefr_level, title, title_tr, title_en, source, questions, " +
-                    "kind, skill, variant, sort_order, scoring) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, CAST(? AS JSONB), ?, ?, ?, ?, CAST(? AS JSONB)) " +
+                    "kind, skill, variant, sort_order, scoring, time_limit_minutes) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, CAST(? AS JSONB), ?, ?, ?, ?, CAST(? AS JSONB), ?) " +
                     "ON CONFLICT (id) DO UPDATE SET questions = EXCLUDED.questions, title = EXCLUDED.title, " +
                     "title_tr = COALESCE(EXCLUDED.title_tr, official_exams.title_tr), " +
                     "title_en = COALESCE(EXCLUDED.title_en, official_exams.title_en), " +
                     "kind = EXCLUDED.kind, skill = COALESCE(EXCLUDED.skill, official_exams.skill), " +
                     "variant = EXCLUDED.variant, sort_order = EXCLUDED.sort_order, " +
-                    "scoring = COALESCE(EXCLUDED.scoring, official_exams.scoring)",
+                    "scoring = COALESCE(EXCLUDED.scoring, official_exams.scoring), " +
+                    "time_limit_minutes = COALESCE(EXCLUDED.time_limit_minutes, official_exams.time_limit_minutes)",
                     exam.get("id"), exam.get("level"), exam.get("title"),
                     exam.get("titleTr"), exam.get("titleEn"), exam.get("source"), questions,
                     exam.get("kind") != null ? exam.get("kind") : "exam", exam.get("skill"),
-                    exam.get("variant"), exam.get("sortOrder"), scoring);
+                    exam.get("variant"), exam.get("sortOrder"), scoring, exam.get("timeLimitMinutes"));
                 inserted++;
             } catch (Exception e) {
                 failed++;
@@ -62,6 +63,28 @@ public class AdminOfficialExamController {
         }
         examBank.invalidate();
         return Map.of("ok", true, "inserted", inserted, "failed", failed);
+    }
+
+    /**
+     * Body: {scoring: {...}, timeLimitMinutes: n|null}. The grading rules and time limit live here, in the
+     * database; send only the fields to change.
+     */
+    @PutMapping("/{examId}/rules")
+    public ResponseEntity<?> putRules(@PathVariable String examId, @RequestBody Map<String, Object> body) throws Exception {
+        if (examBank.getExam(examId) == null) return ResponseEntity.status(404).body(Map.of("error", "Exam not found"));
+        int updated = 0;
+        if (body.containsKey("scoring")) {
+            Object scoring = body.get("scoring");
+            updated += jdbc.update("UPDATE official_exams SET scoring = CAST(? AS JSONB) WHERE id = ?",
+                scoring == null ? null : objectMapper.writeValueAsString(scoring), examId);
+        }
+        if (body.containsKey("timeLimitMinutes")) {
+            Object t = body.get("timeLimitMinutes");
+            updated += jdbc.update("UPDATE official_exams SET time_limit_minutes = ? WHERE id = ?",
+                t instanceof Number n ? n.intValue() : null, examId);
+        }
+        examBank.invalidate();
+        return ResponseEntity.ok(Map.of("ok", true, "updated", updated));
     }
 
     @DeleteMapping("/{examId}")

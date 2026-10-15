@@ -13,7 +13,7 @@ class ExamScoringTest {
         "type", "screening",
         "gate", Map.of("section", "1. osa", "minScore", 35),
         "placement", List.of(
-            Map.of("level", "A1", "ranges", Map.of("1. osa", List.of(0, 19))),
+            Map.of("level", "A1", "recommendedLevel", "A2", "ranges", Map.of("1. osa", List.of(0, 19))),
             Map.of("level", "A2", "ranges", Map.of("1. osa", List.of(20, 34))),
             Map.of("level", "B1", "ranges", Map.of("2. osa", List.of(0, 9))),
             Map.of("level", "B2", "ranges", Map.of("2. osa", List.of(10, 17))),
@@ -46,14 +46,14 @@ class ExamScoringTest {
     }
 
     @Test
-    void anA1EstimateIsPointedAtTheA2Checks() {
+    void placementRulesNameTheLevelToContinueAt() {
         assertEquals("A2", ExamScoring.verdict(SCREENING, sections(5, 0), 5, 75).get("recommendedLevel"));
         assertEquals("B2", ExamScoring.verdict(SCREENING, sections(40, 12), 52, 75).get("recommendedLevel"));
     }
 
     @Test
     void levelCheckPassingPointsOneLevelUp() {
-        var scoring = Map.<String, Object>of("type", "level_check", "level", "B1", "passMark", 0.6);
+        var scoring = Map.<String, Object>of("type", "level_check", "level", "B1", "passMark", 0.6, "nextLevel", "B2");
         var passed = ExamScoring.verdict(scoring, Map.of(), 18, 30);
         assertEquals(true, passed.get("passed"));
         assertEquals("B2", passed.get("recommendedLevel"));

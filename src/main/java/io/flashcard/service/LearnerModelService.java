@@ -24,7 +24,6 @@ public class LearnerModelService {
 
     static final Set<String> ITEM_TYPES = Set.of(
         "word_quiz", "practice_question", "exam_question", "game_word", "grammar_lesson", "lesson_media", "word_card");
-    private static final double PASS_MARK = 0.6;
 
     private final LearningRepository learningRepo;
     private final SentWordRepository sentWordRepo;
@@ -248,7 +247,10 @@ public class LearnerModelService {
         result.put("score", score);
         result.put("total", total);
         result.put("percentage", Math.round(pct * 100));
-        result.put("passed", pct >= PASS_MARK);
+        // Pass/fail only for exams whose stored rules have a pass mark
+        Double passMark = exam.scoring().get("passMark") instanceof Number n ? n.doubleValue() : null;
+        result.put("passMark", passMark);
+        result.put("passed", passMark != null ? pct >= passMark : null);
         result.put("sections", sectionList);
         result.put("skills", skillList);
         result.put("weakLessons", weakLessons);

@@ -7,15 +7,15 @@ import java.util.*;
  *
  * <ul>
  *   <li>{@code screening}: a gate ({section, minScore}) below which later sections do not count, and
- *       placement rules [{level, ranges: {section: [min, max]}}]; the first rule whose ranges all hold
- *       gives the estimated level.</li>
- *   <li>{@code level_check}: the exam checks one level; at or above passMark the learner is ready to
- *       try the next level, below it they should keep working at this one.</li>
+ *       placement rules [{level, recommendedLevel?, ranges: {section: [min, max]}}]; the first rule whose
+ *       ranges all hold gives the estimated level and the level to continue at (the level itself if the
+ *       rule names none).</li>
+ *   <li>{@code level_check}: the exam checks one level; at or above passMark the learner is pointed at
+ *       nextLevel (the same level when there is none), below it at this level.</li>
  * </ul>
+ * Every level, band and mark comes from the stored rules; nothing about levels is assumed here.
  */
 public final class ExamScoring {
-
-    static final List<String> LEVELS = List.of("A1", "A2", "B1", "B2", "C1");
 
     private ExamScoring() {}
 
@@ -42,6 +42,7 @@ public final class ExamScoring {
             result.put("gate", Map.of("section", section, "minScore", min, "score", got, "passed", gatePassed));
         }
         String level = null;
+        String recommended = null;
         if (scoring.get("placement") instanceof List<?> rules) {
             for (Object r : rules) {
                 Map<String, Object> rule = (Map<String, Object>) r;
@@ -59,12 +60,13 @@ public final class ExamScoring {
                 if (matches && !gatePassed && !onlyGateSection(ranges, scoring)) matches = false;
                 if (matches) {
                     level = String.valueOf(rule.get("level"));
+                    recommended = rule.get("recommendedLevel") != null ? String.valueOf(rule.get("recommendedLevel")) : level;
                     break;
                 }
             }
         }
         result.put("level", level);
-        result.put("recommendedLevel", recommendedLevel(level));
+        result.put("recommendedLevel", recommended);
         return result;
     }
 
@@ -74,25 +76,18 @@ public final class ExamScoring {
         return ranges.keySet().stream().allMatch(section::equals);
     }
 
-    /** Diagnostics and exams start at A2: an A1 estimate is pointed at the A2 checks. */
-    static String recommendedLevel(String level) {
-        if (level == null) return null;
-        return "A1".equals(level) ? "A2" : level;
-    }
-
     static Map<String, Object> levelCheck(Map<String, Object> scoring, int score, int total) {
         String level = String.valueOf(scoring.get("level"));
         double passMark = scoring.get("passMark") instanceof Number n ? n.doubleValue() : 0.6;
         boolean passed = total > 0 && (double) score / total >= passMark;
-        int i = LEVELS.indexOf(level);
-        String next = passed && i >= 0 && i + 1 < LEVELS.size() ? LEVELS.get(i + 1) : null;
+        String next = scoring.get("nextLevel") != null ? String.valueOf(scoring.get("nextLevel")) : null;
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("type", "level_check");
         result.put("level", level);
         result.put("passMark", passMark);
         result.put("passed", passed);
-        // Passed: try the next level up (null at the top). Not passed: keep practising this level.
-        result.put("recommendedLevel", passed ? (next != null ? next : level) : level);
+        // Passed: try the next level (this one again at the top). Not passed: keep practising this level.
+        result.put("recommendedLevel", passed && next != null ? next : level);
         return result;
     }
 }

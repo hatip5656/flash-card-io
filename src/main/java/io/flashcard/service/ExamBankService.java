@@ -162,6 +162,12 @@ public class ExamBankService {
             .toList();
     }
 
+    /** The exam's own pass mark (0..1) from its stored rules, or null when it has none. */
+    public Double passMark(String examId) {
+        var exam = examId != null ? getExam(examId) : null;
+        return exam != null && exam.scoring().get("passMark") instanceof Number n ? n.doubleValue() : null;
+    }
+
     public Set<String> examLevels() {
         Set<String> levels = new LinkedHashSet<>();
         for (var e : listExams()) levels.add((String) e.get("cefr_level"));

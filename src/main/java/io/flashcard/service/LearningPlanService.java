@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
 public class LearningPlanService {
 
     static final List<String> LEVELS = List.of("A1", "A2", "B1", "B2");
-    static final double PASS_MARK = 0.6;
+    // A grammar topic scoring below this counts as weak (learner-model tuning, not an exam's pass mark)
+    static final double WEAK_BELOW = 0.6;
     /** Estimated score the learner should reach in practice before the mock is worth taking. */
     static final double MOCK_THRESHOLD = 0.7;
     static final int MIN_EVIDENCE = 10;
@@ -115,8 +116,8 @@ public class LearningPlanService {
                 int attempts = ((Number) m.get("attempts")).intValue();
                 int examMisses = ((Number) m.get("exam_misses")).intValue();
                 boolean due = Boolean.TRUE.equals(m.get("due"));
-                if (examMisses > 0 && score < PASS_MARK) out.add(new Candidate(l, "exam_weak", 4 + (1 - score), m));
-                else if (attempts >= 3 && score < PASS_MARK) out.add(new Candidate(l, "practice_weak", 3 + (1 - score), m));
+                if (examMisses > 0 && score < WEAK_BELOW) out.add(new Candidate(l, "exam_weak", 4 + (1 - score), m));
+                else if (attempts >= 3 && score < WEAK_BELOW) out.add(new Candidate(l, "practice_weak", 3 + (1 - score), m));
                 else if (due) out.add(new Candidate(l, "recheck", 2 + (1 - score), m));
             } else if (rank <= userRank) {
                 // Earlier levels first: gaps in the foundation hurt every later topic.
@@ -238,9 +239,11 @@ public class LearningPlanService {
             .sorted(Comparator.comparingDouble(s -> (Double) s.get("accuracy")))
             .toList();
         Map<String, Object> reading = new LinkedHashMap<>();
+        String mock = examLevel != null ? examBank.mockExamId(examLevel) : null;
+        Double passMark = examBank.passMark(mock);
         reading.put("estimatedScore", estimate);
         reading.put("evidence", n);
-        reading.put("passMark", PASS_MARK);
+        reading.put("passMark", passMark);
         reading.put("skills", skills);
         result.put("reading", reading);
 
@@ -251,7 +254,6 @@ public class LearningPlanService {
             : estimate >= MOCK_THRESHOLD && n >= MOCK_EVIDENCE ? "take_mock" : "keep_training";
         result.put("recommendation", recommendation);
 
-        String mock = examLevel != null ? examBank.mockExamId(examLevel) : null;
         result.put("mockExamId", mock);
         Map<String, Object> lastMock = null;
         if (mock != null) {
@@ -263,7 +265,7 @@ public class LearningPlanService {
                 lastMock = new LinkedHashMap<>();
                 lastMock.put("examId", mock);
                 lastMock.put("percentage", Math.round(pct * 100));
-                lastMock.put("passed", pct >= PASS_MARK);
+                lastMock.put("passed", passMark != null ? pct >= passMark : null);
                 lastMock.put("completedAt", last.get("completed_at"));
             }
         }
@@ -289,7 +291,7 @@ public class LearningPlanService {
             int attempts = ((Number) m.get("attempts")).intValue();
             tested++;
             if (score >= 0.8 && attempts >= 3) mastered++;
-            if (score < PASS_MARK && attempts >= 2) {
+            if (score < WEAK_BELOW && attempts >= 2) {
                 var w = new LinkedHashMap<String, Object>();
                 w.put("lessonId", lesson.id());
                 w.put("topic", lesson.topic());

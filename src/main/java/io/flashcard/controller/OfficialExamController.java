@@ -29,7 +29,7 @@ public class OfficialExamController {
             @RequestParam(required = false) String level,
             @RequestParam(required = false, defaultValue = "exam") String kind) {
         String sql = "SELECT e.id, e.cefr_level, e.title, e.title_tr, e.title_en, e.source, " +
-                     "e.kind, e.skill, e.variant, " +
+                     "e.kind, e.skill, e.variant, e.time_limit_minutes, " +
                      "COALESCE(jsonb_array_length(e.questions), 0) as question_count, " +
                      "(SELECT COUNT(*) FROM exam_attempts a WHERE a.exam_id = e.id AND a.chat_id = CAST(? AS BIGINT)) as attempt_count, " +
                      "(SELECT MAX(a.score) FROM exam_attempts a WHERE a.exam_id = e.id AND a.chat_id = CAST(? AS BIGINT)) as best_score, " +
@@ -56,7 +56,8 @@ public class OfficialExamController {
             @RequestHeader("X-User-Id") String userId,
             @PathVariable String examId) {
         List<Map<String, Object>> rows = jdbc.queryForList(
-            "SELECT id, cefr_level, title, title_tr, title_en, source, kind, skill, variant, scoring::text as scoring, " +
+            "SELECT id, cefr_level, title, title_tr, title_en, source, kind, skill, variant, time_limit_minutes, " +
+            "scoring::text as scoring, " +
             "questions::text as questions FROM official_exams WHERE id = ?",
             examId);
         if (rows.isEmpty()) return Map.of("error", "Exam not found");

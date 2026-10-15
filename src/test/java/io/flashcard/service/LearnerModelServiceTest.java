@@ -47,7 +47,8 @@ class LearnerModelServiceTest {
         var q1 = new ExamBankService.Question(1, "Teine ülesanne", "text", "Mis kell?", List.of("A", "B"), 0, "");
         var exam = new ExamBankService.Exam("a2-x", "A2", "X", "Harno", List.of(q0, q1), Map.of(
             0, new ExamBankService.Tag("vocabulary", List.of(), List.of("apteek")),
-            1, new ExamBankService.Tag("grammar", List.of("a1-partitive-case"), List.of())));
+            1, new ExamBankService.Tag("grammar", List.of("a1-partitive-case"), List.of())),
+            ExamBankService.KIND_EXAM, "reading", Map.of("passMark", 0.6));
         when(examBank.getExam("a2-x")).thenReturn(exam);
     }
 

@@ -130,6 +130,17 @@ def convert_pages(t, section_override=None):
     return questions
 
 
+def time_limit(t):
+    """The duration the test's own info page states ("... kestab 25 minutit"), or None (untimed)."""
+    info = open(os.path.join(raw, t['ref'], 'info.html'), encoding='utf-8', errors='ignore').read()
+    body = re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', info))
+    m = re.search(r'(\d+)\s*minut', body)
+    return int(m.group(1)) if m else None
+
+
+NEXT_LEVEL = {'A2': 'B1', 'B1': 'B2', 'B2': 'C1', 'C1': None}
+
+
 def level_of(t):
     m = re.search(r'\b(A2|B1|B2|C1)\b', t['title'])
     return m.group(1) if m else None
@@ -159,13 +170,15 @@ for v, parts in sorted(screening.items()):
         'id': f'testest-screening-{v}', 'level': 'ALL', 'kind': 'screening', 'skill': 'grammar', 'variant': v,
         'title': f'Sõeltest ({v}. variant)', 'titleTr': f'Seviye belirleme testi ({v}. varyant)',
         'titleEn': f'Placement test (variant {v})', 'source': SOURCE, 'sortOrder': v,
+        'timeLimitMinutes': time_limit(parts[1]),
         'scoring': {
-            'type': 'screening', 'timeLimitMinutes': 25,
+            'type': 'screening',
             # Official TESTEST rule: under 35 in part 1, part 2 is not needed.
             'gate': {'section': '1. osa', 'minScore': 35},
             # Our estimate (not published by TESTEST): first rule whose ranges all hold wins.
             'placement': [
-                {'level': 'A1', 'ranges': {'1. osa': [0, 19]}},
+                # Diagnostics start at A2, so an A1 estimate continues there.
+                {'level': 'A1', 'recommendedLevel': 'A2', 'ranges': {'1. osa': [0, 19]}},
                 {'level': 'A2', 'ranges': {'1. osa': [20, 34]}},
                 {'level': 'B1', 'ranges': {'2. osa': [0, 9]}},
                 {'level': 'B2', 'ranges': {'2. osa': [10, 17]}},
@@ -191,7 +204,8 @@ for t in tests:
     exams.append({'id': eid, 'level': lvl, 'kind': kind, 'skill': sk, 'variant': v, 'title': title, 'titleTr': tr,
                   'titleEn': en, 'source': SOURCE,
                   'sortOrder': ORDER[lvl] * 100 + SK_ORDER[sk] * 10 + (v or 0),
-                  'scoring': {'type': 'level_check', 'level': lvl, 'passMark': 0.6},
+                  'timeLimitMinutes': time_limit(t),
+                  'scoring': {'type': 'level_check', 'level': lvl, 'passMark': 0.6, 'nextLevel': NEXT_LEVEL[lvl]},
                   'questions': convert_pages(t)})
 
 os.makedirs(out, exist_ok=True)
