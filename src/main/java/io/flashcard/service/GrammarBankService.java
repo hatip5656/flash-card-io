@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +18,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class GrammarBankService {
 
     private static final Logger log = LoggerFactory.getLogger(GrammarBankService.class);
+
+    private static final String PODCAST_BASE_URL = "https://wordagram.hatip.dev/podcasts/";
 
     private final JdbcTemplate jdbc;
     private volatile List<GrammarLesson> lessons = List.of();
@@ -32,7 +36,7 @@ public class GrammarBankService {
     public void reload() {
         try {
             List<Map<String, Object>> rows = jdbc.queryForList(
-                "SELECT id, cefr_level, topic, topic_tr, content, content_tr FROM grammar_lessons ORDER BY cefr_level, id");
+                "SELECT id, cefr_level, topic, topic_tr, content, content_tr FROM grammar_lessons ORDER BY cefr_level, sort_order NULLS LAST, id");
             this.lessons = rows.stream().map(r -> new GrammarLesson(
                 (String) r.get("id"),
                 (String) r.get("cefr_level"),
@@ -64,5 +68,31 @@ public class GrammarBankService {
 
     public List<GrammarLesson> getAllLessons() {
         return lessons;
+    }
+
+    /** lessonId → {podcastId, podcastUrl, durationSeconds, hasVideo} for lessons with a ready podcast. */
+    public Map<String, Map<String, Object>> getPodcastInfo() {
+        Map<String, Map<String, Object>> podcastMap = new LinkedHashMap<>();
+        try {
+            var rows = jdbc.queryForList(
+                "SELECT g.id AS lesson_id, g.podcast_id, p.audio_cache_key, p.duration_seconds, p.title AS podcast_title, " +
+                "(v.podcast_id IS NOT NULL) AS has_video " +
+                "FROM grammar_lessons g JOIN podcasts p ON p.id = g.podcast_id " +
+                "LEFT JOIN podcast_videos v ON v.podcast_id = g.podcast_id AND v.status = 'done' AND v.video_url IS NOT NULL " +
+                "WHERE p.status = 'ready'");
+            for (var row : rows) {
+                String lessonId = (String) row.get("lesson_id");
+                String audioKey = (String) row.get("audio_cache_key");
+                if (audioKey != null) {
+                    var podcast = new HashMap<String, Object>();
+                    podcast.put("podcastId", row.get("podcast_id") != null ? row.get("podcast_id").toString() : null);
+                    podcast.put("podcastUrl", PODCAST_BASE_URL + audioKey);
+                    podcast.put("durationSeconds", row.get("duration_seconds") != null ? row.get("duration_seconds") : 0);
+                    podcast.put("hasVideo", Boolean.TRUE.equals(row.get("has_video")));
+                    podcastMap.put(lessonId, podcast);
+                }
+            }
+        } catch (Exception ignored) {}
+        return podcastMap;
     }
 }

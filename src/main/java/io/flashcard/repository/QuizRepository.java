@@ -49,15 +49,23 @@ public class QuizRepository {
     public List<Map<String, Object>> getMostMissedWords(long chatId, int limit) {
         return jdbc.queryForList(
             """
-            SELECT estonian, COUNT(*) as mistakes
-            FROM quiz_answers qa
-            JOIN quiz_results qr ON qa.quiz_id = qr.id
-            WHERE qr.chat_id = ? AND qa.is_correct = false
+            SELECT estonian, COUNT(*) as mistakes FROM (
+              SELECT qa.estonian
+              FROM quiz_answers qa
+              JOIN quiz_results qr ON qa.quiz_id = qr.id
+              WHERE qr.chat_id = ? AND qa.is_correct = false
+              UNION ALL
+              -- Single answers (feed quiz cards, games) never reach quiz_answers
+              SELECT le.estonian
+              FROM learning_events le
+              WHERE le.chat_id = ? AND le.is_correct = false AND le.estonian IS NOT NULL
+                AND le.item_type IN ('word_quiz', 'game_word') AND le.source IS DISTINCT FROM 'quiz'
+            ) misses
             GROUP BY estonian
             ORDER BY mistakes DESC
             LIMIT ?
             """,
-            chatId, limit);
+            chatId, chatId, limit);
     }
 
     public List<QuizResult> getQuizHistory(long chatId, int limit) {

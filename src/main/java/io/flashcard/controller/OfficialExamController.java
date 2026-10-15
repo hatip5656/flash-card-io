@@ -1,5 +1,7 @@
 package io.flashcard.controller;
 
+import io.flashcard.service.LearnerModelService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,9 +12,11 @@ import java.util.*;
 public class OfficialExamController {
 
     private final JdbcTemplate jdbc;
+    private final LearnerModelService learnerModel;
 
-    public OfficialExamController(JdbcTemplate jdbc) {
+    public OfficialExamController(JdbcTemplate jdbc, LearnerModelService learnerModel) {
         this.jdbc = jdbc;
+        this.learnerModel = learnerModel;
     }
 
     @GetMapping
@@ -47,49 +51,15 @@ public class OfficialExamController {
     }
 
     @PostMapping("/{examId}/submit")
-    public Map<String, Object> submitAttempt(
+    public ResponseEntity<?> submitAttempt(
             @RequestHeader("X-User-Id") String userId,
             @PathVariable String examId,
             @RequestBody Map<String, Object> body) {
-        int score = (int) body.getOrDefault("score", 0);
-        int total = (int) body.getOrDefault("total", 0);
-        String answers = body.containsKey("answers") ? body.get("answers").toString() : "[]";
-
-        jdbc.update(
-            "INSERT INTO exam_attempts (chat_id, exam_id, score, total, answers) VALUES (CAST(? AS BIGINT), ?, ?, ?, CAST(? AS JSONB))",
-            userId, examId, score, total, answers);
-
-        return Map.of("ok", true, "score", score, "total", total);
-    }
-
-    @DeleteMapping("/{examId}")
-    public Map<String, Object> deleteExam(@PathVariable String examId) {
-        int deleted = jdbc.update("DELETE FROM official_exams WHERE id = ?", examId);
-        return Map.of("ok", true, "deleted", deleted);
-    }
-
-    @PostMapping("/seed")
-    public Map<String, Object> seedExams(@RequestBody Map<String, Object> body) {
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> exams = (List<Map<String, Object>>) body.get("exams");
-        int inserted = 0;
-        int failed = 0;
-        for (var exam : exams) {
-            try {
-                String questions = exam.get("questions") instanceof String
-                    ? (String) exam.get("questions")
-                    : new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(exam.get("questions"));
-                jdbc.update(
-                    "INSERT INTO official_exams (id, cefr_level, title, title_tr, title_en, source, questions) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, CAST(? AS JSONB)) ON CONFLICT (id) DO UPDATE SET questions = CAST(EXCLUDED.questions AS JSONB), title = EXCLUDED.title",
-                    exam.get("id"), exam.get("level"), exam.get("title"),
-                    exam.get("titleTr"), exam.get("titleEn"), exam.get("source"), questions);
-                inserted++;
-            } catch (Exception e) {
-                failed++;
-                e.printStackTrace();
-            }
-        }
-        return Map.of("ok", true, "inserted", inserted, "failed", failed);
+        // Graded here: the client's own score/total, if sent, are ignored.
+        List<?> answers = body.get("answers") instanceof List<?> l ? l : List.of();
+        Integer duration = body.get("durationSeconds") instanceof Number n ? n.intValue() : null;
+        var result = learnerModel.gradeExam(Long.parseLong(userId), examId, answers, duration);
+        if (result == null) return ResponseEntity.status(404).body(Map.of("error", "Exam not found"));
+        return ResponseEntity.ok(result);
     }
 }

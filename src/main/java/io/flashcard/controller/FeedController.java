@@ -7,6 +7,7 @@ import io.flashcard.repository.SentWordRepository;
 import io.flashcard.repository.SubscriberRepository;
 import io.flashcard.repository.WordDbRepository;
 import io.flashcard.service.ImageService;
+import io.flashcard.service.LearnerModelService;
 import io.flashcard.service.WordBankService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +29,12 @@ public class FeedController {
     private final WordBankService wordBankService;
     private final WordDbRepository wordDbRepo;
     private final ImageService imageService;
+    private final LearnerModelService learnerModel;
 
     public FeedController(SubscriberRepository subscriberRepo, SentWordRepository sentWordRepo,
                           SavedWordRepository savedWordRepo, ActivityRepository activityRepo,
                           WordBankService wordBankService, WordDbRepository wordDbRepo,
-                          ImageService imageService) {
+                          ImageService imageService, LearnerModelService learnerModel) {
         this.subscriberRepo = subscriberRepo;
         this.sentWordRepo = sentWordRepo;
         this.savedWordRepo = savedWordRepo;
@@ -40,6 +42,7 @@ public class FeedController {
         this.wordBankService = wordBankService;
         this.wordDbRepo = wordDbRepo;
         this.imageService = imageService;
+        this.learnerModel = learnerModel;
     }
 
     @GetMapping
@@ -63,11 +66,23 @@ public class FeedController {
         int nextOffset = cursorOffset;
 
         if ("new".equals(cursorMode)) {
+            // Up to a third of each page goes to due reviews, so forgetting is caught before the
+            // learner runs out of new words (otherwise reviews only start once the level is exhausted).
+            List<Word> due = new ArrayList<>();
+            for (var sw : sentWordRepo.getDueWordsForFeed(chatId, limit / 3)) {
+                Word w = wordBankService.getWordById((String) sw.get("word_id"));
+                if (w != null) due.add(w);
+            }
             List<Word> slice = unsent.subList(
                 Math.min(cursorOffset, unsent.size()),
-                Math.min(cursorOffset + limit, unsent.size()));
-            for (Word w : slice) {
-                rawItems.add(Map.of("word", w, "isNew", true));
+                Math.min(cursorOffset + limit - due.size(), unsent.size()));
+            Iterator<Word> dueIt = due.iterator();
+            for (int i = 0; i < slice.size(); i++) {
+                rawItems.add(Map.of("word", slice.get(i), "isNew", true));
+                if (i % 3 == 1 && dueIt.hasNext()) rawItems.add(Map.of("word", dueIt.next(), "isNew", false));
+            }
+            if (!slice.isEmpty()) {
+                while (dueIt.hasNext()) rawItems.add(Map.of("word", dueIt.next(), "isNew", false));
             }
             nextOffset = cursorOffset + slice.size();
 
@@ -75,10 +90,11 @@ public class FeedController {
                 nextMode = "review";
                 nextOffset = 0;
                 int reviewNeeded = limit - rawItems.size();
+                Set<String> onPage = rawItems.stream().map(r -> ((Word) r.get("word")).getId()).collect(Collectors.toSet());
                 var seenWords = sentWordRepo.getSeenWordsByRecency(chatId, reviewNeeded, 0);
                 for (var sw : seenWords) {
                     Word fullWord = wordBankService.getWordById((String) sw.get("word_id"));
-                    if (fullWord != null) rawItems.add(Map.of("word", fullWord, "isNew", false));
+                    if (fullWord != null && !onPage.contains(fullWord.getId())) rawItems.add(Map.of("word", fullWord, "isNew", false));
                 }
                 nextOffset = seenWords.size();
             }
@@ -192,6 +208,7 @@ public class FeedController {
         // installed apps, where each string may be either a word id or a word value).
         Set<String> wordIds = new LinkedHashSet<>();
         Set<String> wordValues = new LinkedHashSet<>();
+        Map<String, Boolean> outcomes = new LinkedHashMap<>();
         Object rawWords = body.get("words");
         int tracked = 0;
         if (rawWords instanceof List<?> list) {
@@ -203,6 +220,7 @@ public class FeedController {
                     wordValues.add(legacy);
                     tracked++;
                 } else if (item instanceof Map<?, ?> m) {
+                    Boolean correct = m.get("correct") instanceof Boolean b ? b : null;
                     String id = m.get("id") instanceof String v && !v.isBlank() ? v : null;
                     String estonian = m.get("estonian") instanceof String v && !v.isBlank() ? v : null;
                     if (id != null && estonian == null) {
@@ -219,7 +237,10 @@ public class FeedController {
                     }
                     if (id == null && estonian == null) continue;
                     if (id != null) wordIds.add(id);
-                    if (estonian != null) wordValues.add(estonian);
+                    if (estonian != null) {
+                        wordValues.add(estonian);
+                        if (correct != null) outcomes.put(estonian, correct);
+                    }
                     tracked++;
                 }
             }
@@ -231,9 +252,14 @@ public class FeedController {
             } else {
                 sentWordRepo.trackSeenCount(chatId, new ArrayList<>(wordIds));
             }
-            for (String word : wordValues) {
-                sentWordRepo.updateSm2(chatId, word, 3);
-            }
+            // Only a known outcome moves spaced repetition; seeing a word in a game proves nothing.
+            List<Map<String, Object>> events = new ArrayList<>();
+            outcomes.forEach((word, correct) -> {
+                sentWordRepo.updateSm2(chatId, word, correct ? 3 : 1);
+                events.add(Map.of("itemType", "game_word", "source", "game", "estonian", word,
+                    "questionType", gameType, "isCorrect", correct));
+            });
+            if (!events.isEmpty()) learnerModel.recordEvents(chatId, events);
         }
         activityRepo.logGameActivity(chatId);
         return Map.of("ok", true, "tracked", tracked);

@@ -29,5 +29,6 @@
     <include file="db/changelog/022-scheduler-history.sql"/>
     <include file="db/changelog/023-podcast-videos.sql"/>
     <include file="db/changelog/024-pipeline-timestamps.sql"/>
+    <include file="db/changelog/025-learning-loop.sql"/>
 
 </databaseChangeLog>

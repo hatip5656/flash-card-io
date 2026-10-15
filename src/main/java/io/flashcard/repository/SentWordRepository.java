@@ -101,6 +101,23 @@ public class SentWordRepository {
             ef, interval, reps, interval, chatId, wordValue);
     }
 
+    /**
+     * Words whose review is due and that the feed hasn't shown in the last 12 hours, most overdue
+     * and weakest first. Lets reviews surface while there are still new words to learn.
+     */
+    public List<Map<String, Object>> getDueWordsForFeed(long chatId, int limit) {
+        return jdbc.queryForList(
+            """
+            SELECT word_id, word_value, english FROM sent_words
+            WHERE chat_id = ? AND word_value IS NOT NULL AND mastered = FALSE
+              AND next_review <= CURRENT_DATE
+              AND (last_fed_at IS NULL OR last_fed_at < NOW() - INTERVAL '12 hours')
+            ORDER BY next_review ASC, ease_factor ASC
+            LIMIT ?
+            """,
+            chatId, limit);
+    }
+
     public List<Map<String, Object>> getSeenWordsByRecency(long chatId, int limit, int offset) {
         return jdbc.queryForList(
             """
