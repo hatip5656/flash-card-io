@@ -187,8 +187,8 @@ public class LearningPlanService {
             return null;
         }
         for (var exam : exams) {
-            if (exam.id().equals(examId) && qi >= 0 && qi < exam.questions().size()) {
-                return new ExamRef(exam, exam.questions().get(qi));
+            if (exam.id().equals(examId) && exam.question(qi) != null) {
+                return new ExamRef(exam, exam.question(qi));
             }
         }
         return null;

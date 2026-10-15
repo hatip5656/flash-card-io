@@ -32,6 +32,14 @@ public class ExamBankService {
         public Tag tag(int index) {
             return tags.getOrDefault(index, Tag.NONE);
         }
+
+        /** The question at a stored position, or null (out of range, or dropped as unrenderable). */
+        public Question question(int index) {
+            for (Question q : questions) {
+                if (q.index() == index) return q;
+            }
+            return null;
+        }
     }
 
     private final JdbcTemplate jdbc;
@@ -147,7 +155,8 @@ public class ExamBankService {
             return List.of();
         }
         List<Question> questions = new ArrayList<>();
-        for (var q : raw) {
+        for (int i = 0; i < raw.size(); i++) {
+            var q = raw.get(i);
             List<String> options = new ArrayList<>();
             if (q.get("options") instanceof List<?> opts) {
                 for (Object o : opts) {
@@ -157,9 +166,10 @@ public class ExamBankService {
             }
             int ci = correctIndex(q, options);
             String prompt = firstNonBlank(q.get("prompt"), q.get("question"), q.get("questionTr"));
-            // Same filter as the app; it runs after mapping, so indices follow the filtered list.
+            // Same filter as the app. A question keeps its position in the stored array, which is
+            // what the app sends answers by and what the tags are keyed on.
             if (options.size() < 2 || prompt.isEmpty()) continue;
-            questions.add(new Question(questions.size(),
+            questions.add(new Question(i,
                 firstNonBlank(q.get("section")),
                 emptyToNull(firstNonBlank(q.get("context"), q.get("taskInstruction"))),
                 prompt, options, ci,

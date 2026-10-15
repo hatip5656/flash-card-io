@@ -124,8 +124,8 @@ class LearnerModelServiceTest {
         assertEquals(2, qs.size());
         assertEquals("B. y", qs.get(0).options().get(1));
         assertEquals(1, qs.get(0).correctIndex());
-        // Blank prompt is dropped and indices follow the filtered list, as in the app
-        assertEquals(1, qs.get(1).index());
+        // Blank prompt is dropped; the others keep their stored position
+        assertEquals(2, qs.get(1).index());
         assertEquals(0, qs.get(1).correctIndex());
         assertEquals("read", qs.get(1).context());
     }

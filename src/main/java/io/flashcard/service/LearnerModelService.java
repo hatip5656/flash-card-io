@@ -101,12 +101,12 @@ public class LearnerModelService {
             return null;
         }
         var exam = examBank.getExam(examId);
-        if (exam == null || qi < 0 || qi >= exam.questions().size()) return null;
+        var q = exam != null ? exam.question(qi) : null;
+        if (q == null) return null;
         Integer chosen = null;
         try {
             if (userAnswer != null && !userAnswer.isBlank()) chosen = Integer.parseInt(userAnswer.trim());
         } catch (NumberFormatException ignored) {}
-        var q = exam.questions().get(qi);
         boolean correct = chosen != null && chosen == q.correctIndex();
         var tag = exam.tag(qi);
         if (chosen != null) applyExamOutcome(chatId, tag, correct);

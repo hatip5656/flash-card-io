@@ -85,8 +85,8 @@ public class AdminOfficialExamController {
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> tags = (List<Map<String, Object>>) list;
         for (var t : tags) {
-            if (!(t.get("questionIndex") instanceof Number n) || n.intValue() < 0 || n.intValue() >= exam.questions().size()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "questionIndex out of range: " + t.get("questionIndex")));
+            if (!(t.get("questionIndex") instanceof Number n) || exam.question(n.intValue()) == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "No question at index " + t.get("questionIndex")));
             }
         }
         examBank.saveTags(examId, tags);
