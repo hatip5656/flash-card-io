@@ -25,11 +25,17 @@ public class ExamBankService {
      * text_gap item (typed answer) is right when the normalised answer is one of {@code accepted}.
      */
     public record Question(int index, String section, String context, String prompt, List<String> options,
-                           int correctIndex, String explanation, String type, List<String> accepted) {
+                           int correctIndex, String explanation, String type, List<String> accepted,
+                           List<String> audio, List<Object> images) {
 
         public Question(int index, String section, String context, String prompt, List<String> options,
                         int correctIndex, String explanation) {
             this(index, section, context, prompt, options, correctIndex, explanation, TYPE_CHOICE, List.of());
+        }
+
+        public Question(int index, String section, String context, String prompt, List<String> options,
+                        int correctIndex, String explanation, String type, List<String> accepted) {
+            this(index, section, context, prompt, options, correctIndex, explanation, type, accepted, List.of(), List.of());
         }
 
         public boolean isTextGap() {
@@ -83,6 +89,17 @@ public class ExamBankService {
             return tags.getOrDefault(index, Tag.NONE);
         }
 
+        /** The exam's first task: what a learner below the exam's level can already attempt. */
+        public boolean isFirstTask(Question q) {
+            return !questions.isEmpty() && Objects.equals(questions.get(0).section(), q.section());
+        }
+
+        /** The question's tagged sub-skill, or the exam's own skill (reading, listening, …). */
+        public String skillOf(Question q) {
+            String tagged = tag(q.index()).skill();
+            return tagged != null ? tagged : skill;
+        }
+
         /** The question at a stored position, or null (out of range, or dropped as unrenderable). */
         public Question question(int index) {
             for (Question q : questions) {
@@ -110,15 +127,35 @@ public class ExamBankService {
         index = null;
     }
 
-    /** id, cefr_level, source for every exam of kind 'exam', ordered by level then id. */
+    public static final String ROLE_GOAL = "goal";
+    public static final String ROLE_PRACTICE = "practice";
+
+    /** id, cefr_level, source, skill, plan_role for every exam the learning plan uses (plan_role set). */
     public List<Map<String, Object>> listExams() {
         var current = index;
         if (current == null) {
             current = jdbc.queryForList(
-                "SELECT id, cefr_level, source FROM official_exams WHERE kind = ? ORDER BY cefr_level, id", KIND_EXAM);
+                "SELECT id, cefr_level, source, skill, plan_role FROM official_exams WHERE plan_role IS NOT NULL " +
+                "ORDER BY cefr_level, sort_order NULLS LAST, id");
             index = current;
         }
         return current;
+    }
+
+    private List<Map<String, Object>> withRole(String level, String role) {
+        return listExams().stream()
+            .filter(e -> level.equals(e.get("cefr_level")) && role.equals(e.get("plan_role")))
+            .toList();
+    }
+
+    /** The goal exams at a level, one per skill (skill → exam id, first in stored order wins). */
+    public Map<String, String> goalExams(String level) {
+        Map<String, String> out = new LinkedHashMap<>();
+        for (var e : withRole(level, ROLE_GOAL)) {
+            String skill = e.get("skill") != null ? (String) e.get("skill") : "reading";
+            out.putIfAbsent(skill, (String) e.get("id"));
+        }
+        return out;
     }
 
     public Exam getExam(String examId) {
@@ -136,30 +173,16 @@ public class ExamBankService {
         return exam;
     }
 
-    /**
-     * The exam per level kept out of the feed so it stays an honest mock test: the first official
-     * Harno paper at that level, or the first exam if there is none.
-     */
-    public String mockExamId(String level) {
-        String fallback = null;
-        for (var e : listExams()) {
-            if (!level.equals(e.get("cefr_level"))) continue;
-            String id = (String) e.get("id");
-            if (fallback == null) fallback = id;
-            Object source = e.get("source");
-            if (source != null && source.toString().toLowerCase().contains("harno")) return id;
-        }
-        return fallback;
+    /** Exams at the level that the feed may draw questions from; goal exams never appear in the feed. */
+    public List<String> practiceExamIds(String level) {
+        return withRole(level, ROLE_PRACTICE).stream().map(e -> (String) e.get("id")).toList();
     }
 
-    /** Exams at the level that the feed may draw questions from (everything but the mock). */
-    public List<String> practiceExamIds(String level) {
-        String mock = mockExamId(level);
-        return listExams().stream()
-            .filter(e -> level.equals(e.get("cefr_level")))
-            .map(e -> (String) e.get("id"))
-            .filter(id -> !id.equals(mock))
-            .toList();
+    /** Every exam at the level the plan uses (goal and practice): the evidence for readiness. */
+    public Set<String> planExamIds(String level) {
+        Set<String> ids = new LinkedHashSet<>();
+        for (var e : listExams()) if (level.equals(e.get("cefr_level"))) ids.add((String) e.get("id"));
+        return ids;
     }
 
     /** The exam's own pass mark (0..1) from its stored rules, or null when it has none. */
@@ -168,10 +191,14 @@ public class ExamBankService {
         return exam != null && exam.scoring().get("passMark") instanceof Number n ? n.doubleValue() : null;
     }
 
+    /** Levels a learner can aim for: those with goal exams (or, failing that, any plan exams). */
     public Set<String> examLevels() {
-        Set<String> levels = new LinkedHashSet<>();
-        for (var e : listExams()) levels.add((String) e.get("cefr_level"));
-        return levels;
+        Set<String> goal = new LinkedHashSet<>(), any = new LinkedHashSet<>();
+        for (var e : listExams()) {
+            any.add((String) e.get("cefr_level"));
+            if (ROLE_GOAL.equals(e.get("plan_role"))) goal.add((String) e.get("cefr_level"));
+        }
+        return goal.isEmpty() ? any : goal;
     }
 
     public void saveTags(String examId, List<Map<String, Object>> tags) throws Exception {
@@ -251,7 +278,9 @@ public class ExamBankService {
                 emptyToNull(firstNonBlank(q.get("context"), q.get("taskInstruction"))),
                 prompt, options, textGap ? -1 : correctIndex(q, options),
                 firstNonBlank(q.get("explanation"), q.get("explanationTr")),
-                textGap ? TYPE_TEXT_GAP : TYPE_CHOICE, List.copyOf(accepted)));
+                textGap ? TYPE_TEXT_GAP : TYPE_CHOICE, List.copyOf(accepted),
+                q.get("audio") instanceof List<?> au ? au.stream().filter(String.class::isInstance).map(String.class::cast).toList() : List.of(),
+                q.get("images") instanceof List<?> im ? List.copyOf(im) : List.of()));
         }
         return questions;
     }

@@ -51,6 +51,14 @@ public class LearningController {
         return planService.plan(getUserId(request), Math.max(1, Math.min(limit, 12)), grammarBank.getPodcastInfo());
     }
 
+    /** Body: {targetLevel}. The learner picks which level's goal exams to work toward. */
+    @PutMapping("/goal")
+    public ResponseEntity<?> setGoal(HttpServletRequest request, @RequestBody Map<String, Object> body) {
+        var goal = planService.setGoal(getUserId(request), body.get("targetLevel") instanceof String s ? s : null);
+        if (goal == null) return ResponseEntity.badRequest().body(Map.of("error", "No goal exams at that level"));
+        return ResponseEntity.ok(goal);
+    }
+
     @GetMapping("/readiness")
     public Map<String, Object> readiness(HttpServletRequest request) {
         return planService.readiness(getUserId(request));

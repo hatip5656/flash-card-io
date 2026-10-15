@@ -42,19 +42,20 @@ public class AdminOfficialExamController {
                 String scoring = exam.get("scoring") == null ? null : objectMapper.writeValueAsString(exam.get("scoring"));
                 jdbc.update(
                     "INSERT INTO official_exams (id, cefr_level, title, title_tr, title_en, source, questions, " +
-                    "kind, skill, variant, sort_order, scoring, time_limit_minutes) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, CAST(? AS JSONB), ?, ?, ?, ?, CAST(? AS JSONB), ?) " +
+                    "kind, skill, variant, sort_order, scoring, time_limit_minutes, plan_role) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, CAST(? AS JSONB), ?, ?, ?, ?, CAST(? AS JSONB), ?, ?) " +
                     "ON CONFLICT (id) DO UPDATE SET questions = EXCLUDED.questions, title = EXCLUDED.title, " +
                     "title_tr = COALESCE(EXCLUDED.title_tr, official_exams.title_tr), " +
                     "title_en = COALESCE(EXCLUDED.title_en, official_exams.title_en), " +
                     "kind = EXCLUDED.kind, skill = COALESCE(EXCLUDED.skill, official_exams.skill), " +
                     "variant = EXCLUDED.variant, sort_order = EXCLUDED.sort_order, " +
                     "scoring = COALESCE(EXCLUDED.scoring, official_exams.scoring), " +
-                    "time_limit_minutes = COALESCE(EXCLUDED.time_limit_minutes, official_exams.time_limit_minutes)",
+                    "time_limit_minutes = COALESCE(EXCLUDED.time_limit_minutes, official_exams.time_limit_minutes), " +
+                    "plan_role = COALESCE(EXCLUDED.plan_role, official_exams.plan_role)",
                     exam.get("id"), exam.get("level"), exam.get("title"),
                     exam.get("titleTr"), exam.get("titleEn"), exam.get("source"), questions,
                     exam.get("kind") != null ? exam.get("kind") : "exam", exam.get("skill"),
-                    exam.get("variant"), exam.get("sortOrder"), scoring, exam.get("timeLimitMinutes"));
+                    exam.get("variant"), exam.get("sortOrder"), scoring, exam.get("timeLimitMinutes"), exam.get("planRole"));
                 inserted++;
             } catch (Exception e) {
                 failed++;
@@ -66,8 +67,8 @@ public class AdminOfficialExamController {
     }
 
     /**
-     * Body: {scoring: {...}, timeLimitMinutes: n|null}. The grading rules and time limit live here, in the
-     * database; send only the fields to change.
+     * Body: {scoring: {...}, timeLimitMinutes: n|null, planRole: 'goal'|'practice'|null}. The grading rules,
+     * time limit and role in the learning plan live here, in the database; send only the fields to change.
      */
     @PutMapping("/{examId}/rules")
     public ResponseEntity<?> putRules(@PathVariable String examId, @RequestBody Map<String, Object> body) throws Exception {
@@ -82,6 +83,13 @@ public class AdminOfficialExamController {
             Object t = body.get("timeLimitMinutes");
             updated += jdbc.update("UPDATE official_exams SET time_limit_minutes = ? WHERE id = ?",
                 t instanceof Number n ? n.intValue() : null, examId);
+        }
+        if (body.containsKey("planRole")) {
+            Object role = body.get("planRole");
+            if (role != null && !ExamBankService.ROLE_GOAL.equals(role) && !ExamBankService.ROLE_PRACTICE.equals(role)) {
+                return ResponseEntity.badRequest().body(Map.of("error", "planRole must be goal, practice or null"));
+            }
+            updated += jdbc.update("UPDATE official_exams SET plan_role = ? WHERE id = ?", role, examId);
         }
         examBank.invalidate();
         return ResponseEntity.ok(Map.of("ok", true, "updated", updated));

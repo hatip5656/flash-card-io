@@ -23,14 +23,23 @@ token = call('POST', '/admin/login', {'username': user, 'password': pw})['token'
 media_root = os.path.join(src, 'media')
 keys = sorted(os.path.relpath(os.path.join(d, f), media_root)
               for d, _, fs in os.walk(media_root) for f in fs)
+CHUNK = 900 * 1024  # the proxy in front of the API rejects request bodies over 1 MB
 sent = 0
 for i, key in enumerate(keys):
-    time.sleep(0.7)  # the API allows about 100 requests a minute per IP; each file costs one or two
-    if call('GET', '/admin/exam-media-exists/' + key, token=token).get('exists'):
-        continue
+    time.sleep(0.7)  # the API allows about 100 requests a minute per IP
     with open(os.path.join(media_root, key), 'rb') as f:
-        call('PUT', '/admin/exam-media/' + key, raw=f.read(), token=token, ctype='application/octet-stream')
+        data = f.read()
+    stored = call('GET', '/admin/exam-media-exists/' + key, token=token)
+    if stored.get('exists') and stored.get('bytes') == len(data):
+        continue
+    for off in range(0, len(data), CHUNK):
+        q = '?append=true' if off else ''
+        call('PUT', '/admin/exam-media/' + key + q, raw=data[off:off + CHUNK], token=token,
+             ctype='application/octet-stream')
+        time.sleep(0.7)
+    check = call('GET', '/admin/exam-media-exists/' + key, token=token)
+    if check.get('bytes') != len(data):
+        sys.exit(f'{key}: stored {check.get("bytes")} bytes, expected {len(data)}')
     sent += 1
-    time.sleep(0.7)
     if sent % 25 == 0: print(f'media {i + 1}/{len(keys)}', flush=True)
 print(f'media: {sent} uploaded, {len(keys) - sent} already there')

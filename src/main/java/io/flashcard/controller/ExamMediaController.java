@@ -36,19 +36,24 @@ public class ExamMediaController {
             .body(new ByteArrayResource(found.bytes()));
     }
 
-    /** Whether a key is stored, without sending the bytes (the importer skips what is already there). */
+    /** Whether a key is stored and its size, without sending the bytes (the importer skips complete files). */
     @GetMapping("/api/admin/exam-media-exists/**")
     public Map<String, Object> exists(HttpServletRequest request) {
         String key = request.getRequestURI().substring("/api/admin/exam-media-exists/".length());
-        return Map.of("key", key, "exists", media.exists(key));
+        Integer size = media.storedSize(key);
+        return size == null ? Map.of("key", key, "exists", false) : Map.of("key", key, "exists", true, "bytes", size);
     }
 
+    /** Stores a file, or with ?append=true adds the next chunk of one (request bodies are capped near 1 MB). */
     @PutMapping("/api/admin/exam-media/**")
-    public ResponseEntity<?> put(HttpServletRequest request, @RequestBody byte[] body) {
+    public ResponseEntity<?> put(HttpServletRequest request, @RequestBody byte[] body,
+                                 @RequestParam(defaultValue = "false") boolean append) {
         String key = request.getRequestURI().substring(ADMIN_PREFIX.length());
-        if (!media.store(key, body)) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Invalid media key or size"));
+        boolean ok = append ? media.append(key, body) : media.store(key, body);
+        if (!ok) {
+            return ResponseEntity.badRequest().body(Map.of("error",
+                append ? "Unknown key, empty chunk or file too large" : "Invalid media key or size"));
         }
-        return ResponseEntity.ok(Map.of("ok", true, "key", key, "bytes", body.length));
+        return ResponseEntity.ok(Map.of("ok", true, "key", key, "bytes", media.storedSize(key)));
     }
 }

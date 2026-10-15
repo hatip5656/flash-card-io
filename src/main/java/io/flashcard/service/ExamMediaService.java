@@ -42,10 +42,24 @@ public class ExamMediaService {
         return rows.isEmpty() ? null : rows.get(0);
     }
 
-    public boolean exists(String key) {
-        if (!validKey(key)) return false;
-        Integer n = jdbc.queryForObject("SELECT COUNT(*) FROM exam_media WHERE media_key = ?", Integer.class, key);
-        return n != null && n > 0;
+    /** Stored size in bytes, or null when nothing is stored under the key. */
+    public Integer storedSize(String key) {
+        if (!validKey(key)) return null;
+        var rows = jdbc.queryForList("SELECT size_bytes FROM exam_media WHERE media_key = ?", Integer.class, key);
+        return rows.isEmpty() ? null : rows.get(0);
+    }
+
+    /**
+     * Adds a chunk to an upload begun with {@link #store}. The proxy in front of the API limits request
+     * bodies to about 1 MB, so larger files arrive in pieces.
+     */
+    public boolean append(String key, byte[] chunk) {
+        if (!validKey(key) || chunk.length == 0) return false;
+        int updated = jdbc.update("""
+            UPDATE exam_media SET bytes = bytes || ?, size_bytes = size_bytes + ?
+            WHERE media_key = ? AND size_bytes + ? <= ?
+            """, chunk, chunk.length, key, chunk.length, MAX_BYTES);
+        return updated == 1;
     }
 
     public boolean store(String key, byte[] bytes) {

@@ -12,12 +12,13 @@ import java.util.stream.Collectors;
 
 /**
  * Decides what the learner should work on next (the feed's non-word cards) and how close they
- * are to passing the state reading exam at their target level.
+ * are to passing the goal exams at their target level. Which exams are goals and which are practice
+ * material is stored per exam (official_exams.plan_role); the target level per learner (learner_goals).
  */
 @Service
 public class LearningPlanService {
 
-    static final List<String> LEVELS = List.of("A1", "A2", "B1", "B2");
+    static final List<String> LEVELS = List.of("A1", "A2", "B1", "B2", "C1");
     // A grammar topic scoring below this counts as weak (learner-model tuning, not an exam's pass mark)
     static final double WEAK_BELOW = 0.6;
     /** Estimated score the learner should reach in practice before the mock is worth taking. */
@@ -58,7 +59,7 @@ public class LearningPlanService {
     public Map<String, Object> plan(long chatId, int limit, Map<String, Map<String, Object>> podcastInfo) {
         String level = subscriberRepo.getSubscriberLevel(chatId);
         boolean useTurkish = "turkish".equals(subscriberRepo.getPreferences(chatId).getNativeLanguage());
-        String examLevel = targetExamLevel(level);
+        String examLevel = targetExamLevel(chatId, level);
 
         List<Candidate> candidates = rankLessons(chatId, level);
         Candidate focus = candidates.isEmpty() ? null : candidates.get(0);
@@ -81,7 +82,7 @@ public class LearningPlanService {
         }
         List<Map<String, Object>> examItems = examItems(chatId, level, examLevel, focus, 2);
 
-        // Interleave so the feed alternates between rule practice and exam-style reading.
+        // Interleave so the feed alternates between rule practice and exam-style questions.
         List<Map<String, Object>> items = new ArrayList<>(lessonItems);
         Iterator<Map<String, Object>> p = practiceItems.iterator(), e = examItems.iterator();
         while (p.hasNext() || e.hasNext()) {
@@ -132,7 +133,7 @@ public class LearningPlanService {
 
     private List<Map<String, Object>> examItems(long chatId, String level, String examLevel, Candidate focus, int max) {
         if (examLevel == null) return List.of();
-        // Below the exam level only the short situational replies (task 1) are within reach.
+        // Below the exam level only each exam's first (shortest) task is within reach.
         boolean firstTaskOnly = LEVELS.indexOf(level) < LEVELS.indexOf(examLevel);
         List<ExamBankService.Exam> exams = examBank.practiceExamIds(examLevel).stream()
             .map(examBank::getExam).filter(Objects::nonNull).toList();
@@ -146,24 +147,26 @@ public class LearningPlanService {
         // 1. Retry one question missed at least 3 days ago: the second attempt shows whether it stuck.
         for (String itemId : learningRepo.getMissedExamItemIds(chatId, 3)) {
             var ref = resolve(exams, itemId);
-            if (ref == null || (firstTaskOnly && !isFirstTask(ref.q()))) continue;
+            if (ref == null || (firstTaskOnly && !ref.exam().isFirstTask(ref.q()))) continue;
             out.add(examItem(ref.exam(), ref.q(), "exam_weak"));
             picked.add(itemId);
             break;
         }
 
-        // 2. Fresh questions: those testing the focus rule first, then the weakest skill.
+        // 2. Fresh questions: those testing the focus rule first, then the weakest exam skill (reading,
+        //    listening, writing), then the weakest tagged sub-skill.
         record Scored(ExamBankService.Exam exam, ExamBankService.Question q, double score) {}
         List<Scored> fresh = new ArrayList<>();
         for (var exam : exams) {
             for (var q : exam.questions()) {
                 String id = exam.id() + "#" + q.index();
                 if (recent.contains(id) || picked.contains(id)) continue;
-                if (firstTaskOnly && !isFirstTask(q)) continue;
+                if (firstTaskOnly && !exam.isFirstTask(q)) continue;
                 var tag = exam.tag(q.index());
                 double score = random.nextDouble() * 0.5;
                 if (focus != null && tag.grammarLessonIds().contains(focus.lesson().id())) score += 2;
-                if (tag.skill() != null) score += 1 - skillAccuracy.getOrDefault(tag.skill(), 0.5);
+                if (exam.skill() != null) score += 1 - skillAccuracy.getOrDefault(exam.skill(), 0.5);
+                if (tag.skill() != null) score += 0.5 * (1 - skillAccuracy.getOrDefault(tag.skill(), 0.5));
                 fresh.add(new Scored(exam, q, score));
             }
         }
@@ -195,13 +198,14 @@ public class LearningPlanService {
         return null;
     }
 
-    private static boolean isFirstTask(ExamBankService.Question q) {
-        return q.section() != null && q.section().startsWith("Esimene");
-    }
-
-    /** The exam the learner is working toward: their own level, or the lowest exam level above it. */
-    String targetExamLevel(String level) {
+    /**
+     * The level whose goal exams the learner is working toward: the one the placement test (or the
+     * learner) chose, else their profile level or the lowest exam level above it.
+     */
+    String targetExamLevel(long chatId, String level) {
         Set<String> available = examBank.examLevels();
+        var goal = learningRepo.getGoal(chatId);
+        if (goal != null && available.contains((String) goal.get("target_level"))) return (String) goal.get("target_level");
         int rank = LEVELS.indexOf(level);
         for (int r = Math.max(rank, 0); r < LEVELS.size(); r++) {
             if (available.contains(LEVELS.get(r))) return LEVELS.get(r);
@@ -209,68 +213,111 @@ public class LearningPlanService {
         return null;
     }
 
+    /** The learner sets their own goal level; null when the level has no goal exams. */
+    public Map<String, Object> setGoal(long chatId, String targetLevel) {
+        if (targetLevel == null || !examBank.examLevels().contains(targetLevel)) return null;
+        learningRepo.saveGoal(chatId, targetLevel, "learner");
+        return Map.of("targetLevel", targetLevel, "source", "learner");
+    }
+
     // ── Readiness ──
 
     public Map<String, Object> readiness(long chatId) {
         String level = subscriberRepo.getSubscriberLevel(chatId);
-        String examLevel = targetExamLevel(level);
+        String examLevel = targetExamLevel(chatId, level);
+        var goal = learningRepo.getGoal(chatId);
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("targetLevel", examLevel != null ? examLevel : level);
+        result.put("targetSource", goal != null && examLevel != null && examLevel.equals(goal.get("target_level"))
+            ? goal.get("source") : "profile");
+        result.put("availableLevels", examBank.examLevels());
 
-        // Reading: latest answer per question across every exam at the target level.
-        Set<String> examIds = examLevel == null ? Set.of() : examBank.listExams().stream()
-            .filter(e -> examLevel.equals(e.get("cefr_level"))).map(e -> (String) e.get("id"))
-            .collect(Collectors.toSet());
-        var answers = learningRepo.getLatestExamAnswers(chatId, examIds);
-        int n = answers.size();
-        long correct = answers.stream().filter(a -> Boolean.TRUE.equals(a.get("is_correct"))).count();
-        Double estimate = n == 0 ? null : estimate(correct, n);
-
-        Map<String, int[]> bySkill = new LinkedHashMap<>();
+        // Evidence: the latest answer to every goal and practice question at the target level, grouped by the
+        // exam's skill; reading also breaks down by tagged sub-skill (vocabulary, detail, …).
+        var answers = examLevel == null ? List.<Map<String, Object>>of()
+            : learningRepo.getLatestExamAnswers(chatId, examBank.planExamIds(examLevel));
+        Map<String, int[]> byExamSkill = new LinkedHashMap<>();
+        Map<String, int[]> readingSub = new LinkedHashMap<>();
         for (var a : answers) {
-            String skill = a.get("skill") != null ? (String) a.get("skill") : "other";
-            int[] c = bySkill.computeIfAbsent(skill, k -> new int[2]);
-            if (Boolean.TRUE.equals(a.get("is_correct"))) c[0]++;
-            c[1]++;
+            String examSkill = a.get("exam_skill") != null ? (String) a.get("exam_skill") : "reading";
+            boolean right = Boolean.TRUE.equals(a.get("is_correct"));
+            tally(byExamSkill, examSkill, right);
+            Object sub = a.get("skill");
+            if ("reading".equals(examSkill) && sub != null && !examSkill.equals(sub)) tally(readingSub, (String) sub, right);
         }
-        List<Map<String, Object>> skills = bySkill.entrySet().stream()
-            .map(s -> Map.<String, Object>of("skill", s.getKey(), "correct", s.getValue()[0], "total", s.getValue()[1],
-                "accuracy", (double) s.getValue()[0] / s.getValue()[1]))
-            .sorted(Comparator.comparingDouble(s -> (Double) s.get("accuracy")))
-            .toList();
+
+        Map<String, String> goals = examLevel != null ? examBank.goalExams(examLevel) : Map.of();
+        LinkedHashSet<String> skillOrder = new LinkedHashSet<>(goals.keySet());
+        skillOrder.addAll(byExamSkill.keySet());
+        List<Map<String, Object>> skills = new ArrayList<>();
+        for (String skill : skillOrder) {
+            int[] c = byExamSkill.getOrDefault(skill, new int[2]);
+            String goalExam = goals.get(skill);
+            skills.add(skillReadiness(chatId, skill, goalExam, c[0], c[1]));
+        }
+        result.put("skills", skills);
+        result.put("tasks", examLevel == null ? List.of() : learningRepo.getTaskProgress(chatId, examLevel));
+
+        // Back-compatible reading summary and single "mock" for app versions that know only reading
+        Map<String, Object> readingSkill = skills.stream().filter(sk -> "reading".equals(sk.get("skill"))).findFirst().orElse(null);
         Map<String, Object> reading = new LinkedHashMap<>();
-        String mock = examLevel != null ? examBank.mockExamId(examLevel) : null;
-        Double passMark = examBank.passMark(mock);
-        reading.put("estimatedScore", estimate);
-        reading.put("evidence", n);
-        reading.put("passMark", passMark);
-        reading.put("skills", skills);
+        reading.put("estimatedScore", readingSkill != null ? readingSkill.get("estimatedScore") : null);
+        reading.put("evidence", readingSkill != null ? readingSkill.get("evidence") : 0);
+        reading.put("passMark", readingSkill != null ? readingSkill.get("passMark") : null);
+        reading.put("skills", readingSub.entrySet().stream()
+            .map(e -> Map.<String, Object>of("skill", e.getKey(), "correct", e.getValue()[0], "total", e.getValue()[1],
+                "accuracy", (double) e.getValue()[0] / e.getValue()[1]))
+            .sorted(Comparator.comparingDouble(m -> (Double) m.get("accuracy")))
+            .toList());
         result.put("reading", reading);
 
         result.put("grammar", grammarSummary(chatId, examLevel != null ? examLevel : level));
         result.put("vocabulary", vocabularySummary(chatId, level));
 
-        String recommendation = n < MIN_EVIDENCE ? "not_enough_data"
-            : estimate >= MOCK_THRESHOLD && n >= MOCK_EVIDENCE ? "take_mock" : "keep_training";
-        result.put("recommendation", recommendation);
+        // Overall: take a goal exam as soon as one skill is ready for it, the weakest-evidence one first
+        var ready = skills.stream().filter(sk -> "take_mock".equals(sk.get("recommendation")) && sk.get("examId") != null).findFirst();
+        boolean anyData = skills.stream().anyMatch(sk -> !"not_enough_data".equals(sk.get("recommendation")));
+        result.put("recommendation", ready.isPresent() ? "take_mock" : anyData ? "keep_training" : "not_enough_data");
+        Map<String, Object> mockSkill = ready.orElse(readingSkill != null ? readingSkill
+            : skills.stream().filter(sk -> sk.get("examId") != null).findFirst().orElse(null));
+        result.put("mockExamId", mockSkill != null ? mockSkill.get("examId") : null);
+        result.put("lastMock", mockSkill != null ? mockSkill.get("lastAttempt") : null);
+        return result;
+    }
 
-        result.put("mockExamId", mock);
-        Map<String, Object> lastMock = null;
-        if (mock != null) {
-            var last = learningRepo.getLastAttempt(chatId, mock);
-            if (last != null) {
-                int score = ((Number) last.get("score")).intValue();
-                int total = ((Number) last.get("total")).intValue();
+    private Map<String, Object> skillReadiness(long chatId, String skill, String goalExam, int correct, int n) {
+        Double estimate = n == 0 ? null : estimate(correct, n);
+        Double passMark = examBank.passMark(goalExam);
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("skill", skill);
+        out.put("examId", goalExam);
+        out.put("estimatedScore", estimate);
+        out.put("evidence", n);
+        out.put("passMark", passMark);
+        out.put("recommendation", n < MIN_EVIDENCE ? "not_enough_data"
+            : estimate >= MOCK_THRESHOLD && n >= MOCK_EVIDENCE ? "take_mock" : "keep_training");
+        Map<String, Object> last = null;
+        if (goalExam != null) {
+            var a = learningRepo.getLastAttempt(chatId, goalExam);
+            if (a != null) {
+                int score = ((Number) a.get("score")).intValue();
+                int total = ((Number) a.get("total")).intValue();
                 double pct = total == 0 ? 0 : (double) score / total;
-                lastMock = new LinkedHashMap<>();
-                lastMock.put("examId", mock);
-                lastMock.put("percentage", Math.round(pct * 100));
-                lastMock.put("passed", passMark != null ? pct >= passMark : null);
-                lastMock.put("completedAt", last.get("completed_at"));
+                last = new LinkedHashMap<>();
+                last.put("examId", goalExam);
+                last.put("percentage", Math.round(pct * 100));
+                last.put("passed", passMark != null ? pct >= passMark : null);
+                last.put("completedAt", a.get("completed_at"));
             }
         }
-        result.put("lastMock", lastMock);
-        return result;
+        out.put("lastAttempt", last);
+        return out;
+    }
+
+    private static void tally(Map<String, int[]> map, String key, boolean correct) {
+        int[] c = map.computeIfAbsent(key, k -> new int[2]);
+        if (correct) c[0]++;
+        c[1]++;
     }
 
     static double estimate(long correct, int n) {
@@ -319,16 +366,13 @@ public class LearningPlanService {
         return Map.of("strong", strong, "required", required, "ready", strong >= required && avgEase >= 2.0);
     }
 
+    /** Estimated accuracy per exam skill (reading, listening, …) and per tagged sub-skill. */
     private Map<String, Double> skillAccuracy(long chatId, String examLevel) {
-        Set<String> ids = examBank.listExams().stream()
-            .filter(e -> examLevel.equals(e.get("cefr_level"))).map(e -> (String) e.get("id"))
-            .collect(Collectors.toSet());
         Map<String, int[]> counts = new HashMap<>();
-        for (var a : learningRepo.getLatestExamAnswers(chatId, ids)) {
-            if (a.get("skill") == null) continue;
-            int[] c = counts.computeIfAbsent((String) a.get("skill"), k -> new int[2]);
-            if (Boolean.TRUE.equals(a.get("is_correct"))) c[0]++;
-            c[1]++;
+        for (var a : learningRepo.getLatestExamAnswers(chatId, examBank.planExamIds(examLevel))) {
+            boolean right = Boolean.TRUE.equals(a.get("is_correct"));
+            if (a.get("exam_skill") != null) tally(counts, (String) a.get("exam_skill"), right);
+            if (a.get("skill") != null && !a.get("skill").equals(a.get("exam_skill"))) tally(counts, (String) a.get("skill"), right);
         }
         Map<String, Double> out = new HashMap<>();
         counts.forEach((k, c) -> out.put(k, estimate(c[0], c[1])));
@@ -393,11 +437,16 @@ public class LearningPlanService {
         item.put("questionIndex", q.index());
         item.put("section", LearnerModelService.sectionName(q.section()));
         if (q.context() != null) item.put("context", q.context());
+        item.put("type", q.type());
         item.put("prompt", q.prompt());
         item.put("options", q.options());
         item.put("correctIndex", q.correctIndex());
+        if (q.isTextGap()) item.put("accepted", q.accepted());
+        if (!q.audio().isEmpty()) item.put("audio", q.audio());
+        if (!q.images().isEmpty()) item.put("images", q.images());
         if (!q.explanation().isEmpty()) item.put("explanation", q.explanation());
-        item.put("skill", exam.tag(q.index()).skill());
+        item.put("skill", exam.skillOf(q));
+        item.put("examSkill", exam.skill());
         return item;
     }
 }

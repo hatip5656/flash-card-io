@@ -64,17 +64,49 @@ public class LearningRepository {
 
     // ── Exam evidence ──
 
-    /** Latest answer per exam question at the given exam ids (feed and full exams alike). */
+    /**
+     * Latest answer per exam question at the given exam ids (feed and full exams alike). skill is the
+     * question's tagged sub-skill when it has one; exam_skill is the exam's own (reading, listening, …).
+     */
     public List<Map<String, Object>> getLatestExamAnswers(long chatId, Set<String> examIds) {
         if (examIds.isEmpty()) return List.of();
         return jdbc.queryForList("""
-            SELECT DISTINCT ON (item_id) item_id, skill, is_correct, created_at
-            FROM learning_events
-            WHERE chat_id = ? AND item_type = 'exam_question' AND is_correct IS NOT NULL
-              AND split_part(item_id, '#', 1) = ANY(?)
-              AND created_at > NOW() - INTERVAL '90 days'
-            ORDER BY item_id, created_at DESC
+            SELECT a.item_id, a.skill, a.is_correct, a.created_at, e.skill AS exam_skill FROM (
+              SELECT DISTINCT ON (item_id) item_id, skill, is_correct, created_at
+              FROM learning_events
+              WHERE chat_id = ? AND item_type = 'exam_question' AND is_correct IS NOT NULL
+                AND split_part(item_id, '#', 1) = ANY(?)
+                AND created_at > NOW() - INTERVAL '90 days'
+              ORDER BY item_id, created_at DESC
+            ) a LEFT JOIN official_exams e ON e.id = split_part(a.item_id, '#', 1)
             """, chatId, examIds.toArray(new String[0]));
+    }
+
+    // ── Goal ──
+
+    /** {target_level, source} or null when the learner has not set a goal or taken the placement test. */
+    public Map<String, Object> getGoal(long chatId) {
+        var rows = jdbc.queryForList("SELECT target_level, source FROM learner_goals WHERE chat_id = ?", chatId);
+        return rows.isEmpty() ? null : rows.get(0);
+    }
+
+    public void saveGoal(long chatId, String targetLevel, String source) {
+        jdbc.update("""
+            INSERT INTO learner_goals (chat_id, target_level, source) VALUES (?, ?, ?)
+            ON CONFLICT (chat_id) DO UPDATE SET target_level = EXCLUDED.target_level, source = EXCLUDED.source,
+              updated_at = NOW()
+            """, chatId, targetLevel, source);
+    }
+
+    /** Writing/speaking tasks at a level: how many exist and how many the learner has answered, per skill. */
+    public List<Map<String, Object>> getTaskProgress(long chatId, String level) {
+        return jdbc.queryForList("""
+            SELECT t.skill, SUM(jsonb_array_length(t.tasks)) AS tasks,
+                   (SELECT COUNT(DISTINCT (r.task_set_id, r.task_index)) FROM exam_task_responses r
+                    JOIN exam_tasks t2 ON t2.id = r.task_set_id
+                    WHERE r.chat_id = ? AND t2.cefr_level = ? AND t2.skill = t.skill) AS answered
+            FROM exam_tasks t WHERE t.cefr_level = ? GROUP BY t.skill ORDER BY t.skill
+            """, chatId, level, level);
     }
 
     /** Exam questions the learner answered in the feed recently (not to be shown again yet). */

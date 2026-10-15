@@ -159,6 +159,25 @@ class LearnerModelServiceTest {
         var low = service.gradeExam(USER, "scr", Arrays.asList("kapsa", 1, null), null);
         assertEquals(1, low.get("score"));
         assertEquals("A2", ((Map<?, ?>) low.get("verdict")).get("level"));
+        // Each placement result becomes the learner's goal level
+        verify(learningRepo).saveGoal(USER, "B2", "placement");
+        verify(learningRepo).saveGoal(USER, "A2", "placement");
+    }
+
+    @Test
+    void feedTypedAnswersAreGradedAgainstTheAcceptedForms() {
+        var gap = new ExamBankService.Question(0, "1. ülesanne", null, "1. __(1)__", List.of(), -1, "",
+            ExamBankService.TYPE_TEXT_GAP, List.of("kapsas", "kapsast"));
+        when(examBank.getExam("w")).thenReturn(new ExamBankService.Exam("w", "A2", "W", "TESTEST",
+            List.of(gap), Map.of(), "diagnostic", "writing", Map.of()));
+
+        var results = service.recordEvents(USER, List.of(
+            Map.of("itemType", "exam_question", "itemId", "w#0", "userAnswer", "Kapsast"),
+            Map.of("itemType", "exam_question", "itemId", "w#0", "userAnswer", "kapsa")));
+
+        assertEquals(true, results.get(0).get("isCorrect"));
+        assertEquals(List.of("kapsas", "kapsast"), results.get(0).get("accepted"));
+        assertEquals(false, results.get(1).get("isCorrect"));
     }
 
     @Test

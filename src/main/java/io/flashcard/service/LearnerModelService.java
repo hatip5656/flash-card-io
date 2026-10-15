@@ -67,7 +67,12 @@ public class LearnerModelService {
                 var graded = gradeExamItem(chatId, itemId, str(e.get("userAnswer")), source != null ? source : "feed", latency, meta);
                 if (graded == null) continue;
                 events.add(graded.event());
-                results.add(Map.of("index", i, "isCorrect", graded.isCorrect(), "correctIndex", graded.correctIndex()));
+                Map<String, Object> r = new LinkedHashMap<>();
+                r.put("index", i);
+                r.put("isCorrect", graded.isCorrect());
+                r.put("correctIndex", graded.correctIndex());
+                if (graded.accepted() != null) r.put("accepted", graded.accepted());
+                results.add(r);
                 continue;
             }
 
@@ -87,7 +92,7 @@ public class LearnerModelService {
         return results;
     }
 
-    private record GradedItem(Event event, boolean isCorrect, int correctIndex) {}
+    private record GradedItem(Event event, boolean isCorrect, int correctIndex, List<String> accepted) {}
 
     private GradedItem gradeExamItem(long chatId, String itemId, String userAnswer, String source,
                                      Integer latency, String meta) {
@@ -102,17 +107,25 @@ public class LearnerModelService {
         var exam = examBank.getExam(examId);
         var q = exam != null ? exam.question(qi) : null;
         if (q == null) return null;
-        Integer chosen = null;
-        try {
-            if (userAnswer != null && !userAnswer.isBlank()) chosen = Integer.parseInt(userAnswer.trim());
-        } catch (NumberFormatException ignored) {}
-        boolean correct = chosen != null && chosen == q.correctIndex();
+        // An option index for multiple choice, the typed text for a text gap
+        Object chosen = null;
+        if (userAnswer != null && !userAnswer.isBlank()) {
+            if (q.isTextGap()) {
+                chosen = userAnswer.strip();
+            } else {
+                try {
+                    chosen = Integer.parseInt(userAnswer.trim());
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+        boolean correct = q.isCorrect(chosen);
         var tag = exam.tag(qi);
         if (chosen != null) applyExamOutcome(chatId, tag, correct);
         return new GradedItem(new Event("exam_question", source, examId + "#" + qi, null, null,
-            tag.grammarLessonIds().isEmpty() ? null : tag.grammarLessonIds().get(0), tag.skill(), "multiple_choice",
-            correct, chosen != null ? chosen.toString() : null, String.valueOf(q.correctIndex()), latency, meta),
-            correct, q.correctIndex());
+            tag.grammarLessonIds().isEmpty() ? null : tag.grammarLessonIds().get(0),
+            tag.skill() != null ? tag.skill() : exam.skill(), q.type(),
+            correct, chosen != null ? chosen.toString() : null, q.correctAnswer(), latency, meta),
+            correct, q.correctIndex(), q.isTextGap() ? q.accepted() : null);
     }
 
     /** A graded exam question moves grammar mastery for its rules; a miss sends its key words back to review. */
@@ -257,7 +270,13 @@ public class LearnerModelService {
         result.put("perQuestion", perQuestion);
         result.put("kind", exam.kind());
         var verdict = ExamScoring.verdict(exam.scoring(), sections, score, total);
-        if (verdict != null) result.put("verdict", verdict);
+        if (verdict != null) {
+            result.put("verdict", verdict);
+            // The placement result becomes the level the learning plan aims for
+            if ("screening".equals(verdict.get("type")) && verdict.get("recommendedLevel") instanceof String lvl) {
+                learningRepo.saveGoal(chatId, lvl, "placement");
+            }
+        }
         return result;
     }
 
