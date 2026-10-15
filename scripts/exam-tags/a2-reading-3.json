@@ -1,0 +1,279 @@
+[
+ {
+  "questionIndex": 0,
+  "skill": "functional-phrases",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "pilet",
+   "tagasisõit"
+  ]
+ },
+ {
+  "questionIndex": 1,
+  "skill": "functional-phrases",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "sööma",
+   "supp",
+   "võileib"
+  ],
+  "suspectAnswer": true,
+  "note": "'Ei, siin ei ole midagi.' is also a valid answer to a yes/no question; item is ambiguous."
+ },
+ {
+  "questionIndex": 2,
+  "skill": "functional-phrases",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "reserveerima",
+   "laud",
+   "soovima"
+  ]
+ },
+ {
+  "questionIndex": 3,
+  "skill": "functional-phrases",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "arst",
+   "aeg",
+   "viga"
+  ],
+  "suspectAnswer": true,
+  "note": "Stored 'Mis arsti juures?' is unidiomatic; 'Tervist! Mis viga on?' (index 1, asking what's wrong) reads as the most natural reply."
+ },
+ {
+  "questionIndex": 4,
+  "skill": "functional-phrases",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "pluus",
+   "suurem",
+   "suurus"
+  ],
+  "suspectAnswer": true,
+  "note": "'Ei, see on ainuke.' is also a valid reply; item is ambiguous."
+ },
+ {
+  "questionIndex": 5,
+  "skill": "functional-phrases",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "arve",
+   "maksma",
+   "kaart",
+   "sularaha"
+  ]
+ },
+ {
+  "questionIndex": 6,
+  "skill": "gist",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "pakkuma",
+   "töö",
+   "kelner"
+  ]
+ },
+ {
+  "questionIndex": 7,
+  "skill": "gist",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "üürima",
+   "korter"
+  ]
+ },
+ {
+  "questionIndex": 8,
+  "skill": "gist",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "müüma",
+   "jalgratas",
+   "transport"
+  ]
+ },
+ {
+  "questionIndex": 9,
+  "skill": "gist",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "tervis",
+   "köha",
+   "arst"
+  ]
+ },
+ {
+  "questionIndex": 10,
+  "skill": "gist",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "otsima",
+   "retsept",
+   "nõuanne"
+  ]
+ },
+ {
+  "questionIndex": 11,
+  "skill": "gist",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "kutsuma",
+   "kokkutulek"
+  ]
+ },
+ {
+  "questionIndex": 12,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "pangaautomaat"
+  ]
+ },
+ {
+  "questionIndex": 13,
+  "skill": "vocabulary",
+  "grammarLessonIds": [
+   "a1-telling-time"
+  ],
+  "keyWords": [
+   "parkimine",
+   "keelatud"
+  ]
+ },
+ {
+  "questionIndex": 14,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "külmik",
+   "puhas",
+   "puhastama"
+  ]
+ },
+ {
+  "questionIndex": 15,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [
+   "a1-telling-time"
+  ],
+  "keyWords": [
+   "lahtiolekuaeg",
+   "laupäev",
+   "pühapäev"
+  ]
+ },
+ {
+  "questionIndex": 16,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "jätma",
+   "jalgratas",
+   "märgistatud",
+   "koht"
+  ]
+ },
+ {
+  "questionIndex": 17,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "suvi",
+   "talv",
+   "ratas"
+  ]
+ },
+ {
+  "questionIndex": 18,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "amet",
+   "insener"
+  ]
+ },
+ {
+  "questionIndex": 19,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "koer",
+   "kaks"
+  ]
+ },
+ {
+  "questionIndex": 20,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "nädalavahetus",
+   "matkama",
+   "mets"
+  ]
+ },
+ {
+  "questionIndex": 21,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "tervis",
+   "oluline",
+   "värske",
+   "õhk"
+  ]
+ },
+ {
+  "questionIndex": 22,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "armas",
+   "väike",
+   "pere"
+  ]
+ },
+ {
+  "questionIndex": 23,
+  "skill": "vocabulary",
+  "grammarLessonIds": [
+   "a1-numbers"
+  ],
+  "keyWords": [
+   "neli",
+   "lasteaed",
+   "aastane"
+  ]
+ },
+ {
+  "questionIndex": 24,
+  "skill": "vocabulary",
+  "grammarLessonIds": [
+   "a2-numbers-11-100"
+  ],
+  "keyWords": [
+   "esimene",
+   "klass",
+   "kooliealine"
+  ]
+ },
+ {
+  "questionIndex": 25,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "käima",
+   "toidupood"
+  ]
+ },
+ {
+  "questionIndex": 26,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "jalutama",
+   "park"
+  ]
+ }
+]

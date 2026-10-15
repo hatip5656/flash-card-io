@@ -1,0 +1,330 @@
+[
+ {
+  "questionIndex": 0,
+  "skill": "gist",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "digiriik",
+   "avalik",
+   "teenus",
+   "kättesaadav"
+  ]
+ },
+ {
+  "questionIndex": 1,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "andmevahetus",
+   "infosüsteem",
+   "ühendama"
+  ]
+ },
+ {
+  "questionIndex": 2,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "seaduslik",
+   "jõud",
+   "esimene",
+   "valimine"
+  ]
+ },
+ {
+  "questionIndex": 3,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "välismaalane",
+   "eesmärk",
+   "asuma"
+  ]
+ },
+ {
+  "questionIndex": 4,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "küberrünnak",
+   "kogema",
+   "ulatuslik"
+  ]
+ },
+ {
+  "questionIndex": 5,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "sõltuvus",
+   "haavatav",
+   "oht"
+  ]
+ },
+ {
+  "questionIndex": 6,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "tegur",
+   "uuendusvalmis",
+   "koostöö",
+   "alus"
+  ]
+ },
+ {
+  "questionIndex": 7,
+  "skill": "gist",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "taastuvenergia",
+   "saavutama",
+   "eesmärk"
+  ]
+ },
+ {
+  "questionIndex": 8,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "soojalembene",
+   "puuliik",
+   "levik",
+   "tamm"
+  ]
+ },
+ {
+  "questionIndex": 9,
+  "skill": "gist",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "rannikuala",
+   "väikesaar",
+   "ohustatud"
+  ]
+ },
+ {
+  "questionIndex": 10,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "taastamine",
+   "pikaajaline",
+   "aastakümme"
+  ]
+ },
+ {
+  "questionIndex": 11,
+  "skill": "gist",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "temperatuur",
+   "tõusma",
+   "märkimisväärne"
+  ]
+ },
+ {
+  "questionIndex": 12,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "põllumees",
+   "katsetama",
+   "põllukultuur"
+  ]
+ },
+ {
+  "questionIndex": 13,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "kuivendamine",
+   "nõrgendama",
+   "võimekus"
+  ]
+ },
+ {
+  "questionIndex": 14,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "kasvuhoonegaas",
+   "heitkogus",
+   "vähendama"
+  ]
+ },
+ {
+  "questionIndex": 15,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "lugema",
+   "nutiseade"
+  ]
+ },
+ {
+  "questionIndex": 16,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "sündmus",
+   "päevakajaline"
+  ]
+ },
+ {
+  "questionIndex": 17,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "väljakutse",
+   "esitama"
+  ]
+ },
+ {
+  "questionIndex": 18,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "eristamine",
+   "tõene"
+  ]
+ },
+ {
+  "questionIndex": 19,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "avastama",
+   "teadlane"
+  ]
+ },
+ {
+  "questionIndex": 20,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "asendamatu",
+   "roll"
+  ]
+ },
+ {
+  "questionIndex": 21,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "analüüsima",
+   "allikas"
+  ]
+ },
+ {
+  "questionIndex": 22,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "silmitsi",
+   "rahastamisraskus"
+  ],
+  "suspectAnswer": true,
+  "note": "Ambiguous: 'kokku puutunud' (on rahastamisraskustega kokku puutunud ning pidanud...) is equally grammatical and meaningful; keyed 'silmitsi' is acceptable but not uniquely correct."
+ },
+ {
+  "questionIndex": 23,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "levinud",
+   "üha"
+  ]
+ },
+ {
+  "questionIndex": 24,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "nurgakivi",
+   "demokraatia"
+  ]
+ },
+ {
+  "questionIndex": 25,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "ärkamine",
+   "glasnost",
+   "laulev revolutsioon"
+  ]
+ },
+ {
+  "questionIndex": 26,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "inimkett",
+   "moodustama",
+   "ulatuma"
+  ]
+ },
+ {
+  "questionIndex": 27,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "lahkuma",
+   "eralduma",
+   "koosseis"
+  ]
+ },
+ {
+  "questionIndex": 28,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "ähvardus",
+   "surve",
+   "takistama"
+  ]
+ },
+ {
+  "questionIndex": 29,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "referendum",
+   "hääletama",
+   "poolt"
+  ]
+ },
+ {
+  "questionIndex": 30,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "koguma",
+   "valvama",
+   "kodanikukaitse"
+  ]
+ },
+ {
+  "questionIndex": 31,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "seadus",
+   "ümberkorraldamine",
+   "nullist"
+  ],
+  "suspectAnswer": true,
+  "note": "Ambiguous: unused distractor 'Riigi rahandussüsteem ... tuli lahti haakida' also fits gap 32 (next sentence mentions restoring the kroon), and the keyed option's 'aastatepikkust tööd' clashes with 'üllatavalt kiiresti'. Key is defensible but not unique."
+ },
+ {
+  "questionIndex": 32,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "püha",
+   "tähistama",
+   "kalender"
+  ]
+ }
+]

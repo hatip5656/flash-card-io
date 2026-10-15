@@ -1,0 +1,360 @@
+[
+ {
+  "questionIndex": 0,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "konsultant",
+   "eripära",
+   "kursis",
+   "iseärasus"
+  ]
+ },
+ {
+  "questionIndex": 1,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "pealiskaudne",
+   "tutvuma",
+   "teenus",
+   "selgeks tegema"
+  ]
+ },
+ {
+  "questionIndex": 2,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "broneerima",
+   "soov",
+   "ootus",
+   "arutama"
+  ]
+ },
+ {
+  "questionIndex": 3,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "tasuma",
+   "jook",
+   "ette maksma",
+   "hinnas"
+  ]
+ },
+ {
+  "questionIndex": 4,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "merevaade",
+   "reisikonsultant",
+   "tellima",
+   "kataloog"
+  ]
+ },
+ {
+  "questionIndex": 5,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "liikumine",
+   "vorm",
+   "rasv",
+   "põletama"
+  ]
+ },
+ {
+  "questionIndex": 6,
+  "skill": "gist",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "eesmärk",
+   "soovitus",
+   "planeerima"
+  ]
+ },
+ {
+  "questionIndex": 7,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [
+   "b2-imperative"
+  ],
+  "keyWords": [
+   "peatuma",
+   "viivitama",
+   "kiirus",
+   "asjatult"
+  ]
+ },
+ {
+  "questionIndex": 8,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "ületuskoht",
+   "veenduma",
+   "ohutus"
+  ]
+ },
+ {
+  "questionIndex": 9,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "kõnnitee",
+   "jalgrattur",
+   "lähedus",
+   "tavakiirus"
+  ]
+ },
+ {
+  "questionIndex": 10,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "jalgrattatee",
+   "hõre",
+   "takistama",
+   "liiklustihedus"
+  ]
+ },
+ {
+  "questionIndex": 11,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "ületama",
+   "jalgratas",
+   "liikumistempo",
+   "tavakiirus"
+  ]
+ },
+ {
+  "questionIndex": 12,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [
+   "b2-imperative"
+  ],
+  "keyWords": [
+   "abivahend",
+   "segama",
+   "ohustama"
+  ]
+ },
+ {
+  "questionIndex": 13,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "eesõigus",
+   "ülekäigukoht",
+   "tähelepanelik"
+  ]
+ },
+ {
+  "questionIndex": 14,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "ületuskoht",
+   "kaugel",
+   "nähtavus",
+   "suvaline"
+  ]
+ },
+ {
+  "questionIndex": 15,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "üle vaatama",
+   "harjumuspärane"
+  ]
+ },
+ {
+  "questionIndex": 16,
+  "skill": "vocabulary",
+  "grammarLessonIds": [
+   "a2-postpositions"
+  ],
+  "keyWords": [
+   "põhjal",
+   "ostunimekiri"
+  ]
+ },
+ {
+  "questionIndex": 17,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "kinni pidama",
+   "ostunimekiri"
+  ]
+ },
+ {
+  "questionIndex": 18,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "vajalik",
+   "lisaväljaminek"
+  ]
+ },
+ {
+  "questionIndex": 19,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "maksumus",
+   "tükihind"
+  ]
+ },
+ {
+  "questionIndex": 20,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "koostis",
+   "tooraine"
+  ]
+ },
+ {
+  "questionIndex": 21,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "kindel",
+   "kvaliteet"
+  ]
+ },
+ {
+  "questionIndex": 22,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "suur",
+   "kogus",
+   "varu"
+  ]
+ },
+ {
+  "questionIndex": 23,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "vältima",
+   "valmistoode"
+  ]
+ },
+ {
+  "questionIndex": 24,
+  "skill": "vocabulary",
+  "grammarLessonIds": [
+   "a2-postpositions"
+  ],
+  "keyWords": [
+   "lähedal",
+   "sõidukulu"
+  ]
+ },
+ {
+  "questionIndex": 25,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "ost",
+   "kord nädalas"
+  ]
+ },
+ {
+  "questionIndex": 26,
+  "skill": "vocabulary",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "arukalt",
+   "majandama"
+  ]
+ },
+ {
+  "questionIndex": 27,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "järjekord",
+   "vähesus",
+   "kasvama"
+  ]
+ },
+ {
+  "questionIndex": 28,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "lubama",
+   "autoomanik",
+   "ajakiri"
+  ]
+ },
+ {
+  "questionIndex": 29,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "veoauto",
+   "suurenema",
+   "toodang"
+  ]
+ },
+ {
+  "questionIndex": 30,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "eraauto",
+   "ületama",
+   "piir"
+  ]
+ },
+ {
+  "questionIndex": 31,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "kooperatiiv",
+   "kauplus",
+   "lisaks"
+  ]
+ },
+ {
+  "questionIndex": 32,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "parandus",
+   "täpsustus",
+   "korrektiiv"
+  ]
+ },
+ {
+  "questionIndex": 33,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "kontrollima",
+   "järjekorranumber",
+   "kohapeal"
+  ]
+ },
+ {
+  "questionIndex": 34,
+  "skill": "detail-comprehension",
+  "grammarLessonIds": [],
+  "keyWords": [
+   "kaebus",
+   "tuttav",
+   "kerkima"
+  ]
+ }
+]
