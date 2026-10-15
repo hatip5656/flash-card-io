@@ -19,22 +19,34 @@ public class OfficialExamController {
         this.learnerModel = learnerModel;
     }
 
+    /**
+     * kind: 'exam' by default, so app versions that only know reading papers keep seeing just those;
+     * 'screening', 'diagnostic', 'sample', or 'all'.
+     */
     @GetMapping
     public Map<String, Object> listExams(
             @RequestHeader("X-User-Id") String userId,
-            @RequestParam(required = false) String level) {
+            @RequestParam(required = false) String level,
+            @RequestParam(required = false, defaultValue = "exam") String kind) {
         String sql = "SELECT e.id, e.cefr_level, e.title, e.title_tr, e.title_en, e.source, " +
+                     "e.kind, e.skill, e.variant, " +
                      "COALESCE(jsonb_array_length(e.questions), 0) as question_count, " +
                      "(SELECT COUNT(*) FROM exam_attempts a WHERE a.exam_id = e.id AND a.chat_id = CAST(? AS BIGINT)) as attempt_count, " +
                      "(SELECT MAX(a.score) FROM exam_attempts a WHERE a.exam_id = e.id AND a.chat_id = CAST(? AS BIGINT)) as best_score, " +
                      "(SELECT MAX(a.total) FROM exam_attempts a WHERE a.exam_id = e.id AND a.chat_id = CAST(? AS BIGINT)) as best_total " +
                      "FROM official_exams e ";
         List<Object> params = new ArrayList<>(List.of(userId, userId, userId));
+        List<String> where = new ArrayList<>();
         if (level != null && !level.isEmpty()) {
-            sql += "WHERE e.cefr_level = ? ";
+            where.add("e.cefr_level = ?");
             params.add(level);
         }
-        sql += "ORDER BY e.cefr_level, e.id";
+        if (!"all".equals(kind)) {
+            where.add("e.kind = ?");
+            params.add(kind);
+        }
+        if (!where.isEmpty()) sql += "WHERE " + String.join(" AND ", where) + " ";
+        sql += "ORDER BY e.kind, e.sort_order NULLS LAST, e.cefr_level, e.id";
         List<Map<String, Object>> exams = jdbc.queryForList(sql, params.toArray());
         return Map.of("exams", exams);
     }
@@ -44,7 +56,8 @@ public class OfficialExamController {
             @RequestHeader("X-User-Id") String userId,
             @PathVariable String examId) {
         List<Map<String, Object>> rows = jdbc.queryForList(
-            "SELECT id, cefr_level, title, title_tr, title_en, source, questions::text as questions FROM official_exams WHERE id = ?",
+            "SELECT id, cefr_level, title, title_tr, title_en, source, kind, skill, variant, scoring::text as scoring, " +
+            "questions::text as questions FROM official_exams WHERE id = ?",
             examId);
         if (rows.isEmpty()) return Map.of("error", "Exam not found");
         return rows.get(0);

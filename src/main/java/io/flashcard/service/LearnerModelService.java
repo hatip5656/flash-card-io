@@ -184,25 +184,37 @@ public class LearnerModelService {
         Map<String, int[]> lessons = new LinkedHashMap<>();
         List<Map<String, Object>> perQuestion = new ArrayList<>();
         List<Event> events = new ArrayList<>();
-        List<Integer> stored = new ArrayList<>();
+        List<Object> stored = new ArrayList<>();
 
         for (var q : exam.questions()) {
             Object a = q.index() < answers.size() ? answers.get(q.index()) : null;
-            Integer chosen = a instanceof Number n ? n.intValue() : null;
+            // An option index for multiple choice, the typed text for a text gap; anything else is a skip.
+            Object chosen = q.isTextGap()
+                ? (a instanceof String t && !t.isBlank() ? t.strip() : null)
+                : (a instanceof Number n ? (Object) n.intValue() : null);
+            if (chosen instanceof String t && t.length() > 200) chosen = t.substring(0, 200);
             stored.add(chosen);
-            boolean correct = chosen != null && chosen == q.correctIndex();
+            boolean correct = q.isCorrect(chosen);
             if (correct) score++;
             var tag = exam.tag(q.index());
 
             tally(sections, sectionName(q.section()), correct);
-            if (tag.skill() != null) tally(skills, tag.skill(), correct);
+            // Tagged exams break down by question skill; the others by the exam's own (listening, writing…).
+            String skill = tag.skill() != null ? tag.skill() : exam.skill();
+            if (skill != null) tally(skills, skill, correct);
             for (String l : tag.grammarLessonIds()) tally(lessons, l, correct);
-            perQuestion.add(Map.of("index", q.index(), "isCorrect", correct, "correctIndex", q.correctIndex()));
+            Map<String, Object> pq = new LinkedHashMap<>();
+            pq.put("index", q.index());
+            pq.put("isCorrect", correct);
+            pq.put("correctIndex", q.correctIndex());
+            if (q.isTextGap()) pq.put("accepted", q.accepted());
+            perQuestion.add(pq);
 
             events.add(new Event("exam_question", "exam", examId + "#" + q.index(), null, null,
-                tag.grammarLessonIds().isEmpty() ? null : tag.grammarLessonIds().get(0), tag.skill(),
-                "multiple_choice", correct, chosen != null ? chosen.toString() : null,
-                String.valueOf(q.correctIndex()), null, null));
+                tag.grammarLessonIds().isEmpty() ? null : tag.grammarLessonIds().get(0),
+                tag.skill() != null ? tag.skill() : exam.skill(),
+                q.type(), correct, chosen != null ? chosen.toString() : null,
+                q.correctAnswer(), null, null));
             // Skipped questions count as wrong for the score but say nothing about a rule or word.
             if (chosen != null) applyExamOutcome(chatId, tag, correct);
         }
@@ -241,6 +253,9 @@ public class LearnerModelService {
         result.put("skills", skillList);
         result.put("weakLessons", weakLessons);
         result.put("perQuestion", perQuestion);
+        result.put("kind", exam.kind());
+        var verdict = ExamScoring.verdict(exam.scoring(), sections, score, total);
+        if (verdict != null) result.put("verdict", verdict);
         return result;
     }
 

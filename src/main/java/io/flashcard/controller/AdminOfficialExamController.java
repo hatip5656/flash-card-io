@@ -39,11 +39,21 @@ public class AdminOfficialExamController {
                 String questions = exam.get("questions") instanceof String
                     ? (String) exam.get("questions")
                     : objectMapper.writeValueAsString(exam.get("questions"));
+                String scoring = exam.get("scoring") == null ? null : objectMapper.writeValueAsString(exam.get("scoring"));
                 jdbc.update(
-                    "INSERT INTO official_exams (id, cefr_level, title, title_tr, title_en, source, questions) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, CAST(? AS JSONB)) ON CONFLICT (id) DO UPDATE SET questions = CAST(EXCLUDED.questions AS JSONB), title = EXCLUDED.title",
+                    "INSERT INTO official_exams (id, cefr_level, title, title_tr, title_en, source, questions, " +
+                    "kind, skill, variant, sort_order, scoring) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, CAST(? AS JSONB), ?, ?, ?, ?, CAST(? AS JSONB)) " +
+                    "ON CONFLICT (id) DO UPDATE SET questions = EXCLUDED.questions, title = EXCLUDED.title, " +
+                    "title_tr = COALESCE(EXCLUDED.title_tr, official_exams.title_tr), " +
+                    "title_en = COALESCE(EXCLUDED.title_en, official_exams.title_en), " +
+                    "kind = EXCLUDED.kind, skill = COALESCE(EXCLUDED.skill, official_exams.skill), " +
+                    "variant = EXCLUDED.variant, sort_order = EXCLUDED.sort_order, " +
+                    "scoring = COALESCE(EXCLUDED.scoring, official_exams.scoring)",
                     exam.get("id"), exam.get("level"), exam.get("title"),
-                    exam.get("titleTr"), exam.get("titleEn"), exam.get("source"), questions);
+                    exam.get("titleTr"), exam.get("titleEn"), exam.get("source"), questions,
+                    exam.get("kind") != null ? exam.get("kind") : "exam", exam.get("skill"),
+                    exam.get("variant"), exam.get("sortOrder"), scoring);
                 inserted++;
             } catch (Exception e) {
                 failed++;

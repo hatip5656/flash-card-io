@@ -129,4 +129,46 @@ class LearnerModelServiceTest {
         assertEquals(0, qs.get(1).correctIndex());
         assertEquals("read", qs.get(1).context());
     }
+
+    @Test
+    void gradesTypedGapsAndAttachesTheScreeningVerdict() {
+        var gap = new ExamBankService.Question(0, "1. osa", null, "Lünk 1", List.of(), -1, "",
+            ExamBankService.TYPE_TEXT_GAP, List.of("kapsas", "kapsast"));
+        var choice = new ExamBankService.Question(1, "1. osa", null, "Minu nimi ... Piret.",
+            List.of("olen", "on"), 1, "");
+        var later = new ExamBankService.Question(2, "2. osa", null, "x", List.of("a", "b"), 0, "");
+        var scoring = Map.<String, Object>of("type", "screening",
+            "gate", Map.of("section", "1. osa", "minScore", 2),
+            "placement", List.of(
+                Map.of("level", "A2", "ranges", Map.of("1. osa", List.of(0, 1))),
+                Map.of("level", "B1", "ranges", Map.of("2. osa", List.of(0, 0))),
+                Map.of("level", "B2", "ranges", Map.of("2. osa", List.of(1, 1)))));
+        when(examBank.getExam("scr")).thenReturn(new ExamBankService.Exam("scr", "ALL", "S", "TESTEST",
+            List.of(gap, choice, later), Map.of(), "screening", "grammar", scoring));
+
+        var result = service.gradeExam(USER, "scr", Arrays.asList("Kapsast", 1, 0), null);
+
+        assertEquals(3, result.get("score"));
+        @SuppressWarnings("unchecked")
+        var verdict = (Map<String, Object>) result.get("verdict");
+        assertEquals("B2", verdict.get("level"));
+        verify(learningRepo).saveExamAttempt(eq(USER), eq("scr"), eq(3), eq(3), eq("[\"Kapsast\",1,0]"), anyString(), isNull());
+
+        // Wrong text and a skipped part 2: below the gate, part 2 does not count.
+        var low = service.gradeExam(USER, "scr", Arrays.asList("kapsa", 1, null), null);
+        assertEquals(1, low.get("score"));
+        assertEquals("A2", ((Map<?, ?>) low.get("verdict")).get("level"));
+    }
+
+    @Test
+    void parseQuestionsKeepsTypedGapsWithAcceptedAnswers() {
+        var bank = new ExamBankService(mock(JdbcTemplate.class), new ObjectMapper());
+        var qs = bank.parseQuestions("""
+            [{"type":"text_gap","prompt":"1. __(1)__","options":[],"accepted":["kapsas","kapsast"],"correctIndex":-1},
+             {"type":"text_gap","prompt":"2. __(2)__","options":[],"accepted":[]}]
+            """);
+        assertEquals(1, qs.size());
+        assertTrue(qs.get(0).isTextGap());
+        assertEquals(List.of("kapsas", "kapsast"), qs.get(0).accepted());
+    }
 }

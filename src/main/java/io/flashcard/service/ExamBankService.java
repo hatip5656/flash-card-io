@@ -20,15 +20,65 @@ public class ExamBankService {
 
     private static final Logger log = LoggerFactory.getLogger(ExamBankService.class);
 
+    /**
+     * One scorable item. A multiple-choice item is right when the chosen index equals correctIndex; a
+     * text_gap item (typed answer) is right when the normalised answer is one of {@code accepted}.
+     */
     public record Question(int index, String section, String context, String prompt, List<String> options,
-                           int correctIndex, String explanation) {}
+                           int correctIndex, String explanation, String type, List<String> accepted) {
+
+        public Question(int index, String section, String context, String prompt, List<String> options,
+                        int correctIndex, String explanation) {
+            this(index, section, context, prompt, options, correctIndex, explanation, TYPE_CHOICE, List.of());
+        }
+
+        public boolean isTextGap() {
+            return TYPE_TEXT_GAP.equals(type);
+        }
+
+        /** The answer as the learner model stores it: the option index, or the typed text. */
+        public String correctAnswer() {
+            return isTextGap() ? String.join(" / ", accepted) : String.valueOf(correctIndex);
+        }
+
+        public boolean isCorrect(Object answer) {
+            if (answer == null) return false;
+            if (isTextGap()) {
+                String given = normalise(answer.toString());
+                return !given.isEmpty() && accepted.stream().anyMatch(a -> normalise(a).equals(given));
+            }
+            if (answer instanceof Number n) return n.intValue() == correctIndex;
+            try {
+                return Integer.parseInt(answer.toString().trim()) == correctIndex;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+    }
+
+    public static final String TYPE_CHOICE = "multiple_choice";
+    public static final String TYPE_TEXT_GAP = "text_gap";
+
+    /** Case, surrounding punctuation and runs of spaces do not count against a typed answer. */
+    static String normalise(String s) {
+        String t = s.strip().toLowerCase(Locale.ROOT)
+            .replace('\u2019', '\'').replace('\u2018', '\'')
+            .replaceAll("\\s+", " ");
+        return t.replaceAll("^[\\p{Punct}\u201e\u201c\u201d\\s]+|[\\p{Punct}\u201e\u201c\u201d\\s]+$", "");
+    }
 
     public record Tag(String skill, List<String> grammarLessonIds, List<String> keyWords) {
         static final Tag NONE = new Tag(null, List.of(), List.of());
     }
 
     public record Exam(String id, String cefrLevel, String title, String source, List<Question> questions,
-                       Map<Integer, Tag> tags) {
+                       Map<Integer, Tag> tags, String kind, String skill, Map<String, Object> scoring) {
+
+        public Exam(String id, String cefrLevel, String title, String source, List<Question> questions,
+                    Map<Integer, Tag> tags) {
+            this(id, cefrLevel, title, source, questions, tags, KIND_EXAM, null, Map.of());
+        }
+
         public Tag tag(int index) {
             return tags.getOrDefault(index, Tag.NONE);
         }
@@ -41,6 +91,9 @@ public class ExamBankService {
             return null;
         }
     }
+
+    /** The reading papers the learning plan and readiness draw on; other kinds stand alone. */
+    public static final String KIND_EXAM = "exam";
 
     private final JdbcTemplate jdbc;
     private final ObjectMapper objectMapper;
@@ -57,11 +110,12 @@ public class ExamBankService {
         index = null;
     }
 
-    /** id, cefr_level, source for every exam, ordered by level then id. */
+    /** id, cefr_level, source for every exam of kind 'exam', ordered by level then id. */
     public List<Map<String, Object>> listExams() {
         var current = index;
         if (current == null) {
-            current = jdbc.queryForList("SELECT id, cefr_level, source FROM official_exams ORDER BY cefr_level, id");
+            current = jdbc.queryForList(
+                "SELECT id, cefr_level, source FROM official_exams WHERE kind = ? ORDER BY cefr_level, id", KIND_EXAM);
             index = current;
         }
         return current;
@@ -71,11 +125,13 @@ public class ExamBankService {
         Exam cached = cache.get(examId);
         if (cached != null) return cached;
         var rows = jdbc.queryForList(
-            "SELECT id, cefr_level, title, source, questions::text AS questions FROM official_exams WHERE id = ?", examId);
+            "SELECT id, cefr_level, title, source, kind, skill, scoring::text AS scoring, questions::text AS questions " +
+            "FROM official_exams WHERE id = ?", examId);
         if (rows.isEmpty()) return null;
         var row = rows.get(0);
         Exam exam = new Exam(examId, (String) row.get("cefr_level"), (String) row.get("title"),
-            (String) row.get("source"), parseQuestions((String) row.get("questions")), loadTags(examId));
+            (String) row.get("source"), parseQuestions((String) row.get("questions")), loadTags(examId),
+            row.get("kind") != null ? (String) row.get("kind") : KIND_EXAM, (String) row.get("skill"), parseScoring((String) row.get("scoring")));
         cache.put(examId, exam);
         return exam;
     }
@@ -145,6 +201,16 @@ public class ExamBankService {
         return tags;
     }
 
+    private Map<String, Object> parseScoring(String json) {
+        if (json == null || json.isBlank()) return Map.of();
+        try {
+            return objectMapper.readValue(json, new TypeReference<Map<String, Object>>() {});
+        } catch (Exception e) {
+            log.warn("Unparseable exam scoring: {}", e.getMessage());
+            return Map.of();
+        }
+    }
+
     @SuppressWarnings("unchecked")
     List<Question> parseQuestions(String json) {
         List<Map<String, Object>> raw;
@@ -164,16 +230,22 @@ public class ExamBankService {
                     else options.add(String.valueOf(o));
                 }
             }
-            int ci = correctIndex(q, options);
             String prompt = firstNonBlank(q.get("prompt"), q.get("question"), q.get("questionTr"));
+            boolean textGap = TYPE_TEXT_GAP.equals(q.get("type"));
+            List<String> accepted = new ArrayList<>();
+            if (textGap && q.get("accepted") instanceof List<?> acc) {
+                for (Object a : acc) if (a != null && !a.toString().isBlank()) accepted.add(a.toString());
+            }
             // Same filter as the app. A question keeps its position in the stored array, which is
             // what the app sends answers by and what the tags are keyed on.
-            if (options.size() < 2 || prompt.isEmpty()) continue;
+            if (prompt.isEmpty()) continue;
+            if (textGap ? accepted.isEmpty() : options.size() < 2) continue;
             questions.add(new Question(i,
                 firstNonBlank(q.get("section")),
                 emptyToNull(firstNonBlank(q.get("context"), q.get("taskInstruction"))),
-                prompt, options, ci,
-                firstNonBlank(q.get("explanation"), q.get("explanationTr"))));
+                prompt, options, textGap ? -1 : correctIndex(q, options),
+                firstNonBlank(q.get("explanation"), q.get("explanationTr")),
+                textGap ? TYPE_TEXT_GAP : TYPE_CHOICE, List.copyOf(accepted)));
         }
         return questions;
     }
