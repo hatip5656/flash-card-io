@@ -216,3 +216,103 @@ for e in exams:
     types = {}
     for q in e['questions']: types[q['type']] = types.get(q['type'], 0) + 1
     print(e['id'], len(e['questions']), types)
+
+
+# ── Writing and speaking tasks (ILIAS learning modules): prompt, model answer, examiner comment ──
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from parse import rich, clean, figures_of, text  # noqa: E402
+
+
+def lm_text(fragment):
+    return clean(rich(re.sub(r'<a class="small" id="ilPageShowAdvContent".*?</a>', '', fragment, flags=re.S)))
+
+
+def lm_media(fragment, ref):
+    audio, images = [], []
+    for f in figures_of(fragment):
+        k = media_key(f['media'], ref)
+        if k.endswith('.mp3'):
+            audio.append(k)
+        else:
+            images.append({'src': k, 'label': f['label']} if f['label'] else {'src': k})
+    return audio, images
+
+
+def lm_page(html_, ref):
+    title = re.search(r'<h1 class="ilc_page_title_PageTitle">(.*?)</h1>', html_, re.S)
+    end = html_.find('ilc_page_bnav_BottomNavigation')
+    if end > 0: end = html_.rfind('<div', 0, end)
+    body = html_[html_.find('<!--COPage-PageTop-->'):end if end > 0 else None]
+    acc = body.find('ilc_va_cntr_VAccordCntr')
+    if acc > 0: acc = body.rfind('<div', 0, acc)  # split at the panel's opening tag
+    prompt_html = body[:acc] if acc > 0 else body
+    answer_html = body[acc:] if acc > 0 else ''
+    answer_html = re.sub(r'<script.*?</script>', '', answer_html, flags=re.S)
+    caption = re.search(r'<div class="ilc_va_ihcap_VAccordIHeadCap">(.*?)</div>', answer_html, re.S)
+    caption = text(caption.group(1)) if caption else ''
+    answer_html = re.sub(r'<div class="ilc_va_ihcap_VAccordIHeadCap">.*?</div>', '', answer_html, flags=re.S)
+    # Drop the "click 'model answer and comment'" hint that only makes sense on the website
+    prompt_html = re.sub(r'<div class="ilc_Paragraph[^"]*">(?:(?!</div>).)*?(?:klõpsa hiirega|Pildi suurendamiseks|Kommentaari lugemiseks)(?:(?!</div>).)*</div>', '', prompt_html, flags=re.S)
+    p_audio, p_images = lm_media(prompt_html, ref)
+    a_audio, a_images = lm_media(answer_html, ref)
+    answer, comment = None, None
+    if answer_html and 'Näidisvastus' not in caption:
+        # A panel captioned just "Kommentaar": tips for the task, no model answer
+        comment = re.sub(r'^\*\*\s*Kommentaar\s*\*\*\s*', '', lm_text(answer_html)).strip() or None
+    elif answer_html:
+        text_ = lm_text(answer_html)
+        m = re.split(r'\*\*\s*Kommentaar\s*\*\*', text_, maxsplit=1)
+        answer = re.sub(r'^\*\*\s*Näidisvastus\s*\*\*\s*', '', m[0])
+        answer = re.sub(r'^Kuula näidisvastust[^\n]*\n?', '', answer.strip()).strip() or None
+        comment = m[1].strip() if len(m) > 1 and m[1].strip() else None
+    return {'title': text(title.group(1)) if title else '', 'prompt': lm_text(prompt_html),
+            'audio': p_audio, 'images': p_images,
+            'modelAnswer': answer, 'modelAudio': a_audio, 'modelImages': a_images, 'comment': comment}
+
+
+def convert_lm(path):
+    d = json.load(open(path))
+    ref = 'lm' + d['ref']
+    title = d['title'].replace('Eesti keele tasemetestid - ', '').strip()
+    t = {'title': title, 'path': []}
+    lvl, v = level_of(t), variant_of(t)
+    skill = 'writing' if 'kirjutamis' in title else 'speaking'
+    pages, seen = [], set()
+    for p in d['pages']:
+        page = lm_page(p['html'], ref)
+        key = (page['title'], page['prompt'][:200])
+        if key in seen or not page['prompt']: continue
+        seen.add(key)
+        pages.append(page)
+    # Task pages are titled "N. ülesanne"; the module's overview page is titled after the module
+    def number(p):
+        m = re.match(r'(\d+)\.\s*ülesanne', p['title'])
+        return int(m.group(1)) if m else None
+    intro = next((p for p in pages if number(p) is None), None)
+    tasks = sorted((p for p in pages if number(p) is not None), key=number)
+    limit = re.search(r'(\d+)\s*minut', intro['prompt']) if intro else None
+    kind = 'diagnostic' if v else 'sample'
+    sk_et = {'writing': 'kirjutamine', 'speaking': 'rääkimine'}[skill]
+    sk_tr = {'writing': 'yazma', 'speaking': 'konuşma'}[skill]
+    sk_en = {'writing': 'writing', 'speaking': 'speaking'}[skill]
+    suffix = f' ({v}. variant)' if v else ''
+    return {
+        'id': f'testest-{kind}-{lvl.lower()}-{skill}' + (f'-{v}' if v else ''),
+        'kind': kind, 'skill': skill, 'level': lvl, 'variant': v, 'source': SOURCE,
+        'title': f'{lvl} {"diagnoostest" if v else "tasemeeksami näidistest"}: {sk_et}{suffix}',
+        'titleTr': f'{lvl} {"tanı testi" if v else "sınav örneği"}: {sk_tr}' + (f' ({v}. varyant)' if v else ''),
+        'titleEn': f'{lvl} {"diagnostic" if v else "sample exam"}: {sk_en}' + (f' (variant {v})' if v else ''),
+        'sortOrder': ORDER[lvl] * 100 + (40 if skill == 'writing' else 50) + (v or 0),
+        'timeLimitMinutes': int(limit.group(1)) if limit else None,
+        'intro': intro['prompt'] if intro else None,
+        'tasks': tasks,
+    }
+
+
+import glob  # noqa: E402
+tasks_out = [convert_lm(p) for p in sorted(glob.glob(os.path.join(raw, 'lm*', 'done.json')))]
+json.dump(tasks_out, open(os.path.join(out, 'testest-tasks.json'), 'w'), ensure_ascii=False, indent=1)
+print(len(tasks_out), 'writing/speaking sets,', sum(len(t['tasks']) for t in tasks_out), 'tasks')
+for t in tasks_out:
+    print(t['id'], len(t['tasks']), [bool(x['modelAnswer'] or x['modelAudio']) for x in t['tasks']], t['timeLimitMinutes'])

@@ -21,6 +21,7 @@ public class RateLimitFilter implements Filter {
     private final Cache<String, Bucket> flashcardBuckets = buildCache(5_000);
     private final Cache<String, Bucket> quizBuckets = buildCache(5_000);
     private final Cache<String, Bucket> adminBuckets = buildCache(1_000);
+    private final Cache<String, Bucket> mediaBuckets = buildCache(10_000);
 
     private static Cache<String, Bucket> buildCache(int maxSize) {
         return Caffeine.newBuilder().maximumSize(maxSize).expireAfterAccess(Duration.ofMinutes(5)).build();
@@ -42,6 +43,19 @@ public class RateLimitFilter implements Filter {
         String ip = req.getRemoteAddr();
         String userId = req.getHeader("X-User-Id");
         String userKey = userId != null ? userId : "anonymous";
+
+        // Exam audio and pictures: one question page can need several files plus audio range requests,
+        // so media has its own, larger budget instead of eating the per-IP API limit.
+        if (path.startsWith("/api/exam-media/")) {
+            Bucket media = mediaBuckets.get(ip, k ->
+                Bucket.builder().addLimit(Bandwidth.simple(600, Duration.ofMinutes(1))).build());
+            if (!media.tryConsume(1)) {
+                sendTooMany(res, "Too many media requests, please wait");
+                return;
+            }
+            chain.doFilter(request, response);
+            return;
+        }
 
         Bucket global = globalBuckets.get(ip, k ->
             Bucket.builder().addLimit(Bandwidth.simple(100, Duration.ofMinutes(1))).build());

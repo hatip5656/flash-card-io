@@ -2,14 +2,13 @@ package io.flashcard.controller;
 
 import io.flashcard.service.ExamMediaService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 
@@ -28,18 +27,24 @@ public class ExamMediaController {
 
     @GetMapping("/api/exam-media/**")
     public ResponseEntity<Resource> get(HttpServletRequest request) {
-        String key = request.getRequestURI().substring(PUBLIC_PREFIX.length());
-        var file = media.find(key);
-        if (file == null) return ResponseEntity.notFound().build();
+        var found = media.find(request.getRequestURI().substring(PUBLIC_PREFIX.length()));
+        if (found == null) return ResponseEntity.notFound().build();
         // Range requests (seeking in audio) are handled by Spring for Resource bodies.
         return ResponseEntity.ok()
-            .contentType(MediaType.parseMediaType(ExamMediaService.contentType(key)))
+            .contentType(MediaType.parseMediaType(found.contentType()))
             .cacheControl(CacheControl.maxAge(Duration.ofDays(30)).cachePublic())
-            .body(new FileSystemResource(file));
+            .body(new ByteArrayResource(found.bytes()));
+    }
+
+    /** Whether a key is stored, without sending the bytes (the importer skips what is already there). */
+    @GetMapping("/api/admin/exam-media-exists/**")
+    public Map<String, Object> exists(HttpServletRequest request) {
+        String key = request.getRequestURI().substring("/api/admin/exam-media-exists/".length());
+        return Map.of("key", key, "exists", media.exists(key));
     }
 
     @PutMapping("/api/admin/exam-media/**")
-    public ResponseEntity<?> put(HttpServletRequest request, @RequestBody byte[] body) throws IOException {
+    public ResponseEntity<?> put(HttpServletRequest request, @RequestBody byte[] body) {
         String key = request.getRequestURI().substring(ADMIN_PREFIX.length());
         if (!media.store(key, body)) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid media key or size"));

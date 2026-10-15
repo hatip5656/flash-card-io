@@ -5,7 +5,6 @@ import html, json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ilias import text
 
-raw, out = sys.argv[1], sys.argv[2]
 
 
 def page_block(s, start_marker, end_marker):
@@ -114,47 +113,52 @@ def details_rows(s):
     return rows
 
 
-tests = []
-for ref in sorted(os.listdir(raw), key=lambda x: int(x) if x.isdigit() else 0):
-    d = os.path.join(raw, ref)
-    if ref.startswith('lm') or not os.path.exists(os.path.join(d, 'done.json')): continue
-    meta = json.load(open(os.path.join(d, 'done.json')))
-    pages, seen = [], set()
-    for f in sorted(x for x in os.listdir(d) if re.match(r'q\d+\.html', x)):
-        s = open(os.path.join(d, f)).read()
-        key = page_block(s, 'id="ilc_Page"', 'tst_discard_solution_modal')
-        key = re.sub(r'il_wac_[a-z]+=[^&"]+', '', key)
-        if key in seen: continue  # the player sometimes shows the same page twice
-        seen.add(key)
-        pages.append(parse_qpage(s))
-    qids = details_rows(open(os.path.join(d, 'details.html')).read())
-    sols = [parse_solution(open(os.path.join(d, f'sol{k:03d}.html')).read()) for k in range(meta['solutions'])]
-    problems = []
-    if len(pages) != len(sols):
-        problems.append(f'{len(pages)} pages vs {len(sols)} solutions')
-    for k, (q, sol) in enumerate(zip(pages, sols)):
-        q['qid'] = qids[k] if k < len(qids) else None
-        q['points'] = sol['max_points']
-        items = []
-        if q['kind'] in ('SingleChoice', 'MultipleChoice'):
-            correct = [i for i, c in enumerate(sol['checked']) if c[0]]
-            if len(sol['checked']) != len(q['options']) or not correct:
-                problems.append(f"{q['title']}: solution options {len(sol['checked'])} vs {len(q['options'])}, correct {correct}")
-            items.append({'prompt': q['stem'], 'options': q['options'], 'correct': correct})
-        elif q['kind'] == 'ClozeTest':
-            if len(sol['gapAnswers']) != len(q['gaps']):
-                problems.append(f"{q['title']}: {len(sol['gapAnswers'])} gap answers vs {len(q['gaps'])} gaps")
-            for g, ans in zip(q['gaps'], sol['gapAnswers']):
-                if g['type'] == 'select':
-                    ci = g['options'].index(ans) if ans in g['options'] else -1
-                    if ci < 0: problems.append(f"{q['title']} gap {g['gap']}: answer {ans!r} not in {g['options']}")
-                    items.append({'gap': len(items) + 1, 'options': g['options'], 'correct': [ci]})
-                else:
-                    items.append({'gap': len(items) + 1, 'kind': 'text', 'accepted': [a.strip() for a in ans.split(' või ') if a.strip()]})
-        else:
-            problems.append(f"{q['title']}: unhandled kind {q['kind']} inputs {q.get('rawInputs')}")
-            q['solutionText'] = sol['text']
-        q['items'] = items
-    tests.append({**meta, 'questions': pages, 'problems': problems})
-    print(ref, meta['title'], len(pages), 'pages', sum(len(q.get('items', [])) for q in pages), 'items', problems[:3])
-json.dump(tests, open(out, 'w'), ensure_ascii=False, indent=1)
+def main(raw, out):
+    tests = []
+    for ref in sorted(os.listdir(raw), key=lambda x: int(x) if x.isdigit() else 0):
+        d = os.path.join(raw, ref)
+        if ref.startswith('lm') or not os.path.exists(os.path.join(d, 'done.json')): continue
+        meta = json.load(open(os.path.join(d, 'done.json')))
+        pages, seen = [], set()
+        for f in sorted(x for x in os.listdir(d) if re.match(r'q\d+\.html', x)):
+            s = open(os.path.join(d, f)).read()
+            key = page_block(s, 'id="ilc_Page"', 'tst_discard_solution_modal')
+            key = re.sub(r'il_wac_[a-z]+=[^&"]+', '', key)
+            if key in seen: continue  # the player sometimes shows the same page twice
+            seen.add(key)
+            pages.append(parse_qpage(s))
+        qids = details_rows(open(os.path.join(d, 'details.html')).read())
+        sols = [parse_solution(open(os.path.join(d, f'sol{k:03d}.html')).read()) for k in range(meta['solutions'])]
+        problems = []
+        if len(pages) != len(sols):
+            problems.append(f'{len(pages)} pages vs {len(sols)} solutions')
+        for k, (q, sol) in enumerate(zip(pages, sols)):
+            q['qid'] = qids[k] if k < len(qids) else None
+            q['points'] = sol['max_points']
+            items = []
+            if q['kind'] in ('SingleChoice', 'MultipleChoice'):
+                correct = [i for i, c in enumerate(sol['checked']) if c[0]]
+                if len(sol['checked']) != len(q['options']) or not correct:
+                    problems.append(f"{q['title']}: solution options {len(sol['checked'])} vs {len(q['options'])}, correct {correct}")
+                items.append({'prompt': q['stem'], 'options': q['options'], 'correct': correct})
+            elif q['kind'] == 'ClozeTest':
+                if len(sol['gapAnswers']) != len(q['gaps']):
+                    problems.append(f"{q['title']}: {len(sol['gapAnswers'])} gap answers vs {len(q['gaps'])} gaps")
+                for g, ans in zip(q['gaps'], sol['gapAnswers']):
+                    if g['type'] == 'select':
+                        ci = g['options'].index(ans) if ans in g['options'] else -1
+                        if ci < 0: problems.append(f"{q['title']} gap {g['gap']}: answer {ans!r} not in {g['options']}")
+                        items.append({'gap': len(items) + 1, 'options': g['options'], 'correct': [ci]})
+                    else:
+                        items.append({'gap': len(items) + 1, 'kind': 'text', 'accepted': [a.strip() for a in ans.split(' või ') if a.strip()]})
+            else:
+                problems.append(f"{q['title']}: unhandled kind {q['kind']} inputs {q.get('rawInputs')}")
+                q['solutionText'] = sol['text']
+            q['items'] = items
+        tests.append({**meta, 'questions': pages, 'problems': problems})
+        print(ref, meta['title'], len(pages), 'pages', sum(len(q.get('items', [])) for q in pages), 'items', problems[:3])
+    json.dump(tests, open(out, 'w'), ensure_ascii=False, indent=1)
+
+
+if __name__ == '__main__':
+    main(sys.argv[1], sys.argv[2])

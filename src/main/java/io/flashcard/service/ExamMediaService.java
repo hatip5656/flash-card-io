@@ -1,34 +1,32 @@
 package io.flashcard.service;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-/** Audio and pictures that exam questions reference by key (e.g. "testest/mm_823/a2kuulamine.mp3"). */
+/** Audio and pictures that exam questions and tasks reference by key, stored in exam_media. */
 @Service
 public class ExamMediaService {
 
     private static final Pattern KEY = Pattern.compile("[a-z0-9_-]+(/[a-z0-9_-]+)*\\.(mp3|jpg|jpeg|png|gif)");
     private static final Map<String, String> TYPES = Map.of(
         "mp3", "audio/mpeg", "jpg", "image/jpeg", "jpeg", "image/jpeg", "png", "image/png", "gif", "image/gif");
-    private static final long MAX_BYTES = 20L * 1024 * 1024;
+    private static final int MAX_BYTES = 20 * 1024 * 1024;
 
-    private final Path root;
+    public record Media(String contentType, byte[] bytes) {}
 
-    public ExamMediaService(DiskCacheService diskCache) {
-        this.root = diskCache.getCacheDir().resolve("exam-media");
+    private final JdbcTemplate jdbc;
+
+    public ExamMediaService(JdbcTemplate jdbc) {
+        this.jdbc = jdbc;
     }
 
-    /** Null unless the key is a plain lowercase relative path with a known media extension. */
-    Path resolve(String key) {
-        if (key == null || !KEY.matcher(key).matches()) return null;
-        Path p = root.resolve(key).normalize();
-        return p.startsWith(root) ? p : null;
+    /** A plain lowercase relative path with a known media extension. */
+    static boolean validKey(String key) {
+        return key != null && KEY.matcher(key).matches();
     }
 
     public static String contentType(String key) {
@@ -36,19 +34,27 @@ public class ExamMediaService {
         return TYPES.getOrDefault(ext, "application/octet-stream");
     }
 
-    /** The file for a key, or null when the key is invalid or nothing is stored under it. */
-    public Path find(String key) {
-        Path p = resolve(key);
-        return p != null && Files.isRegularFile(p) ? p : null;
+    /** The stored media for a key, or null when the key is invalid or nothing is stored under it. */
+    public Media find(String key) {
+        if (!validKey(key)) return null;
+        var rows = jdbc.query("SELECT content_type, bytes FROM exam_media WHERE media_key = ?",
+            (rs, i) -> new Media(rs.getString(1), rs.getBytes(2)), key);
+        return rows.isEmpty() ? null : rows.get(0);
     }
 
-    public boolean store(String key, byte[] bytes) throws IOException {
-        Path p = resolve(key);
-        if (p == null || bytes.length == 0 || bytes.length > MAX_BYTES) return false;
-        Files.createDirectories(p.getParent());
-        Path tmp = p.resolveSibling(p.getFileName() + ".part");
-        Files.write(tmp, bytes);
-        Files.move(tmp, p, java.nio.file.StandardCopyOption.REPLACE_EXISTING, java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+    public boolean exists(String key) {
+        if (!validKey(key)) return false;
+        Integer n = jdbc.queryForObject("SELECT COUNT(*) FROM exam_media WHERE media_key = ?", Integer.class, key);
+        return n != null && n > 0;
+    }
+
+    public boolean store(String key, byte[] bytes) {
+        if (!validKey(key) || bytes.length == 0 || bytes.length > MAX_BYTES) return false;
+        jdbc.update("""
+            INSERT INTO exam_media (media_key, content_type, bytes, size_bytes) VALUES (?, ?, ?, ?)
+            ON CONFLICT (media_key) DO UPDATE SET content_type = EXCLUDED.content_type, bytes = EXCLUDED.bytes,
+              size_bytes = EXCLUDED.size_bytes, created_at = NOW()
+            """, key, contentType(key), bytes, bytes.length);
         return true;
     }
 }

@@ -31,5 +31,8 @@
     <include file="db/changelog/024-pipeline-timestamps.sql"/>
     <include file="db/changelog/025-learning-loop.sql"/>
     <include file="db/changelog/026-exam-kinds.sql"/>
+    <include file="db/changelog/027-exam-media-and-tasks.sql"/>
+    <include file="db/changelog/028-testest-exams.sql"/>
+    <include file="db/changelog/029-testest-tasks.sql"/>
 
 </databaseChangeLog>
