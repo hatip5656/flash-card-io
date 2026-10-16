@@ -48,6 +48,12 @@ public class LearningSettings {
         return (int) Math.round(num(key));
     }
 
+    public String text(String key) {
+        JsonNode v = get(key);
+        if (!v.isTextual()) throw new IllegalStateException("learning setting " + key + " is not text");
+        return v.asText();
+    }
+
     public List<String> list(String key) {
         JsonNode v = get(key);
         if (!v.isArray()) throw new IllegalStateException("learning setting " + key + " is not a list");

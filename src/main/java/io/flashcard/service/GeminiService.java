@@ -19,7 +19,15 @@ public class GeminiService {
     @Value("${app.gemini-api-key:}")
     private String geminiApiKey;
 
-    private static final String GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
+    // The model per feature lives in learning_settings (llm.gemini_model_chat / _generation / _fallback)
+    private static final String GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models/";
+    private static final com.fasterxml.jackson.databind.ObjectMapper MAPPER = new com.fasterxml.jackson.databind.ObjectMapper();
+
+    private final LearningSettings settings;
+
+    public GeminiService(LearningSettings settings) {
+        this.settings = settings;
+    }
 
     private static final String SYSTEM_PROMPT = """
             You are an Estonian language tutor named Keeleabi ("Language Helper"). You help users learn Estonian and prepare for proficiency exams.
@@ -58,43 +66,11 @@ public class GeminiService {
      */
     public String generateJson(String prompt, int maxTokens, double temperature) {
         if (!isAvailable()) return null;
-        try {
-            Map<String, Object> requestBody = new LinkedHashMap<>();
-            requestBody.put("contents", List.of(Map.of("role", "user", "parts", List.of(Map.of("text", prompt)))));
-            requestBody.put("generationConfig", Map.of(
-                "maxOutputTokens", maxTokens, "temperature", temperature, "responseMimeType", "application/json"));
-
-            String jsonBody = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(requestBody);
-            HttpURLConnection conn = (HttpURLConnection) new URL(GEMINI_URL + "?key=" + geminiApiKey).openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setDoOutput(true);
-            conn.setConnectTimeout(15000);
-            conn.setReadTimeout(180000);
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write(jsonBody.getBytes(StandardCharsets.UTF_8));
-            }
-            int status = conn.getResponseCode();
-            String responseBody;
-            try (var is = status >= 400 ? conn.getErrorStream() : conn.getInputStream()) {
-                responseBody = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            }
-            if (status != 200) {
-                log.error("[gemini] JSON generation error {}: {}", status, responseBody.substring(0, Math.min(300, responseBody.length())));
-                return null;
-            }
-            var responseMap = new com.fasterxml.jackson.databind.ObjectMapper().readValue(responseBody, Map.class);
-            var candidates = (List<Map>) responseMap.get("candidates");
-            if (candidates == null || candidates.isEmpty()) return null;
-            var parts = (List<Map>) ((Map) candidates.get(0).get("content")).get("parts");
-            // Thinking models may return several parts; the answer is the last text part
-            String text = null;
-            for (var part : parts) if (part.get("text") instanceof String t && !Boolean.TRUE.equals(part.get("thought"))) text = t;
-            return text;
-        } catch (Exception e) {
-            log.error("[gemini] JSON generation failed: {}", e.getMessage());
-            return null;
-        }
+        Map<String, Object> requestBody = new LinkedHashMap<>();
+        requestBody.put("contents", List.of(Map.of("role", "user", "parts", List.of(Map.of("text", prompt)))));
+        requestBody.put("generationConfig", Map.of(
+            "maxOutputTokens", maxTokens, "temperature", temperature, "responseMimeType", "application/json"));
+        return call("llm.gemini_model_generation", requestBody, 180000);
     }
 
     public String chat(String message, List<Map<String, String>> history, String learnerContext) {
@@ -104,66 +80,94 @@ public class GeminiService {
     public String chat(String message, List<Map<String, String>> history, String learnerContext, int maxTokens) {
         if (!isAvailable()) return null;
 
-        try {
-            List<Map<String, Object>> contents = new ArrayList<>();
-
-            for (var msg : history) {
-                String role = msg.getOrDefault("role", "user");
-                String text = msg.getOrDefault("text", "");
-                contents.add(Map.of(
-                    "role", "bot".equals(role) ? "model" : "user",
-                    "parts", List.of(Map.of("text", text))
-                ));
-            }
-
+        List<Map<String, Object>> contents = new ArrayList<>();
+        for (var msg : history) {
+            String role = msg.getOrDefault("role", "user");
+            String text = msg.getOrDefault("text", "");
             contents.add(Map.of(
-                "role", "user",
-                "parts", List.of(Map.of("text", message))
+                "role", "bot".equals(role) ? "model" : "user",
+                "parts", List.of(Map.of("text", text))
             ));
+        }
+        contents.add(Map.of(
+            "role", "user",
+            "parts", List.of(Map.of("text", message))
+        ));
 
-            String systemWithContext = SYSTEM_PROMPT + "\n--- LEARNER PROFILE ---\n" + learnerContext;
+        String systemWithContext = SYSTEM_PROMPT + "\n--- LEARNER PROFILE ---\n" + learnerContext;
 
-            Map<String, Object> requestBody = new LinkedHashMap<>();
-            requestBody.put("system_instruction", Map.of("parts", List.of(Map.of("text", systemWithContext))));
-            requestBody.put("contents", contents);
-            requestBody.put("generationConfig", Map.of("maxOutputTokens", maxTokens, "temperature", 0.7));
+        Map<String, Object> requestBody = new LinkedHashMap<>();
+        requestBody.put("system_instruction", Map.of("parts", List.of(Map.of("text", systemWithContext))));
+        requestBody.put("contents", contents);
+        requestBody.put("generationConfig", Map.of("maxOutputTokens", maxTokens, "temperature", 0.7));
+        return call("llm.gemini_model_chat", requestBody, maxTokens > 2048 ? 90000 : 30000);
+    }
 
-            String jsonBody = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(requestBody);
-            URL url = new URL(GEMINI_URL + "?key=" + geminiApiKey);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setDoOutput(true);
-            int readTimeout = maxTokens > 2048 ? 90000 : 30000;
-            conn.setConnectTimeout(15000);
-            conn.setReadTimeout(readTimeout);
+    private record Response(int status, String body) {}
 
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write(jsonBody.getBytes(StandardCharsets.UTF_8));
+    /**
+     * Sends the request to the model stored under modelSetting; if Google refuses that model (not found, not
+     * available to this key), tries llm.gemini_model_fallback once. Returns the answer text or null.
+     */
+    private String call(String modelSetting, Map<String, Object> requestBody, int readTimeoutMs) {
+        try {
+            String jsonBody = MAPPER.writeValueAsString(requestBody);
+            String model = settings.text(modelSetting);
+            Response r = post(model, jsonBody, readTimeoutMs);
+            if (r.status() != 200 && modelRefused(r)) {
+                String fallback = settings.text("llm.gemini_model_fallback");
+                if (!fallback.equals(model)) {
+                    log.warn("[gemini] {} refused ({}), retrying with {}", model, r.status(), fallback);
+                    r = post(fallback, jsonBody, readTimeoutMs);
+                }
             }
-
-            int status = conn.getResponseCode();
-            String responseBody;
-            try (var is = status >= 400 ? conn.getErrorStream() : conn.getInputStream()) {
-                responseBody = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-            }
-
-            if (status != 200) {
-                log.error("[gemini] API error {}: {}", status, responseBody.substring(0, Math.min(200, responseBody.length())));
+            if (r.status() != 200) {
+                log.error("[gemini] API error {}: {}", r.status(), r.body().substring(0, Math.min(300, r.body().length())));
                 return null;
             }
-
-            var responseMap = new com.fasterxml.jackson.databind.ObjectMapper().readValue(responseBody, Map.class);
-            var candidates = (List<Map>) responseMap.get("candidates");
-            if (candidates == null || candidates.isEmpty()) return null;
-
-            var content = (Map) candidates.get(0).get("content");
-            var parts = (List<Map>) content.get("parts");
-            return (String) parts.get(0).get("text");
-
+            return answerText(r.body());
         } catch (Exception e) {
             log.error("[gemini] Error: {}", e.getMessage());
             return null;
         }
+    }
+
+    /** 404, or a 400/403 about the model itself: the model is the problem, not the request. */
+    private static boolean modelRefused(Response r) {
+        if (r.status() == 404) return true;
+        String b = r.body().toLowerCase(Locale.ROOT);
+        return (r.status() == 400 || r.status() == 403) && b.contains("model");
+    }
+
+    private Response post(String model, String jsonBody, int readTimeoutMs) throws Exception {
+        URL url = new URL(GEMINI_BASE + model + ":generateContent?key=" + geminiApiKey);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setDoOutput(true);
+        conn.setConnectTimeout(15000);
+        conn.setReadTimeout(readTimeoutMs);
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonBody.getBytes(StandardCharsets.UTF_8));
+        }
+        int status = conn.getResponseCode();
+        try (var is = status >= 400 ? conn.getErrorStream() : conn.getInputStream()) {
+            return new Response(status, is == null ? "" : new String(is.readAllBytes(), StandardCharsets.UTF_8));
+        }
+    }
+
+    /** The answer is the last non-thought text part (thinking models may return several parts). */
+    @SuppressWarnings("unchecked")
+    private static String answerText(String responseBody) throws Exception {
+        var responseMap = MAPPER.readValue(responseBody, Map.class);
+        var candidates = (List<Map>) responseMap.get("candidates");
+        if (candidates == null || candidates.isEmpty()) return null;
+        var content = (Map) candidates.get(0).get("content");
+        if (content == null || !(content.get("parts") instanceof List<?> parts)) return null;
+        String text = null;
+        for (Object o : parts) {
+            if (o instanceof Map<?, ?> part && part.get("text") instanceof String t && !Boolean.TRUE.equals(part.get("thought"))) text = t;
+        }
+        return text;
     }
 }
