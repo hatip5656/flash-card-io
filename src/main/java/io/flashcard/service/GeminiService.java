@@ -103,18 +103,19 @@ public class GeminiService {
         return call("llm.gemini_model_chat", requestBody, maxTokens > 2048 ? 90000 : 30000);
     }
 
-    private record Response(int status, String body) {}
+    record Response(int status, String body) {}
 
     /**
      * Sends the request to the model stored under modelSetting; if Google refuses that model (not found, not
-     * available to this key), tries llm.gemini_model_fallback once. Returns the answer text or null.
+     * available to this key) or it is overloaded or rate-limited, tries llm.gemini_model_fallback once.
+     * Returns the answer text or null.
      */
     private String call(String modelSetting, Map<String, Object> requestBody, int readTimeoutMs) {
         try {
             String jsonBody = MAPPER.writeValueAsString(requestBody);
             String model = settings.text(modelSetting);
             Response r = post(model, jsonBody, readTimeoutMs);
-            if (r.status() != 200 && modelRefused(r)) {
+            if (r.status() != 200 && shouldFallBack(r)) {
                 String fallback = settings.text("llm.gemini_model_fallback");
                 if (!fallback.equals(model)) {
                     log.warn("[gemini] {} refused ({}), retrying with {}", model, r.status(), fallback);
@@ -132,9 +133,12 @@ public class GeminiService {
         }
     }
 
-    /** 404, or a 400/403 about the model itself: the model is the problem, not the request. */
-    private static boolean modelRefused(Response r) {
-        if (r.status() == 404) return true;
+    /**
+     * Worth trying the fallback model: the configured one is overloaded (503), rate-limited (429), failing (500)
+     * or refused (404, or a 400/403 about the model itself). Other 400s are problems with the request.
+     */
+    static boolean shouldFallBack(Response r) {
+        if (r.status() == 404 || r.status() == 429 || r.status() == 500 || r.status() == 503) return true;
         String b = r.body().toLowerCase(Locale.ROOT);
         return (r.status() == 400 || r.status() == 403) && b.contains("model");
     }
