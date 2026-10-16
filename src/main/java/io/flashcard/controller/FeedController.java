@@ -8,6 +8,7 @@ import io.flashcard.repository.SubscriberRepository;
 import io.flashcard.repository.WordDbRepository;
 import io.flashcard.service.ImageService;
 import io.flashcard.service.LearnerModelService;
+import io.flashcard.service.LearningSettings;
 import io.flashcard.service.WordBankService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -30,11 +31,14 @@ public class FeedController {
     private final WordDbRepository wordDbRepo;
     private final ImageService imageService;
     private final LearnerModelService learnerModel;
+    private final LearningSettings settings;
 
     public FeedController(SubscriberRepository subscriberRepo, SentWordRepository sentWordRepo,
                           SavedWordRepository savedWordRepo, ActivityRepository activityRepo,
                           WordBankService wordBankService, WordDbRepository wordDbRepo,
-                          ImageService imageService, LearnerModelService learnerModel) {
+                          ImageService imageService, LearnerModelService learnerModel,
+                          LearningSettings settings) {
+        this.settings = settings;
         this.subscriberRepo = subscriberRepo;
         this.sentWordRepo = sentWordRepo;
         this.savedWordRepo = savedWordRepo;
@@ -66,10 +70,11 @@ public class FeedController {
         int nextOffset = cursorOffset;
 
         if ("new".equals(cursorMode)) {
-            // Up to a third of each page goes to due reviews, so forgetting is caught before the
+            // Part of each page (feed.review_share) goes to due reviews, so forgetting is caught before the
             // learner runs out of new words (otherwise reviews only start once the level is exhausted).
             List<Word> due = new ArrayList<>();
-            for (var sw : sentWordRepo.getDueWordsForFeed(chatId, limit / 3)) {
+            int reviewSlots = (int) Math.floor(limit * settings.num("feed.review_share"));
+            for (var sw : sentWordRepo.getDueWordsForFeed(chatId, reviewSlots, settings.count("feed.review_cooldown_hours"))) {
                 Word w = wordBankService.getWordById((String) sw.get("word_id"));
                 if (w != null) due.add(w);
             }

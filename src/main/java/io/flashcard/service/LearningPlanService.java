@@ -18,15 +18,6 @@ import java.util.stream.Collectors;
 @Service
 public class LearningPlanService {
 
-    static final List<String> LEVELS = List.of("A1", "A2", "B1", "B2", "C1");
-    // A grammar topic scoring below this counts as weak (learner-model tuning, not an exam's pass mark)
-    static final double WEAK_BELOW = 0.6;
-    /** Estimated score the learner should reach in practice before the mock is worth taking. */
-    static final double MOCK_THRESHOLD = 0.7;
-    static final int MIN_EVIDENCE = 10;
-    static final int MOCK_EVIDENCE = 20;
-    /** Pseudo-answers at 50% that keep a handful of lucky answers from looking like readiness. */
-    static final int PRIOR_ANSWERS = 4;
 
     private final SubscriberRepository subscriberRepo;
     private final GrammarRepository grammarRepo;
@@ -36,12 +27,15 @@ public class LearningPlanService {
     private final WordBankService wordBank;
     private final GrammarPracticeService practiceService;
     private final ExamBankService examBank;
+    // Thresholds, counts and the level order: all stored in learning_settings
+    private final LearningSettings settings;
     private final Random random = new Random();
 
     public LearningPlanService(SubscriberRepository subscriberRepo, GrammarRepository grammarRepo,
                                LearningRepository learningRepo, SentWordRepository sentWordRepo,
                                GrammarBankService grammarBank, WordBankService wordBank,
-                               GrammarPracticeService practiceService, ExamBankService examBank) {
+                               GrammarPracticeService practiceService, ExamBankService examBank,
+                               LearningSettings settings) {
         this.subscriberRepo = subscriberRepo;
         this.grammarRepo = grammarRepo;
         this.learningRepo = learningRepo;
@@ -50,6 +44,11 @@ public class LearningPlanService {
         this.wordBank = wordBank;
         this.practiceService = practiceService;
         this.examBank = examBank;
+        this.settings = settings;
+    }
+
+    private List<String> levels() {
+        return settings.list("plan.level_order");
     }
 
     record Candidate(GrammarLesson lesson, String reason, double priority, Map<String, Object> mastery) {}
@@ -72,15 +71,16 @@ public class LearningPlanService {
                 lessonItems.add(lessonItem(focus, podcastInfo));
             }
             // A lesson without enough linked sentences can't be practised; borrow from the next candidate.
+            int want = settings.count("plan.practice_items");
             for (Candidate c : candidates.subList(0, Math.min(5, candidates.size()))) {
-                if (practiceItems.size() >= 3) break;
-                var practice = practiceService.generate(c.lesson().id(), level, useTurkish, 3 - practiceItems.size());
+                if (practiceItems.size() >= want) break;
+                var practice = practiceService.generate(c.lesson().id(), level, useTurkish, want - practiceItems.size());
                 if (practice == null) continue;
                 for (var q : practice.questions()) practiceItems.add(practiceItem(c, q, useTurkish));
                 if (c != focus && practiceItems.size() > 0) break;
             }
         }
-        List<Map<String, Object>> examItems = examItems(chatId, level, examLevel, focus, 2);
+        List<Map<String, Object>> examItems = examItems(chatId, level, examLevel, focus, settings.count("plan.exam_items"));
 
         // Interleave so the feed alternates between rule practice and exam-style questions.
         List<Map<String, Object>> items = new ArrayList<>(lessonItems);
@@ -104,21 +104,24 @@ public class LearningPlanService {
         Set<String> read = grammarRepo.getSentGrammarIds(chatId);
         Map<String, Map<String, Object>> mastery = learningRepo.getAllMastery(chatId).stream()
             .collect(Collectors.toMap(r -> (String) r.get("grammar_lesson_id"), r -> r, (a, b) -> a));
-        int userRank = LEVELS.indexOf(level);
+        List<String> levels = levels();
+        int userRank = levels.indexOf(level);
+        double weakBelow = settings.num("grammar.weak_below");
+        int practiceWeakAttempts = settings.count("grammar.practice_weak_min_attempts");
 
         List<Candidate> out = new ArrayList<>();
         List<GrammarLesson> lessons = grammarBank.getAllLessons();
         for (int i = 0; i < lessons.size(); i++) {
             GrammarLesson l = lessons.get(i);
-            int rank = LEVELS.indexOf(l.cefrLevel());
+            int rank = levels.indexOf(l.cefrLevel());
             var m = mastery.get(l.id());
             if (m != null) {
                 double score = ((Number) m.get("mastery")).doubleValue();
                 int attempts = ((Number) m.get("attempts")).intValue();
                 int examMisses = ((Number) m.get("exam_misses")).intValue();
                 boolean due = Boolean.TRUE.equals(m.get("due"));
-                if (examMisses > 0 && score < WEAK_BELOW) out.add(new Candidate(l, "exam_weak", 4 + (1 - score), m));
-                else if (attempts >= 3 && score < WEAK_BELOW) out.add(new Candidate(l, "practice_weak", 3 + (1 - score), m));
+                if (examMisses > 0 && score < weakBelow) out.add(new Candidate(l, "exam_weak", 4 + (1 - score), m));
+                else if (attempts >= practiceWeakAttempts && score < weakBelow) out.add(new Candidate(l, "practice_weak", 3 + (1 - score), m));
                 else if (due) out.add(new Candidate(l, "recheck", 2 + (1 - score), m));
             } else if (rank <= userRank) {
                 // Earlier levels first: gaps in the foundation hurt every later topic.
@@ -134,18 +137,18 @@ public class LearningPlanService {
     private List<Map<String, Object>> examItems(long chatId, String level, String examLevel, Candidate focus, int max) {
         if (examLevel == null) return List.of();
         // Below the exam level only each exam's first (shortest) task is within reach.
-        boolean firstTaskOnly = LEVELS.indexOf(level) < LEVELS.indexOf(examLevel);
+        boolean firstTaskOnly = levels().indexOf(level) < levels().indexOf(examLevel);
         List<ExamBankService.Exam> exams = examBank.practiceExamIds(examLevel).stream()
             .map(examBank::getExam).filter(Objects::nonNull).toList();
         if (exams.isEmpty()) return List.of();
 
-        Set<String> recent = learningRepo.getRecentExamItemIds(chatId, 30);
+        Set<String> recent = learningRepo.getRecentExamItemIds(chatId, settings.count("plan.exam_recent_days"));
         Map<String, Double> skillAccuracy = skillAccuracy(chatId, examLevel);
         List<Map<String, Object>> out = new ArrayList<>();
         Set<String> picked = new HashSet<>();
 
         // 1. Retry one question missed at least 3 days ago: the second attempt shows whether it stuck.
-        for (String itemId : learningRepo.getMissedExamItemIds(chatId, 3)) {
+        for (String itemId : learningRepo.getMissedExamItemIds(chatId, settings.count("plan.exam_retry_after_days"))) {
             var ref = resolve(exams, itemId);
             if (ref == null || (firstTaskOnly && !ref.exam().isFirstTask(ref.q()))) continue;
             out.add(examItem(ref.exam(), ref.q(), "exam_weak"));
@@ -206,9 +209,10 @@ public class LearningPlanService {
         Set<String> available = examBank.examLevels();
         var goal = learningRepo.getGoal(chatId);
         if (goal != null && available.contains((String) goal.get("target_level"))) return (String) goal.get("target_level");
-        int rank = LEVELS.indexOf(level);
-        for (int r = Math.max(rank, 0); r < LEVELS.size(); r++) {
-            if (available.contains(LEVELS.get(r))) return LEVELS.get(r);
+        List<String> levels = levels();
+        int rank = levels.indexOf(level);
+        for (int r = Math.max(rank, 0); r < levels.size(); r++) {
+            if (available.contains(levels.get(r))) return levels.get(r);
         }
         return null;
     }
@@ -294,8 +298,9 @@ public class LearningPlanService {
         out.put("estimatedScore", estimate);
         out.put("evidence", n);
         out.put("passMark", passMark);
-        out.put("recommendation", n < MIN_EVIDENCE ? "not_enough_data"
-            : estimate >= MOCK_THRESHOLD && n >= MOCK_EVIDENCE ? "take_mock" : "keep_training");
+        out.put("recommendation", n < settings.count("readiness.min_evidence") ? "not_enough_data"
+            : estimate >= settings.num("readiness.mock_threshold") && n >= settings.count("readiness.mock_evidence")
+                ? "take_mock" : "keep_training");
         Map<String, Object> last = null;
         if (goalExam != null) {
             var a = learningRepo.getLastAttempt(chatId, goalExam);
@@ -320,14 +325,24 @@ public class LearningPlanService {
         c[1]++;
     }
 
-    static double estimate(long correct, int n) {
-        return (correct + PRIOR_ANSWERS * 0.5) / (n + PRIOR_ANSWERS);
+    /** Accuracy with priorAnswers pseudo-answers at 50% mixed in, so a few lucky answers do not look like readiness. */
+    double estimate(long correct, int n) {
+        return estimate(correct, n, settings.count("readiness.prior_answers"));
+    }
+
+    static double estimate(long correct, int n, int priorAnswers) {
+        return (correct + priorAnswers * 0.5) / (n + priorAnswers);
     }
 
     private Map<String, Object> grammarSummary(long chatId, String upToLevel) {
-        int maxRank = LEVELS.indexOf(upToLevel);
+        List<String> levels = levels();
+        int maxRank = levels.indexOf(upToLevel);
+        double weakBelow = settings.num("grammar.weak_below");
+        int weakAttempts = settings.count("grammar.summary_weak_min_attempts");
+        double masteredScore = settings.num("grammar.mastered_score");
+        int masteredAttempts = settings.count("grammar.mastered_min_attempts");
         Map<String, GrammarLesson> lessons = grammarBank.getAllLessons().stream()
-            .filter(l -> LEVELS.indexOf(l.cefrLevel()) <= maxRank)
+            .filter(l -> levels.indexOf(l.cefrLevel()) <= maxRank)
             .collect(Collectors.toMap(GrammarLesson::id, l -> l, (a, b) -> a, LinkedHashMap::new));
         int tested = 0, mastered = 0;
         List<Map<String, Object>> weak = new ArrayList<>();
@@ -337,8 +352,8 @@ public class LearningPlanService {
             double score = ((Number) m.get("mastery")).doubleValue();
             int attempts = ((Number) m.get("attempts")).intValue();
             tested++;
-            if (score >= 0.8 && attempts >= 3) mastered++;
-            if (score < WEAK_BELOW && attempts >= 2) {
+            if (score >= masteredScore && attempts >= masteredAttempts) mastered++;
+            if (score < weakBelow && attempts >= weakAttempts) {
                 var w = new LinkedHashMap<String, Object>();
                 w.put("lessonId", lesson.id());
                 w.put("topic", lesson.topic());
@@ -361,9 +376,10 @@ public class LearningPlanService {
     private Map<String, Object> vocabularySummary(long chatId, String level) {
         var r = sentWordRepo.getLevelReadiness(chatId, level);
         int strong = ((Number) r.get("strong")).intValue();
-        int required = (int) Math.ceil(wordBank.getWordsForLevel(level).size() * 0.6);
+        int required = (int) Math.ceil(wordBank.getWordsForLevel(level).size() * settings.num("vocabulary.ready_share"));
         double avgEase = ((Number) r.get("avg_ease")).doubleValue();
-        return Map.of("strong", strong, "required", required, "ready", strong >= required && avgEase >= 2.0);
+        return Map.of("strong", strong, "required", required,
+            "ready", strong >= required && avgEase >= settings.num("vocabulary.ready_avg_ease"));
     }
 
     /** Estimated accuracy per exam skill (reading, listening, …) and per tagged sub-skill. */

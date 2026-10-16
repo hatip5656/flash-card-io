@@ -24,6 +24,11 @@ class LearnerModelServiceTest {
     private LearnerModelService service;
 
     private static final long USER = 42L;
+    // The mastery values seeded in learning_settings
+    private static final LearningSettings SETTINGS = LearningSettings.of(Map.of(
+        "mastery.alpha_floor", 0.2,
+        "mastery.recheck_mid_from", 0.6, "mastery.recheck_strong_from", 0.8,
+        "mastery.recheck_days_weak", 1, "mastery.recheck_days_mid", 3, "mastery.recheck_days_strong", 7));
 
     @BeforeEach
     void setUp() {
@@ -40,7 +45,8 @@ class LearnerModelServiceTest {
         apteek.setEstonian("apteek");
         apteek.setEnglish("pharmacy");
         when(wordBank.getAllWords()).thenReturn(List.of(apteek));
-        service = new LearnerModelService(learningRepo, sentWordRepo, examBank, grammarBank, wordBank, new ObjectMapper());
+        service = new LearnerModelService(learningRepo, sentWordRepo, examBank, grammarBank, wordBank, new ObjectMapper(),
+            SETTINGS);
 
         var q0 = new ExamBankService.Question(0, "Esimene ülesanne – Kuulutused", null, "Kus on apteek?",
             List.of("A", "B", "C"), 1, "");
@@ -54,13 +60,14 @@ class LearnerModelServiceTest {
 
     @Test
     void masteryStartsAtHalfAndWeightsRecentAnswers() {
-        assertEquals(0.75, LearnerModelService.nextMastery(0.5, 1, true), 1e-9);
-        assertEquals(0.25, LearnerModelService.nextMastery(0.5, 1, false), 1e-9);
-        // After many attempts alpha floors at 0.2
-        assertEquals(0.2, LearnerModelService.nextMastery(0.0, 50, true), 1e-9);
-        assertEquals(1, LearnerModelService.recheckDays(0.3));
-        assertEquals(3, LearnerModelService.recheckDays(0.7));
-        assertEquals(7, LearnerModelService.recheckDays(0.9));
+        assertEquals(0.75, LearnerModelService.nextMastery(0.5, 1, true, 0.2), 1e-9);
+        assertEquals(0.25, LearnerModelService.nextMastery(0.5, 1, false, 0.2), 1e-9);
+        // After many attempts alpha floors at the stored alpha_floor
+        assertEquals(0.2, LearnerModelService.nextMastery(0.0, 50, true, 0.2), 1e-9);
+        assertEquals(0.5, LearnerModelService.nextMastery(0.0, 50, true, 0.5), 1e-9);
+        assertEquals(1, service.recheckDays(0.3));
+        assertEquals(3, service.recheckDays(0.7));
+        assertEquals(7, service.recheckDays(0.9));
     }
 
     @Test

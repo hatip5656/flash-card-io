@@ -31,10 +31,12 @@ public class LearnerModelService {
     private final GrammarBankService grammarBank;
     private final WordBankService wordBank;
     private final ObjectMapper objectMapper;
+    private final LearningSettings settings;
 
     public LearnerModelService(LearningRepository learningRepo, SentWordRepository sentWordRepo,
                                ExamBankService examBank, GrammarBankService grammarBank,
-                               WordBankService wordBank, ObjectMapper objectMapper) {
+                               WordBankService wordBank, ObjectMapper objectMapper, LearningSettings settings) {
+        this.settings = settings;
         this.learningRepo = learningRepo;
         this.sentWordRepo = sentWordRepo;
         this.examBank = examBank;
@@ -151,7 +153,7 @@ public class LearnerModelService {
 
     /**
      * Mastery is a running mean that starts at 0.5 and weights recent answers more once there is
-     * enough evidence (alpha floors at 0.2, i.e. roughly the last 5 answers dominate).
+     * enough evidence (alpha floors at mastery.alpha_floor; 0.2 means roughly the last 5 answers dominate).
      */
     void updateMastery(long chatId, String lessonId, boolean correct, boolean fromExam) {
         var row = learningRepo.getMastery(chatId, lessonId);
@@ -167,20 +169,21 @@ public class LearnerModelService {
             examAttempts++;
             if (!correct) examMisses++;
         }
-        mastery = nextMastery(mastery, attempts, correct);
+        mastery = nextMastery(mastery, attempts, correct, settings.num("mastery.alpha_floor"));
         learningRepo.saveMastery(chatId, lessonId, attempts, right, examAttempts, examMisses, mastery,
             recheckDays(mastery));
     }
 
-    static double nextMastery(double mastery, int attemptsIncludingThis, boolean correct) {
-        double alpha = Math.max(0.2, 1.0 / (attemptsIncludingThis + 1));
+    static double nextMastery(double mastery, int attemptsIncludingThis, boolean correct, double alphaFloor) {
+        double alpha = Math.max(alphaFloor, 1.0 / (attemptsIncludingThis + 1));
         return mastery + alpha * ((correct ? 1.0 : 0.0) - mastery);
     }
 
-    static int recheckDays(double mastery) {
-        if (mastery >= 0.8) return 7;
-        if (mastery >= 0.6) return 3;
-        return 1;
+    /** Days until the topic is checked again, by mastery band (bands and days from learning_settings). */
+    int recheckDays(double mastery) {
+        if (mastery >= settings.num("mastery.recheck_strong_from")) return settings.count("mastery.recheck_days_strong");
+        if (mastery >= settings.num("mastery.recheck_mid_from")) return settings.count("mastery.recheck_days_mid");
+        return settings.count("mastery.recheck_days_weak");
     }
 
     // ── Full exam ──
