@@ -25,13 +25,20 @@ public class TestAudioRenderer {
     private final AppProperties appProperties;
     private final ExamMediaService media;
     private final ObjectMapper objectMapper;
+    private final LearningSettings settings;
 
     public TestAudioRenderer(HttpClient httpClient, AppProperties appProperties, ExamMediaService media,
-                             ObjectMapper objectMapper) {
+                             ObjectMapper objectMapper, LearningSettings settings) {
         this.httpClient = httpClient;
         this.appProperties = appProperties;
         this.media = media;
         this.objectMapper = objectMapper;
+        this.settings = settings;
+    }
+
+    /** One short line in a voice, as MP3: lets an admin hear a voice before giving it to a speaker. */
+    public byte[] preview(String voice, String text) throws Exception {
+        return toMp3(synthesize(List.of(new TestDraftConverter.Segment(text, voice, 0))));
     }
 
     /** Renders and stores every job; throws with the first failure so the draft can show it. */
@@ -64,7 +71,10 @@ public class TestAudioRenderer {
         return resp.body();
     }
 
-    /** Speech-quality MP3 (mono, 64 kbps), the format exam media is served in. */
+    /**
+     * Speech-quality MP3 (mono, 64 kbps), the format exam media is served in. generator.speech_tempo slows
+     * (below 1) or speeds up the speech without changing its pitch.
+     */
     private byte[] toMp3(byte[] wav) throws Exception {
         String id = UUID.randomUUID().toString().substring(0, 12);
         Path dir = Path.of(System.getProperty("java.io.tmpdir"));
@@ -72,8 +82,10 @@ public class TestAudioRenderer {
         Path out = dir.resolve("testaudio-" + id + ".mp3");
         try {
             Files.write(in, wav);
+            double tempo = Math.max(0.5, Math.min(2.0, settings.num("generator.speech_tempo")));
+            String filters = (Math.abs(tempo - 1.0) > 0.001 ? "atempo=" + tempo + "," : "") + "loudnorm=I=-16:TP=-1.5:LRA=11";
             Process p = new ProcessBuilder("ffmpeg", "-loglevel", "error", "-y", "-i", in.toString(),
-                "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-ac", "1", "-b:a", "64k", out.toString())
+                "-af", filters, "-ac", "1", "-b:a", "64k", out.toString())
                 .redirectErrorStream(true).start();
             String output = new String(p.getInputStream().readAllBytes());
             if (p.waitFor() != 0) throw new IllegalStateException("ffmpeg failed: " + output);

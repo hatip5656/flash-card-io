@@ -33,6 +33,24 @@ public class AdminTestGeneratorController {
         return ResponseEntity.ok(generator.blueprint(id));
     }
 
+    @GetMapping("/voices")
+    public Map<String, Object> voices() {
+        return generator.voices();
+    }
+
+    /** Body: {voice, text?}. Returns a short MP3 of that voice, to choose voices for speakers. */
+    @PostMapping("/voices/preview")
+    public ResponseEntity<?> previewVoice(@RequestBody Map<String, Object> body) {
+        try {
+            byte[] mp3 = generator.previewVoice(str(body.get("voice")), str(body.get("text")));
+            return ResponseEntity.ok().contentType(org.springframework.http.MediaType.parseMediaType("audio/mpeg")).body(mp3);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(502).body(Map.of("error", "TTS failed: " + e.getMessage()));
+        }
+    }
+
     /** The draft format, plus (with blueprintId and level) the full instructions for that blueprint. */
     @GetMapping("/format")
     public ResponseEntity<?> format(@RequestParam(required = false) String blueprintId,

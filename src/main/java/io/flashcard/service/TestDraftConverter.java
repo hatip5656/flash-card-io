@@ -20,7 +20,8 @@ public final class TestDraftConverter {
               "type": "listening_dialogue | listening_monologue | reading_text | grammar_items | heard_sentence",
               "instruction": "What the learner must do, in Estonian (e.g. 'Kuula dialoogi ja vali õige vastus.')",
               "passage": "reading_text only: the text the learner reads",
-              "script": [ {"speaker": "A", "gender": "f", "text": "One line of the audio, in Estonian"} ],
+              "speakers": [ {"name": "Kati", "gender": "f", "voice": "optional voice id"} ],
+              "script": [ {"speaker": "Kati", "gender": "f", "text": "One line of the audio, in Estonian"} ],
               "questions": [
                 {"type": "multiple_choice", "prompt": "Question", "options": ["…", "…", "…", "…"], "correctIndex": 0, "explanation": "Why, in English"},
                 {"type": "true_false", "prompt": "Statement about the text or audio", "answer": true, "explanation": "…"},
@@ -29,8 +30,10 @@ public final class TestDraftConverter {
             }
           ]
         }
-        Rules: "script" is required for listening_dialogue and listening_monologue (a dialogue has two speakers,
-        a monologue one; "gender" is "f" or "m"). "passage" is required for reading_text. heard_sentence tasks use
+        Rules: "script" is required for listening_dialogue and listening_monologue (a dialogue has two or three
+        speakers, a monologue one; every line names its speaker, and "gender" is "f" or "m"). "speakers" is optional:
+        it lists each speaker once and may pin a voice; without it each speaker gets a different voice of their
+        gender. "passage" is required for reading_text. heard_sentence tasks use
         only heard_sentence questions, and their options must contain the sentence exactly once. Every
         multiple_choice question has 2 to 6 different options and correctIndex points at the one correct option.
         """;
@@ -41,7 +44,19 @@ public final class TestDraftConverter {
     private static final String FALSE = "Vale";
 
     /** Voices for speakers, the pause after each script line, and the question cap per task. */
-    public record Config(List<String> femaleVoices, List<String> maleVoices, int pauseMs, int maxQuestionsPerTask) {}
+    /** tempo only goes into the audio keys: a new tempo means new files, not stale cached ones. */
+    public record Config(List<String> femaleVoices, List<String> maleVoices, int pauseMs, int maxQuestionsPerTask,
+                         double tempo) {
+        public Config(List<String> femaleVoices, List<String> maleVoices, int pauseMs, int maxQuestionsPerTask) {
+            this(femaleVoices, maleVoices, pauseMs, maxQuestionsPerTask, 1.0);
+        }
+
+        List<String> allVoices() {
+            List<String> all = new ArrayList<>(femaleVoices);
+            all.addAll(maleVoices);
+            return all;
+        }
+    }
 
     public record Segment(String text, String voice, int pauseAfterMs) {}
 
@@ -90,6 +105,7 @@ public final class TestDraftConverter {
             // Task-level audio (listening) or passage (reading)
             List<String> taskAudio = List.of();
             String transcript = null;
+            Map<String, String> speakerVoices = new LinkedHashMap<>();
             String context = instruction.isEmpty() ? null : instruction;
             if (type.startsWith("listening_")) {
                 var script = task.get("script") instanceof List<?> l ? l : List.of();
@@ -97,12 +113,14 @@ public final class TestDraftConverter {
                     errors.add(where + ": a listening task needs a script");
                     continue;
                 }
-                var segments = segments(script, config, where, errors, warnings);
+                var speakerList = task.get("speakers") instanceof List<?> sl ? sl : List.of();
+                var segments = segments(script, speakerList, config, where, errors, warnings, speakerVoices);
                 long speakers = script.stream().filter(Map.class::isInstance)
                     .map(s -> str(((Map<?, ?>) s).get("speaker"))).distinct().count();
                 if (type.equals("listening_dialogue") && speakers < 2) warnings.add(where + ": a dialogue with one speaker");
+                if (speakers > 3) warnings.add(where + ": " + speakers + " speakers — more than 3 voices are hard to tell apart");
                 if (type.equals("listening_monologue") && speakers > 1) warnings.add(where + ": a monologue with several speakers");
-                String key = mediaKey(examId, "t" + (t + 1));
+                String key = mediaKey(examId, "t" + (t + 1), segments, config);
                 audio.add(new AudioJob(key, segments));
                 taskAudio = List.of(key);
                 transcript = transcript(script);
@@ -133,6 +151,8 @@ public final class TestDraftConverter {
                 if (context != null) out.put("context", context);
                 if (!taskAudio.isEmpty()) out.put("audio", taskAudio);
                 if (transcript != null) out.put("transcript", transcript);
+                // Which voice reads which speaker (shown in the admin review to change voices)
+                if (!speakerVoices.isEmpty()) out.put("speakers", speakerVoices);
                 out.put("explanation", str(q.get("explanation")));
                 String qType = str(q.get("type"));
                 if (type.equals("heard_sentence") && !qType.equals("heard_sentence")) {
@@ -182,8 +202,9 @@ public final class TestDraftConverter {
                             int words = wordDifference(sentence, o);
                             if (words > 2) warnings.add(qWhere + ": '" + o + "' differs in " + words + " words — not a near-identical pair");
                         }
-                        String key = mediaKey(examId, "t" + (t + 1) + "q" + (i + 1));
-                        audio.add(new AudioJob(key, List.of(new Segment(sentence, voiceFor("f", 0, config), 0))));
+                        var segs = List.of(new Segment(sentence, voiceFor("f", 0, config), 0));
+                        String key = mediaKey(examId, "t" + (t + 1) + "q" + (i + 1), segs, config);
+                        audio.add(new AudioJob(key, segs));
                         out.put("type", "multiple_choice");
                         out.put("prompt", str(q.get("prompt")).isEmpty() ? "Vali lause, mida kuulsid." : str(q.get("prompt")));
                         out.put("options", options);
@@ -202,11 +223,33 @@ public final class TestDraftConverter {
         return new Result(questions, audio, warnings, errors);
     }
 
-    private static List<Segment> segments(List<?> script, Config config, String where, List<String> errors,
-                                          List<String> warnings) {
-        // Speakers get voices in order of appearance, female and male pools kept apart
+    private static List<Segment> segments(List<?> script, List<?> speakers, Config config, String where,
+                                          List<String> errors, List<String> warnings, Map<String, String> resolved) {
+        // Pinned voices first (speakers list, or a line's own voice), then every other speaker gets the next
+        // voice of their gender that nobody in this script uses yet.
         Map<String, String> voiceBySpeaker = new LinkedHashMap<>();
-        int female = 0, male = 0;
+        Set<String> allowed = new HashSet<>(config.allVoices());
+        for (Object o : speakers) {
+            if (!(o instanceof Map<?, ?> sp)) continue;
+            String name = str(sp.get("name"));
+            String voice = str(sp.get("voice"));
+            if (name.isEmpty() || voice.isEmpty()) continue;
+            if (allowed.contains(voice)) voiceBySpeaker.put(name, voice);
+            else warnings.add(where + ": unknown voice '" + voice + "' for " + name + " — choosing one instead");
+        }
+        for (Object o : script) {
+            if (!(o instanceof Map<?, ?> line)) continue;
+            String speaker = str(line.get("speaker")).isEmpty() ? "A" : str(line.get("speaker"));
+            String voice = str(line.get("voice"));
+            if (!voice.isEmpty() && !voiceBySpeaker.containsKey(speaker)) {
+                if (allowed.contains(voice)) voiceBySpeaker.put(speaker, voice);
+                else warnings.add(where + ": unknown voice '" + voice + "' for " + speaker + " — choosing one instead");
+            }
+        }
+        Map<String, String> genderBySpeaker = new HashMap<>();
+        for (Object o : speakers) {
+            if (o instanceof Map<?, ?> sp && !str(sp.get("name")).isEmpty()) genderBySpeaker.put(str(sp.get("name")), str(sp.get("gender")));
+        }
         List<Segment> out = new ArrayList<>();
         for (int i = 0; i < script.size(); i++) {
             if (!(script.get(i) instanceof Map<?, ?> line)) {
@@ -220,14 +263,29 @@ public final class TestDraftConverter {
             }
             if (text.length() > 2000) errors.add(where + " script line " + (i + 1) + " is longer than 2000 characters");
             String speaker = str(line.get("speaker")).isEmpty() ? "A" : str(line.get("speaker"));
-            String gender = "m".equals(str(line.get("gender"))) ? "m" : "f";
-            if (!voiceBySpeaker.containsKey(speaker)) {
-                voiceBySpeaker.put(speaker, "m".equals(gender) ? voiceFor("m", male++, config) : voiceFor("f", female++, config));
-            }
+            String g = str(line.get("gender")).isEmpty() ? genderBySpeaker.getOrDefault(speaker, "") : str(line.get("gender"));
+            String gender = "m".equals(g) ? "m" : "f";
+            if (!voiceBySpeaker.containsKey(speaker)) voiceBySpeaker.put(speaker, nextFreeVoice(gender, voiceBySpeaker.values(), config));
             out.add(new Segment(text, voiceBySpeaker.get(speaker), config.pauseMs()));
         }
+        resolved.putAll(voiceBySpeaker);
+        // Two speakers on one voice cannot be told apart
+        Map<String, List<String>> byVoice = new LinkedHashMap<>();
+        voiceBySpeaker.forEach((sp, v) -> byVoice.computeIfAbsent(v, k -> new ArrayList<>()).add(sp));
+        byVoice.forEach((v, sps) -> {
+            if (sps.size() > 1) warnings.add(where + ": " + String.join(" and ", sps) + " share the voice " + v);
+        });
         if (out.size() > 60) errors.add(where + ": " + out.size() + " script lines, the TTS takes at most 60");
         return out;
+    }
+
+    /** The first voice of the gender not yet used in this script; another gender's, then any, when none is left. */
+    private static String nextFreeVoice(String gender, Collection<String> used, Config config) {
+        List<String> own = "m".equals(gender) ? config.maleVoices() : config.femaleVoices();
+        List<String> other = "m".equals(gender) ? config.femaleVoices() : config.maleVoices();
+        for (String v : own) if (!used.contains(v)) return v;
+        for (String v : other) if (!used.contains(v)) return v;
+        return own.isEmpty() ? (other.isEmpty() ? "default" : other.get(0)) : own.get(0);
     }
 
     private static String voiceFor(String gender, int index, Config config) {
@@ -267,9 +325,19 @@ public final class TestDraftConverter {
         return sb.toString();
     }
 
-    /** exam_media keys are lowercase paths; generated exam ids already are. */
-    static String mediaKey(String examId, String name) {
-        return "generated/" + examId + "/" + name + ".mp3";
+    /**
+     * exam_media keys are lowercase paths; generated exam ids already are. The key ends in a hash of what is
+     * spoken (text, voices, pauses, tempo): media is cached for a long time, so changed audio needs a new URL.
+     */
+    static String mediaKey(String examId, String name, List<Segment> segments, Config config) {
+        StringBuilder sb = new StringBuilder().append(config.tempo());
+        for (Segment s : segments) sb.append('|').append(s.voice()).append('|').append(s.pauseAfterMs()).append('|').append(s.text());
+        try {
+            byte[] d = java.security.MessageDigest.getInstance("SHA-256").digest(sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            return "generated/" + examId + "/" + name + "-" + HexFormat.of().formatHex(d).substring(0, 10) + ".mp3";
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     private static List<String> strings(Object o) {

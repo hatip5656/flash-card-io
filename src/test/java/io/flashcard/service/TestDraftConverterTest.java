@@ -33,7 +33,7 @@ class TestDraftConverterTest {
         assertTrue(r.ok(), () -> r.errors().toString());
         assertEquals(1, r.audio().size());
         var job = r.audio().get(0);
-        assertEquals("generated/gen-b1-listening-abc/t1.mp3", job.key());
+        assertTrue(job.key().matches("generated/gen-b1-listening-abc/t1-[0-9a-f]{10}\\.mp3"), job.key());
         assertEquals(List.of("et_f_reporter", "et_m_kelmsaar", "et_f_reporter"),
             job.segments().stream().map(TestDraftConverter.Segment::voice).toList());
         assertEquals(2, r.questions().size());
@@ -54,7 +54,7 @@ class TestDraftConverterTest {
 
         assertTrue(r.ok(), () -> r.errors().toString());
         assertEquals(1, r.questions().get(0).get("correctIndex"));
-        assertEquals("generated/gen-a2-dictation-x/t1q1.mp3", r.audio().get(0).key());
+        assertTrue(r.audio().get(0).key().startsWith("generated/gen-a2-dictation-x/t1q1-"), r.audio().get(0).key());
         assertEquals("Ma elan Tartus.", r.audio().get(0).segments().get(0).text());
         assertTrue(r.warnings().isEmpty());
     }
@@ -107,9 +107,83 @@ class TestDraftConverterTest {
     }
 
     @Test
+    void changedAudioGetsANewKey() {
+        var task = new HashMap<String, Object>(Map.of("type", "listening_monologue", "instruction", "Kuula.",
+            "script", List.of(Map.of("speaker", "A", "gender", "f", "text", "Tere!")),
+            "questions", List.of(Map.of("type", "true_false", "prompt", "x", "answer", true))));
+        String before = TestDraftConverter.convert(draft(task), "gen-x", CONFIG).audio().get(0).key();
+        String same = TestDraftConverter.convert(draft(task), "gen-x", CONFIG).audio().get(0).key();
+        task.put("script", List.of(Map.of("speaker", "A", "gender", "f", "text", "Tere õhtust!")));
+        String changed = TestDraftConverter.convert(draft(task), "gen-x", CONFIG).audio().get(0).key();
+        String slower = TestDraftConverter.convert(draft(task), "gen-x",
+            new TestDraftConverter.Config(CONFIG.femaleVoices(), CONFIG.maleVoices(), 700, 30, 0.9)).audio().get(0).key();
+        assertEquals(before, same);
+        assertNotEquals(before, changed);
+        assertNotEquals(changed, slower);
+    }
+
+    @Test
     void wordDifferenceCountsChangedWords() {
         assertEquals(1, TestDraftConverter.wordDifference("Ma elan Tartus.", "Ma elan Tartusse."));
         assertEquals(0, TestDraftConverter.wordDifference("Ma elan Tartus.", "ma elan tartus"));
         assertEquals(2, TestDraftConverter.wordDifference("Ma elan Tartus.", "Ma elasin Tartus täna."));
+    }
+
+    private static final TestDraftConverter.Config THREE = new TestDraftConverter.Config(
+        List.of("et_f_reporter", "et_f_rohemae", "et_f_sobak"), List.of("et_m_kelmsaar", "et_m_kilumets"), 700, 30);
+
+    private static List<String> voices(TestDraftConverter.Result r) {
+        return r.audio().get(0).segments().stream().map(TestDraftConverter.Segment::voice).toList();
+    }
+
+    @Test
+    void threeSpeakersGetThreeDifferentVoices() {
+        var task = Map.<String, Object>of("type", "listening_dialogue", "instruction", "Kuula.",
+            "script", List.of(
+                Map.of("speaker", "Mari", "gender", "f", "text", "Tere!"),
+                Map.of("speaker", "Liis", "gender", "f", "text", "Tere, Mari!"),
+                Map.of("speaker", "Toomas", "gender", "m", "text", "Tere mõlemale!"),
+                Map.of("speaker", "Mari", "gender", "f", "text", "Kuidas läheb?")),
+            "questions", List.of(Map.of("type", "true_false", "prompt", "Mari tervitab.", "answer", true)));
+
+        var r = TestDraftConverter.convert(draft(task), "gen-x", THREE);
+
+        assertTrue(r.ok(), () -> r.errors().toString());
+        assertEquals(List.of("et_f_reporter", "et_f_rohemae", "et_m_kelmsaar", "et_f_reporter"), voices(r));
+        assertTrue(r.warnings().isEmpty(), () -> r.warnings().toString());
+    }
+
+    @Test
+    void pinnedVoicesAreKeptAndOthersAvoidThem() {
+        var task = Map.<String, Object>of("type", "listening_dialogue", "instruction", "Kuula.",
+            "speakers", List.of(Map.of("name", "Mari", "gender", "f", "voice", "et_f_reporter"),
+                                Map.of("name", "Jaan", "gender", "m", "voice", "et_m_kilumets")),
+            "script", List.of(
+                Map.of("speaker", "Liis", "gender", "f", "text", "Tere!"),
+                Map.of("speaker", "Mari", "text", "Tere, Liis!"),
+                Map.of("speaker", "Jaan", "text", "Tere!")),
+            "questions", List.of(Map.of("type", "true_false", "prompt", "Liis tervitab.", "answer", true)));
+
+        var r = TestDraftConverter.convert(draft(task), "gen-x", THREE);
+
+        // Liis is not pinned: she gets the first female voice Mari does not use
+        assertEquals(List.of("et_f_rohemae", "et_f_reporter", "et_m_kilumets"), voices(r));
+    }
+
+    @Test
+    void unknownAndSharedVoicesAreFlagged() {
+        var task = Map.<String, Object>of("type", "listening_dialogue", "instruction", "Kuula.",
+            "script", List.of(
+                Map.of("speaker", "Mari", "gender", "f", "voice", "et_f_sobak", "text", "Tere!"),
+                Map.of("speaker", "Liis", "gender", "f", "voice", "et_f_sobak", "text", "Tere!"),
+                Map.of("speaker", "Ott", "gender", "m", "voice", "robot", "text", "Tere!")),
+            "questions", List.of(Map.of("type", "true_false", "prompt", "x", "answer", true)));
+
+        var r = TestDraftConverter.convert(draft(task), "gen-x", THREE);
+
+        var warnings = String.join(" | ", r.warnings());
+        assertTrue(warnings.contains("unknown voice 'robot'"), warnings);
+        assertTrue(warnings.contains("Mari and Liis share the voice et_f_sobak"), warnings);
+        assertEquals("et_m_kelmsaar", voices(r).get(2));
     }
 }

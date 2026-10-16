@@ -94,6 +94,20 @@ public class TestGeneratorService {
             .replace("{{format}}", TestDraftConverter.FORMAT);
     }
 
+    /** The voices speakers can be given (from learning_settings), by gender. */
+    public Map<String, Object> voices() {
+        return Map.of("female", settings.list("generator.voices_female"), "male", settings.list("generator.voices_male"));
+    }
+
+    public byte[] previewVoice(String voice, String text) throws Exception {
+        List<String> all = new ArrayList<>(settings.list("generator.voices_female"));
+        all.addAll(settings.list("generator.voices_male"));
+        if (!all.contains(voice)) throw new IllegalArgumentException("Unknown voice " + voice);
+        String line = text == null || text.isBlank() ? "Tere! Mina olen see hääl, kes sulle täna räägib." : text.strip();
+        if (line.length() > 300) throw new IllegalArgumentException("Preview text is limited to 300 characters");
+        return renderer.preview(voice, line);
+    }
+
     // ── Creating drafts ──
 
     /** Asks Gemini for a draft and saves it. Throws when Gemini gives nothing usable. */
@@ -271,6 +285,10 @@ public class TestGeneratorService {
             setAudio(examId, Map.of("status", "rendering", "files", jobs.size()));
             try {
                 renderer.render(jobs);
+                // Audio from earlier versions of the draft is no longer referenced
+                List<String> keep = jobs.stream().map(TestDraftConverter.AudioJob::key).toList();
+                jdbc.update("DELETE FROM exam_media WHERE media_key LIKE ? AND NOT (media_key = ANY(?))",
+                    "generated/" + examId + "/%", keep.toArray(new String[0]));
                 setAudio(examId, Map.of("status", "ready", "files", jobs.size(), "renderedAt", new Date().toInstant().toString()));
             } catch (Exception e) {
                 log.warn("[test-gen] audio for {} failed: {}", examId, e.getMessage());
@@ -290,7 +308,8 @@ public class TestGeneratorService {
 
     private TestDraftConverter.Config converterConfig() {
         return new TestDraftConverter.Config(settings.list("generator.voices_female"), settings.list("generator.voices_male"),
-            settings.count("generator.pause_ms"), settings.count("generator.max_questions_per_task"));
+            settings.count("generator.pause_ms"), settings.count("generator.max_questions_per_task"),
+            settings.num("generator.speech_tempo"));
     }
 
     private List<Map<String, Object>> withJson(List<Map<String, Object>> rows, String... columns) {

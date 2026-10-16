@@ -39,5 +39,6 @@
     <include file="db/changelog/032-exam-attempt-verdicts.sql"/>
     <include file="db/changelog/033-ranking-settings.sql"/>
     <include file="db/changelog/034-test-generator.sql"/>
+    <include file="db/changelog/035-dialogue-voices.sql"/>
 
 </databaseChangeLog>
