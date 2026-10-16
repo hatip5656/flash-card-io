@@ -32,11 +32,18 @@ for i, key in enumerate(keys):
     stored = call('GET', '/admin/exam-media-exists/' + key, token=token)
     if stored.get('exists') and stored.get('bytes') == len(data):
         continue
-    for off in range(0, len(data), CHUNK):
-        q = '?append=true' if off else ''
-        call('PUT', '/admin/exam-media/' + key + q, raw=data[off:off + CHUNK], token=token,
-             ctype='application/octet-stream')
-        time.sleep(0.7)
+    for attempt in range(3):
+        try:
+            # The first chunk replaces whatever is stored, so a retry starts the file cleanly
+            for off in range(0, len(data), CHUNK):
+                q = '?append=true' if off else ''
+                call('PUT', '/admin/exam-media/' + key + q, raw=data[off:off + CHUNK], token=token,
+                     ctype='application/octet-stream')
+                time.sleep(0.7)
+            break
+        except OSError as e:  # timeouts and dropped connections
+            print(f'{key}: {e}; retrying', flush=True)
+            time.sleep(5)
     check = call('GET', '/admin/exam-media-exists/' + key, token=token)
     if check.get('bytes') != len(data):
         sys.exit(f'{key}: stored {check.get("bytes")} bytes, expected {len(data)}')
