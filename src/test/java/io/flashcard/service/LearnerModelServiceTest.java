@@ -117,7 +117,7 @@ class LearnerModelServiceTest {
         @SuppressWarnings("unchecked")
         var weak = (List<Map<String, Object>>) result.get("weakLessons");
         assertEquals("a1-partitive-case", weak.get(0).get("lessonId"));
-        verify(learningRepo).saveExamAttempt(eq(USER), eq("a2-x"), eq(1), eq(2), eq("[1,1]"), anyString(), eq(600));
+        verify(learningRepo).saveExamAttempt(eq(USER), eq("a2-x"), eq(1), eq(2), eq("[1,1]"), anyString(), eq(600), isNull(), isNull());
         verify(learningRepo).saveMastery(eq(USER), eq("a1-partitive-case"), eq(1), eq(0), eq(1), eq(1), anyDouble(), anyInt());
     }
 
@@ -160,7 +160,7 @@ class LearnerModelServiceTest {
         @SuppressWarnings("unchecked")
         var verdict = (Map<String, Object>) result.get("verdict");
         assertEquals("B2", verdict.get("level"));
-        verify(learningRepo).saveExamAttempt(eq(USER), eq("scr"), eq(3), eq(3), eq("[\"Kapsast\",1,0]"), anyString(), isNull());
+        verify(learningRepo).saveExamAttempt(eq(USER), eq("scr"), eq(3), eq(3), eq("[\"Kapsast\",1,0]"), anyString(), isNull(), anyString(), isNull());
 
         // Wrong text and a skipped part 2: below the gate, part 2 does not count.
         var low = service.gradeExam(USER, "scr", Arrays.asList("kapsa", 1, null), null);

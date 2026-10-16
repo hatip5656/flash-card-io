@@ -132,10 +132,17 @@ public class LearningRepository {
 
     public void saveExamAttempt(long chatId, String examId, int score, int total, String answersJson,
                                 String sectionsJson, Integer durationSeconds) {
+        saveExamAttempt(chatId, examId, score, total, answersJson, sectionsJson, durationSeconds, null, null);
+    }
+
+    /** verdictJson: what the scoring rules made of it; predictedScore: the skill estimate just before it. */
+    public void saveExamAttempt(long chatId, String examId, int score, int total, String answersJson,
+                                String sectionsJson, Integer durationSeconds, String verdictJson, Double predictedScore) {
         jdbc.update("""
-            INSERT INTO exam_attempts (chat_id, exam_id, score, total, answers, sections, duration_seconds, server_graded)
-            VALUES (?, ?, ?, ?, CAST(? AS JSONB), CAST(? AS JSONB), ?, TRUE)
-            """, chatId, examId, score, total, answersJson, sectionsJson, durationSeconds);
+            INSERT INTO exam_attempts (chat_id, exam_id, score, total, answers, sections, duration_seconds, server_graded,
+              verdict, predicted_score)
+            VALUES (?, ?, ?, ?, CAST(? AS JSONB), CAST(? AS JSONB), ?, TRUE, CAST(? AS JSONB), ?)
+            """, chatId, examId, score, total, answersJson, sectionsJson, durationSeconds, verdictJson, predictedScore);
     }
 
     public Map<String, Object> getLastAttempt(long chatId, String examId) {

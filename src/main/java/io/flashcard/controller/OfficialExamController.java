@@ -1,6 +1,7 @@
 package io.flashcard.controller;
 
 import io.flashcard.service.LearnerModelService;
+import io.flashcard.service.LearningPlanService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -13,10 +14,12 @@ public class OfficialExamController {
 
     private final JdbcTemplate jdbc;
     private final LearnerModelService learnerModel;
+    private final LearningPlanService planService;
 
-    public OfficialExamController(JdbcTemplate jdbc, LearnerModelService learnerModel) {
+    public OfficialExamController(JdbcTemplate jdbc, LearnerModelService learnerModel, LearningPlanService planService) {
         this.jdbc = jdbc;
         this.learnerModel = learnerModel;
+        this.planService = planService;
     }
 
     /**
@@ -72,7 +75,10 @@ public class OfficialExamController {
         // Graded here: the client's own score/total, if sent, are ignored.
         List<?> answers = body.get("answers") instanceof List<?> l ? l : List.of();
         Integer duration = body.get("durationSeconds") instanceof Number n ? n.intValue() : null;
-        var result = learnerModel.gradeExam(Long.parseLong(userId), examId, answers, duration);
+        long chatId = Long.parseLong(userId);
+        // The skill estimate before this attempt counts toward it, so take it before grading
+        Double predicted = planService.predictedScore(chatId, examId);
+        var result = learnerModel.gradeExam(chatId, examId, answers, duration, predicted);
         if (result == null) return ResponseEntity.status(404).body(Map.of("error", "Exam not found"));
         return ResponseEntity.ok(result);
     }

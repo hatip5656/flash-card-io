@@ -36,5 +36,6 @@
     <include file="db/changelog/029-testest-tasks.sql"/>
     <include file="db/changelog/030-exam-goals.sql"/>
     <include file="db/changelog/031-learning-settings.sql"/>
+    <include file="db/changelog/032-exam-attempt-verdicts.sql"/>
 
 </databaseChangeLog>

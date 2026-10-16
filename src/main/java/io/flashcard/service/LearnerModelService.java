@@ -190,6 +190,12 @@ public class LearnerModelService {
 
     /** Grades a whole exam attempt on the server and feeds every question into the learner model. */
     public Map<String, Object> gradeExam(long chatId, String examId, List<?> answers, Integer durationSeconds) {
+        return gradeExam(chatId, examId, answers, durationSeconds, null);
+    }
+
+    /** predictedScore: the readiness estimate for this exam's skill just before the attempt (goal exams). */
+    public Map<String, Object> gradeExam(long chatId, String examId, List<?> answers, Integer durationSeconds,
+                                         Double predictedScore) {
         var exam = examBank.getExam(examId);
         if (exam == null) return null;
 
@@ -254,8 +260,10 @@ public class LearnerModelService {
             })
             .toList();
 
+        var verdict = ExamScoring.verdict(exam.scoring(), sections, score, total);
         learningRepo.insertEvents(chatId, events);
-        learningRepo.saveExamAttempt(chatId, examId, score, total, toJson(stored), toJson(sectionList), durationSeconds);
+        learningRepo.saveExamAttempt(chatId, examId, score, total, toJson(stored), toJson(sectionList), durationSeconds,
+            verdict != null ? toJson(verdict) : null, predictedScore);
 
         double pct = total == 0 ? 0 : (double) score / total;
         Map<String, Object> result = new LinkedHashMap<>();
@@ -272,7 +280,6 @@ public class LearnerModelService {
         result.put("weakLessons", weakLessons);
         result.put("perQuestion", perQuestion);
         result.put("kind", exam.kind());
-        var verdict = ExamScoring.verdict(exam.scoring(), sections, score, total);
         if (verdict != null) {
             result.put("verdict", verdict);
             // The placement result becomes the level the learning plan aims for

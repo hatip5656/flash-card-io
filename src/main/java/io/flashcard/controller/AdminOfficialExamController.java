@@ -28,6 +28,27 @@ public class AdminOfficialExamController {
         this.objectMapper = objectMapper;
     }
 
+    /** Every exam with its role, rules and how it is used (attempts, learners, average score, pass rate). */
+    @GetMapping
+    public Map<String, Object> list() throws Exception {
+        var rows = jdbc.queryForList("""
+            SELECT e.id, e.kind, e.skill, e.cefr_level, e.variant, e.title, e.source, e.plan_role, e.time_limit_minutes,
+                   e.sort_order, e.scoring::text AS scoring, jsonb_array_length(e.questions) AS question_count,
+                   (SELECT COUNT(*) FROM exam_question_tags t WHERE t.exam_id = e.id) AS tag_count,
+                   COUNT(a.id) AS attempts, COUNT(DISTINCT a.chat_id) AS learners,
+                   AVG(a.score::float / NULLIF(a.total, 0)) AS avg_score,
+                   AVG(CASE WHEN a.score::float / NULLIF(a.total, 0) >= (e.scoring->>'passMark')::float THEN 1.0 ELSE 0.0 END)
+                     FILTER (WHERE a.id IS NOT NULL AND e.scoring ? 'passMark') AS pass_rate,
+                   MAX(a.completed_at) AS last_attempt_at
+            FROM official_exams e LEFT JOIN exam_attempts a ON a.exam_id = e.id
+            GROUP BY e.id ORDER BY e.kind, e.sort_order NULLS LAST, e.cefr_level, e.id
+            """);
+        for (var r : rows) {
+            if (r.get("scoring") instanceof String sc) r.put("scoring", objectMapper.readValue(sc, Object.class));
+        }
+        return Map.of("exams", rows);
+    }
+
     @PostMapping("/seed")
     public Map<String, Object> seedExams(@RequestBody Map<String, Object> body) {
         @SuppressWarnings("unchecked")

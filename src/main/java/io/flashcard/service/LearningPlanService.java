@@ -289,6 +289,26 @@ public class LearningPlanService {
         return result;
     }
 
+    /**
+     * For a goal exam: the learner's readiness estimate for its skill at its level, from the evidence so far.
+     * Taken just before grading, so the prediction can later be compared with the actual score. Null for
+     * other exams or when there is no evidence yet.
+     */
+    public Double predictedScore(long chatId, String examId) {
+        var row = examBank.listExams().stream().filter(e -> examId.equals(e.get("id"))).findFirst().orElse(null);
+        if (row == null || !ExamBankService.ROLE_GOAL.equals(row.get("plan_role"))) return null;
+        String level = (String) row.get("cefr_level");
+        String skill = row.get("skill") != null ? (String) row.get("skill") : "reading";
+        int correct = 0, n = 0;
+        for (var a : learningRepo.getLatestExamAnswers(chatId, examBank.planExamIds(level))) {
+            String examSkill = a.get("exam_skill") != null ? (String) a.get("exam_skill") : "reading";
+            if (!skill.equals(examSkill)) continue;
+            n++;
+            if (Boolean.TRUE.equals(a.get("is_correct"))) correct++;
+        }
+        return n == 0 ? null : estimate(correct, n);
+    }
+
     private Map<String, Object> skillReadiness(long chatId, String skill, String goalExam, int correct, int n) {
         Double estimate = n == 0 ? null : estimate(correct, n);
         Double passMark = examBank.passMark(goalExam);
