@@ -19,7 +19,7 @@ public class GeminiService {
     @Value("${app.gemini-api-key:}")
     private String geminiApiKey;
 
-    // The model per feature lives in learning_settings (llm.gemini_model_chat / _generation / _fallback)
+    // The model per feature lives in learning_settings (llm.gemini_model_chat / _generation / _fallbacks)
     private static final String GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models/";
     private static final com.fasterxml.jackson.databind.ObjectMapper MAPPER = new com.fasterxml.jackson.databind.ObjectMapper();
 
@@ -107,7 +107,8 @@ public class GeminiService {
 
     /**
      * Sends the request to the model stored under modelSetting; if Google refuses that model (not found, not
-     * available to this key) or it is overloaded or rate-limited, tries llm.gemini_model_fallback once.
+     * available to this key) or it is overloaded or rate-limited, tries each model of llm.gemini_model_fallbacks
+     * in order.
      * Returns the answer text or null.
      */
     private String call(String modelSetting, Map<String, Object> requestBody, int readTimeoutMs) {
@@ -115,13 +116,15 @@ public class GeminiService {
             String jsonBody = MAPPER.writeValueAsString(requestBody);
             String model = settings.text(modelSetting);
             Response r = post(model, jsonBody, readTimeoutMs);
-            if (r.status() != 200 && shouldFallBack(r)) {
-                String fallback = settings.text("llm.gemini_model_fallback");
-                if (!fallback.equals(model)) {
-                    log.warn("[gemini] {} refused ({}), retrying with {}", model, r.status(), fallback);
-                    r = post(fallback, jsonBody, readTimeoutMs);
-                }
+            // Each model has its own capacity: when one is overloaded or refused, walk the fallback chain
+            for (String fallback : settings.list("llm.gemini_model_fallbacks")) {
+                if (r.status() == 200 || !shouldFallBack(r)) break;
+                if (fallback.equals(model)) continue;
+                log.warn("[gemini] {} answered {}, trying {}", model, r.status(), fallback);
+                model = fallback;
+                r = post(model, jsonBody, readTimeoutMs);
             }
+            if (r.status() == 200) log.debug("[gemini] answered by {}", model);
             if (r.status() != 200) {
                 log.error("[gemini] API error {}: {}", r.status(), r.body().substring(0, Math.min(300, r.body().length())));
                 return null;

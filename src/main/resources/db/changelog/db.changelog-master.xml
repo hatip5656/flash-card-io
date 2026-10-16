@@ -41,5 +41,6 @@
     <include file="db/changelog/034-test-generator.sql"/>
     <include file="db/changelog/035-dialogue-voices.sql"/>
     <include file="db/changelog/036-gemini-models.sql"/>
+    <include file="db/changelog/037-gemini-fallback-chain.sql"/>
 
 </databaseChangeLog>
