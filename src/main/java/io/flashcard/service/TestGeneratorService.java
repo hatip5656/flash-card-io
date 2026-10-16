@@ -236,6 +236,15 @@ public class TestGeneratorService {
         var result = TestDraftConverter.convert((Map<String, Object>) gen.get("draft"), examId, converterConfig());
         if (!result.ok()) throw new IllegalStateException("Fix the draft's errors first");
         if (result.audio().isEmpty()) return current;
+        // The audio keys depend on voices and tempo, so the questions must point at the new files before the
+        // old ones are cleaned up after rendering.
+        try {
+            jdbc.update("UPDATE official_exams SET questions = CAST(? AS JSONB) WHERE id = ?",
+                objectMapper.writeValueAsString(result.questions()), examId);
+        } catch (Exception e) {
+            throw new IllegalStateException("Could not update the questions: " + e.getMessage());
+        }
+        examBank.invalidate();
         setAudio(examId, Map.of("status", "pending"));
         renderLater(examId, result.audio());
         return get(examId);
