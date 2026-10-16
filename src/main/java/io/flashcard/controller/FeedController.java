@@ -82,9 +82,12 @@ public class FeedController {
                 Math.min(cursorOffset, unsent.size()),
                 Math.min(cursorOffset + limit - due.size(), unsent.size()));
             Iterator<Word> dueIt = due.iterator();
+            // One review per feed.review_every new words, placed after the second word of each group
+            int every = Math.max(1, settings.count("feed.review_every"));
+            int slot = Math.min(1, every - 1);
             for (int i = 0; i < slice.size(); i++) {
                 rawItems.add(Map.of("word", slice.get(i), "isNew", true));
-                if (i % 3 == 1 && dueIt.hasNext()) rawItems.add(Map.of("word", dueIt.next(), "isNew", false));
+                if (i % every == slot && dueIt.hasNext()) rawItems.add(Map.of("word", dueIt.next(), "isNew", false));
             }
             if (!slice.isEmpty()) {
                 while (dueIt.hasNext()) rawItems.add(Map.of("word", dueIt.next(), "isNew", false));

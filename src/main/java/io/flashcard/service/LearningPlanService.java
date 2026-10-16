@@ -72,7 +72,8 @@ public class LearningPlanService {
             }
             // A lesson without enough linked sentences can't be practised; borrow from the next candidate.
             int want = settings.count("plan.practice_items");
-            for (Candidate c : candidates.subList(0, Math.min(5, candidates.size()))) {
+            int window = settings.count("plan.practice_candidate_window");
+            for (Candidate c : candidates.subList(0, Math.min(window, candidates.size()))) {
                 if (practiceItems.size() >= want) break;
                 var practice = practiceService.generate(c.lesson().id(), level, useTurkish, want - practiceItems.size());
                 if (practice == null) continue;
@@ -85,9 +86,9 @@ public class LearningPlanService {
         // Interleave so the feed alternates between rule practice and exam-style questions.
         List<Map<String, Object>> items = new ArrayList<>(lessonItems);
         Iterator<Map<String, Object>> p = practiceItems.iterator(), e = examItems.iterator();
+        int perExam = Math.max(1, settings.count("plan.practice_per_exam"));
         while (p.hasNext() || e.hasNext()) {
-            if (p.hasNext()) items.add(p.next());
-            if (p.hasNext()) items.add(p.next());
+            for (int k = 0; k < perExam && p.hasNext(); k++) items.add(p.next());
             if (e.hasNext()) items.add(e.next());
         }
         if (items.size() > limit) items = items.subList(0, limit);
@@ -108,6 +109,14 @@ public class LearningPlanService {
         int userRank = levels.indexOf(level);
         double weakBelow = settings.num("grammar.weak_below");
         int practiceWeakAttempts = settings.count("grammar.practice_weak_min_attempts");
+        double examWeakBase = settings.num("ranking.exam_weak_base");
+        double practiceWeakBase = settings.num("ranking.practice_weak_base");
+        double recheckBase = settings.num("ranking.recheck_base");
+        double untestedBase = settings.num("ranking.untested_base");
+        double nextUpBase = settings.num("ranking.next_up_base");
+        double weaknessWeight = settings.num("ranking.weakness_weight");
+        double earlierLevelBonus = settings.num("ranking.earlier_level_bonus");
+        double orderStep = settings.num("ranking.teaching_order_step");
 
         List<Candidate> out = new ArrayList<>();
         List<GrammarLesson> lessons = grammarBank.getAllLessons();
@@ -120,14 +129,15 @@ public class LearningPlanService {
                 int attempts = ((Number) m.get("attempts")).intValue();
                 int examMisses = ((Number) m.get("exam_misses")).intValue();
                 boolean due = Boolean.TRUE.equals(m.get("due"));
-                if (examMisses > 0 && score < weakBelow) out.add(new Candidate(l, "exam_weak", 4 + (1 - score), m));
-                else if (attempts >= practiceWeakAttempts && score < weakBelow) out.add(new Candidate(l, "practice_weak", 3 + (1 - score), m));
-                else if (due) out.add(new Candidate(l, "recheck", 2 + (1 - score), m));
+                double weakness = weaknessWeight * (1 - score);
+                if (examMisses > 0 && score < weakBelow) out.add(new Candidate(l, "exam_weak", examWeakBase + weakness, m));
+                else if (attempts >= practiceWeakAttempts && score < weakBelow) out.add(new Candidate(l, "practice_weak", practiceWeakBase + weakness, m));
+                else if (due) out.add(new Candidate(l, "recheck", recheckBase + weakness, m));
             } else if (rank <= userRank) {
                 // Earlier levels first: gaps in the foundation hurt every later topic.
-                double levelBias = (userRank - rank) * 0.1;
-                if (read.contains(l.id())) out.add(new Candidate(l, "untested", 1.5 + levelBias, null));
-                else out.add(new Candidate(l, "next_up", 1 + levelBias - i * 0.001, null));
+                double levelBias = (userRank - rank) * earlierLevelBonus;
+                if (read.contains(l.id())) out.add(new Candidate(l, "untested", untestedBase + levelBias, null));
+                else out.add(new Candidate(l, "next_up", nextUpBase + levelBias - i * orderStep, null));
             }
         }
         out.sort((a, b) -> Double.compare(b.priority(), a.priority()));
@@ -160,16 +170,21 @@ public class LearningPlanService {
         //    listening, writing), then the weakest tagged sub-skill.
         record Scored(ExamBankService.Exam exam, ExamBankService.Question q, double score) {}
         List<Scored> fresh = new ArrayList<>();
+        double jitter = settings.num("exam_pick.random_jitter");
+        double focusBonus = settings.num("exam_pick.focus_rule_bonus");
+        double examSkillWeight = settings.num("exam_pick.exam_skill_weight");
+        double subSkillWeight = settings.num("exam_pick.sub_skill_weight");
+        double unknownAccuracy = settings.num("exam_pick.unknown_skill_accuracy");
         for (var exam : exams) {
             for (var q : exam.questions()) {
                 String id = exam.id() + "#" + q.index();
                 if (recent.contains(id) || picked.contains(id)) continue;
                 if (firstTaskOnly && !exam.isFirstTask(q)) continue;
                 var tag = exam.tag(q.index());
-                double score = random.nextDouble() * 0.5;
-                if (focus != null && tag.grammarLessonIds().contains(focus.lesson().id())) score += 2;
-                if (exam.skill() != null) score += 1 - skillAccuracy.getOrDefault(exam.skill(), 0.5);
-                if (tag.skill() != null) score += 0.5 * (1 - skillAccuracy.getOrDefault(tag.skill(), 0.5));
+                double score = random.nextDouble() * jitter;
+                if (focus != null && tag.grammarLessonIds().contains(focus.lesson().id())) score += focusBonus;
+                if (exam.skill() != null) score += examSkillWeight * (1 - skillAccuracy.getOrDefault(exam.skill(), unknownAccuracy));
+                if (tag.skill() != null) score += subSkillWeight * (1 - skillAccuracy.getOrDefault(tag.skill(), unknownAccuracy));
                 fresh.add(new Scored(exam, q, score));
             }
         }
