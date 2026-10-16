@@ -32,7 +32,7 @@ public class AdminOfficialExamController {
     @GetMapping
     public Map<String, Object> list() throws Exception {
         var rows = jdbc.queryForList("""
-            SELECT e.id, e.kind, e.skill, e.cefr_level, e.variant, e.title, e.source, e.plan_role, e.time_limit_minutes,
+            SELECT e.id, e.kind, e.status, e.skill, e.cefr_level, e.variant, e.title, e.source, e.plan_role, e.time_limit_minutes,
                    e.sort_order, e.scoring::text AS scoring, jsonb_array_length(e.questions) AS question_count,
                    (SELECT COUNT(*) FROM exam_question_tags t WHERE t.exam_id = e.id) AS tag_count,
                    COUNT(a.id) AS attempts, COUNT(DISTINCT a.chat_id) AS learners,

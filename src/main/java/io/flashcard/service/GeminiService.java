@@ -52,6 +52,51 @@ public class GeminiService {
         return geminiApiKey != null && !geminiApiKey.isBlank();
     }
 
+    /**
+     * One prompt, a JSON answer (Gemini's JSON mode). Used for generated content such as test drafts.
+     * Returns the raw JSON text, or null when Gemini is unavailable or fails.
+     */
+    public String generateJson(String prompt, int maxTokens, double temperature) {
+        if (!isAvailable()) return null;
+        try {
+            Map<String, Object> requestBody = new LinkedHashMap<>();
+            requestBody.put("contents", List.of(Map.of("role", "user", "parts", List.of(Map.of("text", prompt)))));
+            requestBody.put("generationConfig", Map.of(
+                "maxOutputTokens", maxTokens, "temperature", temperature, "responseMimeType", "application/json"));
+
+            String jsonBody = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(requestBody);
+            HttpURLConnection conn = (HttpURLConnection) new URL(GEMINI_URL + "?key=" + geminiApiKey).openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(15000);
+            conn.setReadTimeout(180000);
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(jsonBody.getBytes(StandardCharsets.UTF_8));
+            }
+            int status = conn.getResponseCode();
+            String responseBody;
+            try (var is = status >= 400 ? conn.getErrorStream() : conn.getInputStream()) {
+                responseBody = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+            }
+            if (status != 200) {
+                log.error("[gemini] JSON generation error {}: {}", status, responseBody.substring(0, Math.min(300, responseBody.length())));
+                return null;
+            }
+            var responseMap = new com.fasterxml.jackson.databind.ObjectMapper().readValue(responseBody, Map.class);
+            var candidates = (List<Map>) responseMap.get("candidates");
+            if (candidates == null || candidates.isEmpty()) return null;
+            var parts = (List<Map>) ((Map) candidates.get(0).get("content")).get("parts");
+            // Thinking models may return several parts; the answer is the last text part
+            String text = null;
+            for (var part : parts) if (part.get("text") instanceof String t && !Boolean.TRUE.equals(part.get("thought"))) text = t;
+            return text;
+        } catch (Exception e) {
+            log.error("[gemini] JSON generation failed: {}", e.getMessage());
+            return null;
+        }
+    }
+
     public String chat(String message, List<Map<String, String>> history, String learnerContext) {
         return chat(message, history, learnerContext, 2048);
     }

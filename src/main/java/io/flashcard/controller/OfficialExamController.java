@@ -39,7 +39,8 @@ public class OfficialExamController {
                      "(SELECT MAX(a.total) FROM exam_attempts a WHERE a.exam_id = e.id AND a.chat_id = CAST(? AS BIGINT)) as best_total " +
                      "FROM official_exams e ";
         List<Object> params = new ArrayList<>(List.of(userId, userId, userId));
-        List<String> where = new ArrayList<>();
+        // Drafts (generated tests awaiting review) are never shown to learners
+        List<String> where = new ArrayList<>(List.of("e.status = 'published'"));
         if (level != null && !level.isEmpty()) {
             where.add("e.cefr_level = ?");
             params.add(level);
@@ -48,7 +49,7 @@ public class OfficialExamController {
             where.add("e.kind = ?");
             params.add(kind);
         }
-        if (!where.isEmpty()) sql += "WHERE " + String.join(" AND ", where) + " ";
+        sql += "WHERE " + String.join(" AND ", where) + " ";
         sql += "ORDER BY e.kind, e.sort_order NULLS LAST, e.cefr_level, e.id";
         List<Map<String, Object>> exams = jdbc.queryForList(sql, params.toArray());
         return Map.of("exams", exams);
@@ -61,7 +62,7 @@ public class OfficialExamController {
         List<Map<String, Object>> rows = jdbc.queryForList(
             "SELECT id, cefr_level, title, title_tr, title_en, source, kind, skill, variant, time_limit_minutes, " +
             "scoring::text as scoring, " +
-            "questions::text as questions FROM official_exams WHERE id = ?",
+            "questions::text as questions FROM official_exams WHERE id = ? AND status = 'published'",
             examId);
         if (rows.isEmpty()) return Map.of("error", "Exam not found");
         return rows.get(0);
@@ -76,6 +77,9 @@ public class OfficialExamController {
         List<?> answers = body.get("answers") instanceof List<?> l ? l : List.of();
         Integer duration = body.get("durationSeconds") instanceof Number n ? n.intValue() : null;
         long chatId = Long.parseLong(userId);
+        Integer published = jdbc.queryForObject(
+            "SELECT COUNT(*) FROM official_exams WHERE id = ? AND status = 'published'", Integer.class, examId);
+        if (published == null || published == 0) return ResponseEntity.status(404).body(Map.of("error", "Exam not found"));
         // The skill estimate before this attempt counts toward it, so take it before grading
         Double predicted = planService.predictedScore(chatId, examId);
         var result = learnerModel.gradeExam(chatId, examId, answers, duration, predicted);

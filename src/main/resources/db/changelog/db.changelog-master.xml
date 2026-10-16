@@ -38,5 +38,6 @@
     <include file="db/changelog/031-learning-settings.sql"/>
     <include file="db/changelog/032-exam-attempt-verdicts.sql"/>
     <include file="db/changelog/033-ranking-settings.sql"/>
+    <include file="db/changelog/034-test-generator.sql"/>
 
 </databaseChangeLog>

@@ -135,7 +135,8 @@ public class ExamBankService {
         var current = index;
         if (current == null) {
             current = jdbc.queryForList(
-                "SELECT id, cefr_level, source, skill, plan_role FROM official_exams WHERE plan_role IS NOT NULL " +
+                "SELECT id, cefr_level, source, skill, plan_role FROM official_exams " +
+                "WHERE plan_role IS NOT NULL AND status = 'published' " +
                 "ORDER BY cefr_level, sort_order NULLS LAST, id");
             index = current;
         }
