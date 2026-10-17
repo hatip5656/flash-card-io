@@ -198,4 +198,22 @@ class LearnerModelServiceTest {
         assertTrue(qs.get(0).isTextGap());
         assertEquals(List.of("kapsas", "kapsast"), qs.get(0).accepted());
     }
+
+    @Test
+    void matchingQuestionsGetTheirSectionAdsAsOptions() {
+        var bank = new ExamBankService(mock(JdbcTemplate.class), new ObjectMapper());
+        var qs = bank.parseQuestions("""
+            [{"type":"matching","prompt":"Tiit","section":"1","options":["A","B"],"correctIndex":0,
+              "context":"Reklaamid:\\nA – Rahvamuusika kool: kanneltunnid.\\nB – Muuseum: näitused."},
+             {"type":"matching","prompt":"Mihkel","section":"1","options":["A","B"],"correctIndex":1,"context":null},
+             {"prompt":"Other task","section":"2","options":["A","B"],"correctIndex":0}]
+            """);
+        assertEquals(List.of("Rahvamuusika kool: kanneltunnid.", "Muuseum: näitused."), qs.get(1).options());
+        assertEquals(1, qs.get(1).correctIndex());
+        assertNull(qs.get(1).context());
+        // A different section does not inherit the ads
+        assertEquals(List.of("A", "B"), qs.get(2).options());
+        // A letter without a line keeps the letters and shows the text instead
+        assertNull(ExamBankService.expandLetterOptions(List.of("A", "C"), "A – x\\nB – y"));
+    }
 }

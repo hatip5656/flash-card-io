@@ -255,6 +255,7 @@ public class ExamBankService {
             return List.of();
         }
         List<Question> questions = new ArrayList<>();
+        String sectionContext = null, contextSection = null;
         for (int i = 0; i < raw.size(); i++) {
             var q = raw.get(i);
             List<String> options = new ArrayList<>();
@@ -263,6 +264,17 @@ public class ExamBankService {
                     if (o instanceof Map<?, ?> m && m.get("text") != null) options.add(m.get("label") + ". " + m.get("text"));
                     else options.add(String.valueOf(o));
                 }
+            }
+            // A task's shared text (the ads of a matching task) is often stored on its first question
+            // only. The feed shows questions one at a time, so later questions of the section inherit it.
+            String section = firstNonBlank(q.get("section"));
+            String context = emptyToNull(firstNonBlank(q.get("context"), q.get("taskInstruction")));
+            if (context != null) { sectionContext = context; contextSection = section; }
+            else if (!section.isEmpty() && section.equals(contextSection)) context = sectionContext;
+            // Bare letters ("A".."F") point into that text; show what each letter stands for
+            if (context != null) {
+                var expanded = expandLetterOptions(options, context);
+                if (expanded != null) { options = expanded; context = null; }
             }
             String prompt = firstNonBlank(q.get("prompt"), q.get("question"), q.get("questionTr"));
             boolean textGap = TYPE_TEXT_GAP.equals(q.get("type"));
@@ -274,9 +286,7 @@ public class ExamBankService {
             // what the app sends answers by and what the tags are keyed on.
             if (prompt.isEmpty()) continue;
             if (textGap ? accepted.isEmpty() : options.size() < 2) continue;
-            questions.add(new Question(i,
-                firstNonBlank(q.get("section")),
-                emptyToNull(firstNonBlank(q.get("context"), q.get("taskInstruction"))),
+            questions.add(new Question(i, section, context,
                 prompt, options, textGap ? -1 : correctIndex(q, options),
                 firstNonBlank(q.get("explanation"), q.get("explanationTr")),
                 textGap ? TYPE_TEXT_GAP : TYPE_CHOICE, List.copyOf(accepted),
@@ -300,6 +310,29 @@ public class ExamBankService {
             ci = 0;
         }
         return ci < 0 || ci >= options.size() ? 0 : ci;
+    }
+
+    private static final java.util.regex.Pattern LETTER_LINE =
+        java.util.regex.Pattern.compile("^\\s*([A-Z])\\s*[–—:.)-]\\s*(.+?)\\s*$");
+
+    /**
+     * Options that are single letters, each defined by a "A – text" line of the context, become those
+     * texts. Returns null when any letter has no line, so the card keeps the letters and the text.
+     */
+    static List<String> expandLetterOptions(List<String> options, String context) {
+        if (options.isEmpty() || !options.stream().allMatch(o -> o.trim().matches("[A-Z]"))) return null;
+        Map<String, String> byLetter = new HashMap<>();
+        for (String line : context.split("\\R")) {
+            var m = LETTER_LINE.matcher(line);
+            if (m.matches()) byLetter.putIfAbsent(m.group(1), m.group(2));
+        }
+        List<String> out = new ArrayList<>();
+        for (String o : options) {
+            String text = byLetter.get(o.trim());
+            if (text == null) return null;
+            out.add(text);
+        }
+        return out;
     }
 
     private static String firstNonBlank(Object... values) {
