@@ -42,5 +42,6 @@
     <include file="db/changelog/035-dialogue-voices.sql"/>
     <include file="db/changelog/036-gemini-models.sql"/>
     <include file="db/changelog/037-gemini-fallback-chain.sql"/>
+    <include file="db/changelog/038-orphan-sent-words.sql"/>
 
 </databaseChangeLog>

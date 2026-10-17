@@ -112,6 +112,7 @@ public class SentWordRepository {
             WHERE chat_id = ? AND word_value IS NOT NULL AND mastered = FALSE
               AND next_review <= CURRENT_DATE
               AND (last_fed_at IS NULL OR last_fed_at < NOW() - make_interval(hours => ?))
+              AND EXISTS (SELECT 1 FROM words w WHERE w.id = sent_words.word_id)
             ORDER BY next_review ASC, ease_factor ASC
             LIMIT ?
             """,
@@ -123,6 +124,8 @@ public class SentWordRepository {
             """
             SELECT word_id, word_value, english FROM sent_words
             WHERE chat_id = ? AND word_value IS NOT NULL AND mastered = FALSE
+              -- Words no longer in the word bank cannot be shown; left in, they sort first and empty the page
+              AND EXISTS (SELECT 1 FROM words w WHERE w.id = sent_words.word_id)
             ORDER BY
                 CASE WHEN next_review <= CURRENT_DATE THEN 0 ELSE 1 END,
                 seen_count ASC,
