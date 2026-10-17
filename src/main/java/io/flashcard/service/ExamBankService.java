@@ -265,6 +265,7 @@ public class ExamBankService {
                     else options.add(String.valueOf(o));
                 }
             }
+            String prompt = firstNonBlank(q.get("prompt"), q.get("question"), q.get("questionTr"));
             // A task's shared text (the ads of a matching task) is often stored on its first question
             // only. The feed shows questions one at a time, so later questions of the section inherit it.
             String section = firstNonBlank(q.get("section"));
@@ -272,11 +273,16 @@ public class ExamBankService {
             if (context != null) { sectionContext = context; contextSection = section; }
             else if (!section.isEmpty() && section.equals(contextSection)) context = sectionContext;
             // Bare letters ("A".."F") point into that text; show what each letter stands for
-            if (context != null) {
-                var expanded = expandLetterOptions(options, context);
-                if (expanded != null) { options = expanded; context = null; }
+            List<String> shown = options;
+            // ...unless the letters label pictures, which the card shows
+            boolean lettersArePictures = q.get("images") instanceof List<?> imgs && imgs.stream()
+                .anyMatch(im -> im instanceof Map<?, ?> m && options.contains(String.valueOf(m.get("label"))));
+            if (context != null && !lettersArePictures) {
+                var gapMatch = GAP.matcher(prompt);
+                String gap = q.get("gap") != null ? String.valueOf(q.get("gap")) : gapMatch.find() ? gapMatch.group(1) : null;
+                var expanded = expandLetterOptions(options, context, gap);
+                if (expanded != null) shown = expanded;
             }
-            String prompt = firstNonBlank(q.get("prompt"), q.get("question"), q.get("questionTr"));
             boolean textGap = TYPE_TEXT_GAP.equals(q.get("type"));
             List<String> accepted = new ArrayList<>();
             if (textGap && q.get("accepted") instanceof List<?> acc) {
@@ -287,7 +293,8 @@ public class ExamBankService {
             if (prompt.isEmpty()) continue;
             if (textGap ? accepted.isEmpty() : options.size() < 2) continue;
             questions.add(new Question(i, section, context,
-                prompt, options, textGap ? -1 : correctIndex(q, options),
+                // The answer key refers to the stored letters, so grade against those
+                prompt, shown, textGap ? -1 : correctIndex(q, options),
                 firstNonBlank(q.get("explanation"), q.get("explanationTr")),
                 textGap ? TYPE_TEXT_GAP : TYPE_CHOICE, List.copyOf(accepted),
                 q.get("audio") instanceof List<?> au ? au.stream().filter(String.class::isInstance).map(String.class::cast).toList() : List.of(),
@@ -313,26 +320,78 @@ public class ExamBankService {
     }
 
     private static final java.util.regex.Pattern LETTER_LINE =
-        java.util.regex.Pattern.compile("^\\s*([A-Z])\\s*[–—:.)-]\\s*(.+?)\\s*$");
+        java.util.regex.Pattern.compile("^\\s*([A-Z])(?:\\s*[–—:.)-])?\\s+(\\S.*?)\\s*$");
+    /** Longer texts (a whole ad or article) make poor answer buttons; those keep their letters. */
+    private static final int MAX_OPTION_CHARS = 200;
+    private static final java.util.regex.Pattern GAP = java.util.regex.Pattern.compile("__\\((\\d+)\\)__");
 
     /**
-     * Options that are single letters, each defined by a "A – text" line of the context, become those
-     * texts. Returns null when any letter has no line, so the card keeps the letters and the text.
+     * Options that are single letters, each defined in the context, become those texts. Returns null,
+     * so the card keeps the letters and the text, whenever the definitions are not found or ambiguous.
+     * <ul>
+     *   <li>When the context holds this question's gap ("7. ... __(7)__") with its own options under
+     *       it, only that block is read: several questions often share one text, each with A/B/C.</li>
+     *   <li>Otherwise a letter is defined once in the whole text, on its own "A – text" line or inline
+     *       as "... A Text one. B Text two." (how the TESTEST scrape flattened its tables).</li>
+     * </ul>
      */
-    static List<String> expandLetterOptions(List<String> options, String context) {
+    static List<String> expandLetterOptions(List<String> options, String context, String gap) {
         if (options.isEmpty() || !options.stream().allMatch(o -> o.trim().matches("[A-Z]"))) return null;
-        Map<String, String> byLetter = new HashMap<>();
-        for (String line : context.split("\\R")) {
+        if (gap != null) {
+            String marker = "__(" + gap + ")__";
+            int at = context.indexOf(marker);
+            if (at >= 0) {
+                int from = at + marker.length();
+                var next = GAP.matcher(context);
+                int end = next.find(from) ? next.start() : context.length();
+                var own = fromLines(options, context.substring(from, end));
+                if (own != null) return own;
+            }
+        }
+        var lines = fromLines(options, context);
+        return lines != null ? lines : inlineLetterTexts(options, context);
+    }
+
+    private static List<String> fromLines(List<String> options, String text) {
+        Map<String, List<String>> byLetter = new HashMap<>();
+        for (String line : text.split("\\R")) {
             var m = LETTER_LINE.matcher(line);
-            if (m.matches()) byLetter.putIfAbsent(m.group(1), m.group(2));
+            if (m.matches()) byLetter.computeIfAbsent(m.group(1), k -> new ArrayList<>()).add(m.group(2));
         }
         List<String> out = new ArrayList<>();
         for (String o : options) {
-            String text = byLetter.get(o.trim());
-            if (text == null) return null;
-            out.add(text);
+            var texts = byLetter.get(o.trim());
+            if (texts == null || texts.size() != 1 || texts.get(0).length() > MAX_OPTION_CHARS) return null;
+            out.add(texts.get(0));
         }
         return out;
+    }
+
+    private static List<String> inlineLetterTexts(List<String> options, String context) {
+        List<String> found = null;
+        for (String paragraph : context.split("\\R\\s*\\R")) {
+            // Each letter in turn, standing alone and followed by a capitalised word
+            List<int[]> spans = new ArrayList<>();
+            int from = 0;
+            for (String o : options) {
+                var m = java.util.regex.Pattern.compile("(?:^|\\s)" + o.trim() + "\\s+(?=\\p{Lu})").matcher(paragraph);
+                if (!m.find(from)) { spans = null; break; }
+                spans.add(new int[]{m.start(), m.end()});
+                from = m.end();
+            }
+            if (spans == null) continue;
+            List<String> out = new ArrayList<>();
+            for (int i = 0; i < spans.size(); i++) {
+                int end = i + 1 < spans.size() ? spans.get(i + 1)[0] : paragraph.length();
+                String text = paragraph.substring(spans.get(i)[1], end).trim();
+                if (text.isEmpty() || text.length() > MAX_OPTION_CHARS) { out = null; break; }
+                out.add(text);
+            }
+            if (out == null) continue;
+            if (found != null) return null; // defined in two places: cannot tell which belongs here
+            found = out;
+        }
+        return found;
     }
 
     private static String firstNonBlank(Object... values) {

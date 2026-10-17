@@ -210,10 +210,27 @@ class LearnerModelServiceTest {
             """);
         assertEquals(List.of("Rahvamuusika kool: kanneltunnid.", "Muuseum: näitused."), qs.get(1).options());
         assertEquals(1, qs.get(1).correctIndex());
-        assertNull(qs.get(1).context());
+        assertNotNull(qs.get(1).context());
         // A different section does not inherit the ads
         assertEquals(List.of("A", "B"), qs.get(2).options());
         // A letter without a line keeps the letters and shows the text instead
-        assertNull(ExamBankService.expandLetterOptions(List.of("A", "C"), "A – x\\nB – y"));
+        assertNull(ExamBankService.expandLetterOptions(List.of("A", "C"), "A – x\nB – y", null));
+        // TESTEST tables were flattened into one line
+        assertEquals(List.of("Siia ei tohi astuda.", "Siin ei tohi loomi toita."), ExamBankService.expandLetterOptions(
+            List.of("A", "B"), "Leia igale märgile (1-5) sobiv teade (A−B). 1 2 A Siia ei tohi astuda. B Siin ei tohi loomi toita.\n\nMilline?", null));
+        // Several questions in one text: each reads the options under its own gap, not the example's
+        String shared = "**Näidis**\n0. Vastus: B\nA Näide üks.\nB Näide kaks.\n\n20. __(20)__\nA Laul üks.\nB Laul kaks.\n21. __(21)__\nA Pidu üks.\nB Pidu kaks.";
+        assertEquals(List.of("Pidu üks.", "Pidu kaks."), ExamBankService.expandLetterOptions(List.of("A", "B"), shared, "21"));
+        // Without its gap the letters are ambiguous, so they stay letters
+        assertNull(ExamBankService.expandLetterOptions(List.of("A", "B"), shared, null));
+        // Letters that label pictures stay letters, and the answer key still grades by letter
+        var pics = bank.parseQuestions("""
+            [{"prompt":"Tekst 1","section":"2","options":["A","B"],"answer":"B","context":"A Pilt üks. B Pilt kaks.",
+              "images":[{"src":"a.jpg","label":"A"},{"src":"b.jpg","label":"B"}]},
+             {"prompt":"Märk 1","section":"3","options":["A","B"],"answer":"B","context":"A Pilt üks. B Pilt kaks."}]
+            """);
+        assertEquals(List.of("A", "B"), pics.get(0).options());
+        assertEquals(List.of("Pilt üks.", "Pilt kaks."), pics.get(1).options());
+        assertEquals(1, pics.get(1).correctIndex());
     }
 }
