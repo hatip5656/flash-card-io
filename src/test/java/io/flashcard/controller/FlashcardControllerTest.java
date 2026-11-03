@@ -44,7 +44,7 @@ class FlashcardControllerTest {
         jdbc = mock(JdbcTemplate.class);
         mvc = MockMvcBuilders.standaloneSetup(
                 new FlashcardController(subscriberRepo, sentWordRepo, grammarRepo, grammarBankService, jdbc))
-            .addFilters(new AuthFilter())
+            .addFilters(new AuthFilter(org.mockito.Mockito.mock(io.flashcard.service.AuthService.class)))
             .build();
     }
 

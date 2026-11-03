@@ -1,5 +1,6 @@
 package io.flashcard.filter;
 
+import io.flashcard.service.AuthService;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -7,11 +8,21 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Set;
 
 @Component
 @Order(2)
 public class AuthFilter implements Filter {
+
+    /** Set when the request was authenticated with a session token rather than the learner id alone. */
+    public static final String SESSION_ATTRIBUTE = "viaSession";
+
+    private final AuthService auth;
+
+    public AuthFilter(AuthService auth) {
+        this.auth = auth;
+    }
 
     private static final Set<String> PUBLIC_PATHS = Set.of(
         "/api/levels", "/api/categories", "/api/idioms", "/api/schedules", "/api/users"
@@ -39,6 +50,24 @@ public class AuthFilter implements Filter {
             return;
         }
 
+        // Signed-in apps send a session token; it decides who the request is for
+        String authorization = req.getHeader("Authorization");
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            Optional<Long> chatId = auth.resolveSession(authorization.substring(7).trim());
+            if (chatId.isEmpty()) {
+                // The code tells the app to drop its token; other 401s must not cost it the session
+                res.setStatus(401);
+                res.setContentType("application/json");
+                res.getWriter().write("{\"error\":\"Session expired, sign in again\",\"code\":\"session_invalid\"}");
+                return;
+            }
+            req.setAttribute("userId", chatId.get());
+            req.setAttribute(SESSION_ATTRIBUTE, true);
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // Apps that have not signed in identify with the learner id alone (the widget too)
         String userIdStr = req.getHeader("X-User-Id");
         if (userIdStr == null) {
             userIdStr = req.getParameter("userId");
@@ -67,6 +96,7 @@ public class AuthFilter implements Filter {
         }
         if (path.equals("/api/users") && "POST".equals(method)) return true;
         if (path.equals("/api/users/auto") && "POST".equals(method)) return true;
+        if (path.equals("/api/auth/google") && "POST".equals(method)) return true;
         return false;
     }
 

@@ -19,6 +19,11 @@ public class AppProperties {
     private String cronTimezone = "Europe/Tallinn";
     private String cronSchedule = "0 9 * * *";
     private List<String> cefrLevels = List.of("A1", "A2");
+    /** OAuth client ids whose Google ID tokens are accepted (the web client id the app asks tokens for) */
+    private List<String> googleClientIds = List.of();
+
+    public List<String> getGoogleClientIds() { return googleClientIds; }
+    public void setGoogleClientIds(List<String> v) { this.googleClientIds = v; }
 
     public String getUnsplashAccessKey() { return unsplashAccessKey; }
     public void setUnsplashAccessKey(String v) { this.unsplashAccessKey = v; }

@@ -39,7 +39,7 @@ class UserControllerTest {
         wordBankService = mock(WordBankService.class);
         mvc = MockMvcBuilders.standaloneSetup(
                 new UserController(subscriberRepo, activityRepo, scheduleService, wordBankService, mock(io.flashcard.service.AccountLinkService.class)))
-            .addFilters(new AuthFilter())
+            .addFilters(new AuthFilter(org.mockito.Mockito.mock(io.flashcard.service.AuthService.class)))
             .build();
     }
 

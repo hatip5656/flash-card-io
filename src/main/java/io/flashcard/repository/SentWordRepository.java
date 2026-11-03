@@ -141,8 +141,14 @@ public class SentWordRepository {
     public List<Map<String, Object>> getLearnedWordsForQuiz(long chatId) {
         return jdbc.queryForList(
             """
-            SELECT word_value, english, quiz_count, seen_count, ease_factor FROM sent_words
-            WHERE chat_id = ? AND word_value IS NOT NULL AND english IS NOT NULL AND mastered = FALSE
+            SELECT word_value, english, quiz_count, seen_count, ease_factor FROM (
+                -- A word sent at two levels (a1-huvitav, a2-huvitav) has two rows; quiz it once,
+                -- using the row the learner has actually worked with
+                SELECT DISTINCT ON (word_value) word_value, english, quiz_count, seen_count, ease_factor, last_quizzed_at
+                FROM sent_words
+                WHERE chat_id = ? AND word_value IS NOT NULL AND english IS NOT NULL AND mastered = FALSE
+                ORDER BY word_value, seen_count DESC, quiz_count DESC
+            ) w
             ORDER BY
                 CASE WHEN quiz_count = 0 AND seen_count > 0 THEN 0 ELSE 1 END,
                 quiz_count ASC,

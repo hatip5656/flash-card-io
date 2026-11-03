@@ -111,9 +111,8 @@ public class SubscriberRepository {
     }
 
     public long getNextMobileUserId() {
-        Long nextId = jdbc.queryForObject(
-            "SELECT COALESCE(MAX(chat_id), ? - 1) + 1 FROM subscribers WHERE chat_id >= ?",
-            Long.class, MOBILE_ID_BASE, MOBILE_ID_BASE);
+        // A sequence never hands out the same id twice, even to concurrent sign-ups or after a delete
+        Long nextId = jdbc.queryForObject("SELECT nextval('mobile_user_id_seq')", Long.class);
         return nextId != null ? nextId : MOBILE_ID_BASE;
     }
 

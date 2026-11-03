@@ -23,10 +23,13 @@ public class AdminUserController {
     private final ActivityRepository activityRepo;
     private final WordBankService wordBankService;
     private final JdbcTemplate jdbc;
+    private final io.flashcard.service.AuthService authService;
 
     public AdminUserController(SubscriberRepository subscriberRepo, SentWordRepository sentWordRepo,
                                QuizRepository quizRepo, ActivityRepository activityRepo,
-                               WordBankService wordBankService, JdbcTemplate jdbc) {
+                               WordBankService wordBankService, JdbcTemplate jdbc,
+                               io.flashcard.service.AuthService authService) {
+        this.authService = authService;
         this.subscriberRepo = subscriberRepo;
         this.sentWordRepo = sentWordRepo;
         this.quizRepo = quizRepo;
@@ -221,6 +224,8 @@ public class AdminUserController {
         jdbc.update("DELETE FROM activity_log WHERE chat_id = ?", chatId);
         jdbc.update("DELETE FROM podcasts WHERE chat_id = ?", chatId);
         jdbc.update("DELETE FROM word_comments WHERE chat_id = ?", chatId);
+        // Sign-in accounts and sessions too, or they would keep pointing at this id
+        authService.forgetLearner(chatId);
         jdbc.update("DELETE FROM subscribers WHERE chat_id = ?", chatId);
 
         return ResponseEntity.ok(Map.of("deleted", chatId));
