@@ -4,8 +4,11 @@ import io.flashcard.repository.DailyGoalRepository;
 import io.flashcard.repository.SubscriberRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Sends daily goal messages to every device of a learner, forgetting devices FCM no longer knows. */
@@ -18,11 +21,19 @@ public class FcmGoalNotifier implements GoalNotifier {
     private final DailyGoalRepository repo;
     private final SubscriberRepository subscribers;
     private final AtomicBoolean loggedOff = new AtomicBoolean();
+    // "done" is sent from the request that finished the goal; the FCM calls must not hold it up
+    private final Executor background;
 
+    @Autowired
     public FcmGoalNotifier(FcmClient fcm, DailyGoalRepository repo, SubscriberRepository subscribers) {
+        this(fcm, repo, subscribers, Executors.newVirtualThreadPerTaskExecutor());
+    }
+
+    FcmGoalNotifier(FcmClient fcm, DailyGoalRepository repo, SubscriberRepository subscribers, Executor background) {
         this.fcm = fcm;
         this.repo = repo;
         this.subscribers = subscribers;
+        this.background = background;
     }
 
     @Override
@@ -37,7 +48,13 @@ public class FcmGoalNotifier implements GoalNotifier {
 
     @Override
     public void sendDone(long chatId, int streak) {
-        send(chatId, GoalMessages.done(streak, lang(chatId)));
+        background.execute(() -> {
+            try {
+                send(chatId, GoalMessages.done(streak, lang(chatId)));
+            } catch (RuntimeException e) {
+                log.warn("Daily goal done message for {} failed: {}", chatId, e.getMessage());
+            }
+        });
     }
 
     private void send(long chatId, String body) {

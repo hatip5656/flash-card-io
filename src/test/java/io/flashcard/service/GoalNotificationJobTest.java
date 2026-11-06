@@ -44,7 +44,7 @@ class GoalNotificationJobTest {
     @Test
     void sendsMorningOnceClaimed() {
         when(repo.learnersDueFor("morning_sent_at", "morning_time", DAY, NOW)).thenReturn(List.of(1L));
-        when(goals.today(1L)).thenReturn(open);
+        when(goals.refresh(1L)).thenReturn(open);
         when(repo.claim(1L, DAY, "morning_sent_at")).thenReturn(true);
 
         job.run();
@@ -55,7 +55,7 @@ class GoalNotificationJobTest {
     @Test
     void claimFailsSecondTime_noSecondSend() {
         when(repo.learnersDueFor("morning_sent_at", "morning_time", DAY, NOW)).thenReturn(List.of(1L));
-        when(goals.today(1L)).thenReturn(open);
+        when(goals.refresh(1L)).thenReturn(open);
         when(repo.claim(1L, DAY, "morning_sent_at")).thenReturn(true, false);
 
         job.run();
@@ -67,7 +67,7 @@ class GoalNotificationJobTest {
     @Test
     void eveningSkippedWhenComplete() {
         when(repo.learnersDueFor("evening_sent_at", "evening_time", DAY, NOW)).thenReturn(List.of(2L));
-        when(goals.today(2L)).thenReturn(done);
+        when(goals.refresh(2L)).thenReturn(done);
 
         job.run();
 
@@ -78,7 +78,7 @@ class GoalNotificationJobTest {
     @Test
     void eveningSentWhenOpen() {
         when(repo.learnersDueFor("evening_sent_at", "evening_time", DAY, NOW)).thenReturn(List.of(2L));
-        when(goals.today(2L)).thenReturn(open);
+        when(goals.refresh(2L)).thenReturn(open);
         when(repo.claim(2L, DAY, "evening_sent_at")).thenReturn(true);
 
         job.run();
@@ -98,10 +98,40 @@ class GoalNotificationJobTest {
     }
 
     @Test
+    void emptyGoalGetsNoMessages() {
+        var empty = new Today(DAY, List.of(), null, null, false, 0);
+        when(repo.learnersDueFor("morning_sent_at", "morning_time", DAY, NOW)).thenReturn(List.of(4L));
+        when(repo.learnersDueFor("evening_sent_at", "evening_time", DAY, NOW)).thenReturn(List.of(4L));
+        when(goals.refresh(4L)).thenReturn(empty);
+
+        job.run();
+
+        verify(repo, never()).claim(eq(4L), any(), anyString());
+        verify(notifier, never()).sendMorning(anyLong(), any());
+        verify(notifier, never()).sendEvening(anyLong(), any());
+    }
+
+    @Test
+    void doneMessageLeavesTheCallingThread() {
+        FcmClient fcm = mock(FcmClient.class);
+        SubscriberRepository subscribers = mock(SubscriberRepository.class);
+        when(fcm.isConfigured()).thenReturn(true);
+        when(subscribers.getPreferences(7L)).thenReturn(new UserPreferences());
+        when(repo.deviceTokens(7L)).thenReturn(List.of("alive"));
+        List<Runnable> queued = new java.util.ArrayList<>();
+
+        new FcmGoalNotifier(fcm, repo, subscribers, queued::add).sendDone(7L, 3);
+
+        verify(fcm, never()).send(anyString(), anyString(), anyString());
+        queued.forEach(Runnable::run);
+        verify(fcm).send(eq("alive"), anyString(), anyString());
+    }
+
+    @Test
     void oneLearnerFailureDoesNotStopOthers() {
         when(repo.learnersDueFor("morning_sent_at", "morning_time", DAY, NOW)).thenReturn(List.of(1L, 2L));
-        when(goals.today(1L)).thenThrow(new RuntimeException("boom"));
-        when(goals.today(2L)).thenReturn(open);
+        when(goals.refresh(1L)).thenThrow(new RuntimeException("boom"));
+        when(goals.refresh(2L)).thenReturn(open);
         when(repo.claim(2L, DAY, "morning_sent_at")).thenReturn(true);
 
         job.run();
@@ -119,7 +149,7 @@ class GoalNotificationJobTest {
         when(fcm.send(eq("dead"), anyString(), anyString())).thenReturn(FcmClient.SendResult.DEAD_TOKEN);
         when(fcm.send(eq("alive"), anyString(), anyString())).thenReturn(FcmClient.SendResult.SENT);
 
-        new FcmGoalNotifier(fcm, repo, subscribers).sendDone(7L, 3);
+        new FcmGoalNotifier(fcm, repo, subscribers, Runnable::run).sendDone(7L, 3);
 
         verify(repo).deleteDevice("dead");
         verify(fcm).send("alive", "Wordagram", "Günlük hedef tamam 🔥 3 günlük seri");

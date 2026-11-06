@@ -224,6 +224,42 @@ class DailyGoalServiceTest {
         verify(repo, never()).claim(anyLong(), any(), anyString());
     }
 
+    @Test
+    void refreshRecordsCompletionFoundOnRead() {
+        givenSettings(new DailyGoalSettings(true, 10, false, 20, false, false, true, LocalTime.of(9, 0), LocalTime.of(20, 0)));
+        givenRow(DailyGoalRow.create(USER, TODAY, 10, 20, 0, null));
+        when(repo.wordsSeenSince(USER, DAY_START)).thenReturn(10);
+        when(repo.claim(eq(USER), eq(TODAY), anyString())).thenReturn(true);
+        when(repo.completedStreak(USER, TODAY)).thenReturn(1);
+
+        var today = service.refresh(USER);
+
+        assertTrue(today.complete());
+        verify(repo).claim(USER, TODAY, "completed_at");
+        verify(notifier).sendDone(USER, 1);
+    }
+
+    @Test
+    void progressCheckSkippedOnceRecordedAndSent() {
+        givenRow(new DailyGoalRow(USER, TODAY, 10, 20, 0, null, 0, 0,
+            Instant.parse("2026-11-06T07:00:00Z"), null, null, Instant.parse("2026-11-06T07:00:00Z")));
+
+        service.onProgress(USER);
+        service.recordQuizAnswers(USER, List.of("maja"));
+
+        verify(repo, never()).wordsSeenSince(anyLong(), any());
+        verify(repo, never()).claim(anyLong(), any(), anyString());
+        verify(repo).addQuiz(USER, TODAY, 1, 0);
+    }
+
+    @Test
+    void goalFailuresNeverReachTheCaller() {
+        when(repo.find(USER, TODAY)).thenThrow(new RuntimeException("db down"));
+
+        assertDoesNotThrow(() -> service.recordQuizAnswers(USER, List.of("maja")));
+        assertDoesNotThrow(() -> service.onProgress(USER));
+    }
+
     // ── Streak and settings ──
 
     @Test

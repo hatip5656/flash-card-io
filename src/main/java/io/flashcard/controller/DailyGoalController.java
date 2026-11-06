@@ -31,7 +31,7 @@ public class DailyGoalController {
     // GET /api/users/me/daily-goal
     @GetMapping("/daily-goal")
     public Map<String, Object> today(HttpServletRequest request) {
-        var t = goals.today(UserController.getUserId(request));
+        var t = goals.refresh(UserController.getUserId(request));
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("date", t.date().toString());
         out.put("tasks", t.tasks().stream().map(task -> Map.of(

@@ -115,6 +115,18 @@ class LearnerModelServiceTest {
     }
 
     @Test
+    void gradedExamCountsTowardGoal() {
+        service.gradeExam(USER, "a2-x", Arrays.asList(1, 1), 600);
+        verify(goals).onProgress(USER);
+    }
+
+    @Test
+    void examQuestionInFeedCountsTowardGoal() {
+        service.recordEvents(USER, List.of(Map.of("itemType", "exam_question", "itemId", "a2-x#1", "userAnswer", "0")));
+        verify(goals).onProgress(USER);
+    }
+
+    @Test
     void eventsWithoutGrammarPracticeLeaveGoalAlone() {
         service.recordEvents(USER, List.of(Map.of("itemType", "not_a_type")));
         verify(goals, never()).onProgress(anyLong());

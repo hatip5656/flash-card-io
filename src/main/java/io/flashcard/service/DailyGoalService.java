@@ -29,6 +29,8 @@ import java.util.Set;
 @Service
 public class DailyGoalService {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DailyGoalService.class);
+
     public static final Set<Integer> WORD_TARGETS = Set.of(5, 10, 20);
     public static final Set<Integer> QUIZ_TARGETS = Set.of(10, 20, 40);
     static final int MAX_REVIEWS = 20;
@@ -101,19 +103,37 @@ public class DailyGoalService {
         return new Today(date, tasks, lessonId, topic, complete, streak(chatId, s, date));
     }
 
-    /** Count quiz answers (and the due reviews among them). Call before the answers update review dates. */
-    public void recordQuizAnswers(long chatId, List<String> estonian) {
-        if (estonian == null || estonian.isEmpty()) return;
-        LocalDate date = localDate();
-        ensureRow(chatId, date, settings(chatId));
-        int due = repo.countDue(chatId, date, estonian);
-        repo.addQuiz(chatId, date, estonian.size(), due);
-        checkCompletion(chatId);
+    /** Today's goal, recording it as completed (and sending "done") if it is. */
+    public Today refresh(long chatId) {
+        Today t = today(chatId);
+        recordIfComplete(chatId, t);
+        return t;
     }
 
-    /** Words seen or grammar practised: see whether that finished the goal. */
+    /**
+     * Count quiz answers (and the due reviews among them). Call before the answers update review dates.
+     * Never throws: the goal must not break the answer it is counting.
+     */
+    public void recordQuizAnswers(long chatId, List<String> estonian) {
+        if (estonian == null || estonian.isEmpty()) return;
+        try {
+            LocalDate date = localDate();
+            ensureRow(chatId, date, settings(chatId));
+            int due = repo.countDue(chatId, date, estonian);
+            repo.addQuiz(chatId, date, estonian.size(), due);
+            checkCompletion(chatId);
+        } catch (RuntimeException e) {
+            log.warn("Daily goal quiz progress for {} failed: {}", chatId, e.getMessage());
+        }
+    }
+
+    /** Words seen, grammar practised or exam answered: see whether that finished the goal. Never throws. */
     public void onProgress(long chatId) {
-        checkCompletion(chatId);
+        try {
+            checkCompletion(chatId);
+        } catch (RuntimeException e) {
+            log.warn("Daily goal check for {} failed: {}", chatId, e.getMessage());
+        }
     }
 
     public int streak(long chatId) {
@@ -138,7 +158,16 @@ public class DailyGoalService {
     // ── Internals ─────────────────────────────────
 
     private void checkCompletion(long chatId) {
-        Today t = today(chatId);
+        // Already recorded (and announced, or nothing to announce): skip the progress queries
+        var row = repo.find(chatId, localDate());
+        if (row.isPresent() && row.get().completedAt() != null
+            && (row.get().doneSentAt() != null || !settings(chatId).notifyEnabled())) {
+            return;
+        }
+        recordIfComplete(chatId, today(chatId));
+    }
+
+    private void recordIfComplete(long chatId, Today t) {
         if (!t.complete()) return;
         repo.claim(chatId, t.date(), "completed_at");
         if (settings(chatId).notifyEnabled() && repo.claim(chatId, t.date(), "done_sent_at")) {

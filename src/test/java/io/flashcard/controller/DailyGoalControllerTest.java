@@ -40,7 +40,7 @@ class DailyGoalControllerTest {
 
     @Test
     void getTodayReturnsTasks() throws Exception {
-        when(goals.today(USER)).thenReturn(new Today(LocalDate.of(2026, 11, 6),
+        when(goals.refresh(USER)).thenReturn(new Today(LocalDate.of(2026, 11, 6),
             List.of(new Task("words", 10, 4, true), new Task("grammar", 1, 0, true)),
             "a2-pron", "Kişi Zamirleri", false, 3));
 

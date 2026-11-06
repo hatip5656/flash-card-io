@@ -35,14 +35,17 @@ public class GoalNotificationJob {
         LocalTime now = goals.localTime();
         for (long chatId : repo.learnersDueFor("morning_sent_at", "morning_time", date, now)) {
             each(chatId, () -> {
-                var today = goals.today(chatId);
+                var today = goals.refresh(chatId);
+                // Nothing counts today (e.g. only reviews on, none due): no empty message
+                if (today.tasks().isEmpty()) return;
                 if (repo.claim(chatId, date, "morning_sent_at")) notifier.sendMorning(chatId, today);
             });
         }
         for (long chatId : repo.learnersDueFor("evening_sent_at", "evening_time", date, now)) {
             each(chatId, () -> {
-                var today = goals.today(chatId);
-                if (!today.complete() && repo.claim(chatId, date, "evening_sent_at")) notifier.sendEvening(chatId, today);
+                var today = goals.refresh(chatId);
+                if (today.tasks().isEmpty() || today.complete()) return;
+                if (repo.claim(chatId, date, "evening_sent_at")) notifier.sendEvening(chatId, today);
             });
         }
     }

@@ -73,6 +73,7 @@ public class LearnerModelService {
             if ("exam_question".equals(itemType)) {
                 var graded = gradeExamItem(chatId, itemId, str(e.get("userAnswer")), source != null ? source : "feed", latency, meta);
                 if (graded == null) continue;
+                practisedGrammar = true; // an exam answer can move grammar mastery and add key words
                 events.add(graded.event());
                 Map<String, Object> r = new LinkedHashMap<>();
                 r.put("index", i);
@@ -294,6 +295,8 @@ public class LearnerModelService {
                 learningRepo.saveGoal(chatId, lvl, "placement");
             }
         }
+        // Graded answers moved grammar mastery and may have added key words
+        dailyGoals.onProgress(chatId);
         return result;
     }
 
