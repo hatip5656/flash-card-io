@@ -69,6 +69,9 @@ spec:
               value: "0 9 * * *"
             - name: APP_CEFR_LEVELS
               value: "A1,A2,B1,B2"
+            # Google sign-in: ID tokens must be issued to one of these OAuth client ids (Web client; not a secret)
+            - name: GOOGLE_CLIENT_IDS
+              value: "779329801698-ltnrqfbr26tpkto7v5guirufpuvd51d0.apps.googleusercontent.com"
             - name: APP_GEMINI_API_KEY
               valueFrom:
                 secretKeyRef:
