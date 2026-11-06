@@ -21,9 +21,13 @@ public class AppProperties {
     private List<String> cefrLevels = List.of("A1", "A2");
     /** OAuth client ids whose Google ID tokens are accepted (the web client id the app asks tokens for) */
     private List<String> googleClientIds = List.of();
+    // Service-account JSON for sending push notifications (FCM); blank = notifications off
+    private String firebaseServiceAccount = "";
 
     public List<String> getGoogleClientIds() { return googleClientIds; }
     public void setGoogleClientIds(List<String> v) { this.googleClientIds = v; }
+    public String getFirebaseServiceAccount() { return firebaseServiceAccount; }
+    public void setFirebaseServiceAccount(String v) { this.firebaseServiceAccount = v; }
 
     public String getUnsplashAccessKey() { return unsplashAccessKey; }
     public void setUnsplashAccessKey(String v) { this.unsplashAccessKey = v; }

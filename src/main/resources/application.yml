@@ -52,6 +52,7 @@ app:
   cefr-levels: ${CEFR_LEVELS:A1,A2}
   # Comma-separated OAuth client ids; Google sign-in is off while empty
   google-client-ids: ${GOOGLE_CLIENT_IDS:}
+  firebase-service-account: ${FIREBASE_SERVICE_ACCOUNT:}
 
 admin:
   username: ${ADMIN_USERNAME:admin}
