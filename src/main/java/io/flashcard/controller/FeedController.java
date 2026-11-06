@@ -1,5 +1,6 @@
 package io.flashcard.controller;
 
+import io.flashcard.service.DailyGoalService;
 import io.flashcard.model.Word;
 import io.flashcard.repository.ActivityRepository;
 import io.flashcard.repository.SavedWordRepository;
@@ -33,11 +34,14 @@ public class FeedController {
     private final LearnerModelService learnerModel;
     private final LearningSettings settings;
 
+    private final DailyGoalService dailyGoals;
+
     public FeedController(SubscriberRepository subscriberRepo, SentWordRepository sentWordRepo,
                           SavedWordRepository savedWordRepo, ActivityRepository activityRepo,
                           WordBankService wordBankService, WordDbRepository wordDbRepo,
                           ImageService imageService, LearnerModelService learnerModel,
-                          LearningSettings settings) {
+                          LearningSettings settings, DailyGoalService dailyGoals) {
+        this.dailyGoals = dailyGoals;
         this.settings = settings;
         this.subscriberRepo = subscriberRepo;
         this.sentWordRepo = sentWordRepo;
@@ -185,6 +189,7 @@ public class FeedController {
         sentWordRepo.trackSeenCount(chatId, List.of(wordId));
         if (isNew) {
             activityRepo.logWordActivity(chatId);
+            dailyGoals.onProgress(chatId);
         }
         return Map.of("seen", true, "wordId", wordId);
     }
@@ -270,6 +275,7 @@ public class FeedController {
             if (!events.isEmpty()) learnerModel.recordEvents(chatId, events);
         }
         activityRepo.logGameActivity(chatId);
+        if (tracked > 0) dailyGoals.onProgress(chatId);
         return Map.of("ok", true, "tracked", tracked);
     }
 

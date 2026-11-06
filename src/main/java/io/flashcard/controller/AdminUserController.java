@@ -226,6 +226,9 @@ public class AdminUserController {
         jdbc.update("DELETE FROM word_comments WHERE chat_id = ?", chatId);
         // Sign-in accounts and sessions too, or they would keep pointing at this id
         authService.forgetLearner(chatId);
+        jdbc.update("DELETE FROM daily_goals WHERE chat_id = ?", chatId);
+        jdbc.update("DELETE FROM daily_goal_settings WHERE chat_id = ?", chatId);
+        jdbc.update("DELETE FROM push_devices WHERE chat_id = ?", chatId);
         jdbc.update("DELETE FROM subscribers WHERE chat_id = ?", chatId);
 
         return ResponseEntity.ok(Map.of("deleted", chatId));
@@ -242,6 +245,8 @@ public class AdminUserController {
         jdbc.update("DELETE FROM sent_grammar WHERE chat_id = ?", chatId);
         jdbc.update("DELETE FROM activity_log WHERE chat_id = ?", chatId);
         jdbc.update("DELETE FROM podcasts WHERE chat_id = ?", chatId);
+        // Progress only: goal settings and devices stay
+        jdbc.update("DELETE FROM daily_goals WHERE chat_id = ?", chatId);
 
         return ResponseEntity.ok(Map.of("reset", chatId));
     }

@@ -32,9 +32,13 @@ public class FlashcardController {
     private final GrammarBankService grammarBankService;
     private final org.springframework.jdbc.core.JdbcTemplate jdbc;
 
+    private final io.flashcard.service.DailyGoalService dailyGoals;
+
     public FlashcardController(SubscriberRepository subscriberRepo, SentWordRepository sentWordRepo,
                                GrammarRepository grammarRepo, GrammarBankService grammarBankService,
-                               org.springframework.jdbc.core.JdbcTemplate jdbc) {
+                               org.springframework.jdbc.core.JdbcTemplate jdbc,
+                               io.flashcard.service.DailyGoalService dailyGoals) {
+        this.dailyGoals = dailyGoals;
         this.subscriberRepo = subscriberRepo;
         this.sentWordRepo = sentWordRepo;
         this.grammarRepo = grammarRepo;
@@ -112,6 +116,7 @@ public class FlashcardController {
     public Map<String, Object> markGrammarLessonRead(HttpServletRequest request, @PathVariable String lessonId) {
         long chatId = getUserId(request);
         grammarRepo.markGrammarSent(chatId, lessonId);
+        dailyGoals.onProgress(chatId);
         return Map.of("ok", true, "lessonId", lessonId);
     }
 

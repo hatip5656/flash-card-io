@@ -7,6 +7,7 @@ import io.flashcard.repository.QuizRepository;
 import io.flashcard.repository.SentWordRepository;
 import io.flashcard.repository.SubscriberRepository;
 import io.flashcard.repository.ActivityRepository;
+import io.flashcard.service.DailyGoalService;
 import io.flashcard.service.WordBankService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +28,12 @@ public class MobileQuizController {
     private final ActivityRepository activityRepo;
     private final WordBankService wordBankService;
 
+    private final DailyGoalService dailyGoals;
+
     public MobileQuizController(QuizRepository quizRepo, SentWordRepository sentWordRepo,
                                 SubscriberRepository subscriberRepo, ActivityRepository activityRepo,
-                                WordBankService wordBankService) {
+                                WordBankService wordBankService, DailyGoalService dailyGoals) {
+        this.dailyGoals = dailyGoals;
         this.quizRepo = quizRepo;
         this.sentWordRepo = sentWordRepo;
         this.subscriberRepo = subscriberRepo;
@@ -153,6 +157,8 @@ public class MobileQuizController {
         int score = (int) answers.stream().filter(QuizAnswer::isCorrect).count();
         int total = answers.size();
 
+        // Before the reviews below move the words' due dates: the goal counts answers to words that were due
+        dailyGoals.recordQuizAnswers(chatId, answers.stream().map(QuizAnswer::estonian).filter(java.util.Objects::nonNull).toList());
         quizRepo.saveQuizResult(chatId, score, total, answers);
         activityRepo.logQuizActivity(chatId);
         sentWordRepo.incrementQuizCount(chatId, answers.stream().map(QuizAnswer::estonian).toList());
@@ -206,7 +212,8 @@ public class MobileQuizController {
 
         if (estonian == null) return Map.of("error", "estonian required");
 
-        // Track the answer
+        // Track the answer; the goal first, while the word's due date is unchanged
+        dailyGoals.recordQuizAnswers(chatId, java.util.List.of(estonian));
         sentWordRepo.incrementQuizCount(chatId, java.util.List.of(estonian));
         int quality = isCorrect ? 4 : 1;
         sentWordRepo.updateSm2(chatId, estonian, quality);

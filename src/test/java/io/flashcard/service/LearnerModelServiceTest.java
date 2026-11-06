@@ -17,6 +17,8 @@ import static org.mockito.Mockito.*;
 
 class LearnerModelServiceTest {
 
+    private DailyGoalService goals;
+
     private LearningRepository learningRepo;
     private SentWordRepository sentWordRepo;
     private ExamBankService examBank;
@@ -45,8 +47,9 @@ class LearnerModelServiceTest {
         apteek.setEstonian("apteek");
         apteek.setEnglish("pharmacy");
         when(wordBank.getAllWords()).thenReturn(List.of(apteek));
+        goals = mock(DailyGoalService.class);
         service = new LearnerModelService(learningRepo, sentWordRepo, examBank, grammarBank, wordBank, new ObjectMapper(),
-            SETTINGS);
+            SETTINGS, goals);
 
         var q0 = new ExamBankService.Question(0, "Esimene ülesanne – Kuulutused", null, "Kus on apteek?",
             List.of("A", "B", "C"), 1, "");
@@ -102,6 +105,19 @@ class LearnerModelServiceTest {
         verify(learningRepo, times(1)).saveMastery(eq(USER), eq("a1-partitive-case"), eq(1), eq(0), eq(0), eq(0),
             eq(0.25), eq(1));
         verify(learningRepo).insertEvents(eq(USER), argThat(events -> events.size() == 2));
+    }
+
+    @Test
+    void practiceAnswerCountsTowardGoal() {
+        service.recordEvents(USER, List.of(
+            Map.of("itemType", "practice_question", "grammarLessonId", "a1-partitive-case", "isCorrect", true)));
+        verify(goals).onProgress(USER);
+    }
+
+    @Test
+    void eventsWithoutGrammarPracticeLeaveGoalAlone() {
+        service.recordEvents(USER, List.of(Map.of("itemType", "not_a_type")));
+        verify(goals, never()).onProgress(anyLong());
     }
 
     @Test

@@ -28,7 +28,8 @@ public class GrammarRepository {
     @CacheEvict(value = "grammar_sent_ids", key = "#chatId")
     public void markGrammarSent(long chatId, String lessonId) {
         jdbc.update(
-            "INSERT INTO sent_grammar (chat_id, lesson_id) VALUES (?, ?) ON CONFLICT DO NOTHING",
+            // sent_at is the last read, so re-reading a lesson counts toward today's goal
+            "INSERT INTO sent_grammar (chat_id, lesson_id) VALUES (?, ?) ON CONFLICT (chat_id, lesson_id) DO UPDATE SET sent_at = NOW()",
             chatId, lessonId);
     }
 }

@@ -26,9 +26,12 @@ public class StatsController {
     private final SavedWordRepository savedWordRepo;
     private final WordBankService wordBankService;
 
+    private final io.flashcard.service.DailyGoalService dailyGoals;
+
     public StatsController(ActivityRepository activityRepo, QuizRepository quizRepo,
                            SentWordRepository sentWordRepo, SavedWordRepository savedWordRepo,
-                           WordBankService wordBankService) {
+                           WordBankService wordBankService, io.flashcard.service.DailyGoalService dailyGoals) {
+        this.dailyGoals = dailyGoals;
         this.activityRepo = activityRepo;
         this.quizRepo = quizRepo;
         this.sentWordRepo = sentWordRepo;
@@ -41,7 +44,8 @@ public class StatsController {
         long chatId = getUserId(request);
         Map<String, Object> stats = activityRepo.getStats(chatId);
         Map<String, Object> quizStats = quizRepo.getQuizStats(chatId);
-        int streak = activityRepo.getStreak(chatId);
+        // Days the daily goal was completed (any activity, for learners with the goal off)
+        int streak = dailyGoals.streak(chatId);
         Map<String, Object> today = activityRepo.getTodayActivity(chatId);
         Map<String, Object> wordCounts = sentWordRepo.getWordCounts(chatId);
         int savedCount = savedWordRepo.countSavedWords(chatId);

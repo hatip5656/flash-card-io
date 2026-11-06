@@ -33,9 +33,13 @@ public class LearnerModelService {
     private final ObjectMapper objectMapper;
     private final LearningSettings settings;
 
+    private final DailyGoalService dailyGoals;
+
     public LearnerModelService(LearningRepository learningRepo, SentWordRepository sentWordRepo,
                                ExamBankService examBank, GrammarBankService grammarBank,
-                               WordBankService wordBank, ObjectMapper objectMapper, LearningSettings settings) {
+                               WordBankService wordBank, ObjectMapper objectMapper, LearningSettings settings,
+                               DailyGoalService dailyGoals) {
+        this.dailyGoals = dailyGoals;
         this.settings = settings;
         this.learningRepo = learningRepo;
         this.sentWordRepo = sentWordRepo;
@@ -56,6 +60,7 @@ public class LearnerModelService {
         List<Event> events = new ArrayList<>();
         List<Map<String, Object>> results = new ArrayList<>();
 
+        boolean practisedGrammar = false;
         for (int i = 0; i < raw.size(); i++) {
             Map<String, Object> e = raw.get(i);
             String itemType = str(e.get("itemType"));
@@ -88,9 +93,11 @@ public class LearnerModelService {
 
             if ("practice_question".equals(itemType) && lessonId != null && isCorrect != null) {
                 updateMastery(chatId, lessonId, isCorrect, false);
+                practisedGrammar = true;
             }
         }
         learningRepo.insertEvents(chatId, events);
+        if (practisedGrammar) dailyGoals.onProgress(chatId);
         return results;
     }
 

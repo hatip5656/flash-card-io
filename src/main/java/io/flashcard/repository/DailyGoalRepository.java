@@ -120,10 +120,13 @@ public class DailyGoalRepository {
     }
 
     public boolean grammarPracticedSince(long chatId, Instant dayStart, String level) {
+        // Practising a lesson's questions or reading a lesson both count
         Boolean any = jdbc.queryForObject("""
             SELECT EXISTS (SELECT 1 FROM grammar_mastery m JOIN grammar_lessons l ON l.id = m.grammar_lesson_id
                            WHERE m.chat_id = ? AND m.last_practiced_at >= ? AND l.cefr_level = ?)
-            """, Boolean.class, chatId, Timestamp.from(dayStart), level);
+                OR EXISTS (SELECT 1 FROM sent_grammar g JOIN grammar_lessons l ON l.id = g.lesson_id
+                           WHERE g.chat_id = ? AND g.sent_at >= ? AND l.cefr_level = ?)
+            """, Boolean.class, chatId, Timestamp.from(dayStart), level, chatId, Timestamp.from(dayStart), level);
         return Boolean.TRUE.equals(any);
     }
 
@@ -177,6 +180,11 @@ public class DailyGoalRepository {
 
     public void deleteDevice(String token) {
         jdbc.update("DELETE FROM push_devices WHERE token = ?", token);
+    }
+
+    /** A learner removing one of their own devices (sign-out); other learners' tokens are untouched. */
+    public void deleteDevice(long chatId, String token) {
+        jdbc.update("DELETE FROM push_devices WHERE chat_id = ? AND token = ?", chatId, token);
     }
 
     public List<String> deviceTokens(long chatId) {

@@ -32,6 +32,7 @@ class FlashcardControllerTest {
     private GrammarRepository grammarRepo;
     private GrammarBankService grammarBankService;
     private JdbcTemplate jdbc;
+    private io.flashcard.service.DailyGoalService goals;
 
     private static final String AUTH = "12345";
 
@@ -42,8 +43,9 @@ class FlashcardControllerTest {
         grammarRepo = mock(GrammarRepository.class);
         grammarBankService = mock(GrammarBankService.class);
         jdbc = mock(JdbcTemplate.class);
+        goals = mock(io.flashcard.service.DailyGoalService.class);
         mvc = MockMvcBuilders.standaloneSetup(
-                new FlashcardController(subscriberRepo, sentWordRepo, grammarRepo, grammarBankService, jdbc))
+                new FlashcardController(subscriberRepo, sentWordRepo, grammarRepo, grammarBankService, jdbc, goals))
             .addFilters(new AuthFilter(org.mockito.Mockito.mock(io.flashcard.service.AuthService.class)))
             .build();
     }
@@ -242,5 +244,13 @@ class FlashcardControllerTest {
             .andExpect(jsonPath("$[1].hasVideo").value(false));
 
         verify(jdbc, times(1)).queryForList(contains("podcast_videos"));
+    }
+
+    @Test
+    void readingGrammarLessonCountsTowardGoal() throws Exception {
+        mvc.perform(post("/api/flashcards/grammar-feed/a2-pron/read").header("X-User-Id", AUTH))
+            .andExpect(status().isOk());
+        verify(grammarRepo).markGrammarSent(12345L, "a2-pron");
+        verify(goals).onProgress(12345L);
     }
 }
