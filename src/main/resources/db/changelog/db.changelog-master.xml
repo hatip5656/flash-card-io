@@ -45,5 +45,6 @@
     <include file="db/changelog/038-orphan-sent-words.sql"/>
     <include file="db/changelog/039-auth.sql"/>
     <include file="db/changelog/040-daily-goals.sql"/>
+    <include file="db/changelog/041-mastery-prompts.sql"/>
 
 </databaseChangeLog>

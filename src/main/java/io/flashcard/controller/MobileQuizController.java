@@ -169,6 +169,10 @@ public class MobileQuizController {
         }
 
         Map<String, Object> response = new java.util.LinkedHashMap<>();
+        // Words this quiz brought to their checkpoint, asked about on the results screen
+        response.put("masteryPrompts", answers.stream().filter(QuizAnswer::isCorrect).map(QuizAnswer::estonian)
+            .filter(java.util.Objects::nonNull).distinct()
+            .flatMap(w -> sentWordRepo.masteryPromptFor(chatId, w).stream()).toList());
         response.put("score", score);
         response.put("total", total);
         response.put("percentage", Math.round((float) score / total * 100));
@@ -218,7 +222,12 @@ public class MobileQuizController {
         int quality = isCorrect ? 4 : 1;
         sentWordRepo.updateSm2(chatId, estonian, quality);
 
-        return Map.of("ok", true, "isCorrect", isCorrect);
+        Map<String, Object> result = new java.util.LinkedHashMap<>();
+        result.put("ok", true);
+        result.put("isCorrect", isCorrect);
+        // This answer may have reached the word's checkpoint: the app asks "did you master it?"
+        if (isCorrect) sentWordRepo.masteryPromptFor(chatId, estonian).ifPresent(p -> result.put("askMastery", p));
+        return result;
     }
 
 }

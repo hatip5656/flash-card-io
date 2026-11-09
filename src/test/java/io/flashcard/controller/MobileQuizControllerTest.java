@@ -13,11 +13,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class MobileQuizControllerTest {
 
@@ -58,5 +59,38 @@ class MobileQuizControllerTest {
         InOrder order = inOrder(goals, sentWords);
         order.verify(goals).recordQuizAnswers(USER, List.of("maja", "koer"));
         order.verify(sentWords, times(2)).updateSm2(eq(USER), anyString(), anyInt());
+    }
+
+    @Test
+    void correctAnswerThatReachesTheCheckpointAsksAboutMastery() throws Exception {
+        when(sentWords.masteryPromptFor(USER, "maja")).thenReturn(
+            java.util.Optional.of(Map.of("wordId", "w1", "estonian", "maja", "english", "house", "correctCount", 10)));
+
+        mvc.perform(post("/api/mobile/quiz/answer").requestAttr("userId", USER).contentType("application/json")
+                .content("{\"estonian\":\"maja\",\"isCorrect\":true}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.askMastery.wordId").value("w1"));
+    }
+
+    @Test
+    void wrongAnswerNeverAsksAboutMastery() throws Exception {
+        mvc.perform(post("/api/mobile/quiz/answer").requestAttr("userId", USER).contentType("application/json")
+                .content("{\"estonian\":\"maja\",\"isCorrect\":false}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.askMastery").doesNotExist());
+        verify(sentWords, never()).masteryPromptFor(anyLong(), anyString());
+    }
+
+    @Test
+    void submittedQuizListsWordsToAskAbout() throws Exception {
+        when(sentWords.masteryPromptFor(USER, "maja")).thenReturn(
+            java.util.Optional.of(Map.of("wordId", "w1", "estonian", "maja", "english", "house", "correctCount", 10)));
+        when(sentWords.masteryPromptFor(USER, "koer")).thenReturn(java.util.Optional.empty());
+
+        mvc.perform(post("/api/mobile/quiz/submit").requestAttr("userId", USER).contentType("application/json")
+                .content("{\"answers\":[{\"estonian\":\"maja\",\"isCorrect\":true},{\"estonian\":\"koer\",\"isCorrect\":true}]}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.masteryPrompts.length()").value(1))
+            .andExpect(jsonPath("$.masteryPrompts[0].estonian").value("maja"));
     }
 }

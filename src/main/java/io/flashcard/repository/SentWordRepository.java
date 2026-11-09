@@ -95,10 +95,39 @@ public class SentWordRepository {
         jdbc.update(
             """
             UPDATE sent_words SET ease_factor = ?, interval_days = ?, repetitions = ?,
-              next_review = CURRENT_DATE + ?::INTEGER
+              next_review = CURRENT_DATE + ?::INTEGER,
+              correct_count = correct_count + ?
             WHERE chat_id = ? AND word_value = ?
             """,
-            ef, interval, reps, interval, chatId, wordValue);
+            ef, interval, reps, interval, quality >= 3 ? 1 : 0, chatId, wordValue);
+    }
+
+    // ── "Did you master this word?" ───────────────
+
+    private static final String MASTERY_PROMPT_COLUMNS =
+        "word_id AS \"wordId\", word_value AS estonian, english, correct_count AS \"correctCount\"";
+
+    /** Words with enough correct answers to ask whether they are mastered, most answered first. */
+    public List<Map<String, Object>> masteryPrompts(long chatId, int limit) {
+        // One row per word: the same word can be stored once per level
+        return jdbc.queryForList("SELECT * FROM (SELECT DISTINCT ON (word_value) " + MASTERY_PROMPT_COLUMNS
+            + " FROM sent_words WHERE chat_id = ? AND NOT COALESCE(mastered, FALSE)"
+            + " AND correct_count >= mastery_ask_at ORDER BY word_value, correct_count DESC) p"
+            + " ORDER BY \"correctCount\" DESC LIMIT ?", chatId, limit);
+    }
+
+    /** The question for one word, if it is due. */
+    public java.util.Optional<Map<String, Object>> masteryPromptFor(long chatId, String wordValue) {
+        return jdbc.queryForList("SELECT " + MASTERY_PROMPT_COLUMNS
+            + " FROM sent_words WHERE chat_id = ? AND word_value = ? AND NOT COALESCE(mastered, FALSE)"
+            + " AND correct_count >= mastery_ask_at LIMIT 1", chatId, wordValue).stream().findFirst();
+    }
+
+    /** "Not yet": ask again after this many more correct answers. */
+    public void postponeMasteryPrompt(long chatId, String wordId, int moreCorrect) {
+        jdbc.update("UPDATE sent_words SET mastery_ask_at = correct_count + ? WHERE chat_id = ? AND (word_id = ?"
+                + " OR word_value = (SELECT word_value FROM sent_words WHERE chat_id = ? AND word_id = ?))",
+            moreCorrect, chatId, wordId, chatId, wordId);
     }
 
     /**
@@ -198,8 +227,10 @@ public class SentWordRepository {
     })
     public void markWordMastered(long chatId, String wordId) {
         jdbc.update(
-            "UPDATE sent_words SET mastered = TRUE, mastered_at = NOW() WHERE chat_id = ? AND word_id = ?",
-            chatId, wordId);
+            // Every stored copy of the word (one per level can exist), so it doesn't come back from another level
+            "UPDATE sent_words SET mastered = TRUE, mastered_at = NOW() WHERE chat_id = ? AND (word_id = ?"
+                + " OR word_value = (SELECT word_value FROM sent_words WHERE chat_id = ? AND word_id = ?))",
+            chatId, wordId, chatId, wordId);
     }
 
     @Caching(evict = {
