@@ -70,16 +70,22 @@ public class GrammarBankService {
         return lessons;
     }
 
-    /** lessonId → {podcastId, podcastUrl, durationSeconds, hasVideo} for lessons with a ready podcast. */
-    public Map<String, Map<String, Object>> getPodcastInfo() {
+    /**
+     * lessonId → {podcastId, podcastUrl, durationSeconds, hasVideo} for lessons with a ready podcast in
+     * {@code language} ("tr" or "en"). A lesson without one in that language is left out, never filled
+     * from the other language.
+     */
+    public Map<String, Map<String, Object>> getPodcastInfo(String language) {
         Map<String, Map<String, Object>> podcastMap = new LinkedHashMap<>();
         try {
-            var rows = jdbc.queryForList(
-                "SELECT g.id AS lesson_id, g.podcast_id, p.audio_cache_key, p.duration_seconds, p.title AS podcast_title, " +
-                "(v.podcast_id IS NOT NULL) AS has_video " +
-                "FROM grammar_lessons g JOIN podcasts p ON p.id = g.podcast_id " +
-                "LEFT JOIN podcast_videos v ON v.podcast_id = g.podcast_id AND v.status = 'done' AND v.video_url IS NOT NULL " +
-                "WHERE p.status = 'ready'");
+            var rows = jdbc.queryForList("""
+                SELECT gp.lesson_id, gp.podcast_id, p.audio_cache_key, p.duration_seconds,
+                       (v.podcast_id IS NOT NULL) AS has_video
+                FROM grammar_lesson_podcasts gp
+                JOIN podcasts p ON p.id = gp.podcast_id
+                LEFT JOIN podcast_videos v ON v.podcast_id = gp.podcast_id AND v.status = 'done' AND v.video_url IS NOT NULL
+                WHERE gp.language = ? AND p.status = 'ready'
+                """, language);
             for (var row : rows) {
                 String lessonId = (String) row.get("lesson_id");
                 String audioKey = (String) row.get("audio_cache_key");

@@ -2,6 +2,7 @@ package io.flashcard.controller;
 
 import io.flashcard.filter.AuthFilter;
 import io.flashcard.model.GrammarLesson;
+import io.flashcard.model.UserPreferences;
 import io.flashcard.repository.GrammarRepository;
 import io.flashcard.repository.SentWordRepository;
 import io.flashcard.repository.SubscriberRepository;
@@ -48,6 +49,102 @@ class FlashcardControllerTest {
                 new FlashcardController(subscriberRepo, sentWordRepo, grammarRepo, grammarBankService, jdbc, goals))
             .addFilters(new AuthFilter(org.mockito.Mockito.mock(io.flashcard.service.AuthService.class)))
             .build();
+        when(subscriberRepo.getPreferences(anyLong())).thenReturn(UserPreferences.defaults());
+    }
+
+    private void learnerLanguage(String nativeLanguage) {
+        var prefs = UserPreferences.defaults();
+        prefs.setNativeLanguage(nativeLanguage);
+        when(subscriberRepo.getPreferences(12345L)).thenReturn(prefs);
+    }
+
+    private static Map<String, Object> mediaRow(String lessonId, String podcastId, String audioKey) {
+        var row = new HashMap<String, Object>();
+        row.put("lesson_id", lessonId);
+        row.put("podcast_id", podcastId);
+        row.put("audio_cache_key", audioKey);
+        row.put("duration_seconds", audioKey == null ? null : 60);
+        row.put("podcast_timings", audioKey == null ? null : "[{\"text\":\"Hi\",\"language\":\"en\",\"start_ms\":0,\"end_ms\":900}]");
+        row.put("video_url", audioKey == null ? null : "https://videos.example/" + podcastId + ".mp4");
+        return row;
+    }
+
+    private static Map<String, Map<String, Object>> podcastInfo(String lessonId, String podcastId) {
+        return Map.of(lessonId, Map.of("podcastId", podcastId,
+            "podcastUrl", "https://wordagram.hatip.dev/podcasts/" + podcastId + ".wav",
+            "durationSeconds", 90, "hasVideo", true));
+    }
+
+    @Test
+    void lessonMediaUsesEnglishForEnglishLearner() throws Exception {
+        learnerLanguage("english");
+        when(jdbc.queryForList(anyString(), eq("en"), eq("a1-x"))).thenReturn(List.of(mediaRow("a1-x", "pod-en", "pod-en.wav")));
+
+        mvc.perform(get("/api/grammar/lessons/a1-x/media").header("X-User-Id", AUTH))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.podcastId").value("pod-en"))
+            .andExpect(jsonPath("$.videoUrl").value("https://videos.example/pod-en.mp4"));
+    }
+
+    @Test
+    void lessonMediaUsesTurkishForTurkishLearner() throws Exception {
+        learnerLanguage("turkish");
+        when(jdbc.queryForList(anyString(), eq("tr"), eq("a1-x"))).thenReturn(List.of(mediaRow("a1-x", "pod-tr", "pod-tr.wav")));
+
+        mvc.perform(get("/api/grammar/lessons/a1-x/media").header("X-User-Id", AUTH))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.podcastId").value("pod-tr"));
+    }
+
+    @Test
+    void learnerWithoutSavedLanguageGetsTheAppDefault() throws Exception {
+        // No saved language: the app and the server both treat the learner as Turkish, so the media must match
+        when(jdbc.queryForList(anyString(), eq("tr"), eq("a1-x"))).thenReturn(List.of(mediaRow("a1-x", "pod-tr", "pod-tr.wav")));
+
+        mvc.perform(get("/api/grammar/lessons/a1-x/media").header("X-User-Id", AUTH))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.podcastId").value("pod-tr"));
+    }
+
+    @Test
+    void englishPodcastNotReadyMeansNoPodcast() throws Exception {
+        // The English row has no ready podcast yet: nothing is served, never the Turkish one
+        learnerLanguage("english");
+        when(jdbc.queryForList(anyString(), eq("en"), eq("a1-x"))).thenReturn(List.of(mediaRow("a1-x", null, null)));
+
+        mvc.perform(get("/api/grammar/lessons/a1-x/media").header("X-User-Id", AUTH))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.podcastUrl").isEmpty())
+            .andExpect(jsonPath("$.videoUrl").isEmpty())
+            .andExpect(jsonPath("$.subtitles.length()").value(0));
+        verify(jdbc, never()).queryForList(anyString(), eq("tr"), eq("a1-x"));
+    }
+
+    @Test
+    void lessonListUsesLearnerLanguage() throws Exception {
+        learnerLanguage("english");
+        when(grammarRepo.getSentGrammarIds(12345L)).thenReturn(Set.of());
+        when(grammarBankService.getAllLessons()).thenReturn(List.of(
+            new GrammarLesson("lesson-1", "A1", "Verb 'olema'", "'olema' fiili", "c", "c")));
+        when(grammarBankService.getPodcastInfo("en")).thenReturn(podcastInfo("lesson-1", "pod-en"));
+        when(jdbc.queryForList(contains("sentence_grammar_links"))).thenReturn(List.of());
+
+        mvc.perform(get("/api/grammar/lessons").header("X-User-Id", AUTH))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.lessons[0].podcastId").value("pod-en"));
+    }
+
+    @Test
+    void grammarFeedUsesLearnerLanguage() throws Exception {
+        learnerLanguage("english");
+        when(subscriberRepo.getSubscriberLevel(12345L)).thenReturn("A1");
+        when(grammarBankService.getAllLessons()).thenReturn(List.of(
+            new GrammarLesson("lesson-1", "A1", "Verb 'olema'", "'olema' fiili", "c", "c")));
+        when(grammarBankService.getPodcastInfo("en")).thenReturn(podcastInfo("lesson-1", "pod-en"));
+
+        mvc.perform(get("/api/flashcards/grammar-feed").header("X-User-Id", AUTH))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].podcastUrl").value("https://wordagram.hatip.dev/podcasts/pod-en.wav"));
     }
 
     @Test
@@ -140,7 +237,7 @@ class FlashcardControllerTest {
              {"text":"Tere","language":"et","start_ms":2000,"end_ms":2600}]
             """);
         row.put("video_url", "https://videos.example/pod-1.mp4");
-        when(jdbc.queryForList(anyString(), eq("lesson-1"))).thenReturn(List.of(row));
+        when(jdbc.queryForList(anyString(), eq("tr"), eq("lesson-1"))).thenReturn(List.of(row));
 
         mvc.perform(get("/api/grammar/lessons/lesson-1/media").header("X-User-Id", AUTH))
             .andExpect(status().isOk())
@@ -169,7 +266,7 @@ class FlashcardControllerTest {
         row.put("duration_seconds", null);
         row.put("podcast_timings", null);
         row.put("video_url", null);
-        when(jdbc.queryForList(anyString(), eq("lesson-2"))).thenReturn(List.of(row));
+        when(jdbc.queryForList(anyString(), eq("tr"), eq("lesson-2"))).thenReturn(List.of(row));
 
         mvc.perform(get("/api/grammar/lessons/lesson-2/media").header("X-User-Id", AUTH))
             .andExpect(status().isOk())
@@ -183,7 +280,7 @@ class FlashcardControllerTest {
 
     @Test
     void getLessonMediaReturns404ForUnknownLesson() throws Exception {
-        when(jdbc.queryForList(anyString(), eq("missing"))).thenReturn(List.of());
+        when(jdbc.queryForList(anyString(), eq("tr"), eq("missing"))).thenReturn(List.of());
 
         mvc.perform(get("/api/grammar/lessons/missing/media").header("X-User-Id", AUTH))
             .andExpect(status().isNotFound());
@@ -201,13 +298,7 @@ class FlashcardControllerTest {
         when(grammarBankService.getAllLessons()).thenReturn(List.of(
             new GrammarLesson("lesson-1", "A1", "Verb 'olema'", "'olema' fiili", "c", "c"),
             new GrammarLesson("lesson-2", "A1", "Plural", "Çoğul", "c", "c")));
-        var row = new HashMap<String, Object>();
-        row.put("lesson_id", "lesson-1");
-        row.put("podcast_id", "pod-1");
-        row.put("audio_cache_key", "pod-1.wav");
-        row.put("duration_seconds", 90);
-        row.put("has_video", true);
-        when(jdbc.queryForList(contains("podcast_videos"))).thenReturn(List.of(row));
+        when(grammarBankService.getPodcastInfo("tr")).thenReturn(podcastInfo("lesson-1", "pod-1"));
         when(jdbc.queryForList(contains("sentence_grammar_links"))).thenReturn(List.of());
 
         mvc.perform(get("/api/grammar/lessons").header("X-User-Id", AUTH))
@@ -218,8 +309,8 @@ class FlashcardControllerTest {
             .andExpect(jsonPath("$.lessons[1].podcastId").isEmpty())
             .andExpect(jsonPath("$.lessons[1].hasVideo").value(false));
 
-        // One batched podcast query regardless of lesson count (no N+1)
-        verify(jdbc, times(1)).queryForList(contains("podcast_videos"));
+        // One batched podcast lookup regardless of lesson count (no N+1)
+        verify(grammarBankService, times(1)).getPodcastInfo("tr");
     }
 
     @Test
@@ -228,13 +319,7 @@ class FlashcardControllerTest {
         when(grammarBankService.getAllLessons()).thenReturn(List.of(
             new GrammarLesson("lesson-1", "A1", "Verb 'olema'", "'olema' fiili", "c", "c"),
             new GrammarLesson("lesson-2", "A1", "Plural", "Çoğul", "c", "c")));
-        var row = new HashMap<String, Object>();
-        row.put("lesson_id", "lesson-1");
-        row.put("podcast_id", "pod-1");
-        row.put("audio_cache_key", "pod-1.wav");
-        row.put("duration_seconds", 90);
-        row.put("has_video", true);
-        when(jdbc.queryForList(contains("podcast_videos"))).thenReturn(List.of(row));
+        when(grammarBankService.getPodcastInfo("tr")).thenReturn(podcastInfo("lesson-1", "pod-1"));
 
         mvc.perform(get("/api/flashcards/grammar-feed").header("X-User-Id", AUTH))
             .andExpect(status().isOk())
@@ -243,7 +328,7 @@ class FlashcardControllerTest {
             .andExpect(jsonPath("$[1].podcastUrl").doesNotExist())
             .andExpect(jsonPath("$[1].hasVideo").value(false));
 
-        verify(jdbc, times(1)).queryForList(contains("podcast_videos"));
+        verify(grammarBankService, times(1)).getPodcastInfo("tr");
     }
 
     @Test

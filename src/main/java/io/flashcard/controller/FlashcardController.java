@@ -1,6 +1,8 @@
 package io.flashcard.controller;
 
+import io.flashcard.model.GrammarLanguage;
 import io.flashcard.model.GrammarLesson;
+import io.flashcard.model.UserPreferences;
 import io.flashcard.repository.GrammarRepository;
 import io.flashcard.repository.SentWordRepository;
 import io.flashcard.repository.SubscriberRepository;
@@ -83,7 +85,7 @@ public class FlashcardController {
                                                       @RequestParam(defaultValue = "3") int limit) {
         long chatId = getUserId(request);
         String level = subscriberRepo.getSubscriberLevel(chatId);
-        var podcastMap = loadPodcastInfo();
+        var podcastMap = grammarBankService.getPodcastInfo(podcastLanguage(chatId));
         var all = grammarBankService.getAllLessons().stream()
             .filter(l -> l.cefrLevel().equals(level) || compareLevels(l.cefrLevel(), level) < 0)
             .limit(Math.min(limit, 10))
@@ -126,8 +128,8 @@ public class FlashcardController {
         Set<String> readIds = grammarRepo.getSentGrammarIds(chatId);
         var allLessons = grammarBankService.getAllLessons();
 
-        // Batch-fetch podcast info for all lessons
-        var podcastMap = loadPodcastInfo();
+        // Batch-fetch podcast info for all lessons, in the learner's language
+        var podcastMap = grammarBankService.getPodcastInfo(podcastLanguage(chatId));
 
         // Batch-fetch linked example sentences for all grammar lessons (up to 5 per lesson)
         Map<String, List<Map<String, String>>> sentencesMap = new java.util.LinkedHashMap<>();
@@ -179,15 +181,17 @@ public class FlashcardController {
     }
 
     @GetMapping("/grammar/lessons/{id}/media")
-    public ResponseEntity<?> getGrammarLessonMedia(@PathVariable String id) {
+    public ResponseEntity<?> getGrammarLessonMedia(HttpServletRequest request, @PathVariable String id) {
+        // Only the learner's language: a lesson without a podcast in it has none, never the other language's
         var rows = jdbc.queryForList("""
-            SELECT g.id AS lesson_id, g.podcast_id, p.audio_cache_key, p.duration_seconds,
+            SELECT g.id AS lesson_id, gp.podcast_id, p.audio_cache_key, p.duration_seconds,
                    p.script AS podcast_timings, v.video_url
             FROM grammar_lessons g
-            LEFT JOIN podcasts p ON p.id = g.podcast_id AND p.status = 'ready'
+            LEFT JOIN grammar_lesson_podcasts gp ON gp.lesson_id = g.id AND gp.language = ?
+            LEFT JOIN podcasts p ON p.id = gp.podcast_id AND p.status = 'ready'
             LEFT JOIN podcast_videos v ON v.podcast_id = p.id AND v.status = 'done'
             WHERE g.id = ?
-            """, id);
+            """, podcastLanguage(getUserId(request)), id);
         if (rows.isEmpty()) {
             return ResponseEntity.status(404).body(Map.of("error", "Lesson not found"));
         }
@@ -209,30 +213,11 @@ public class FlashcardController {
         return ResponseEntity.ok(media);
     }
 
-    // Podcast info (URL, duration, video flag) for every lesson with a ready podcast, in one query.
-    private Map<String, Map<String, Object>> loadPodcastInfo() {
-        Map<String, Map<String, Object>> podcastMap = new java.util.LinkedHashMap<>();
-        try {
-            var rows = jdbc.queryForList(
-                "SELECT g.id AS lesson_id, g.podcast_id, p.audio_cache_key, p.duration_seconds, p.title AS podcast_title, " +
-                "(v.podcast_id IS NOT NULL) AS has_video " +
-                "FROM grammar_lessons g JOIN podcasts p ON p.id = g.podcast_id " +
-                "LEFT JOIN podcast_videos v ON v.podcast_id = g.podcast_id AND v.status = 'done' AND v.video_url IS NOT NULL " +
-                "WHERE p.status = 'ready'");
-            for (var row : rows) {
-                String lessonId = (String) row.get("lesson_id");
-                String audioKey = (String) row.get("audio_cache_key");
-                if (audioKey != null) {
-                    var podcast = new java.util.HashMap<String, Object>();
-                    podcast.put("podcastId", row.get("podcast_id") != null ? row.get("podcast_id").toString() : null);
-                    podcast.put("podcastUrl", PODCAST_BASE_URL + audioKey);
-                    podcast.put("durationSeconds", row.get("duration_seconds") != null ? row.get("duration_seconds") : 0);
-                    podcast.put("hasVideo", Boolean.TRUE.equals(row.get("has_video")));
-                    podcastMap.put(lessonId, podcast);
-                }
-            }
-        } catch (Exception ignored) {}
-        return podcastMap;
+    /** The language of a learner's grammar podcasts and videos: the same one the app shows them. */
+    private String podcastLanguage(long chatId) {
+        var prefs = subscriberRepo.getPreferences(chatId);
+        return GrammarLanguage.forLearner(prefs != null ? prefs.getNativeLanguage()
+            : UserPreferences.defaults().getNativeLanguage());
     }
 
     @SuppressWarnings("unchecked")

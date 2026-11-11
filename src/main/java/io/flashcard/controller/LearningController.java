@@ -1,5 +1,8 @@
 package io.flashcard.controller;
 
+import io.flashcard.model.GrammarLanguage;
+import io.flashcard.model.UserPreferences;
+import io.flashcard.repository.SubscriberRepository;
 import io.flashcard.service.GrammarBankService;
 import io.flashcard.service.LearnerModelService;
 import io.flashcard.service.LearningPlanService;
@@ -22,12 +25,14 @@ public class LearningController {
     private final LearnerModelService learnerModel;
     private final LearningPlanService planService;
     private final GrammarBankService grammarBank;
+    private final SubscriberRepository subscribers;
 
     public LearningController(LearnerModelService learnerModel, LearningPlanService planService,
-                              GrammarBankService grammarBank) {
+                              GrammarBankService grammarBank, SubscriberRepository subscribers) {
         this.learnerModel = learnerModel;
         this.planService = planService;
         this.grammarBank = grammarBank;
+        this.subscribers = subscribers;
     }
 
     @PostMapping("/events")
@@ -48,7 +53,11 @@ public class LearningController {
 
     @GetMapping("/plan")
     public Map<String, Object> plan(HttpServletRequest request, @RequestParam(defaultValue = "6") int limit) {
-        return planService.plan(getUserId(request), Math.max(1, Math.min(limit, 12)), grammarBank.getPodcastInfo());
+        long chatId = getUserId(request);
+        var prefs = subscribers.getPreferences(chatId);
+        String language = GrammarLanguage.forLearner(prefs != null ? prefs.getNativeLanguage()
+            : UserPreferences.defaults().getNativeLanguage());
+        return planService.plan(chatId, Math.max(1, Math.min(limit, 12)), grammarBank.getPodcastInfo(language));
     }
 
     /** Body: {targetLevel}. The learner picks which level's goal exams to work toward. */
