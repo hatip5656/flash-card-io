@@ -2,6 +2,7 @@ package io.flashcard.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.flashcard.config.AppProperties;
+import io.flashcard.model.GrammarLanguage;
 import io.flashcard.model.GrammarLesson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +89,7 @@ public class GrammarPodcastService {
 
     /**
      * Generates pending podcasts back to back instead of one per scheduler run.
-     * A lesson that fails is skipped for the rest of the run so it cannot block the others;
+     * A (lesson, language) that fails is skipped for the rest of the run so it cannot block the others;
      * a call made while a run is active makes that run look again before it stops.
      */
     public void generateAllPending() {
@@ -100,7 +101,7 @@ public class GrammarPodcastService {
                 while (true) {
                     Outcome result = generateNext(failed);
                     if (result == null) break;         // nothing left to generate
-                    if (!result.ok()) failed.add(result.lessonId());
+                    if (!result.ok()) failed.add(result.key());
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -128,7 +129,8 @@ public class GrammarPodcastService {
         }
     }
 
-    private record Outcome(String lessonId, boolean ok) {}
+    /** {@code key} is "lessonId:language", the form the pending query skips by. */
+    private record Outcome(String key, boolean ok) {}
 
     /** Waits for any generation in progress, then generates one. Returns null when none is pending. */
     private Outcome generateNext(Set<String> skip) throws InterruptedException {
@@ -141,12 +143,15 @@ public class GrammarPodcastService {
     }
 
     private Outcome generateClaimed(Set<String> skip) {
-        // Find next grammar lesson with a pre-written script but no podcast yet
+        // Next (lesson, language) with a pre-written script but no podcast yet
         List<Map<String, Object>> rows = jdbc.queryForList("""
-            SELECT id, cefr_level, topic, podcast_script
-            FROM grammar_lessons WHERE podcast_id IS NULL AND podcast_script IS NOT NULL
-              AND NOT (id = ANY(?))
-            ORDER BY cefr_level, id LIMIT 1
+            SELECT gp.lesson_id, gp.language, g.cefr_level,
+                   CASE WHEN gp.language = 'tr' THEN coalesce(g.topic_tr, g.topic) ELSE g.topic END AS topic,
+                   gp.script
+            FROM grammar_lesson_podcasts gp JOIN grammar_lessons g ON g.id = gp.lesson_id
+            WHERE gp.podcast_id IS NULL AND gp.script IS NOT NULL
+              AND NOT ((gp.lesson_id || ':' || gp.language) = ANY(?))
+            ORDER BY g.cefr_level, gp.lesson_id, gp.language LIMIT 1
             """, (Object) skip.toArray(new String[0]));
 
         if (rows.isEmpty()) {
@@ -157,21 +162,23 @@ public class GrammarPodcastService {
         long start = System.currentTimeMillis();
         updateStatus("running");
         var lesson = rows.get(0);
-        String lessonId = (String) lesson.get("id");
-        events.publish("podcast", Map.of("lessonId", lessonId, "status", "running"));
+        String lessonId = (String) lesson.get("lesson_id");
+        String language = (String) lesson.get("language");
+        String key = lessonId + ":" + language;
+        events.publish("podcast", Map.of("lessonId", lessonId, "language", language, "status", "running"));
 
         try {
             String level = (String) lesson.get("cefr_level");
             String topic = (String) lesson.get("topic");
-            String scriptJson = lesson.get("podcast_script").toString();
+            String scriptJson = lesson.get("script").toString();
 
-            log.info("[grammar-podcast] Generating from pre-written script for lesson {} ({}): {}", lessonId, level, topic);
+            log.info("[grammar-podcast] Generating {} podcast for lesson {} ({}): {}", language, lessonId, level, topic);
 
             List<?> segments = objectMapper.readValue(scriptJson, List.class);
             if (segments.isEmpty()) {
                 log.warn("[grammar-podcast] Empty segments for lesson {}", lessonId);
-                fail(lessonId, start, "Lesson " + lessonId + " has an empty script");
-                return new Outcome(lessonId, false);
+                fail(lessonId, language, start, "Lesson " + label(lessonId, language) + " has an empty script");
+                return new Outcome(key, false);
             }
 
             // Call TTS
@@ -189,8 +196,8 @@ public class GrammarPodcastService {
 
             if (response.statusCode() != 200) {
                 log.error("[grammar-podcast] TTS returned {} for lesson {}", response.statusCode(), lessonId);
-                fail(lessonId, start, "TTS returned " + response.statusCode() + " for lesson " + lessonId);
-                return new Outcome(lessonId, false);
+                fail(lessonId, language, start, "TTS returned " + response.statusCode() + " for lesson " + label(lessonId, language));
+                return new Outcome(key, false);
             }
 
             // Save audio
@@ -224,33 +231,38 @@ public class GrammarPodcastService {
                 """, podcastId, title, "Grammar lesson podcast",
                 timingsJson, filename, durationSeconds, level);
 
-            // Link to grammar lesson
-            jdbc.update("UPDATE grammar_lessons SET podcast_id = ? WHERE id = ?", podcastId, lessonId);
+            // Link to the lesson's row for this language
+            jdbc.update("UPDATE grammar_lesson_podcasts SET podcast_id = ? WHERE lesson_id = ? AND language = ?",
+                podcastId, lessonId, language);
 
             long duration = System.currentTimeMillis() - start;
             log.info("[grammar-podcast] Generated podcast {} for lesson {} in {}ms ({}s audio)",
-                podcastId, lessonId, duration, durationSeconds);
+                podcastId, label(lessonId, language), duration, durationSeconds);
 
             recordSuccess(start);
-            events.publish("podcast", Map.of("lessonId", lessonId, "status", "ready",
+            events.publish("podcast", Map.of("lessonId", lessonId, "language", language, "status", "ready",
                 "podcastId", podcastId, "durationSeconds", durationSeconds));
-            String msg = "Lesson " + lessonId + " — " + durationSeconds + "s audio (" + (duration / 1000) + "s generation)";
+            String msg = "Lesson " + label(lessonId, language) + " — " + durationSeconds + "s audio (" + (duration / 1000) + "s generation)";
             historyService.logRun("grammar-podcast", "success", java.time.Instant.ofEpochMilli(start), duration, 1, 0, msg);
             notifications.success("podcasts", "Grammar Podcast Generated", msg);
-            return new Outcome(lessonId, true);
+            return new Outcome(key, true);
 
         } catch (Exception e) {
             log.error("[grammar-podcast] Failed: {}", e.getMessage(), e);
-            fail(lessonId, start, String.valueOf(e.getMessage()));
-            return new Outcome(lessonId, false);
+            fail(lessonId, language, start, label(lessonId, language) + ": " + e.getMessage());
+            return new Outcome(key, false);
         }
     }
 
-    private void fail(String lessonId, long start, String reason) {
+    private static String label(String lessonId, String language) {
+        return lessonId + " (" + language.toUpperCase() + ")";
+    }
+
+    private void fail(String lessonId, String language, long start, String reason) {
         long duration = System.currentTimeMillis() - start;
         recordFailure(start);
         historyService.logRun("grammar-podcast", "failed", java.time.Instant.ofEpochMilli(start), duration, 0, 1, reason);
-        events.publish("podcast", Map.of("lessonId", lessonId, "status", "failed", "error", reason));
+        events.publish("podcast", Map.of("lessonId", lessonId, "language", language, "status", "failed", "error", reason));
         notifications.error("podcasts", "Grammar Podcast Failed", reason);
     }
 
@@ -285,33 +297,55 @@ public class GrammarPodcastService {
     }
 
     /**
-     * Get scheduler status for admin UI.
+     * Scheduler status for the admin. {@code byLanguage} counts lessons per language; the top-level
+     * lesson counts are the Turkish ones, which is what they meant before English existed.
      */
     public Map<String, Object> getStatus() {
         List<Map<String, Object>> rows = jdbc.queryForList(
             "SELECT * FROM scheduler_status WHERE job_name = ?", JOB_NAME);
 
-        int pending = jdbc.queryForObject(
-            "SELECT COUNT(*) FROM grammar_lessons WHERE podcast_id IS NULL",
-            Integer.class);
-        int total = jdbc.queryForObject("SELECT COUNT(*) FROM grammar_lessons", Integer.class);
+        Map<String, Map<String, Object>> byLanguage = new LinkedHashMap<>();
+        for (String lang : GrammarLanguage.ALL) byLanguage.put(lang, counts(0, 0));
+        int total = 0;
+        for (var row : jdbc.queryForList("""
+                SELECT l.language, count(g.id) AS total, count(gp.podcast_id) AS completed
+                FROM grammar_lessons g
+                CROSS JOIN (VALUES ('tr'), ('en')) AS l(language)
+                LEFT JOIN grammar_lesson_podcasts gp ON gp.lesson_id = g.id AND gp.language = l.language
+                GROUP BY l.language
+                """)) {
+            int t = ((Number) row.get("total")).intValue();
+            total = Math.max(total, t);
+            byLanguage.put((String) row.get("language"), counts(t, ((Number) row.get("completed")).intValue()));
+        }
 
         Map<String, Object> result = new LinkedHashMap<>();
         if (!rows.isEmpty()) {
             result.putAll(rows.get(0));
         }
-        result.put("pendingLessons", pending);
+        var tr = byLanguage.get("tr");
+        result.put("pendingLessons", tr.get("pending"));
         result.put("totalLessons", total);
-        result.put("completedLessons", total - pending);
+        result.put("completedLessons", tr.get("completed"));
+        result.put("byLanguage", byLanguage);
         return result;
     }
 
+    private static Map<String, Object> counts(int total, int completed) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("total", total);
+        m.put("completed", completed);
+        m.put("pending", total - completed);
+        return m;
+    }
+
     /**
-     * Manually trigger generation for a specific lesson.
+     * Manually trigger generation for one language of a lesson.
      */
-    public void triggerManual(String lessonId) {
-        jdbc.update("UPDATE grammar_lessons SET podcast_id = NULL WHERE id = ?", lessonId);
-        log.info("[grammar-podcast] Manual trigger for lesson {}", lessonId);
+    public void triggerManual(String lessonId, String language) {
+        jdbc.update("UPDATE grammar_lesson_podcasts SET podcast_id = NULL WHERE lesson_id = ? AND language = ?",
+            lessonId, language);
+        log.info("[grammar-podcast] Manual trigger for lesson {}", label(lessonId, language));
     }
 
 }
