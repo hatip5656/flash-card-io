@@ -41,6 +41,21 @@ class PodcastVideoServiceTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    void englishVideoNotificationNamesTheLanguage() throws Exception {
+        when(jdbc.queryForList(contains("WHERE v.status IN"))).thenReturn(List.of(
+            Map.of("podcast_id", PODCAST, "lesson_id", "a1-comitative-abessive", "topic", "With (-ga) and Without (-ta)",
+                "status", "rendering", "progress", 0.5f, "language", "en")));
+        when(simulator.getStatus(PODCAST)).thenReturn(Optional.of(Map.of("id", PODCAST, "status", "done", "videoUrl", URL)));
+
+        service.pollActiveRenders();
+
+        verify(notifications).emit(eq("success"), eq("videos"), eq("Video ready: With (-ga) and Without (-ta) (EN)"),
+            eq(URL), anyString());
+        verify(events, atLeastOnce()).publish(eq("video"), argThat(m -> "en".equals(((Map<String, Object>) m).get("language"))));
+    }
+
+    @Test
     void notifiesWithLinkWhenRenderCompletes() throws Exception {
         when(simulator.getStatus(PODCAST)).thenReturn(Optional.of(Map.of("id", PODCAST, "status", "done", "videoUrl", URL)));
 

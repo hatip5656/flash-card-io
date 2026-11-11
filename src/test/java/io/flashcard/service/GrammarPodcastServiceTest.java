@@ -105,21 +105,37 @@ class GrammarPodcastServiceTest {
         verify(jdbc).update(contains("grammar_lesson_podcasts SET podcast_id = NULL"), eq("a1-x"), eq("en"));
     }
 
-    @Test
-    @SuppressWarnings("unchecked")
-    void generatedPodcastIsLinkedToItsLanguage() throws Exception {
-        pending("[{\"text\":\"Hello\",\"language\":\"en\"}]", "a1-x:en");
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void ttsReturnsAudio() throws Exception {
         HttpResponse<byte[]> res = mock(HttpResponse.class);
         when(res.statusCode()).thenReturn(200);
         when(res.body()).thenReturn(new byte[44]);
         when(res.headers()).thenReturn(HttpHeaders.of(Map.of(), (a, b) -> true));
         when(http.send(any(), any(HttpResponse.BodyHandler.class))).thenReturn((HttpResponse) res);
+    }
+
+    @Test
+    void turkishPodcastKeepsTodaysTitle() throws Exception {
+        // Learners' copies are matched to library podcasts by title: Turkish titles must not change
+        pending("[{\"text\":\"Merhaba\",\"language\":\"tr\"}]", "a1-x:tr");
+        ttsReturnsAudio();
+
+        service.generateAllPending();
+
+        verify(jdbc).update(contains("INSERT INTO podcasts"), any(), eq("Grammar: a1-x"), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void generatedPodcastIsLinkedToItsLanguage() throws Exception {
+        pending("[{\"text\":\"Hello\",\"language\":\"en\"}]", "a1-x:en");
+        ttsReturnsAudio();
 
         service.generateAllPending();
 
         verify(jdbc).update(eq("UPDATE grammar_lesson_podcasts SET podcast_id = ? WHERE lesson_id = ? AND language = ?"),
             anyString(), eq("a1-x"), eq("en"));
-        verify(jdbc).update(contains("INSERT INTO podcasts"), any(), eq("Grammar: a1-x"), any(), any(), any(), any(), any());
+        verify(jdbc).update(contains("INSERT INTO podcasts"), any(), eq("Grammar: a1-x (EN)"), any(), any(), any(), any(), any());
         verify(events).publish(eq("podcast"), argThat(m -> "en".equals(((Map<String, Object>) m).get("language"))
             && "ready".equals(((Map<String, Object>) m).get("status"))));
     }

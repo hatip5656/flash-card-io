@@ -145,9 +145,7 @@ public class GrammarPodcastService {
     private Outcome generateClaimed(Set<String> skip) {
         // Next (lesson, language) with a pre-written script but no podcast yet
         List<Map<String, Object>> rows = jdbc.queryForList("""
-            SELECT gp.lesson_id, gp.language, g.cefr_level,
-                   CASE WHEN gp.language = 'tr' THEN coalesce(g.topic_tr, g.topic) ELSE g.topic END AS topic,
-                   gp.script
+            SELECT gp.lesson_id, gp.language, g.cefr_level, g.topic, gp.script
             FROM grammar_lesson_podcasts gp JOIN grammar_lessons g ON g.id = gp.lesson_id
             WHERE gp.podcast_id IS NULL AND gp.script IS NOT NULL
               AND NOT ((gp.lesson_id || ':' || gp.language) = ANY(?))
@@ -222,8 +220,9 @@ public class GrammarPodcastService {
                 if (sr > 0) durationSeconds = ds / (sr * 2);
             }
 
-            // Create podcast record
-            String title = "Grammar: " + topic;
+            // Create podcast record. Learners' copies are matched to library podcasts by title, so the
+            // Turkish title stays what it always was and the English one is told apart by its suffix.
+            String title = "Grammar: " + topic + ("en".equals(language) ? " (EN)" : "");
             jdbc.update("""
                 INSERT INTO podcasts (id, chat_id, title, description, script, audio_cache_key,
                     duration_seconds, cefr_level, status, created_at)

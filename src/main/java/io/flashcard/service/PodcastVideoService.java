@@ -63,7 +63,7 @@ public class PodcastVideoService {
                                     THEN podcast_videos.completed_at ELSE EXCLUDED.completed_at END
             """, podcastId, lessonId, state, progressOf(status), status.get("videoUrl"), state, state);
         var result = statusFor(podcastId);
-        publish(podcastId, lessonId, result);
+        publish(podcastId, lessonId, languageOf(podcastId), result);
         return result;
     }
 
@@ -90,26 +90,29 @@ public class PodcastVideoService {
     @Scheduled(fixedDelay = 3_000, initialDelay = 30_000)
     public void pollActiveRenders() {
         var active = jdbc.queryForList("""
-            SELECT v.podcast_id, v.lesson_id, v.status, v.progress, g.topic
+            SELECT v.podcast_id, v.lesson_id, v.status, v.progress, g.topic, gp.language
             FROM podcast_videos v
             LEFT JOIN grammar_lessons g ON g.id = v.lesson_id
+            LEFT JOIN grammar_lesson_podcasts gp ON gp.podcast_id = v.podcast_id
             WHERE v.status IN ('queued', 'rendering')
             """);
         for (var row : active) {
             String podcastId = (String) row.get("podcast_id");
             String lessonId = (String) row.get("lesson_id");
-            String topic = row.get("topic") != null ? (String) row.get("topic") : lessonId;
+            String language = (String) row.get("language");
+            String topic = (row.get("topic") != null ? (String) row.get("topic") : lessonId)
+                + (language != null ? " (" + language.toUpperCase() + ")" : "");
             try {
                 Optional<Map<String, Object>> status = simulator.getStatus(podcastId);
                 if (status.isEmpty()) {
-                    finish(podcastId, lessonId, topic, "failed", null,
+                    finish(podcastId, lessonId, language, topic, "failed", null,
                         "The render was lost because the video service restarted. Generate it again.");
                     continue;
                 }
                 var s = status.get();
                 switch (String.valueOf(s.get("status"))) {
-                    case "done" -> finish(podcastId, lessonId, topic, "done", (String) s.get("videoUrl"), null);
-                    case "failed" -> finish(podcastId, lessonId, topic, "failed", null,
+                    case "done" -> finish(podcastId, lessonId, language, topic, "done", (String) s.get("videoUrl"), null);
+                    case "failed" -> finish(podcastId, lessonId, language, topic, "failed", null,
                         s.get("error") != null ? s.get("error").toString() : "unknown error");
                     // started_at marks when rendering began, so the dashboard can estimate time left
                     default -> {
@@ -123,7 +126,7 @@ public class PodcastVideoService {
                                     started_at = CASE WHEN ? = 'rendering' THEN COALESCE(started_at, NOW()) END
                                 WHERE podcast_id = ?
                                 """, state, progress, state, podcastId);
-                            publish(podcastId, lessonId, statusFor(podcastId));
+                            publish(podcastId, lessonId, language, statusFor(podcastId));
                         }
                     }
                 }
@@ -134,14 +137,15 @@ public class PodcastVideoService {
         }
     }
 
-    private void finish(String podcastId, String lessonId, String topic, String state, String videoUrl, String error) {
+    private void finish(String podcastId, String lessonId, String language, String topic, String state,
+                        String videoUrl, String error) {
         jdbc.update("""
             UPDATE podcast_videos SET status = ?, progress = CASE WHEN ? = 'done' THEN 1 ELSE progress END,
                 error = ?, video_url = ?, completed_at = NOW()
             WHERE podcast_id = ?
             """, state, state, error, videoUrl, podcastId);
 
-        publish(podcastId, lessonId, statusFor(podcastId));
+        publish(podcastId, lessonId, language, statusFor(podcastId));
 
         String metadata = metadataJson(lessonId, podcastId, videoUrl);
         if ("done".equals(state)) {
@@ -153,10 +157,18 @@ public class PodcastVideoService {
         }
     }
 
-    private void publish(String podcastId, String lessonId, Map<String, Object> status) {
+    private void publish(String podcastId, String lessonId, String language, Map<String, Object> status) {
         var event = new LinkedHashMap<String, Object>(status);
         event.put("lessonId", lessonId);
+        if (language != null) event.put("language", language);
         events.publish("video", event);
+    }
+
+    /** The language of a grammar lesson podcast, or null for a podcast no lesson links to. */
+    private String languageOf(String podcastId) {
+        var rows = jdbc.queryForList(
+            "SELECT language FROM grammar_lesson_podcasts WHERE podcast_id = ?", String.class, podcastId);
+        return rows.isEmpty() ? null : rows.get(0);
     }
 
     private String metadataJson(String lessonId, String podcastId, String videoUrl) {

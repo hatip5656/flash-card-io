@@ -48,6 +48,22 @@ class PodcastAssignmentTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    void grammarPodcastsCarryTheirLanguage() {
+        var en = row("g-en", "Grammar: Numbers (EN)", "en.wav", "a1-numbers");
+        en.put("language", "en");
+        var tr = row("g-tr", "Grammar: Numbers", "tr.wav", "a1-numbers");
+        tr.put("language", "tr");
+        when(repo.findAssignable()).thenReturn(List.of(tr, en));
+        when(repo.findForUser(USER)).thenReturn(List.of());
+
+        var available = (List<Map<String, Object>>) service.assignmentsFor(USER).get("available");
+
+        assertEquals("tr", available.get(0).get("language"));
+        assertEquals("en", available.get(1).get("language"));
+    }
+
+    @Test
     void assignSkipsUsersWhoAlreadyHaveTheAudio() {
         var source = new Podcast();
         source.setAudioCacheKey("new.wav");

@@ -44,11 +44,11 @@ class AdminGrammarVideoTest {
         podcasts = mock(GrammarPodcastService.class);
         mvc = MockMvcBuilders.standaloneSetup(new AdminGrammarController(
             jdbc, new ObjectMapper(), podcasts,
-            mock(GrammarBankService.class), videos)).build();
+            mock(GrammarBankService.class), videos, "/nonexistent")).build();
     }
 
     private void lessonRow(Map<String, Object> row) {
-        when(jdbc.queryForList(anyString(), eq("a1-plural-formation"))).thenReturn(List.of(row));
+        when(jdbc.queryForList(anyString(), eq("tr"), eq("a1-plural-formation"))).thenReturn(List.of(row));
     }
 
     private Map<String, Object> readyPodcast() {
@@ -115,7 +115,7 @@ class AdminGrammarVideoTest {
 
     @Test
     void bulkRedoQueuesOnlyLessonsWithScripts() throws Exception {
-        when(jdbc.queryForList(contains("RETURNING id"), eq(String.class), any(Object.class)))
+        when(jdbc.queryForList(contains("RETURNING lesson_id"), eq(String.class), any(), eq("tr")))
             .thenReturn(List.of("a1-negation"));
 
         mvc.perform(post("/api/admin/grammar/redo-podcasts")

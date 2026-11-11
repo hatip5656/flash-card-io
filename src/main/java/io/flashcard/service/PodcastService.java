@@ -563,6 +563,7 @@ public class PodcastService {
             var item = assignmentItem(p);
             item.put("kind", kindOf(p));
             item.put("lessonId", p.get("lesson_id"));
+            item.put("language", p.get("language"));
             if (olderCopyByTitle.containsKey(p.get("title"))) item.put("olderCopyId", olderCopyByTitle.get(p.get("title")));
             available.add(item);
         }

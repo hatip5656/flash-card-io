@@ -140,11 +140,11 @@ public class PodcastRepository {
     public List<Map<String, Object>> findAssignable() {
         return jdbc.sql("""
             SELECT p.id, p.title, p.cefr_level, p.duration_seconds, p.audio_cache_key, p.created_at,
-                   g.id AS lesson_id
+                   gp.lesson_id, gp.language
             FROM podcasts p
-            LEFT JOIN grammar_lessons g ON g.podcast_id = p.id
+            LEFT JOIN grammar_lesson_podcasts gp ON gp.podcast_id = p.id
             WHERE p.chat_id = 0 AND p.status = 'ready' AND p.audio_cache_key IS NOT NULL
-              AND (p.title NOT LIKE 'Grammar:%' OR g.id IS NOT NULL)
+              AND (p.title NOT LIKE 'Grammar:%' OR gp.lesson_id IS NOT NULL)
             ORDER BY p.cefr_level, p.title
             """)
             .query()
