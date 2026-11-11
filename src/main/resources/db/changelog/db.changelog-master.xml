@@ -47,5 +47,6 @@
     <include file="db/changelog/040-daily-goals.sql"/>
     <include file="db/changelog/041-mastery-prompts.sql"/>
     <include file="db/changelog/042-grammar-lesson-podcasts.sql"/>
+    <include file="db/changelog/043-english-grammar-content.sql"/>
 
 </databaseChangeLog>
