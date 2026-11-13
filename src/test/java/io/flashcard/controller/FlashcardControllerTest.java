@@ -135,6 +135,37 @@ class FlashcardControllerTest {
     }
 
     @Test
+    void lessonExamplesNeverRepeatASentence() throws Exception {
+        learnerLanguage("turkish");
+        when(grammarRepo.getSentGrammarIds(12345L)).thenReturn(Set.of());
+        when(grammarBankService.getAllLessons()).thenReturn(List.of(
+            new GrammarLesson("lesson-1", "A1", "Numbers", "Sayılar", "c", "c")));
+        when(grammarBankService.getPodcastInfo("tr")).thenReturn(Map.of());
+        // The same sentence twice: stored twice for one word, or linked through another word
+        when(jdbc.queryForList(contains("sentence_grammar_links"))).thenReturn(List.of(
+            sentenceRow("lesson-1", "Üks aasta on 12 kuud.", "aasta"),
+            sentenceRow("lesson-1", "Üks aasta on 12 kuud.", "aasta"),
+            sentenceRow("lesson-1", "Mul ei ole aega.", "aeg"),
+            sentenceRow("lesson-1", "Üks aasta on 12 kuud.", "kuu")));
+
+        mvc.perform(get("/api/grammar/lessons").header("X-User-Id", AUTH))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.lessons[0].sentences.length()").value(2))
+            .andExpect(jsonPath("$.lessons[0].sentences[0].estonian").value("Üks aasta on 12 kuud."))
+            .andExpect(jsonPath("$.lessons[0].sentences[1].estonian").value("Mul ei ole aega."));
+    }
+
+    private static Map<String, Object> sentenceRow(String lessonId, String estonian, String word) {
+        Map<String, Object> row = new HashMap<>();
+        row.put("grammar_lesson_id", lessonId);
+        row.put("sentence_estonian", estonian);
+        row.put("sentence_english", "en");
+        row.put("sentence_turkish", "tr");
+        row.put("word", word);
+        return row;
+    }
+
+    @Test
     void grammarFeedUsesLearnerLanguage() throws Exception {
         learnerLanguage("english");
         when(subscriberRepo.getSubscriberLevel(12345L)).thenReturn("A1");

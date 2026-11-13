@@ -113,7 +113,8 @@ public class CandidateRepository {
             "SELECT estonian, english, turkish, sort_order FROM candidate_sentences WHERE candidate_id = ? ORDER BY sort_order", id);
         for (Map<String, Object> s : sents) {
             jdbc.update(
-                "INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VALUES (?, ?, ?, ?, ?) " +
+                "ON CONFLICT (word_id, estonian) DO NOTHING",
                 wordId, s.get("estonian"), s.get("english"), s.get("turkish"), s.get("sort_order"));
         }
 
@@ -164,7 +165,8 @@ public class CandidateRepository {
 
             for (Map<String, Object> s : sentMap.getOrDefault(candidateId, List.of())) {
                 jdbc.update(
-                    "INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VALUES (?, ?, ?, ?, ?)",
+                    "INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VALUES (?, ?, ?, ?, ?) " +
+                "ON CONFLICT (word_id, estonian) DO NOTHING",
                     wordId, s.get("estonian"), s.get("english"), s.get("turkish"), s.get("sort_order"));
             }
 

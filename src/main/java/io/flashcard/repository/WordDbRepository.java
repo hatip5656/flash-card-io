@@ -116,7 +116,8 @@ public class WordDbRepository {
             for (int i = 0; i < sentences.size(); i++) {
                 Map<String, String> s = sentences.get(i);
                 jdbc.update(
-                    "INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VALUES (?, ?, ?, ?, ?)",
+                    "INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VALUES (?, ?, ?, ?, ?) " +
+                "ON CONFLICT (word_id, estonian) DO NOTHING",
                     id, s.get("estonian"), s.get("english"), s.get("turkish"), i);
             }
         }
@@ -232,7 +233,8 @@ public class WordDbRepository {
 
     public void insertSentence(String wordId, String estonian, String english, String turkish, int sortOrder) {
         jdbc.update(
-            "INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO word_sentences (word_id, estonian, english, turkish, sort_order) VALUES (?, ?, ?, ?, ?) " +
+                "ON CONFLICT (word_id, estonian) DO NOTHING",
             wordId, estonian, english, turkish, sortOrder);
     }
 

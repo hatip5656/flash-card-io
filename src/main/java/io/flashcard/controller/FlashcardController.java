@@ -148,9 +148,12 @@ public class FlashcardController {
             for (var row : sentRows) {
                 String lessonId = (String) row.get("grammar_lesson_id");
                 var list = sentencesMap.computeIfAbsent(lessonId, k -> new java.util.ArrayList<>());
-                if (list.size() < 5) {
+                String estonian = (String) row.get("sentence_estonian");
+                // A sentence can come twice (linked through two words): show it once
+                boolean shown = list.stream().anyMatch(sent -> sent.get("estonian").equals(estonian));
+                if (list.size() < 5 && !shown) {
                     var sent = new java.util.LinkedHashMap<String, String>();
-                    sent.put("estonian", (String) row.get("sentence_estonian"));
+                    sent.put("estonian", estonian);
                     sent.put("english", (String) row.get("sentence_english"));
                     sent.put("turkish", (String) row.get("sentence_turkish"));
                     sent.put("word", (String) row.get("word"));
