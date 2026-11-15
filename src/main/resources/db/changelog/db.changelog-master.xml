@@ -51,5 +51,6 @@
     <include file="db/changelog/044-unique-word-sentences.sql"/>
     <include file="db/changelog/045-quiz-bank.sql"/>
     <include file="db/changelog/046-quiz-bank-round2.sql"/>
+    <include file="db/changelog/047-quiz-bank-round3.sql"/>
 
 </databaseChangeLog>
