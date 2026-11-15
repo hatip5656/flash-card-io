@@ -4,10 +4,11 @@ import io.flashcard.model.QuizAnswer;
 import io.flashcard.model.QuizResult;
 import io.flashcard.model.QuizSession;
 import io.flashcard.model.UserPreferences;
-import io.flashcard.model.Word;
 import io.flashcard.repository.QuizRepository;
 import io.flashcard.repository.SentWordRepository;
 import io.flashcard.repository.SubscriberRepository;
+import io.flashcard.service.QuizBankService;
+import io.flashcard.service.QuizGenerator;
 import io.flashcard.service.WordBankService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +27,12 @@ public class QuizController {
     private final SentWordRepository sentWordRepo;
     private final SubscriberRepository subscriberRepo;
     private final WordBankService wordBankService;
+    private final QuizBankService quizBank;
 
     public QuizController(QuizRepository quizRepo, SentWordRepository sentWordRepo,
-                          SubscriberRepository subscriberRepo, WordBankService wordBankService) {
+                          SubscriberRepository subscriberRepo, WordBankService wordBankService,
+                          QuizBankService quizBank) {
+        this.quizBank = quizBank;
         this.quizRepo = quizRepo;
         this.sentWordRepo = sentWordRepo;
         this.subscriberRepo = subscriberRepo;
@@ -42,7 +46,6 @@ public class QuizController {
         UserPreferences prefs = subscriberRepo.getPreferences(chatId);
         boolean useTurkish = "turkish".equals(prefs.getNativeLanguage());
 
-        Map<String, String> turkishLookup = useTurkish ? buildTurkishLookup() : Map.of();
         List<Map<String, Object>> allWords = sentWordRepo.getLearnedWordsForQuiz(chatId);
 
         if (allWords.size() < 4) {
@@ -56,44 +59,27 @@ public class QuizController {
         List<Map<String, Object>> missed = quizRepo.getMostMissedWords(chatId, Math.min(count, 20));
         Set<String> missedSet = missed.stream().map(m -> (String) m.get("estonian")).collect(Collectors.toSet());
 
-        List<Map<String, Object>> prioritized = new ArrayList<>();
-        prioritized.addAll(allWords.stream().filter(w -> missedSet.contains(w.get("word_value"))).toList());
-        prioritized.addAll(allWords.stream().filter(w -> !missedSet.contains(w.get("word_value"))).toList());
-        List<Map<String, Object>> selected = prioritized.subList(0, Math.min(count, prioritized.size()));
+        List<String> candidates = new ArrayList<>(allWords.stream().map(w -> (String) w.get("word_value"))
+            .filter(missedSet::contains).toList());
+        allWords.stream().map(w -> (String) w.get("word_value")).filter(w -> !missedSet.contains(w)).forEach(candidates::add);
+        List<String> learned = allWords.stream().map(w -> (String) w.get("word_value")).toList();
 
-        String typeLabel = useTurkish ? "tr" : "eng";
+        // Answered one by one with a chosen option: multiple choice only
+        List<Map<String, Object>> generated = new QuizGenerator(quizBank, wordBankService.getAllWords())
+            .questions(candidates, learned, count, useTurkish, false, new Random());
+        if (generated.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", useTurkish
+                ? "Quiz icin uygun kelime bulunamadi. Ogrenmeye devam et!"
+                : "No words ready for a quiz yet. Keep learning!"));
+        }
         List<QuizSession.QuizQuestion> questions = new ArrayList<>();
         List<QuizSession.QuizWord> words = new ArrayList<>();
-        Random rnd = new Random();
-
-        for (int i = 0; i < selected.size(); i++) {
-            Map<String, Object> word = selected.get(i);
-            String estonian = (String) word.get("word_value");
-            String english = (String) word.get("english");
-            String nativeT = useTurkish && turkishLookup.containsKey(estonian) ? turkishLookup.get(estonian) : english;
-
-            boolean isEstToNative = rnd.nextBoolean();
-            String correct = isEstToNative ? nativeT : estonian;
-            List<String> pool = allWords.stream()
-                .filter(w -> !w.get("word_value").equals(estonian))
-                .map(w -> {
-                    String est = (String) w.get("word_value");
-                    String eng = (String) w.get("english");
-                    return isEstToNative ? (useTurkish && turkishLookup.containsKey(est) ? turkishLookup.get(est) : eng) : est;
-                }).collect(Collectors.toList());
-            Collections.shuffle(pool);
-            List<String> distractors = pool.subList(0, Math.min(3, pool.size()));
-            List<String> options = new ArrayList<>(distractors);
-            options.add(correct);
-            Collections.shuffle(options);
-
-            questions.add(new QuizSession.QuizQuestion(
-                i,
-                isEstToNative ? "est-to-" + typeLabel : typeLabel + "-to-est",
-                isEstToNative ? estonian : nativeT,
-                options,
-                options.indexOf(correct)));
-            words.add(new QuizSession.QuizWord(estonian, english));
+        for (Map<String, Object> q : generated) {
+            @SuppressWarnings("unchecked") List<String> options = (List<String>) q.get("options");
+            @SuppressWarnings("unchecked") Map<String, String> word = (Map<String, String>) q.get("word");
+            questions.add(new QuizSession.QuizQuestion((int) q.get("index"), (String) q.get("type"),
+                (String) q.get("prompt"), options, (int) q.get("correctIndex")));
+            words.add(new QuizSession.QuizWord(word.get("estonian"), word.get("english")));
         }
 
         quizRepo.upsertQuizSession(chatId, questions, words);
@@ -214,11 +200,5 @@ public class QuizController {
     public List<Map<String, Object>> getMissedWords(HttpServletRequest request,
                                                      @RequestParam(defaultValue = "20") int limit) {
         return quizRepo.getMostMissedWords(getUserId(request), Math.min(limit, 50));
-    }
-
-    private Map<String, String> buildTurkishLookup() {
-        return wordBankService.getAllWords().stream()
-            .filter(w -> w.getTurkish() != null)
-            .collect(Collectors.toMap(Word::getEstonian, Word::getTurkish, (a, b) -> a));
     }
 }

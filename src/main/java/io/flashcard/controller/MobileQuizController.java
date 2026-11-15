@@ -2,12 +2,13 @@ package io.flashcard.controller;
 
 import io.flashcard.model.QuizAnswer;
 import io.flashcard.model.UserPreferences;
-import io.flashcard.model.Word;
 import io.flashcard.repository.QuizRepository;
 import io.flashcard.repository.SentWordRepository;
 import io.flashcard.repository.SubscriberRepository;
 import io.flashcard.repository.ActivityRepository;
 import io.flashcard.service.DailyGoalService;
+import io.flashcard.service.QuizBankService;
+import io.flashcard.service.QuizGenerator;
 import io.flashcard.service.WordBankService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
@@ -29,10 +30,13 @@ public class MobileQuizController {
     private final WordBankService wordBankService;
 
     private final DailyGoalService dailyGoals;
+    private final QuizBankService quizBank;
 
     public MobileQuizController(QuizRepository quizRepo, SentWordRepository sentWordRepo,
                                 SubscriberRepository subscriberRepo, ActivityRepository activityRepo,
-                                WordBankService wordBankService, DailyGoalService dailyGoals) {
+                                WordBankService wordBankService, DailyGoalService dailyGoals,
+                                QuizBankService quizBank) {
+        this.quizBank = quizBank;
         this.dailyGoals = dailyGoals;
         this.quizRepo = quizRepo;
         this.sentWordRepo = sentWordRepo;
@@ -43,13 +47,14 @@ public class MobileQuizController {
 
     @GetMapping("/generate")
     public ResponseEntity<?> generateQuiz(HttpServletRequest request,
-                                           @RequestParam(defaultValue = "10") int count) {
+                                           @RequestParam(defaultValue = "10") int count,
+                                           // false for the feed cards and the widget, which can't take typed answers
+                                           @RequestParam(defaultValue = "true") boolean typed) {
         long chatId = getUserId(request);
         count = Math.min(Math.max(count, 5), 50);
 
         UserPreferences prefs = subscriberRepo.getPreferences(chatId);
         boolean useTurkish = "turkish".equals(prefs.getNativeLanguage());
-        Map<String, String> turkishLookup = useTurkish ? buildTurkishLookup() : Map.of();
 
         List<Map<String, Object>> allWords = sentWordRepo.getLearnedWordsForQuiz(chatId);
         if (allWords.size() < 4) {
@@ -73,65 +78,17 @@ public class MobileQuizController {
             .filter(w -> !missedIds.contains(w.get("word_value"))).toList());
         // Keep DB order: viewed-but-never-quizzed first, then by ease_factor (struggling)
 
-        List<Map<String, Object>> selected = new ArrayList<>(missedWords);
-        selected.addAll(otherWords.subList(0, Math.min(count - missedWords.size(), otherWords.size())));
-        Collections.shuffle(selected);
+        // Missed words first, then the rest in the database's order; words that can't make a fair
+        // question are skipped and the next one takes their place
+        List<String> candidates = new ArrayList<>(missedWords.stream().map(w -> (String) w.get("word_value")).toList());
+        otherWords.forEach(w -> candidates.add((String) w.get("word_value")));
+        List<String> learned = allWords.stream().map(w -> (String) w.get("word_value")).toList();
 
-        String typeLabel = useTurkish ? "tr" : "eng";
         Random rnd = new Random();
-        List<Map<String, Object>> questions = new ArrayList<>();
-
-        for (int i = 0; i < selected.size(); i++) {
-            Map<String, Object> word = selected.get(i);
-            String estonian = (String) word.get("word_value");
-            String english = (String) word.get("english");
-            String nativeT = useTurkish && turkishLookup.containsKey(estonian) ? turkishLookup.get(estonian) : english;
-
-            // ~20% fill-blank questions for words with sentences
-            Word fullWord = wordBankService.getAllWords().stream()
-                .filter(w -> w.getEstonian().equals(estonian)).findFirst().orElse(null);
-            if (rnd.nextInt(5) == 0 && fullWord != null && fullWord.getSentences() != null && !fullWord.getSentences().isEmpty()) {
-                Word.Sentence sent = fullWord.getSentences().get(rnd.nextInt(fullWord.getSentences().size()));
-                String sentenceEst = sent.estonian();
-                if (sentenceEst != null && sentenceEst.toLowerCase().contains(estonian.toLowerCase())) {
-                    String blanked = sentenceEst.replaceFirst("(?i)" + java.util.regex.Pattern.quote(estonian), "___");
-                    String hint = estonian.substring(0, 1);
-                    questions.add(Map.of(
-                        "index", i,
-                        "type", "fill_blank",
-                        "prompt", blanked,
-                        "hint", hint,
-                        "correctAnswer", estonian,
-                        "options", List.of(),
-                        "correctIndex", -1,
-                        "word", Map.of("estonian", estonian, "english", english)));
-                    continue;
-                }
-            }
-
-            boolean isEstToNative = rnd.nextBoolean();
-            String correct = isEstToNative ? nativeT : estonian;
-            List<String> pool = allWords.stream()
-                .filter(w -> !w.get("word_value").equals(estonian))
-                .map(w -> {
-                    String est = (String) w.get("word_value");
-                    String eng = (String) w.get("english");
-                    return isEstToNative ? (useTurkish && turkishLookup.containsKey(est) ? turkishLookup.get(est) : eng) : est;
-                }).collect(Collectors.toList());
-            Collections.shuffle(pool);
-            List<String> distractors = pool.subList(0, Math.min(3, pool.size()));
-            List<String> options = new ArrayList<>(distractors);
-            options.add(correct);
-            Collections.shuffle(options);
-
-            questions.add(Map.of(
-                "index", i,
-                "type", isEstToNative ? "est-to-" + typeLabel : typeLabel + "-to-est",
-                "prompt", isEstToNative ? estonian : nativeT,
-                "options", options,
-                "correctIndex", options.indexOf(correct),
-                "word", Map.of("estonian", estonian, "english", english)));
-        }
+        List<Map<String, Object>> questions = new QuizGenerator(quizBank, wordBankService.getAllWords())
+            .questions(candidates, learned, count, useTurkish, typed, rnd);
+        Collections.shuffle(questions, rnd);
+        for (int i = 0; i < questions.size(); i++) questions.get(i).put("index", i);
 
         return ResponseEntity.ok(Map.of("totalQuestions", questions.size(), "questions", questions));
     }
@@ -198,12 +155,6 @@ public class MobileQuizController {
         }
 
         return ResponseEntity.ok(response);
-    }
-
-    private Map<String, String> buildTurkishLookup() {
-        return wordBankService.getAllWords().stream()
-            .filter(w -> w.getTurkish() != null)
-            .collect(Collectors.toMap(Word::getEstonian, Word::getTurkish, (a, b) -> a));
     }
 
     @PostMapping("/answer")

@@ -5,6 +5,7 @@ import io.flashcard.repository.QuizRepository;
 import io.flashcard.repository.SentWordRepository;
 import io.flashcard.repository.SubscriberRepository;
 import io.flashcard.service.DailyGoalService;
+import io.flashcard.service.QuizBankService;
 import io.flashcard.service.WordBankService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class MobileQuizControllerTest {
         SubscriberRepository subscribers = mock(SubscriberRepository.class);
         when(subscribers.getSubscriberLevel(USER)).thenReturn("B2"); // no level-up check in the response
         mvc = MockMvcBuilders.standaloneSetup(new MobileQuizController(mock(QuizRepository.class), sentWords,
-            subscribers, mock(ActivityRepository.class), mock(WordBankService.class), goals)).build();
+            subscribers, mock(ActivityRepository.class), mock(WordBankService.class), goals, mock(QuizBankService.class))).build();
     }
 
     // The goal counts a review only if the word was due, so it must look before the answer moves the date
