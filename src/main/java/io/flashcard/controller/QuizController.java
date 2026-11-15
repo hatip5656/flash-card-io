@@ -66,7 +66,7 @@ public class QuizController {
 
         // Answered one by one with a chosen option: multiple choice only
         List<Map<String, Object>> generated = new QuizGenerator(quizBank, wordBankService.getAllWords())
-            .questions(candidates, learned, count, useTurkish, false, new Random());
+            .questions(candidates, learned, count, useTurkish, false, subscriberRepo.getSubscriberLevel(chatId), new Random());
         if (generated.isEmpty()) {
             return ResponseEntity.badRequest().body(Map.of("error", useTurkish
                 ? "Quiz icin uygun kelime bulunamadi. Ogrenmeye devam et!"

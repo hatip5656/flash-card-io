@@ -62,6 +62,17 @@ class QuizBankServiceTest {
     }
 
     @Test
+    void readsTheFormLevelAndTheCuratedConfusables() {
+        Map<String, Object> it = item("elama", "Ma elan Tallinnas.", "elan", "IndPrSg1",
+            new String[]{"elab", "elame", "elama"}, new String[]{});
+        it.put("level", "A1");
+        Map<String, Entry> bank = QuizBankService.fromRows(List.of(word("elama", "verb")), List.of(it),
+            List.of(Map.of("estonian", "elama", "distractor", "surema"), Map.of("estonian", "elama", "distractor", "sündima")));
+        assertEquals("A1", bank.get("elama").items().get(0).level());
+        assertEquals(List.of("surema", "sündima"), bank.get("elama").confusables());
+    }
+
+    @Test
     void keepsWordTypeAndBadMeaningFlagsForWordsWithoutItems() {
         Map<String, Entry> bank = QuizBankService.fromRows(List.of(word("riisuma", "verb", "tr")), List.of());
         assertEquals(Set.of("tr"), bank.get("riisuma").badMeaning());

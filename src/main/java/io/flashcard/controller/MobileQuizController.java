@@ -86,7 +86,7 @@ public class MobileQuizController {
 
         Random rnd = new Random();
         List<Map<String, Object>> questions = new QuizGenerator(quizBank, wordBankService.getAllWords())
-            .questions(candidates, learned, count, useTurkish, typed, rnd);
+            .questions(candidates, learned, count, useTurkish, typed, subscriberRepo.getSubscriberLevel(chatId), rnd);
         Collections.shuffle(questions, rnd);
         for (int i = 0; i < questions.size(); i++) questions.get(i).put("index", i);
 

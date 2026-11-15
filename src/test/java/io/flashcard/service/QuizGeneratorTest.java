@@ -162,7 +162,50 @@ class QuizGeneratorTest {
             new Item("See on maja.", "See on ___.", "maja", "SgN", List.of("majas", "majja", "majast"), List.of()))));
         var gen = new QuizGenerator(new QuizBankService(items), BANK);
         assertTrue(gen.question("maja", QuizGenerator.Kind.TYPED, LEARNED, true, new Random(1)).isEmpty());
-        assertTrue(gen.question("maja", QuizGenerator.Kind.FORM_CHOICE, LEARNED, true, new Random(1)).isPresent());
+    }
+
+    @Test
+    void formChoiceNeverAsksForTheDictionaryForm() {
+        // The clue names the dictionary form, and guessing it is a known shortcut: such items aren't form questions
+        Map<String, Entry> items = new HashMap<>(ITEMS);
+        items.put("maja", new Entry("maja", "noun", List.of(
+            new Item("See on maja.", "See on ___.", "maja", "SgN", List.of("majas", "majja", "majast"), List.of()))));
+        var gen = new QuizGenerator(new QuizBankService(items), BANK);
+        assertTrue(gen.question("maja", QuizGenerator.Kind.FORM_CHOICE, LEARNED, true, new Random(1)).isEmpty());
+    }
+
+    @Test
+    void meaningOptionsComeFromTheCuratedConfusablesFirst() {
+        Map<String, Entry> items = new HashMap<>(ITEMS);
+        items.put("kirjutama", new Entry("kirjutama", "verb", ITEMS.get("kirjutama").items(), Set.of(),
+            List.of("lugema", "jooma", "magama")));
+        var gen = new QuizGenerator(new QuizBankService(items), BANK);
+        for (int seed = 0; seed < 30; seed++) {
+            var q = gen.question("kirjutama", QuizGenerator.Kind.TO_NATIVE, LEARNED, true, new Random(seed)).orElseThrow();
+            assertEquals(Set.of("yazmak", "okumak", "içmek", "uyumak"), new HashSet<>((List<?>) q.get("options")));
+        }
+    }
+
+    @Test
+    void curatedConfusablesThatShareTheMeaningAreStillSkipped() {
+        Map<String, Entry> items = new HashMap<>(ITEMS);
+        for (String w : List.of("loosung", "hüüdlause", "tunnuslause")) items.put(w, new Entry(w, "noun", List.of()));
+        items.put("moto", new Entry("moto", "noun", List.of(), Set.of(), List.of("loosung", "maja", "koer", "laud")));
+        var gen = new QuizGenerator(new QuizBankService(items), BANK);
+        var q = gen.question("moto", QuizGenerator.Kind.TO_NATIVE, LEARNED, true, new Random(2)).orElseThrow();
+        assertEquals(1, ((List<?>) q.get("options")).stream().filter(o -> o.toString().contains("slogan")).count());
+    }
+
+    @Test
+    void gapItemsAboveTheLearnersLevelAreKeptForLater() {
+        Map<String, Entry> items = new HashMap<>(ITEMS);
+        items.put("kirjutama", new Entry("kirjutama", "verb", List.of(
+            new Item("Ma kirjutan kirja.", "Ma ___ kirja.", "kirjutan", "IndPrSg1",
+                List.of("kirjutab", "kirjutama", "kirjutada"), List.of(), "B1"))));
+        var gen = new QuizGenerator(new QuizBankService(items), BANK);
+        assertTrue(gen.question("kirjutama", QuizGenerator.Kind.FORM_CHOICE, LEARNED, true, "A1", new Random(1)).isEmpty());
+        assertTrue(gen.question("kirjutama", QuizGenerator.Kind.FORM_CHOICE, LEARNED, true, "B1", new Random(1)).isPresent());
+        assertTrue(gen.question("kirjutama", QuizGenerator.Kind.FORM_CHOICE, LEARNED, true, "B2", new Random(1)).isPresent());
     }
 
     @Test

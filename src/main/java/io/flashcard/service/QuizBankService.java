@@ -27,13 +27,28 @@ public class QuizBankService {
 
     private static final Logger log = LoggerFactory.getLogger(QuizBankService.class);
 
-    /** {@code form} is Ekilex's morph code of the answer, e.g. IndPrSg1. */
+    /**
+     * {@code form} is Ekilex's morph code of the answer, e.g. IndPrSg1; {@code level} the CEFR level at which
+     * learners meet that form ({@code morph_form_levels}), null when unknown.
+     */
     public record Item(String sentence, String gap, String answer, String form,
-                       List<String> formOptions, List<String> wordOptions) {}
+                       List<String> formOptions, List<String> wordOptions, String level) {
+        public Item(String sentence, String gap, String answer, String form,
+                    List<String> formOptions, List<String> wordOptions) {
+            this(sentence, gap, answer, form, formOptions, wordOptions, null);
+        }
+    }
 
-    /** {@code badMeaning} names the stored meanings ("tr", "en") that are wrong or untranslated. */
-    public record Entry(String estonian, String pos, List<Item> items, Set<String> badMeaning) {
-        public Entry(String estonian, String pos, List<Item> items) { this(estonian, pos, items, Set.of()); }
+    /**
+     * {@code badMeaning} names the stored meanings ("tr", "en") that are wrong or untranslated;
+     * {@code confusables} are hand-picked words of the same type whose meanings a learner could mix up with
+     * this one (same field or look-alike), used first as wrong options in meaning questions.
+     */
+    public record Entry(String estonian, String pos, List<Item> items, Set<String> badMeaning, List<String> confusables) {
+        public Entry(String estonian, String pos, List<Item> items) { this(estonian, pos, items, Set.of(), List.of()); }
+        public Entry(String estonian, String pos, List<Item> items, Set<String> badMeaning) {
+            this(estonian, pos, items, badMeaning, List.of());
+        }
     }
 
     private final JdbcTemplate jdbc;
@@ -59,13 +74,22 @@ public class QuizBankService {
             List<Map<String, Object>> words = jdbc.queryForList(
                 "SELECT estonian, pos, quiz_bad_meaning FROM words WHERE pos IS NOT NULL");
             List<Map<String, Object>> items = jdbc.queryForList("""
-                SELECT w.estonian, s.estonian AS sentence, i.answer, i.morph_code, i.form_options, i.word_options
+                SELECT w.estonian, s.estonian AS sentence, i.answer, i.morph_code, i.form_options, i.word_options,
+                       l.cefr_level AS level
                 FROM word_quiz_items i
                 JOIN words w ON w.id = i.word_id
                 JOIN word_sentences s ON s.id = i.sentence_id
+                LEFT JOIN morph_form_levels l ON l.morph_code = i.morph_code
                 ORDER BY i.id
                 """);
-            Map<String, Entry> loaded = fromRows(words, items);
+            List<Map<String, Object>> confusables = jdbc.queryForList("""
+                SELECT w.estonian, d.estonian AS distractor
+                FROM word_quiz_confusables c
+                JOIN words w ON w.id = c.word_id
+                JOIN words d ON d.id = c.distractor_id
+                ORDER BY c.word_id, c.sort_order
+                """);
+            Map<String, Entry> loaded = fromRows(words, items, confusables);
             byWord = Map.copyOf(loaded);
             log.info("[quiz-bank] {} words, {} gap items", loaded.size(),
                 loaded.values().stream().mapToInt(e -> e.items().size()).sum());
@@ -75,6 +99,15 @@ public class QuizBankService {
     }
 
     static Map<String, Entry> fromRows(List<Map<String, Object>> words, List<Map<String, Object>> items) {
+        return fromRows(words, items, List.of());
+    }
+
+    static Map<String, Entry> fromRows(List<Map<String, Object>> words, List<Map<String, Object>> items,
+                                       List<Map<String, Object>> confusables) {
+        Map<String, List<String>> confusablesByWord = new HashMap<>();
+        for (Map<String, Object> r : confusables) {
+            confusablesByWord.computeIfAbsent((String) r.get("estonian"), k -> new ArrayList<>()).add((String) r.get("distractor"));
+        }
         Map<String, List<Item>> itemsByWord = new HashMap<>();
         for (Map<String, Object> r : items) {
             String sentence = (String) r.get("sentence");
@@ -84,14 +117,15 @@ public class QuizBankService {
             if (gap == null) continue;
             itemsByWord.computeIfAbsent((String) r.get("estonian"), k -> new ArrayList<>()).add(new Item(
                 sentence, gap, answer, (String) r.get("morph_code"),
-                strings(r.get("form_options")), strings(r.get("word_options"))));
+                strings(r.get("form_options")), strings(r.get("word_options")), (String) r.get("level")));
         }
         Map<String, Entry> out = new HashMap<>();
         for (Map<String, Object> r : words) {
             String est = (String) r.get("estonian");
             out.put(est, new Entry(est, (String) r.get("pos"),
                 List.copyOf(itemsByWord.getOrDefault(est, List.of())),
-                Set.copyOf(strings(r.get("quiz_bad_meaning")))));
+                Set.copyOf(strings(r.get("quiz_bad_meaning"))),
+                List.copyOf(confusablesByWord.getOrDefault(est, List.of()))));
         }
         return out;
     }

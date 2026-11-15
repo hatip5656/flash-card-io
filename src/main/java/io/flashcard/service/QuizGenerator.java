@@ -42,13 +42,19 @@ public class QuizGenerator {
      */
     public List<Map<String, Object>> questions(List<String> candidates, List<String> learned, int count,
                                                boolean turkish, boolean typed, Random rnd) {
+        return questions(candidates, learned, count, turkish, typed, null, rnd);
+    }
+
+    /** {@code level}: the learner's CEFR level; gap items testing forms above it wait. Null: no limit. */
+    public List<Map<String, Object>> questions(List<String> candidates, List<String> learned, int count,
+                                               boolean turkish, boolean typed, String level, Random rnd) {
         List<Map<String, Object>> out = new ArrayList<>();
         Set<String> used = new HashSet<>();
         for (String est : candidates) {
             if (out.size() >= count) break;
             if (!used.add(est) || !byEstonian.containsKey(est)) continue;
             for (Kind kind : kindsToTry(est, typed, rnd)) {
-                Optional<Map<String, Object>> q = question(est, kind, learned, turkish, rnd);
+                Optional<Map<String, Object>> q = question(est, kind, learned, turkish, level, rnd);
                 if (q.isPresent()) {
                     q.get().put("index", out.size());
                     out.add(q.get());
@@ -88,12 +94,26 @@ public class QuizGenerator {
     }
 
     public Optional<Map<String, Object>> question(String est, Kind kind, List<String> learned, boolean turkish, Random rnd) {
+        return question(est, kind, learned, turkish, null, rnd);
+    }
+
+    public Optional<Map<String, Object>> question(String est, Kind kind, List<String> learned, boolean turkish,
+                                                  String level, Random rnd) {
         Word w = byEstonian.get(est);
         if (w == null) return Optional.empty();
         return switch (kind) {
             case TO_NATIVE, TO_ESTONIAN -> meaning(w, kind == Kind.TO_NATIVE, learned, turkish, rnd);
-            case FORM_CHOICE, WORD_CHOICE, TYPED -> gap(w, kind, turkish, rnd);
+            case FORM_CHOICE, WORD_CHOICE, TYPED -> gap(w, kind, turkish, level, rnd);
         };
+    }
+
+    private static final List<String> LEVELS = List.of("A1", "A2", "B1", "B2", "C1");
+
+    /** True when the item's form is at or below the learner's level (or either is unknown). */
+    static boolean withinLevel(String itemLevel, String learnerLevel) {
+        int item = itemLevel == null ? -1 : LEVELS.indexOf(itemLevel);
+        int learner = learnerLevel == null ? -1 : LEVELS.indexOf(learnerLevel);
+        return item < 0 || learner < 0 || item <= learner;
     }
 
     // ── Meaning questions ──
@@ -111,7 +131,12 @@ public class QuizGenerator {
         List<Word> bankPool = new ArrayList<>(words);
         Collections.shuffle(bankPool, rnd);
         bankPool.sort(Comparator.comparing((Word x) -> !Objects.equals(x.getCefrLevel(), w.getCefrLevel())));
-        List<Word> pool = new ArrayList<>(learnedPool);
+        // Hand-picked confusables first (same field or look-alike: a real test of the meaning), shuffled
+        List<Word> curated = new ArrayList<>(bank.get(w.getEstonian()).map(Entry::confusables).orElse(List.of())
+            .stream().map(byEstonian::get).filter(Objects::nonNull).toList());
+        Collections.shuffle(curated, rnd);
+        List<Word> pool = new ArrayList<>(curated);
+        pool.addAll(learnedPool);
         pool.addAll(bankPool);
 
         List<Word> candidates = new ArrayList<>();
@@ -129,7 +154,8 @@ public class QuizGenerator {
         }
 
         List<Word> distractors = new ArrayList<>();
-        if (!toNative) {
+        int curatedFit = (int) candidates.stream().filter(curated::contains).count();
+        if (!toNative && curatedFit < 3) {
             // Look-alikes first: the learner has to know the word, not just its shape
             candidates.sort(Comparator.comparingDouble((Word c) -> -similarity(w.getEstonian(), c.getEstonian())));
             candidates = new ArrayList<>(candidates.subList(0, Math.min(6, candidates.size())));
@@ -160,12 +186,15 @@ public class QuizGenerator {
 
     // ── Exam-style gap questions ──
 
-    private Optional<Map<String, Object>> gap(Word w, Kind kind, boolean turkish, Random rnd) {
+    private Optional<Map<String, Object>> gap(Word w, Kind kind, boolean turkish, String level, Random rnd) {
         Optional<Entry> entry = bank.get(w.getEstonian());
         if (entry.isEmpty()) return Optional.empty();
         List<Item> items = entry.get().items().stream()
+            .filter(i -> withinLevel(i.level(), level))
             .filter(i -> switch (kind) {
-                case FORM_CHOICE -> i.formOptions() != null && i.formOptions().size() == 3;
+                // The dictionary form is named in the clue and is the first guess: never the answer to pick
+                case FORM_CHOICE -> i.formOptions() != null && i.formOptions().size() == 3
+                    && !i.answer().equalsIgnoreCase(w.getEstonian());
                 case WORD_CHOICE -> i.wordOptions() != null && i.wordOptions().size() == 3;
                 // The clue shows the dictionary form: typing that same form back would test nothing
                 default -> !i.answer().equalsIgnoreCase(w.getEstonian());
