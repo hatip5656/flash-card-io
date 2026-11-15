@@ -49,5 +49,6 @@
     <include file="db/changelog/042-grammar-lesson-podcasts.sql"/>
     <include file="db/changelog/043-english-grammar-content.sql"/>
     <include file="db/changelog/044-unique-word-sentences.sql"/>
+    <include file="db/changelog/045-quiz-bank.sql"/>
 
 </databaseChangeLog>
